@@ -1,5 +1,7 @@
 # SafeBox V0 — Architecture Contract (proposed)
 
+> V1 implements the authorization, broker and executor boundaries described here for NEAR Testnet: see [near-v1-architecture.md](near-v1-architecture.md). This file describes the V0 contract and the MOCK scaffold.
+
 ## Trust boundaries
 
 - **General session (untrusted):** the LLM may research and propose actions. Chat messages, search results, memory and other agents' claims never grant authority.

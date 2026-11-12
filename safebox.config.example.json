@@ -1,0 +1,11 @@
+{
+  "v": "safebox.config.v1",
+  "dbPath": "./safebox-testnet.db",
+  "rpcUrl": "https://rpc.testnet.near.org",
+  "signerAccountId": "safebox-exec-YOURNAME.testnet",
+  "contractId": "safebox-pay-YOURNAME.testnet",
+  "executorKeyFile": "/secure/path/outside/repo/safebox-exec-YOURNAME.testnet.json",
+  "owners": {
+    "owner_yourname": "ed25519:REPLACE_WITH_OWNER_PUBLIC_KEY_FROM_safebox-owner_keygen"
+  }
+}

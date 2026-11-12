@@ -1,11 +1,11 @@
-name: SafeBox mock CI
+name: SafeBox CI
 on:
   push:
   pull_request:
 permissions:
   contents: read
 jobs:
-  mock-contract:
+  node:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,5 +15,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+      - run: npm ci
       - run: npm test
       - run: npm run demo
+      - run: npm run demo:v1
+      - name: Testnet demo must refuse without prerequisites
+        run: node demo/testnet-v1.mjs || test $? -eq 2
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo test --manifest-path contract/Cargo.toml
+      - run: cargo build --manifest-path contract/Cargo.toml --release --target wasm32-unknown-unknown
