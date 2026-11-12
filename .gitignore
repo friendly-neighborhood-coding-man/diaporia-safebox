@@ -147,3 +147,12 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# SafeBox local state and secrets
+*.db
+*.db-wal
+*.db-shm
+safebox.config.json
+*.key.json
+keys/
+contract/target/

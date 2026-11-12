@@ -1,6 +1,6 @@
 # NEAR Testnet MVP — Work Plan
 
-**Planned, not implemented.** The initial scaffold cannot sign, submit or verify a NEAR transaction.
+**Status (V1, branch `feature/near-testnet-v1`):** work packages 1–8 are implemented and tested offline against a simulated chain; a live Testnet transaction has not yet been executed. See [near-v1-test-report.md](near-v1-test-report.md). The V0 mock below remains unchanged.
 
 ## Target demonstration
 

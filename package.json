@@ -1,13 +1,22 @@
 {
   "name": "diaporia-safebox",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "scripts": {
-    "test": "node --test",
-    "demo": "node demo/mock-flow.mjs"
+    "test": "node --disable-warning=ExperimentalWarning --test",
+    "test:contract": "cargo test --manifest-path contract/Cargo.toml",
+    "build:contract": "cargo build --manifest-path contract/Cargo.toml --release --target wasm32-unknown-unknown",
+    "demo": "node demo/mock-flow.mjs",
+    "demo:v1": "node --disable-warning=ExperimentalWarning demo/offline-v1.mjs",
+    "demo:testnet": "node --disable-warning=ExperimentalWarning demo/testnet-v1.mjs",
+    "evidence": "SAFEBOX_WRITE_EVIDENCE=1 node --disable-warning=ExperimentalWarning --test tests/v1/adversarial.test.mjs",
+    "vectors": "node scripts/gen-contract-vectors.mjs"
+  },
+  "dependencies": {
+    "near-api-js": "7.5.3"
   }
 }

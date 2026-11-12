@@ -79,25 +79,39 @@ The NEAR integration is the project's first implementation target.
 
 ---
 
-## Quickstart — MOCK contract only
+## Quickstart
 
-Requires **Node.js 22 or later**. No dependencies, keys, paid APIs or wallet are needed.
+Requires **Node.js 22.13 or later** (uses the built-in `node:sqlite`). Offline tests need no keys, wallet, network or funds.
 
 ```bash
 git clone https://github.com/friendly-neighborhood-coding-man/diaporia-safebox.git
 cd diaporia-safebox
-npm test
-npm run demo
+npm ci
+npm test               # V0 mock + V1 tests (V1 runs against a SIMULATED NEAR testnet)
+npm run demo           # V0 in-memory mock (unchanged)
+npm run demo:v1        # V1 end-to-end: proposal -> owner Ed25519 authorization -> signed NEAR tx -> verification (simulated chain)
+npm run test:contract  # Rust payment contract tests (Rust >= 1.95)
 ```
 
-The demo exercises a synthetic sealed intent, mismatched recipient/amount rejections, a single mock execution and replay denial. This is an **in-memory contract example**, not an implementation of real authentication, isolation, signing, payment or NEAR integration.
+### V1 — NEAR Testnet execution (experimental)
 
-**Current implementation:** typed-shape mock contract and 7 unit tests, on the bootstrap branch until merged. **Planned:** independent authentication, durable one-use mandates, actual network isolation and NEAR Testnet execution.
+- **Sealed intent** `safebox.intent.v1`: canonical, domain-separated, every execution field bound (testnet only).
+- **Independent authorization**: the owner signs the exact intent digest with an Ed25519 key held only by
+  `bin/safebox-owner.mjs`; SafeBox verifies it against a pinned public key. Agents cannot authorize.
+- **Durable capability broker**: SQLite compare-and-set lifecycle, single-use reservation, owner-signed
+  mandates, hash-chained append-only journal, crash recovery and UNKNOWN reconciliation.
+- **NEAR executor**: near-api-js transaction built only from the sealed record and re-checked before signing.
+- **Payment contract** (`contract/`): releases funds only for owner-signed, unexpired, one-use intents.
+- **Independent verification** from NEAR RPC transaction status, not from submission success.
 
-- [Architecture and trust boundaries](docs/architecture.md)
-- [Threat model and adversarial evaluation](docs/threat-model.md)
-- [NEAR Testnet implementation roadmap](docs/near-mvp.md)
-- [Security policy](SECURITY.md)
-- [Contributing](CONTRIBUTING.md)
+**Status: no live NEAR Testnet transaction has been executed yet.** All V1 execution evidence so far is
+from the simulated chain. The Testnet run needs operator-created Testnet accounts and keys:
+see the [operator guide](docs/near-v1-operator-guide.md) (`npm run demo:testnet`).
 
-**Security warning:** Never connect the mock approval method to real credentials, payments or mainnet funds. Its approval call is deliberately unauthenticated so the contract can be tested offline.
+- [V1 architecture](docs/near-v1-architecture.md) · [V1 security boundaries](docs/near-v1-security.md) ·
+  [V1 test report](docs/near-v1-test-report.md) · [V1 operator guide](docs/near-v1-operator-guide.md)
+- [V0 architecture and trust boundaries](docs/architecture.md) · [Threat model](docs/threat-model.md) ·
+  [NEAR roadmap](docs/near-mvp.md) · [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+
+**Security warning:** experimental Testnet prototype. Never use mainnet accounts or real funds. The V0 mock
+approval method is deliberately unauthenticated; never connect it to anything real.
