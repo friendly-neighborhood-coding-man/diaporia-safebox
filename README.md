@@ -76,3 +76,28 @@ This project is not intended for production financial transactions in its curren
 The NEAR integration is the project's first implementation target.
 
 *Let AI explore freely. Let only authorized actions execute.*
+
+---
+
+## Quickstart — MOCK contract only
+
+Requires **Node.js 22 or later**. No dependencies, keys, paid APIs or wallet are needed.
+
+```bash
+git clone https://github.com/friendly-neighborhood-coding-man/diaporia-safebox.git
+cd diaporia-safebox
+npm test
+npm run demo
+```
+
+The demo exercises a synthetic sealed intent, mismatched recipient/amount rejections, a single mock execution and replay denial. This is an **in-memory contract example**, not an implementation of real authentication, isolation, signing, payment or NEAR integration.
+
+**Current implementation:** typed-shape mock contract and 7 unit tests, on the bootstrap branch until merged. **Planned:** independent authentication, durable one-use mandates, actual network isolation and NEAR Testnet execution.
+
+- [Architecture and trust boundaries](docs/architecture.md)
+- [Threat model and adversarial evaluation](docs/threat-model.md)
+- [NEAR Testnet implementation roadmap](docs/near-mvp.md)
+- [Security policy](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+
+**Security warning:** Never connect the mock approval method to real credentials, payments or mainnet funds. Its approval call is deliberately unauthenticated so the contract can be tested offline.
