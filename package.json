@@ -1,0 +1,13 @@
+{
+  "name": "diaporia-safebox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "demo": "node demo/mock-flow.mjs"
+  }
+}
