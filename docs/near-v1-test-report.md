@@ -105,13 +105,17 @@ transfers cannot be limited on-chain by access keys. Contract mode does not have
 NEAR Testnet runtime accepts this module (wasm feature set emitted by recent rustc) is unverified. The
 operator guide gives the `cargo near build` fallback.
 
+## GitHub CI
+
+GitHub Actions on `4a4aa9c` (runs 43310820763 and 43310916016): `node (22)`, `node (24)` and `contract`
+(Rust tests + wasm build on stable) all passed.
+
 ## What remains untested
 
 - Any interaction with the real NEAR Testnet: RPC response shapes beyond the documented ones the verifier
   parses, real finality timing, real gas costs, real access-key permission errors, contract deployment.
 - The Rust contract in a NEAR sandbox / workspaces integration test (only the near-sdk mocked VM was used).
 - WebAuthn / passkey owner authorization (not implemented).
-- Node.js 24 (CI matrix includes it; not run locally). CI on GitHub has not run for this branch at the time of writing.
 
 ## Exact command for the real Testnet demonstration
 
