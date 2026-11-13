@@ -7,6 +7,7 @@ Branch `feature/v4-intent-bound-recovery` (Draft PR #6, never merge), base V3 `f
 | A (original) | `33ea4f8` (A_r1, B_r3), `802ab9c` (A2, B2, C, D, E: tests, docs and one extra scenario only, no security-code change) | first complete V4 |
 | B (repaired, frozen) | `780e676` | A + F-V4-01 + F-V4-02 |
 | harness update | `483594c` | campaign owner uses an ORC-attested open after an attacker-caused cooldown (no security-code change) |
+| C (review fix) | see §7 F-V4-01b | B + per-hold freeze provenance and consent-screen disclosure (owner review of `780e676`) |
 
 ## 1. Verification levels (§17), kept separate
 
@@ -109,6 +110,15 @@ In the fresh E_avail the attacker opened a false claim that the owner ORC-cancel
 11. **Fresh campaign**: §6.2: no permanent lockout in any scenario.
 
 The repair is not FREEZE-based: no denial in the replay relies on a global freeze.
+
+### F-V4-01b: freeze-reinforcement provenance (owner code review of `780e676`)
+
+1. **Observation** (review, not an executed exploit): V3 treats a FREEZE on an already frozen vault as a reinforcement without recording the signer; the `780e676` repair recorded only the first freeze's signers and lifted the whole freeze when those were all revoked.
+2. **Reproduced**: on `780e676`, stolen K1 freezes, the owner deliberately reinforces with K2, a recovery revokes K1, and the vault is unfrozen. The K2 intent is lost (`tests/v4/f01-suspension-lockout.test.mjs` REINFORCEMENT fails on `780e676`, passes on C).
+3. **Invariant**: owner intent preservation (INV-V4-05 / INV-V4-10 side: an automatic cleanup must not undo a deliberate owner action).
+4. **Fix**: every FREEZE (including a reinforcement) is its own hold with provenance (`s.v4.freezeHolds`: approvers, or `source:supervisor`). A completed recovery drops only the holds placed solely by keys it revokes. The freeze lifts only if no other hold remains, it is an owner-source freeze, and it is not a supervisor breach freeze (that one lifts only with its trusted repair certificate). The consent / ORC screen lists every suspension it would reactivate and every freeze hold it would drop, and whether the freeze stays, so the owner approves those effects explicitly (bound through `summaryDigest`).
+5. **Tests**: REINFORCEMENT (vault stays frozen; the owner unfreezes with K2 + K3); SUPERVISOR (both orders: the breach freeze stays and requires repair); HONEST OWNER FREEZE (a freeze placed with a key that is later rotated stays; one placed with a key later lost is shown, a declining owner keeps it, an approving owner can re-freeze with one tap).
+6. **Mutations**: 4 new (reinforcement not recorded, lift despite another hold, supervisor freeze lifted, disclosure removed).
 
 ### F-V4-02: withdrawal statements were standing resignations (found in self-review)
 

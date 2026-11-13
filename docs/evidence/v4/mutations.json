@@ -1,7 +1,7 @@
 {
  "generatedBy": "scripts/v4/mutations.mjs",
- "caught": 22,
- "total": 22,
+ "caught": 24,
+ "total": 26,
  "rows": [
   {
    "name": "R-1: RECONSTITUTE without ORC authorization",
@@ -121,19 +121,42 @@
    "name": "F-V4-01: suspended survivor consent not counted",
    "file": "src/v4/root/chain.mjs",
    "caught": true,
-   "failingTests": 3
+   "failingTests": 4
   },
   {
    "name": "F-V4-01: protective actions of revoked keys not lifted at completion",
    "file": "src/v4/root/chain.mjs",
-   "caught": true,
-   "failingTests": 3
+   "error": "PATTERN_NOT_FOUND"
   },
   {
    "name": "F-V4-01: owner-imposed suspensions lifted too (over-broad repair)",
    "file": "src/v4/root/chain.mjs",
    "caught": true,
    "failingTests": 1
+  },
+  {
+   "name": "F-V4-01b: freeze reinforcement not recorded as its own hold",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "F-V4-01b: freeze lifted although another hold remains",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "F-V4-01b: supervisor breach freeze lifted by recovery",
+   "file": "src/v4/root/chain.mjs",
+   "caught": false,
+   "failingTests": 0
+  },
+  {
+   "name": "F-V4-01b: consent screen omits protective lifts",
+   "file": "src/v4/intent/summary.mjs",
+   "caught": true,
+   "failingTests": 2
   }
  ]
 }

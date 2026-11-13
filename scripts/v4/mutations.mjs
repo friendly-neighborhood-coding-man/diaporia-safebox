@@ -23,8 +23,12 @@ const M = [
   ['R-3: security delay removed', 'src/v4/root/chain.mjs', "if (at < g.executeAfter) fail('GOV_SECURITY_DELAY_OPEN');", ""],
   ['R-3: empty electorate allowed', 'src/v4/root/chain.mjs', "if (!electorate.length) fail('EMERGENCY_ELECTORATE_EMPTY'", "if (false) fail('EMERGENCY_ELECTORATE_EMPTY'"],
   ['F-V4-01: suspended survivor consent not counted', 'src/v4/root/chain.mjs', "if (!suspendedSurvivorConsent(s, a, tr, at, fx)) H3.RECOVERY_CONSENT", "H3.RECOVERY_CONSENT"],
-  ['F-V4-01: protective actions of revoked keys not lifted at completion', 'src/v4/root/chain.mjs', "installPlanMeta(s, cs);\n    liftProtectiveActionsOfLost(s, cs.lost, fx);\n  },\n  RECONSTITUTE", "installPlanMeta(s, cs);\n  },\n  RECONSTITUTE"],
+  ['F-V4-01: protective actions of revoked keys not lifted at completion', 'src/v4/root/chain.mjs', "installPlanMeta(s, cs);\n    liftProtectiveActionsOfLost(s, cs.lost, fx, at);\n  },\n  RECONSTITUTE", "installPlanMeta(s, cs);\n  },\n  RECONSTITUTE"],
   ['F-V4-01: owner-imposed suspensions lifted too (over-broad repair)', 'src/v4/root/chain.mjs', "by.length && by.every(x => L.has(x))", "by.length"],
+  ['F-V4-01b: freeze reinforcement not recorded as its own hold', 'src/v4/root/chain.mjs', "    s.v4.freezeHolds.push({ freezeId: a.body.freezeId, by, at: String(at) });", "    if (s.v4.freezeHolds.length === 0) s.v4.freezeHolds.push({ freezeId: a.body.freezeId, by, at: String(at) });"],
+  ['F-V4-01b: freeze lifted although another hold remains', 'src/v4/root/chain.mjs', "dropped.length && !s.v4.freezeHolds.length && s.freeze.source", "dropped.length && s.freeze.source"],
+  ['F-V4-01b: supervisor breach freeze lifted by recovery', 'src/v4/root/chain.mjs', "&& s.freeze.source === 'owner' && !s.freeze.requiresRepair) {", ") {"],
+  ['F-V4-01b: consent screen omits protective lifts', 'src/v4/intent/summary.mjs', "...protectiveLiftLines(s, cs)]", "]"],
 ];
 const rows = [];
 for (const [name, file, from, to] of M) {

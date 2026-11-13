@@ -24,6 +24,7 @@ V4 adds:
 | Lockdown budget | claim-triggered lockdown ≤ 96 h per 30 days (worst case observed: 146 h across the budget window boundary, ≤ budget + one 72 h window) | |
 | ORC-attested open | an open carrying one ORC intent is exempt from cooldown and claim budget (the V3 global 1 h case interval still applies) | `RECOVERY_OPEN` |
 | ORC is never a payment / Purpose / freeze authority | ORC IDs are not V3 credentials; only ORC_REPLACE, owner-quorum membership and case actions accept them | |
+| Protective actions of revoked keys (F-V4-01 / 01b) | a suspended survivor's own intent-bound consent counts; on completion, suspensions imposed only by revoked keys are reactivated and freeze holds placed only by revoked keys are dropped; the freeze lifts only when no other hold remains, never for a supervisor breach freeze; the consent / ORC screen lists all of it | `RECOVERY_CONSENT`, `liftProtectiveActionsOfLost` |
 
 **INV-V4-01 / 02.** Silence is never consent: the only transitions that move authority in a majority case require an ORC intent bound to the case digest. Acknowledgements and elapsed time only gate timing.
 

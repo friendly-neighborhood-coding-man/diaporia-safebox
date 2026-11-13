@@ -174,7 +174,7 @@ export function genesisState(gen, { pinnedChainId = null } = {}) {
   st.head = sha3hex(Buffer.concat([Buffer.from(V3_DOMAINS.TRANSITION), Buffer.from(ZERO), Buffer.from(canon({ seq: '0', at: gen.v3.at, actionDigest: chainId }))]));
   st.usedNonces[a.nonce] = 0;
   st.v4 = { config, orcs, displays, confirmers, adjudicators, tally: { ...b.tally }, challengeIssuer: { ...b.challengeIssuer },
-    usedChallenges: {}, screenDigests: {}, claims: [], burnedPlanKeys: {}, lockdowns: [], gcase: null, gcaseHistory: [], disqualified: {}, retired: {}, removedIdvs: {}, liveness: {}, suspendedBy: {}, freezeBy: null };
+    usedChallenges: {}, screenDigests: {}, claims: [], burnedPlanKeys: {}, lockdowns: [], gcase: null, gcaseHistory: [], disqualified: {}, retired: {}, removedIdvs: {}, liveness: {}, suspendedBy: {}, freezeHolds: [] };
   return st;
 }
 
@@ -270,7 +270,7 @@ const HANDLERS4 = {
     if (!trusted) fail('NO_TRUSTED_CONFIRMATION_IN_CASE', 'at least one consent through a trusted display / protected confirmation, or ORC authorization');
     H3.RECOVERY_COMPLETE(s, a, tr, at, fx);
     installPlanMeta(s, cs);
-    liftProtectiveActionsOfLost(s, cs.lost, fx);
+    liftProtectiveActionsOfLost(s, cs.lost, fx, at);
   },
   RECONSTITUTE(s, a, tr, at, fx) {
     const cs = s.case; if (!cs) fail('NO_RECOVERY_CASE');
@@ -280,7 +280,7 @@ const HANDLERS4 = {
     if (at >= cs.v4.deadline + Number(s.v4.config.completionGraceMs)) fail('RECOVERY_CASE_EXPIRED');
     H3.RECONSTITUTE(s, a, tr, at, fx);
     installPlanMeta(s, cs);
-    liftProtectiveActionsOfLost(s, cs.lost, fx);
+    liftProtectiveActionsOfLost(s, cs.lost, fx, at);
   },
   RECOVERY_EXPIRE(s, a, tr, at, fx) {
     body(a, ['caseId', 'caseDigest']);
@@ -336,11 +336,13 @@ const HANDLERS4 = {
   },
   UNSUSPEND(s, a, tr, at, fx) { H3.UNSUSPEND(s, a, tr, at, fx); delete s.v4.suspendedBy[a.body.credId]; },
   FREEZE(s, a, tr, at, fx) {
-    const was = s.freeze.active;
+    // every FREEZE, including a reinforcement of an existing freeze, is an independent hold with its own provenance
+    // (review of 780e676: a deliberate K2 reinforcement must survive the revocation of the K1 that froze first)
     H3.FREEZE(s, a, tr, at, fx);
-    if (!was && s.freeze.active) s.v4.freezeBy = s.freeze.source === 'owner' ? (tr.approvals ?? []).map(x => x.credId).sort() : null;
+    const by = a.body.source === 'owner' ? (tr.approvals ?? []).map(x => x.credId).sort() : ['source:' + a.body.source];
+    s.v4.freezeHolds.push({ freezeId: a.body.freezeId, by, at: String(at) });
   },
-  UNFREEZE(s, a, tr, at, fx) { H3.UNFREEZE(s, a, tr, at, fx); s.v4.freezeBy = null; },
+  UNFREEZE(s, a, tr, at, fx) { H3.UNFREEZE(s, a, tr, at, fx); s.v4.freezeHolds = []; },
   GOV_CASE_OPEN(s, a, tr, at, fx) {
     body(a, ['gcaseId', 'procedure', 'accused', 'ground', 'evidence', 'replacements']);
     noCase(s, 'RECOVERY_CASE_OPEN'); noLockdown(s);
@@ -529,18 +531,23 @@ function suspendedSurvivorConsent(s, a, tr, at, fx) {
   return true;
 }
 /** F-V4-01: suspensions and an owner-source freeze imposed only by credentials this completed recovery revokes are lifted. */
-function liftProtectiveActionsOfLost(s, lost, fx) {
+function liftProtectiveActionsOfLost(s, lost, fx, at) {
   const L = new Set(lost);
   for (const [cid, by] of Object.entries(s.v4.suspendedBy)) {
     const c = s.creds[cid];
     if (c && c.status === 'suspended' && by.length && by.every(x => L.has(x))) { c.status = 'active'; delete c.suspendedAt; fx.push({ type: 'SUSPENSION_LIFTED', credId: cid, by }); }
     if (!c || c.status !== 'suspended') delete s.v4.suspendedBy[cid];
   }
-  const fb = s.v4.freezeBy;
-  if (s.freeze.active && s.freeze.source === 'owner' && !s.freeze.requiresRepair && Array.isArray(fb) && fb.length && fb.every(x => L.has(x))) {
-    fx.push({ type: 'FREEZE_LIFTED', freezeId: s.freeze.freezeId, by: fb });
-    s.freeze = { active: false, freezeId: null, requiresRepair: false, source: null, at: s.lastAt };
-    s.v4.freezeBy = null;
+  // freeze: drop the holds attributable ONLY to revoked keys; lift the freeze only when no other hold remains, it is an
+  // owner-source freeze, and it is not a supervisor breach freeze (which lifts only with its trusted repair certificate)
+  if (!s.freeze.active) return;
+  const before = s.v4.freezeHolds.length;
+  const dropped = s.v4.freezeHolds.filter(h => h.by.length && h.by.every(x => L.has(x)));
+  s.v4.freezeHolds = s.v4.freezeHolds.filter(h => !dropped.includes(h));
+  for (const h of dropped) fx.push({ type: 'FREEZE_HOLD_DROPPED', freezeId: h.freezeId, by: h.by });
+  if (before && dropped.length && !s.v4.freezeHolds.length && s.freeze.source === 'owner' && !s.freeze.requiresRepair) {
+    fx.push({ type: 'FREEZE_LIFTED', freezeId: s.freeze.freezeId, by: dropped.flatMap(h => h.by) });
+    s.freeze = { active: false, freezeId: null, requiresRepair: false, source: null, at };
   }
 }
 function gcaseMatch(s, a) { const g = s.v4.gcase; if (!g) fail('NO_GOVERNANCE_CASE'); if (a.body?.gcaseId !== g.gcaseId || a.body?.gcaseDigest !== g.digest) fail('GOVERNANCE_CASE_MISMATCH'); return g; }

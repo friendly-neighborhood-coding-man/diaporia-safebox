@@ -18,6 +18,19 @@ const AUTH_TEXT = { DAILY: 'pay within the Purpose; co-sign governance', ROOT: '
   RECOVERY: 'recovery consent; co-sign recovery-key rotation', ADMIN: 'administration', ORC: 'owner recovery authorization only (never pays or amends)' };
 const roleAuth = (role) => `${role}: ${AUTH_TEXT[role] ?? role}`;
 
+/** Protective actions a completed recovery would undo: those imposed ONLY by credentials the case revokes (shown, so the
+ * owner approves them explicitly; a hold by any other key, and a supervisor breach freeze, always stay). */
+function protectiveLiftLines(s, cs) {
+  if (!cs || !s.v4) return [];
+  const L = new Set(cs.lost); const out = [];
+  for (const [cid, by] of Object.entries(s.v4.suspendedBy ?? {})) if (s.creds[cid]?.status === 'suspended' && by.length && by.every(x => L.has(x))) out.push(`On completion: reactivates ${cid} (suspended only by ${by.join(',')})`);
+  for (const h of s.v4.freezeHolds ?? []) if (s.freeze.active && h.by.length && h.by.every(x => L.has(x))) out.push(`On completion: drops freeze hold ${h.freezeId} (placed only by ${h.by.join(',')})`);
+  if (s.freeze.active) {
+    const keep = (s.v4.freezeHolds ?? []).filter(h => !(h.by.length && h.by.every(x => L.has(x))));
+    out.push(keep.length || s.freeze.requiresRepair || s.freeze.source !== 'owner' ? `Freeze ${s.freeze.freezeId} stays (other holds: ${keep.map(h => h.by.join('+')).join(';') || s.freeze.source})` : `On completion: freeze ${s.freeze.freezeId} lifts (no other hold)`);
+  }
+  return out;
+}
 function planOf(state, action) {
   const b = action.body ?? {};
   if (Array.isArray(b.plan)) return b.plan.filter(p => p && typeof p === 'object').map(p => ({ credId: String(p.credId), role: String(p.role), publicKey: String(p.publicKey ?? p.registration?.clientDataJSON ?? '?') }));
@@ -83,7 +96,7 @@ export function buildSummary(state, action, { expiresAt }) {
       out.resultingAuthority = plan.map(p => roleAuth(p.role) + ` -> ${p.credId}`);
       out.reversible = 'No (a new recovery is required to undo)';
       out.delay = cs ? `Objection window until ${iso(cs.openedAt + Number(s.config.windowMs))}; an unapproved case terminates at that deadline` : NONE;
-      out.sideEffects = [epochLine(s), ...(recon ? ['ALL current credentials are retired'] : [])];
+      out.sideEffects = [epochLine(s), ...(recon ? ['ALL current credentials are retired'] : []), ...protectiveLiftLines(s, cs)];
       out.scope = `This approval authorizes ONLY the credential set shown for case ${out.caseId}; it never authorizes payments, Purpose changes or another case.`; break;
     }
     case 'RECOVERY_CANCEL': case 'RECOVERY_ORC_CANCEL': case 'RECOVERY_WITHDRAW': {

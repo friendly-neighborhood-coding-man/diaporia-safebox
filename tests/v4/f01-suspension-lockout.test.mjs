@@ -69,3 +69,70 @@ test('F-V4-01 narrowness: owner-imposed suspensions survive; a suspended key con
   assert.notEqual(c.ok, true);
   assert.equal((await w2.verify()).authority.unauthorized.length, 0);
 });
+
+// ---- review of 780e676 (freeze-reinforcement provenance): every FREEZE is its own hold; only holds placed solely by
+// revoked keys are dropped; a supervisor breach freeze never lifts without its repair certificate; the owner sees it all.
+const { buildSummary, renderText } = await import('../../src/v4/intent/summary.mjs');
+const freeze = (w, id, creds) => w.legacyAct('FREEZE', { freezeId: id, reason: 'x', source: 'owner' }, creds, { notIntended: true });
+
+test('F-V4-01b REINFORCEMENT: stolen K1 freezes, the owner deliberately reinforces with K2, recovery revokes K1 => vault stays frozen', async () => {
+  const w = buildV4();
+  ok(await freeze(w, 'fz-thief', ['k1-phone']));
+  ok(await freeze(w, 'fz-owner', ['k2-laptop']));
+  assert.equal(w.root.state.v4.freezeHolds.length, 2);
+  let shown = null; const d0 = w.owner.decide; w.owner.decide = (sm, text, ctx) => { if (ctx.action.type === 'RECOVERY_CONSENT') shown = text; return d0(sm, text, ctx); };
+  const r = await legitimateRecoveryV4(w, ['k1-phone']);
+  assert.equal(r.outcome, 'RECOVERED', JSON.stringify(r));
+  assert.match(shown, /drops freeze hold fz-thief \(placed only by k1-phone\)/);
+  assert.match(shown, /Freeze fz-thief stays \(other holds: k2-laptop\)/);
+  assert.equal(w.root.state.freeze.active, true, 'the K2 reinforcement keeps the vault frozen');
+  assert.deepEqual(w.root.state.v4.freezeHolds.map(h => h.by.join('+')), ['k2-laptop']);
+  ok(await w.ownerAct('UNFREEZE', { freezeId: w.root.state.freeze.freezeId }, ['k2-laptop', 'k3-root-hw']));
+  assert.equal(w.root.state.freeze.active, false);
+});
+
+test('F-V4-01b SUPERVISOR: a breach freeze reinforced by the stolen key is never lifted by recovery', async () => {
+  for (const order of ['supervisor-first', 'thief-first']) {
+    const w = buildV4();
+    const sup = () => w.submitRaw('FREEZE', { freezeId: 'sup-1', reason: 'verifier: unauthorized effect', source: 'supervisor' }, { attest: (a) => ({ supervisorSig: w.owner.supervisorFreezeSign(a) }), intended: false });
+    if (order === 'supervisor-first') { ok(await sup()); ok(await freeze(w, 'fz-thief', ['k1-phone'])); }
+    else { ok(await freeze(w, 'fz-thief', ['k1-phone'])); ok(await sup()); }
+    const r = await legitimateRecoveryV4(w, ['k1-phone']);
+    assert.equal(r.outcome, 'RECOVERED', order + JSON.stringify(r));
+    assert.equal(w.root.state.freeze.active, true, order);
+    assert.equal(w.root.state.freeze.requiresRepair, true, order);
+  }
+  // defence in depth: even if the supervisor's own hold record were missing, requiresRepair alone keeps the freeze
+  const w = buildV4();
+  ok(await w.submitRaw('FREEZE', { freezeId: 'sup-1', reason: 'verifier: unauthorized effect', source: 'supervisor' }, { attest: (a) => ({ supervisorSig: w.owner.supervisorFreezeSign(a) }), intended: false }));
+  ok(await freeze(w, 'fz-thief', ['k1-phone']));
+  w.root.state.v4.freezeHolds = w.root.state.v4.freezeHolds.filter(h => !h.by[0].startsWith('source:'));
+  assert.equal((await legitimateRecoveryV4(w, ['k1-phone'])).outcome, 'RECOVERED');
+  assert.equal(w.root.state.freeze.active, true);
+});
+
+test('F-V4-01b HONEST OWNER FREEZE: a freeze placed with a key that is later rotated stays; one placed with a key later lost is shown before it is dropped', async () => {
+  // rotation (not recovery) never touches freeze holds
+  const w = buildV4();
+  ok(await freeze(w, 'fz-own', ['k1-phone']));
+  const { Device, ACCOUNT } = await import('../../src/v4/kit.mjs');
+  const a = w.owner.action(w.view(), 'ROTATE', { credId: 'k4-freeze', newCredential: null });
+  const d = new Device({ credId: 'k4-freeze-2', role: 'FREEZE', holderId: 'alice', channelId: 'ch-phone', kind: 'passkey' }); w.owner.devices.push(d);
+  a.body.newCredential = d.enrollment(ACCOUNT, `${ACCOUNT}:${a.nonce}`);
+  const rr = await w.submit({ action: a, approvals: w.owner.authorize(w.root.state, a, ['k3-root-hw', 'k4-freeze']) });
+  assert.equal(w.root.state.freeze.active, true, 'freeze survives a rotation: ' + JSON.stringify(rr.error ?? rr.ok));
+  // the owner froze with K1, then K1 is lost: the consent screen names the hold the recovery would drop, so the owner
+  // can decline (the case then does not complete and the freeze stays) or approve and re-freeze with one tap afterwards
+  const w2 = buildV4();
+  ok(await freeze(w2, 'fz-own', ['k1-phone']));
+  w2.owner.decide = (sm, text, ctx) => !(ctx.action.type === 'RECOVERY_CONSENT' && /drops freeze hold fz-own/.test(text));
+  const r2 = await legitimateRecoveryV4(w2, ['k1-phone']);
+  assert.notEqual(r2.outcome, 'RECOVERED');
+  assert.equal(w2.root.state.freeze.active, true, 'declined => intent preserved');
+  const w3 = buildV4();
+  ok(await freeze(w3, 'fz-own', ['k1-phone']));
+  assert.equal((await legitimateRecoveryV4(w3, ['k1-phone'])).outcome, 'RECOVERED');
+  assert.equal(w3.root.state.freeze.active, false);
+  ok(await freeze(w3, 'fz-again', ['k2-laptop']));
+  assert.equal(w3.root.state.freeze.active, true, 're-freeze with one tap');
+});
