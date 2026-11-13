@@ -65,7 +65,14 @@ export async function legitimateRecoveryV4(w, lost, { orc = 'orc-1', ackAll = tr
     independentSignerInteractions: independent, signatures: chainSignatures(w, seq0), declined: w.owner.metrics.declined - m0.declined, steps, epoch: w.root.state.epoch, ...extra });
   try {
     const full = lost.length * 2 > w.root.state.baseline.credIds.length;
-    const o = await openCaseV4(w, { lost, full }); if (!o.r.ok) return report('FAILED:open:' + o.r.error.code);
+    let o = await openCaseV4(w, { lost, full });
+    // the owner's ORC lifts the per-subject reattempt cooldown / claim budget (never the 1 h global anti-spam interval)
+    if (!o.r.ok && /RECOVERY_REATTEMPT_COOLDOWN|RECOVERY_CLAIM_BUDGET_EXHAUSTED/.test(o.r.error.code) && orc && !w.owner.lostOrcs.has(orc)) {
+      w.owner.devices.splice(w.owner.devices.length - o.devices.length, o.devices.length); // the refused open registered nothing
+      w.owner.metrics.gestures -= o.devices.length; w.owner.metrics.prompts -= o.devices.length;
+      o = await openCaseV4(w, { lost, full, orcAttest: orc });
+    }
+    if (!o.r.ok) return report('FAILED:open:' + o.r.error.code);
     if (cs(w).state !== 'IDENTITY_CHECK') return report('FAILED:NOT_DISPATCHED:' + cs(w).state);
     const idvs = honestIdvs ?? Object.keys(w.root.state.idvs);
     await step('identity-1', evidence4.identity(w, idvs[0]), { independentSigner: true });
