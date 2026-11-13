@@ -5,7 +5,8 @@
 // authorization). There is no op for arbitrary signing, secret export, recovery completion by fiat, or financial release.
 import { DatabaseSync } from 'node:sqlite';
 import { fail, exactFields, iso, canon } from '../common/canon.mjs';
-import { genesisState, applyTransition, rootView, TR_V } from './chain.mjs';
+import * as V3CHAIN from './chain.mjs';
+const { TR_V } = V3CHAIN;
 import { isPlainObject } from '../../v1/canonical.mjs';
 
 const SCHEMA = `
@@ -16,7 +17,8 @@ CREATE TRIGGER IF NOT EXISTS chain_no_delete BEFORE DELETE ON chain BEGIN SELECT
 `;
 
 export class RootService {
-  constructor({ genesis, pinnedChainId, dbPath = ':memory:', now, onEffects = null, crashAfterPersist = null }) {
+  constructor({ genesis, pinnedChainId, dbPath = ':memory:', now, onEffects = null, crashAfterPersist = null, chain = V3CHAIN }) {
+    this.C = chain; // the protocol's pure state machine (V3 by default; V4 passes its own)
     this.genesis = genesis; this.pinnedChainId = pinnedChainId; this.now = now; this.onEffects = onEffects; this.crashAfterPersist = crashAfterPersist;
     this.db = new DatabaseSync(dbPath);
     this.db.exec('PRAGMA busy_timeout=10000; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;');
@@ -24,8 +26,8 @@ export class RootService {
     this.#rebuild();
   }
   #rebuild() {
-    let st = genesisState(this.genesis, { pinnedChainId: this.pinnedChainId });
-    for (const r of this.db.prepare('SELECT * FROM chain ORDER BY seq').all()) { st = applyTransition(st, JSON.parse(r.tr)).state; if (st.head !== r.head) fail('ROOT_STORE_CORRUPT'); }
+    let st = this.C.genesisState(this.genesis, { pinnedChainId: this.pinnedChainId });
+    for (const r of this.db.prepare('SELECT * FROM chain ORDER BY seq').all()) { st = this.C.applyTransition(st, JSON.parse(r.tr)).state; if (st.head !== r.head) fail('ROOT_STORE_CORRUPT'); }
     this.state = st;
   }
   close() { this.db.close(); }
@@ -35,11 +37,11 @@ export class RootService {
     if (!isPlainObject(req.action)) fail('SUBMIT_ACTION');
     if (Buffer.byteLength(JSON.stringify(req)) > 192 * 1024) fail('SUBMIT_TOO_LARGE');
     const at = Math.max(this.now(), this.state.lastAt);
-    const tr = { v: TR_V, seq: String(this.state.seq + 1), prev: this.state.head, at: iso(at), action: req.action };
+    const tr = { v: this.C.TR_V ?? TR_V, seq: String(this.state.seq + 1), prev: this.state.head, at: iso(at), action: req.action };
     for (const k of ['approvals', 'guardianApprovals', 'attestation']) if (k in req) tr[k] = req[k];
     canon(tr); // canonical encodability = data, never code
     let r;
-    try { r = applyTransition(this.state, tr); }
+    try { r = this.C.applyTransition(this.state, tr); }
     catch (e) { try { this.db.prepare('INSERT INTO rejects (at, type, code) VALUES (?,?,?)').run(at, String(req.action.type ?? '').slice(0, 40), e.code ?? 'ERROR'); } catch {} throw e; }
     // compare-and-append: a concurrent writer that got there first makes this a fork and the insert fails
     this.db.exec('BEGIN IMMEDIATE');
@@ -55,7 +57,7 @@ export class RootService {
     return { seq: tr.seq, head: r.state.head, effects: r.effects };
   }
   chain(sinceSeq = 0) { return this.db.prepare('SELECT tr FROM chain WHERE seq > ? ORDER BY seq').all(Number(sinceSeq) || 0).map(r => JSON.parse(r.tr)); }
-  view() { return { ...rootView(this.state), now: this.now() }; }
+  view() { return { ...this.C.rootView(this.state), now: this.now() }; }
   rejects() { return this.db.prepare('SELECT * FROM rejects ORDER BY n').all(); }
 }
 

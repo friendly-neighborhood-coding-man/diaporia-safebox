@@ -33,11 +33,14 @@ const CONFIG_FIELDS = Object.keys(DEFAULT_CONFIG);
 const RECOVERY_STATES = ['LOSS_REPORTED', 'IDENTITY_CHECK', 'RECOVERY_CHALLENGE', 'HOLD', 'INSUFFICIENT_AUTHORITY', 'EMERGENCY_LOCKDOWN', 'RECONSTITUTION', 'RECOVERY_IMPOSSIBLE'];
 
 // ---------------------------------------------------------------- helpers
-const rolesOf = (m) => m.profile === 'personal' ? PERSONAL_ROLES : MULTI_ROLES;
-const isLive = (c) => c.status === 'active' || c.status === 'suspended';
+export const rolesOf = (m) => m.profile === 'personal' ? PERSONAL_ROLES : MULTI_ROLES;
+export const isLive = (c) => c.status === 'active' || c.status === 'suspended';
 export const actionDigest = (action) => digest(V3_DOMAINS.ACTION, action);
+// Per-protocol approval verifiers (V4 registers 'safebox.v4'). A V3 state has no `protocol` and is unaffected.
+const APPROVAL_VERIFIERS = new Map();
+export function registerApprovalVerifier(protocol, fn) { if (APPROVAL_VERIFIERS.has(protocol) && APPROVAL_VERIFIERS.get(protocol) !== fn) fail('PROTOCOL_VERIFIER_CONFLICT'); APPROVAL_VERIFIERS.set(protocol, fn); }
 
-function parseConfig(c) {
+export function parseConfig(c) {
   exactFields(c, CONFIG_FIELDS, [], 'CONFIG_FIELDS');
   const n = Object.fromEntries(CONFIG_FIELDS.map(k => [k, Number(uint(c[k], k))]));
   if (n.windowMs > 72 * 3600_000 || n.windowMs < n.minWindowMs || n.minWindowMs < 600_000) fail('CONFIG_WINDOW');
@@ -47,7 +50,7 @@ function parseConfig(c) {
 }
 
 /** Assigns verified approvers to an alternative's role slots. Returns true if satisfied. */
-function satisfies(alt, approvers, { subject, countMode }) {
+export function satisfies(alt, approvers, { subject, countMode }) {
   const pool = approvers.filter(a => a.credId !== subject);
   const holdersUsed = new Set();
   let ok = true;
@@ -74,15 +77,23 @@ export function verifyApprovals(state, action, approvals, ruleName, { subject = 
   if (!Array.isArray(approvals) || approvals.length > 12) fail('APPROVALS_INVALID');
   const dig = actionDigest(action);
   const seen = new Set(); const approvers = []; const signCounts = {};
+  const delegate = state.protocol ? APPROVAL_VERIFIERS.get(state.protocol) : null;
+  if (state.protocol && !delegate) fail('PROTOCOL_VERIFIER_NOT_LOADED', state.protocol);
   for (const ap of approvals) {
-    exactFields(ap, ['credId'], ['webauthn', 'sig'], 'APPROVAL_FIELDS');
+    if (delegate) { if (!ap || typeof ap !== 'object' || Array.isArray(ap) || typeof ap.credId !== 'string') fail('APPROVAL_FIELDS'); } // the delegate checks the exact shape
+    else exactFields(ap, ['credId'], ['webauthn', 'sig'], 'APPROVAL_FIELDS');
     if (seen.has(ap.credId)) fail('DUPLICATE_APPROVAL'); seen.add(ap.credId);
     const c = state.creds[ap.credId];
     if (!c) fail('APPROVAL_UNKNOWN_CREDENTIAL');
     const selfSusp = allowSuspendedSelf && ap.credId === subject && c.status === 'suspended';
     if (c.status !== 'active' && !selfSusp) fail('APPROVAL_CREDENTIAL_NOT_ACTIVE', `${ap.credId}:${c.status}`);
     let uv = false;
-    if (c.kind === 'passkey') {
+    if (delegate) {
+      // V4+: the protocol's own per-approval verification (e.g. AuthorizationIntent + one-time challenge + trusted
+      // confirmation). It receives the mutable transition-local state, so challenge consumption is atomic with the transition.
+      const r = delegate({ state, action, approval: ap, credential: c, rule, ruleName, at });
+      uv = r.uv; if (r.signCount !== undefined && r.signCount !== null) signCounts[ap.credId] = r.signCount;
+    } else if (c.kind === 'passkey') {
       if (!ap.webauthn || 'sig' in ap) fail('APPROVAL_KIND_MISMATCH');
       const r = verifyAssertion(ap.webauthn, { rp: state.rp, expectedChallenge: dig, credential: { ...c.webauthn, signCount: c.signCount }, requireUV: rule.uv === '1' });
       uv = r.uv; signCounts[ap.credId] = r.signCount;
@@ -104,7 +115,7 @@ export function verifyApprovals(state, action, approvals, ruleName, { subject = 
   return { approvers: approvers.map(a => a.credId), signCounts, digestHex: dig.toString('hex') };
 }
 
-function checkGuardians(state, action, guardianApprovals, need) {
+export function checkGuardians(state, action, guardianApprovals, need) {
   const dig = actionDigest(action);
   const ok = new Set();
   for (const g of guardianApprovals ?? []) {
@@ -117,7 +128,7 @@ function checkGuardians(state, action, guardianApprovals, need) {
   if (ok.size < need) fail('GUARDIAN_QUORUM_NOT_MET');
 }
 
-function checkActionHeader(state, action, at) {
+export function checkActionHeader(state, action, at) {
   exactFields(action, ['v', 'type', 'accountId', 'chainId', 'epoch', 'matrixVersion', 'purposeVersion', 'nonce', 'issuedAt', 'expiresAt', 'body'], [], 'ACTION_FIELDS');
   if (action.v !== ACTION_V) fail('ACTION_VERSION');
   if (action.accountId !== state.accountId) fail('ACTION_WRONG_ACCOUNT');
@@ -133,7 +144,7 @@ function checkActionHeader(state, action, at) {
   if (at >= ea) fail('ACTION_EXPIRED');
 }
 
-function pinEnrollments(state, enrollments, context, { replacingRoles = null } = {}) {
+export function pinEnrollments(state, enrollments, context, { replacingRoles = null } = {}) {
   if (!Array.isArray(enrollments) || !enrollments.length || enrollments.length > 8) fail('ENROLLMENTS_INVALID');
   const everything = Object.values(state.creds).map(c => c);
   const out = [];
@@ -151,7 +162,7 @@ function pinEnrollments(state, enrollments, context, { replacingRoles = null } =
   return out;
 }
 
-function activeRoleCounts(state) {
+export function activeRoleCounts(state) {
   const r = {};
   for (const c of Object.values(state.creds)) if (c.status === 'active') r[c.role] = (r[c.role] ?? 0) + 1;
   return r;
@@ -265,15 +276,15 @@ export function applyTransition(state0, tr) {
   return { state: s, effects };
 }
 
-function applySignCounts(s, signCounts) { for (const [k, v] of Object.entries(signCounts)) s.creds[k].signCount = v; }
-function bumpEpoch(s, effects, why) { s.epoch += 1; effects.push({ type: 'EPOCH', epoch: s.epoch, why }); }
-function noCase(s, code = 'RECOVERY_IN_PROGRESS') { if (s.case) fail(code); }
-function noLockdown(s) { if (s.lockdown.active) fail('EMERGENCY_LOCKDOWN_ACTIVE'); }
+export function applySignCounts(s, signCounts) { for (const [k, v] of Object.entries(signCounts)) s.creds[k].signCount = v; }
+export function bumpEpoch(s, effects, why) { s.epoch += 1; effects.push({ type: 'EPOCH', epoch: s.epoch, why }); }
+export function noCase(s, code = 'RECOVERY_IN_PROGRESS') { if (s.case) fail(code); }
+export function noLockdown(s) { if (s.lockdown.active) fail('EMERGENCY_LOCKDOWN_ACTIVE'); }
 const body = (a, req, opt = []) => exactFields(a.body, req, opt, `BODY_${a.type}`);
 
-const ROTATE_RULE = { DAILY: 'ROTATE_DAILY', ROOT: 'ROTATE_ROOT', FREEZE: 'ROTATE_FREEZE', RECOVERY: 'ROTATE_RECOVERY', ADMIN: 'ROTATE_ADMIN' };
+export const ROTATE_RULE = { DAILY: 'ROTATE_DAILY', ROOT: 'ROTATE_ROOT', FREEZE: 'ROTATE_FREEZE', RECOVERY: 'ROTATE_RECOVERY', ADMIN: 'ROTATE_ADMIN' };
 
-const HANDLERS = {
+export const HANDLERS = {
   AMEND_PURPOSE(s, a, tr, at, fx) {
     noCase(s); noLockdown(s);
     body(a, ['capsule']);
@@ -655,25 +666,25 @@ const HANDLERS = {
   },
 };
 
-function dispute(cs, d, fx) {
+export function dispute(cs, d, fx) {
   if (!cs.disputes.some(x => x.by === d.by)) cs.disputes.push(d);
   if (cs.state !== 'HOLD') { cs.prior = cs.state; cs.state = 'HOLD'; }
   fx.push({ type: 'RECOVERY_DISPUTED', by: d.by, kind: d.kind, state: 'HOLD' });
 }
-function withdraw(cs, by, fx) {
+export function withdraw(cs, by, fx) {
   const n = cs.disputes.length; cs.disputes = cs.disputes.filter(d => d.by !== by);
   if (n === cs.disputes.length) fail('NO_SUCH_OBJECTION');
   if (!cs.disputes.length && cs.state === 'HOLD') { cs.state = cs.prior; cs.prior = null; }
   fx.push({ type: 'RECOVERY_OBJECTION_WITHDRAWN', by });
 }
-function closeCase(s, cs, outcome, at, fx) {
+export function closeCase(s, cs, outcome, at, fx) {
   s.caseHistory.push({ caseId: cs.caseId, kind: cs.kind, lost: cs.lost, outcome, openedAt: cs.openedAt, closedAt: at, overrides: cs.overrides ?? 0 });
   s.case = null; s.lastCaseClosedAt = at;
   fx.push({ type: 'RECOVERY_CLOSED', caseId: cs.caseId, outcome });
 }
 
 /** Loss is CONFIRMED by independent evidence (identity verification / official document), never by the claim. */
-function maybeConfirm(s, cs, at, fx) {
+export function maybeConfirm(s, cs, at, fx) {
   if (cs.confirmed) return;
   if (!Object.keys(cs.identity).length) return;
   if (cs.kind !== 'KEY_LOSS' && !Object.keys(cs.official).length) return;
@@ -693,7 +704,7 @@ function maybeConfirm(s, cs, at, fx) {
   } else { cs.path = 'RECOVERY'; set('RECOVERY_CHALLENGE'); fx.push({ type: 'RECOVERY_CHALLENGE', caseId: cs.caseId }); }
 }
 
-function requireCommon(s, cs, at, { guardianNeed, idNeed, early }) {
+export function requireCommon(s, cs, at, { guardianNeed, idNeed, early }) {
   if (cs.disputes.length) fail('RECOVERY_DISPUTED');
   if (!cs.confirmed) fail('LOSS_NOT_CONFIRMED');
   if (cs.dispatched.join(',') !== Object.keys(s.channels).sort().join(',')) fail('NOTIFICATIONS_INCOMPLETE');
