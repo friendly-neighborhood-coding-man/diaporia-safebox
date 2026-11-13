@@ -1,0 +1,13 @@
+{
+  "id": "FP-001",
+  "title": "Legitimate payment blocked because the untrusted memo contained non-ASCII text",
+  "kind": "FALSE_POSITIVE (availability), not a security breach",
+  "discoveredBy": "smoke run of the holdout generator on a DEV seed ('dev-only-not-the-eval') before freezing; case H0046 mutation memo_unicode",
+  "integrityNote": "Because this was found with the holdout grammar (dev seed), knowledge of the memo_unicode mutation leaked into development. The frozen evaluation uses a different seed but the same grammar; this is reported as a limitation.",
+  "prePatchCommit": "463c870",
+  "prePatchEvidence": "docs/evidence/v2/false-positives/FP-001-prepatch-devseed.json",
+  "rootCause": "PROPOSE required printable-ASCII memo although the memo is free text that never influences an authorization decision and is never signed.",
+  "patch": "Accept any memo <= 280 UTF-16 units without control characters; store it ASCII-escaped. Recipient/amount/asset/capability validation unchanged.",
+  "regressionTest": "tests/v2/lifecycle.test.mjs 'FP-001 ...'",
+  "status": "FIXED"
+}

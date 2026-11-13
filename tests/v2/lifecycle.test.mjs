@@ -81,3 +81,11 @@ test('delayed ledger settlement: RELEASED waits, then SETTLED exactly once', asy
   assert.equal((await w.gz.call('STATUS', { paymentId: p.paymentId })).state, 'SETTLED');
   assert.equal((await ledgerTransfers(w)).length, 1);
 });
+
+test('FP-001: a legitimate payment with a Unicode memo is not blocked (memo is never a decision input); control chars still refused', async () => {
+  const w = await world();
+  const p = await legitPropose(w, { memo: 'café ☕ order' });
+  await w.advance(11 * 60_000);
+  assert.equal((await w.gz.call('STATUS', { paymentId: p.paymentId })).state, 'SETTLED');
+  assert.equal(await codeOf(legitPropose(w, { memo: 'line\nbreak' })), 'INVALID_MEMO');
+});

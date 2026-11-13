@@ -11,7 +11,10 @@ import { evaluatePayment, evaluateRelease } from './policy.mjs';
 import { SensitiveStore } from './store.mjs';
 import { LEDGER_TX_VERSION } from '../mock-ledger/ledger.mjs';
 
-const MEMO_RE = /^[\x20-\x7e]{0,280}$/;
+// FP-001: the memo is untrusted free text that never influences a decision and is never signed. Any Unicode text
+// without control characters is accepted; it is stored ASCII-escaped.
+const MEMO_OK = (m) => typeof m === 'string' && m.length <= 280 && !/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/.test(m);
+const memoAscii = (m) => JSON.stringify(m).replace(/[\u0080-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
 const LEDGER_DEFINITIVE = /^LEDGER_(BAD_TX|BAD_SIGNATURE|UNSUPPORTED_ASSET|WRONG_SENDER|AMOUNT_OVER_CAP|UNKNOWN_RECIPIENT|SELF_TRANSFER|INSUFFICIENT_FUNDS)$/;
 
 export class SensitiveZone {
@@ -49,7 +52,7 @@ export class SensitiveZone {
       mockAccount(args.recipientId, 'recipientId');
       atomicAmount(args.amountYocto, 'amountYocto');
       if (typeof args.asset !== 'string' || args.asset.length > 16) fail('INVALID_ASSET');
-      if (typeof args.memo !== 'string' || !MEMO_RE.test(args.memo)) fail('INVALID_MEMO');
+      if (!MEMO_OK(args.memo)) fail('INVALID_MEMO');
       cap = openCapability(args.capability, this.cfg.trustedOwnerKeys);
     } catch (e) { this.store.decision('gz', 'PROPOSE', 'DENY', [e.code ?? 'INVALID'], cap?.capId ?? null); throw e; }
 
@@ -69,7 +72,7 @@ export class SensitiveZone {
         this.store.db.prepare(`INSERT INTO payments (payment_id, cap_id, cap_digest, principal_id, policy_id, policy_digest, recipient, asset, amount,
           intent_nonce, state, proposed_at, cap_expires_at, memo, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?, 'PROPOSED', ?,?,?,?)`)
           .run(paymentId, cap.capId, cap.digest, cap.principalId, pol.policy.policyId, pol.digest, args.recipientId, args.asset, args.amountYocto,
-            randomBytes(16).toString('hex'), now, Date.parse(cap.expiresAt), args.memo, now);
+            randomBytes(16).toString('hex'), now, Date.parse(cap.expiresAt), memoAscii(args.memo), now);
         this.store.journal(paymentId, null, 'PROPOSED', 'general-zone', { capId: cap.capId, taskRef: cap.taskRef, recipient: args.recipientId, amount: args.amountYocto });
         this.store.db.prepare('INSERT INTO caps_used (cap_id, payment_id) VALUES (?,?)').run(cap.capId, paymentId);
         this.store.move(paymentId, 'PROPOSED', 'AUTHORIZED', 'policy', { decision: 'ALLOW', policyDigest: pol.digest, capDigest: cap.digest });

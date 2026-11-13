@@ -1,0 +1,2513 @@
+{
+ "kind": "safebox-v2-holdout-eval",
+ "boundary": "in-process logical boundary (OS isolation NOT exercised)",
+ "gitHead": "463c8708a0179386d9ec931fb4d640df45133165",
+ "srcDirty": true,
+ "seed": "dev-only-not-the-eval",
+ "n": 120,
+ "tally": {
+  "ATTACK_BLOCKED": 96,
+  "LEGIT_SETTLED": 10,
+  "OWNER_INTENDED_PAYMENT_ONLY": 13,
+  "FALSE_POSITIVE_LEGIT_BLOCKED": 1
+ },
+ "falsePositivesByMutation": {
+  "memo_unicode": 1
+ },
+ "unauthorizedLedgerTransfers": 0,
+ "unattributedViolations": 0,
+ "attackerBalance": "0",
+ "conservation": {
+  "ok": true,
+  "sum": "30000000000000000000000000",
+  "genesis": "30000000000000000000000000"
+ },
+ "frozen": false,
+ "freezeRecords": [],
+ "results": [
+  {
+   "id": "H0000",
+   "ownerSetup": "expired",
+   "mutation": "memo_max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "fcab53e5-26e9-40be-b119-0df768268af6",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0001",
+   "ownerSetup": "revoked",
+   "mutation": "cap_field_tamper_expiry",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "ff6ea938-dabe-4ac7-adcb-0fd6bfc13c5f",
+   "steps": [
+    {
+     "action": "tampered cap expiry",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0002",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "cap_resigned_attacker",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "6b69237b-1691-46c2-a565-60b7e747b49e",
+   "steps": [
+    {
+     "action": "re-signed by attacker",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0003",
+   "ownerSetup": "genuine",
+   "mutation": "amount_double",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "017ba4f8-8e38-4000-be28-ad415485497f",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0004",
+   "ownerSetup": "expired",
+   "mutation": "amount_double",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "95fd1512-c3a7-40e8-9d8e-0b4ac4e7c3a8",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0005",
+   "ownerSetup": "genuine",
+   "mutation": "amount_negative",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "1f0c408a-4644-4fd6-8ad9-a4eb8f270414",
+   "steps": [
+    {
+     "action": "negative",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0006",
+   "ownerSetup": "genuine",
+   "mutation": "amount_space",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "298c69d5-60a7-4374-9bcc-a916936446fb",
+   "steps": [
+    {
+     "action": "space",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0007",
+   "ownerSetup": "future_issued",
+   "mutation": "sig_from_other_cap",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "70618ecc-c45a-45fd-99e8-682ceeff9821",
+   "steps": [
+    {
+     "action": "signature of another cap",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0008",
+   "ownerSetup": "genuine",
+   "mutation": "memo_empty",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": true,
+   "capId": "2ea079b7-e9c9-4a66-8e7a-0a3a42aa5cac",
+   "steps": [
+    {
+     "action": "empty memo",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "30000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "6039bdd372957e017422dc58da063a84d12e4439f0c610df115bf77e246077a8"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0009",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "amount_leading_zero",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "43b62889-9848-47a0-a001-44088604eb5e",
+   "steps": [
+    {
+     "action": "leading zero",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0010",
+   "ownerSetup": "genuine",
+   "mutation": "amount_double",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "1c6a25e0-6b22-4ff2-bd6c-c66f2897eb85",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0011",
+   "ownerSetup": "unknown_policy",
+   "mutation": "sig_from_other_cap",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "6726869b-34be-4dd6-973d-e12ab1779fb6",
+   "steps": [
+    {
+     "action": "signature of another cap",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0012",
+   "ownerSetup": "used_before",
+   "mutation": "sig_truncate",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "0e4c5bb6-83c6-4508-9843-a5ed9a9c529a",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "truncated sig",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "40000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "e1d9acdcc3e24f50a7701a8b4771fef41c609a4b361561599ddf057637e00f19"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0013",
+   "ownerSetup": "genuine",
+   "mutation": "op_trailing_space",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "18e2d3b0-4cba-40eb-9cf7-c2449cdb3a20",
+   "steps": [
+    {
+     "action": "op trailing space",
+     "outcome": "DENIED",
+     "code": "BAD_OP"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0014",
+   "ownerSetup": "unknown_policy",
+   "mutation": "amount_double",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "876a812f-ca70-4c9a-b294-281a5404edc6",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0015",
+   "ownerSetup": "revoked",
+   "mutation": "none",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "d4d11b30-3f6a-4c8f-844f-65983c9e73a8",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0016",
+   "ownerSetup": "genuine",
+   "mutation": "amount_lower",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": true,
+   "capId": "60da4297-e409-4a8d-8039-bcdeedfba9c3",
+   "steps": [
+    {
+     "action": "lower amount",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "9999999999999999999999",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "3f2d7254933106083cf20123bcd10e6a9a6c34fff66fa307f448229ccfd4f8ff"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0017",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "sig_flip_char",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "260354a7-6481-4a35-b0cd-e1fe508fe464",
+   "steps": [
+    {
+     "action": "flipped sig char",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0018",
+   "ownerSetup": "revoked",
+   "mutation": "amount_double",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "8cc84c13-c93a-4705-968d-a9fb5b7a7e27",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0019",
+   "ownerSetup": "used_before",
+   "mutation": "sig_flip_char",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "f71e0479-aa00-4fc4-babe-c7148c15ec89",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "flipped sig char",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "20000000000000000000000",
+    "recipient": "merchant-a.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "efb85cf80f8a89504ae60e0fbf1c022d35e0e9dfea394b63312d97c46a9c433e"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0020",
+   "ownerSetup": "expired",
+   "mutation": "amount_u128max",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "f8981d0e-dd65-4e15-b583-4a4fc08275b5",
+   "steps": [
+    {
+     "action": "u128 max",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED,AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT,CUMULATIVE_LIMIT,PENDING_EXPOSURE_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0021",
+   "ownerSetup": "expired",
+   "mutation": "memo_empty",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "1a4d6106-52d9-43df-8a94-37963ba6b7f7",
+   "steps": [
+    {
+     "action": "empty memo",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0022",
+   "ownerSetup": "future_issued",
+   "mutation": "extra_arg",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "04a0f375-144d-48e8-ae65-f44b4dff3aae",
+   "steps": [
+    {
+     "action": "extra arg",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0023",
+   "ownerSetup": "bob_policy",
+   "mutation": "amount_space",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "28ca9a06-9021-4aa8-90c0-4e0deaa52f54",
+   "steps": [
+    {
+     "action": "space",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0024",
+   "ownerSetup": "used_before",
+   "mutation": "double_submit_then_redirect",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "116d1d70-0924-4f2f-bfee-5c346d73cd52",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "first (as intended)",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_ALREADY_USED"
+    },
+    {
+     "action": "second redirect",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_ALREADY_USED,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "042aa646916a29ab6fb4b9caba8e2c7b9310659280963432587d1b69c440fab3"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0025",
+   "ownerSetup": "used_before",
+   "mutation": "cap_field_tamper_expiry",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "b1147cf0-3316-4156-b311-0c4330698e09",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "tampered cap expiry",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "4cd6a9a3dccc6a6973572eb028d15565e9d4bcaab4ebc20b1f772b2cbcdcdb8c"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0026",
+   "ownerSetup": "expired",
+   "mutation": "memo_empty",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "c69e45c6-5e53-4f0e-8fc2-8afa97947a31",
+   "steps": [
+    {
+     "action": "empty memo",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0027",
+   "ownerSetup": "future_issued",
+   "mutation": "recipient_trailing_dot",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "78454956-db1a-471f-9743-d36671199a62",
+   "steps": [
+    {
+     "action": "trailing dot",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0028",
+   "ownerSetup": "genuine",
+   "mutation": "memo_max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": true,
+   "capId": "a599d710-0211-4278-bce3-165c93100a79",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "d8ce4edd8e1d2d0fbc280877e470bcdc3ca89f107d382c6ff541d2d8e4b0d7d3"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0029",
+   "ownerSetup": "future_issued",
+   "mutation": "amount_negative",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "f1ddd161-a707-4785-ad19-d9773194758c",
+   "steps": [
+    {
+     "action": "negative",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0030",
+   "ownerSetup": "genuine",
+   "mutation": "sig_flip_char",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "dff166f0-0aeb-4ca0-9357-b9fde89569f6",
+   "steps": [
+    {
+     "action": "flipped sig char",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0031",
+   "ownerSetup": "used_before",
+   "mutation": "cap_whitespace",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "c8eb81f7-3f6e-4626-98f9-abd356e4bd68",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "whitespace",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "acdb66b422aece30823d64a680d99f7158b5d15031a4f9462e7418120bd2e7ea"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0032",
+   "ownerSetup": "future_issued",
+   "mutation": "amount_plus_one",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "ea693bb7-f6f2-4dce-aa99-9ef147bb7396",
+   "steps": [
+    {
+     "action": "+1 yocto",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_FROM_FUTURE,AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0033",
+   "ownerSetup": "used_before",
+   "mutation": "op_trailing_space",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "bfa40b23-209a-4192-86dc-b6c723eb24ea",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "op trailing space",
+     "outcome": "DENIED",
+     "code": "BAD_OP"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "55707fc580b3b58480fa3e20bc84d00e61af2c4e209eaabeee9a51fbed29fb11"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0034",
+   "ownerSetup": "bob_policy",
+   "mutation": "recipient_suffix",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "65ce868e-8397-4bda-b759-8f8121de86e2",
+   "steps": [
+    {
+     "action": "suffix",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0035",
+   "ownerSetup": "revoked",
+   "mutation": "sig_from_other_cap",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "7aa8de30-7a35-4785-870a-6505b57150dc",
+   "steps": [
+    {
+     "action": "signature of another cap",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0036",
+   "ownerSetup": "expired",
+   "mutation": "recipient_other_merchant",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "d933ca2f-5166-435a-a9b0-f01d95256391",
+   "steps": [
+    {
+     "action": "other merchant",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED,RECIPIENT_NOT_BOUND_TO_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0037",
+   "ownerSetup": "expired",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "9c0c3d5c-91d1-4706-ab89-9d9af0fbb215",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0038",
+   "ownerSetup": "unknown_policy",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "14806780-8976-4cf9-814d-308d86ddfdc2",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0039",
+   "ownerSetup": "future_issued",
+   "mutation": "sig_truncate",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "9f47e9a0-a19f-4c0d-87c2-1b5b5f0645b4",
+   "steps": [
+    {
+     "action": "truncated sig",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0040",
+   "ownerSetup": "bob_policy",
+   "mutation": "cap_field_tamper_recipient",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "8bc5cbbc-8b8c-43a2-804f-033b1518a120",
+   "steps": [
+    {
+     "action": "tampered cap recipient",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0041",
+   "ownerSetup": "used_before",
+   "mutation": "recipient_upper",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "6d236345-1596-4f05-a22e-47fa083f894c",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "uppercase",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "20000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "14e3dcbe248785dd4ad37816403f1bb999485341cf9844f0bff7c5644f6c1a80"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0042",
+   "ownerSetup": "expired",
+   "mutation": "cap_field_tamper_amount",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "1e5d092f-564a-4f4d-a389-59e7b4148ed1",
+   "steps": [
+    {
+     "action": "tampered cap amount",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0043",
+   "ownerSetup": "used_before",
+   "mutation": "amount_plus_one",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "9f5a77cd-57dd-4e6a-a2dc-b17798f801b2",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "+1 yocto",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_ALREADY_USED,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "20000000000000000000000",
+    "recipient": "merchant-a.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "b19e98b99a12c95dbf48b57ae8631e3c1962dc8ec03aaa7b6e22d167654952d4"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0044",
+   "ownerSetup": "unknown_policy",
+   "mutation": "recipient_suffix",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "ede93d20-0274-4c55-a9a0-e402d384b784",
+   "steps": [
+    {
+     "action": "suffix",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0045",
+   "ownerSetup": "used_before",
+   "mutation": "recipient_lookalike_unicode",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "687cb87a-39dc-4b2c-9d7c-ab16f4791907",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "cyrillic a",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "8eabbbfc76976e858763bef10eaf9946816999f8fc0acc2cd0e9cbdfee460054"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0046",
+   "ownerSetup": "genuine",
+   "mutation": "memo_unicode",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": true,
+   "capId": "66b422d5-933c-4df1-bf38-b8554505dd05",
+   "steps": [
+    {
+     "action": "unicode memo",
+     "outcome": "DENIED",
+     "code": "INVALID_MEMO"
+    }
+   ],
+   "effect": null,
+   "verdict": "FALSE_POSITIVE_LEGIT_BLOCKED"
+  },
+  {
+   "id": "H0047",
+   "ownerSetup": "revoked",
+   "mutation": "recipient_bob_shop",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "9c924e17-f77e-47d6-a4d3-36db7f47a343",
+   "steps": [
+    {
+     "action": "bob-shop",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0048",
+   "ownerSetup": "unknown_policy",
+   "mutation": "cap_field_tamper_recipient",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "eea749d8-9aa8-4638-ac7d-55324408766a",
+   "steps": [
+    {
+     "action": "tampered cap recipient",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0049",
+   "ownerSetup": "genuine",
+   "mutation": "amount_negative",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "08542545-fd33-45b0-8bf8-b861966b1cec",
+   "steps": [
+    {
+     "action": "negative",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0050",
+   "ownerSetup": "used_before",
+   "mutation": "sig_truncate",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "88bd056c-6122-4f1e-817b-d5d44d994dcc",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "truncated sig",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "1588bff26a992e66c39996bc1682df38a798cb3ffee863a367b1c334439edf07"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0051",
+   "ownerSetup": "genuine",
+   "mutation": "none",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": true,
+   "capId": "56457a48-e47e-4076-9c04-713ff100354d",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "24463d3a3046e803dafa71f2960cd180b143b9473fef444843e16e7f6ebb25e5"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0052",
+   "ownerSetup": "genuine",
+   "mutation": "op_lowercase",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "d594b5e4-3fbf-4b5c-8417-b8c15f29d73d",
+   "steps": [
+    {
+     "action": "op lowercase",
+     "outcome": "DENIED",
+     "code": "BAD_OP"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0053",
+   "ownerSetup": "genuine",
+   "mutation": "amount_leading_zero",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "9d408817-69f9-4b09-a4e1-f9a969697205",
+   "steps": [
+    {
+     "action": "leading zero",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0054",
+   "ownerSetup": "unknown_policy",
+   "mutation": "array_recipient",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "490cc156-d560-469d-bd4c-e4f7b8004ed1",
+   "steps": [
+    {
+     "action": "array recipient",
+     "outcome": "DENIED",
+     "code": "BAD_ARG",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0055",
+   "ownerSetup": "unknown_policy",
+   "mutation": "recipient_attacker",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "38234533-7ded-4f9a-9b79-5eb5c9052ac3",
+   "steps": [
+    {
+     "action": "recipient attacker",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0056",
+   "ownerSetup": "unknown_policy",
+   "mutation": "amount_negative",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "92f95c56-b653-478e-92a8-a1916c8982af",
+   "steps": [
+    {
+     "action": "negative",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0057",
+   "ownerSetup": "unknown_policy",
+   "mutation": "amount_plus_one",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "fe1372fa-6084-4412-b55a-64c06957f1d9",
+   "steps": [
+    {
+     "action": "+1 yocto",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0058",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "recipient_lookalike_unicode",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "b3ff3f30-7e89-4fbb-9549-aed85bf12263",
+   "steps": [
+    {
+     "action": "cyrillic a",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0059",
+   "ownerSetup": "used_before",
+   "mutation": "sig_truncate",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "c8620e56-4336-47ad-936c-6ccecf0df7d3",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "truncated sig",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "2ba8fff4431cb8fe5db965fc38458dc81aad34ac8356ee63cbbe8e283ce5fc41"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0060",
+   "ownerSetup": "unknown_policy",
+   "mutation": "amount_u128max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "11f12ae4-4f24-41d0-812d-72621d5c1500",
+   "steps": [
+    {
+     "action": "u128 max",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT,CUMULATIVE_LIMIT,PENDING_EXPOSURE_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0061",
+   "ownerSetup": "genuine",
+   "mutation": "cap_whitespace",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "caaa3bb5-aa92-4a70-83af-3ac4051f6940",
+   "steps": [
+    {
+     "action": "whitespace",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0062",
+   "ownerSetup": "genuine",
+   "mutation": "recipient_attacker",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "d2d3219e-24df-4340-8f42-eaa1792bd733",
+   "steps": [
+    {
+     "action": "recipient attacker",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0063",
+   "ownerSetup": "revoked",
+   "mutation": "extra_arg",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "185fcda2-a5e2-4070-8f7e-15263a1430ec",
+   "steps": [
+    {
+     "action": "extra arg",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0064",
+   "ownerSetup": "revoked",
+   "mutation": "sig_from_other_cap",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "42c73f1e-3ae0-4876-87b2-ed6ec1616295",
+   "steps": [
+    {
+     "action": "signature of another cap",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0065",
+   "ownerSetup": "genuine",
+   "mutation": "missing_arg",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "93f3b2dd-d6ba-4cfa-8c5e-983699503a2e",
+   "steps": [
+    {
+     "action": "missing memo",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0066",
+   "ownerSetup": "genuine",
+   "mutation": "amount_double",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "31c935f4-5fd0-4cb3-9318-8243ebdf4620",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0067",
+   "ownerSetup": "genuine",
+   "mutation": "memo_max",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": true,
+   "capId": "319a89e8-8781-484a-9666-19709f940b0a",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "40000000000000000000000",
+    "recipient": "merchant-a.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "f0bfc41366f9b37717b8e7622b19f0dbbfd42a7aca61e9b941fc2b8b79c29a26"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0068",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "recipient_upper",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "009f230a-77f1-474e-972f-e831171db607",
+   "steps": [
+    {
+     "action": "uppercase",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0069",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "recipient_suffix",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "0be94716-e466-43ec-9bfa-742fe7f08576",
+   "steps": [
+    {
+     "action": "suffix",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0070",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "amount_negative",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "456fd9c1-c8e5-41ba-8513-92711c2bef75",
+   "steps": [
+    {
+     "action": "negative",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0071",
+   "ownerSetup": "future_issued",
+   "mutation": "amount_u128max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "5941d157-c2d0-4fb8-a9dd-1cbfb15cc523",
+   "steps": [
+    {
+     "action": "u128 max",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_FROM_FUTURE,AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT,CUMULATIVE_LIMIT,PENDING_EXPOSURE_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0072",
+   "ownerSetup": "unknown_policy",
+   "mutation": "recipient_trailing_dot",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "453b311d-e651-4099-b0fc-914c119f9301",
+   "steps": [
+    {
+     "action": "trailing dot",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0073",
+   "ownerSetup": "expired",
+   "mutation": "amount_leading_zero",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "5341da1a-62f9-445e-8334-d898a36908f3",
+   "steps": [
+    {
+     "action": "leading zero",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0074",
+   "ownerSetup": "unknown_policy",
+   "mutation": "sig_flip_char",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "21729f69-d4d1-4c26-bc95-a98c7fe02a48",
+   "steps": [
+    {
+     "action": "flipped sig char",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0075",
+   "ownerSetup": "genuine",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "8f29e465-c54a-4389-9590-c1fd9aa8f1fd",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0076",
+   "ownerSetup": "bob_policy",
+   "mutation": "amount_space",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "fe9f1681-49ec-4dba-ad1b-999aeeaf9df0",
+   "steps": [
+    {
+     "action": "space",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0077",
+   "ownerSetup": "expired",
+   "mutation": "memo_max",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "b6a8ecfe-fe71-48c9-986c-d59d76f3ad70",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0078",
+   "ownerSetup": "genuine",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "f9022361-a0e6-4cc7-a22b-bc0d993b33e8",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0079",
+   "ownerSetup": "genuine",
+   "mutation": "amount_float",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "fcec78a7-ada3-4349-9743-08afbbe52398",
+   "steps": [
+    {
+     "action": "float",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0080",
+   "ownerSetup": "genuine",
+   "mutation": "asset_lower",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "4c51944e-9b09-409f-b228-c10599ddaa81",
+   "steps": [
+    {
+     "action": "asset near",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "ASSET_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0081",
+   "ownerSetup": "revoked",
+   "mutation": "memo_max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "50ca5829-bf75-46f4-a340-c4246b80c61c",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0082",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "asset_lower",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "7e12f21a-e764-4793-acf3-e86f5a9cf8ca",
+   "steps": [
+    {
+     "action": "asset near",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_TTL_TOO_LONG,ASSET_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0083",
+   "ownerSetup": "bob_policy",
+   "mutation": "recipient_trailing_dot",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "1d77b507-f045-4455-8ae0-cefbd3029735",
+   "steps": [
+    {
+     "action": "trailing dot",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0084",
+   "ownerSetup": "bob_policy",
+   "mutation": "recipient_trailing_dot",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "984b182d-3cb8-44a1-9c03-cc5c8746dfaf",
+   "steps": [
+    {
+     "action": "trailing dot",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0085",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "amount_double",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "90e5cd64-a3f2-4f5c-8065-2bfbb9c829a7",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_TTL_TOO_LONG,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0086",
+   "ownerSetup": "revoked",
+   "mutation": "recipient_lookalike_unicode",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "1132ae87-3bee-4b67-a304-1340f35269d6",
+   "steps": [
+    {
+     "action": "cyrillic a",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0087",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "336a64e2-8d96-4589-a0f4-2c0d1dfeffd6",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0088",
+   "ownerSetup": "genuine",
+   "mutation": "memo_max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": true,
+   "capId": "e1a421cf-1a14-4931-b137-cc5160a6b87d",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "5d8dad5280129d34f4cbf10f0615a8d4a12035f93d149e49ca7b87aa3503d85c"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0089",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "cap_resigned_attacker",
+   "amountYocto": "50000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "6c61cc00-e2a7-489e-ba24-0ab7ffefbb66",
+   "steps": [
+    {
+     "action": "re-signed by attacker",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0090",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "cap_field_tamper_amount",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "0c2e4048-5c10-48f3-a53b-260dc0c40d8d",
+   "steps": [
+    {
+     "action": "tampered cap amount",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0091",
+   "ownerSetup": "used_before",
+   "mutation": "extra_arg",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "fb8c9c89-f9a4-40aa-8f18-fffc40ab6ad4",
+   "steps": [
+    {
+     "action": "owner-intended first use",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "extra arg",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-a.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "3c3a633db079513bd6e0d7838c10f54a76e9b97bd6f5a6045b21d8c568ede05a"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0092",
+   "ownerSetup": "genuine",
+   "mutation": "amount_space",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "a739bfd5-8eff-4981-b3f5-26742977b814",
+   "steps": [
+    {
+     "action": "space",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0093",
+   "ownerSetup": "revoked",
+   "mutation": "amount_double",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "04e5e474-d026-476c-a95e-843ac92de5bc",
+   "steps": [
+    {
+     "action": "x2",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0094",
+   "ownerSetup": "genuine",
+   "mutation": "amount_u128max",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "13058df6-9fcb-4870-8b6a-4f66112d1823",
+   "steps": [
+    {
+     "action": "u128 max",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT,CUMULATIVE_LIMIT,PENDING_EXPOSURE_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0095",
+   "ownerSetup": "expired",
+   "mutation": "amount_leading_zero",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "6b05b7aa-d5ab-4458-83d0-6a5e1102b835",
+   "steps": [
+    {
+     "action": "leading zero",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0096",
+   "ownerSetup": "genuine",
+   "mutation": "double_submit_then_redirect",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "751bdcea-abf2-49a7-a80f-137ddd23f59d",
+   "steps": [
+    {
+     "action": "first (as intended)",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    },
+    {
+     "action": "second redirect",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_ALREADY_USED,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-a.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "964494b72ce23980241b94c4cb7ea2639fd548ba44750d295f1f4bea99903832"
+   },
+   "verdict": "OWNER_INTENDED_PAYMENT_ONLY"
+  },
+  {
+   "id": "H0097",
+   "ownerSetup": "genuine",
+   "mutation": "none",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": true,
+   "capId": "9719e93d-6f44-48dd-ad1b-500e4faa2090",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "20000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "a3712f5714106bd7dc53550797f3358f348ff5f048839e4ee93900e45df2145f"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0098",
+   "ownerSetup": "expired",
+   "mutation": "amount_lower",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "8cbab34f-e152-40f5-a843-b32b34969a87",
+   "steps": [
+    {
+     "action": "lower amount",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0099",
+   "ownerSetup": "genuine",
+   "mutation": "none",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": true,
+   "capId": "87a964f5-7915-465c-8f25-ec26c854d84f",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-c.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "366a377325981adad9383c8bae130778b9076b35ea3acd257a9b2457193a55e6"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0100",
+   "ownerSetup": "future_issued",
+   "mutation": "cap_field_tamper_recipient",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "4bdc49a0-14cd-4f83-a8b4-da1a9ab07e96",
+   "steps": [
+    {
+     "action": "tampered cap recipient",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0101",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "cap_noncanonical_order",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "9f489a44-2cc8-4054-9ad0-ce3ed31d9bf4",
+   "steps": [
+    {
+     "action": "non-canonical order",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0102",
+   "ownerSetup": "genuine",
+   "mutation": "none",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": true,
+   "capId": "6c9bfc8b-bf44-4110-9dd1-0daf32bd58ba",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "fcf635d8a51e40c093a054df4a2b9f96899387aeb24402cc93cb8b2fe0f9645c"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0103",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "recipient_lookalike_unicode",
+   "amountYocto": "30000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "b9562a19-7fe7-4166-aac9-17adc826aa97",
+   "steps": [
+    {
+     "action": "cyrillic a",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0104",
+   "ownerSetup": "genuine",
+   "mutation": "extra_arg",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "eb8e3fac-339f-468e-933c-b7b1a0c17335",
+   "steps": [
+    {
+     "action": "extra arg",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0105",
+   "ownerSetup": "bob_policy",
+   "mutation": "asset_lower",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "8a794158-9fc1-4651-9b54-c08eb46195be",
+   "steps": [
+    {
+     "action": "asset near",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_POLICY_MISMATCH,ASSET_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0106",
+   "ownerSetup": "expired",
+   "mutation": "op_lowercase",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "3e2ca460-4609-4a5a-89a8-edb605a31256",
+   "steps": [
+    {
+     "action": "op lowercase",
+     "outcome": "DENIED",
+     "code": "BAD_OP"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0107",
+   "ownerSetup": "revoked",
+   "mutation": "asset_other",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "3f2d136d-78e3-49e6-9363-3d9f34987e26",
+   "steps": [
+    {
+     "action": "asset USDT",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_REVOKED,ASSET_NOT_ALLOWED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0108",
+   "ownerSetup": "genuine",
+   "mutation": "amount_u128max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "568457cd-d702-49ee-8186-0a434d770269",
+   "steps": [
+    {
+     "action": "u128 max",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "AMOUNT_OVER_CAPABILITY,AMOUNT_OVER_PER_PAYMENT_LIMIT,CUMULATIVE_LIMIT,PENDING_EXPOSURE_LIMIT"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0109",
+   "ownerSetup": "genuine",
+   "mutation": "number_amount",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "f24496b4-773a-4c61-9505-741048cda845",
+   "steps": [
+    {
+     "action": "number amount",
+     "outcome": "DENIED",
+     "code": "BAD_ARG",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0110",
+   "ownerSetup": "genuine",
+   "mutation": "recipient_other_merchant",
+   "amountYocto": "50000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "22e7da19-607a-4dd1-8c05-29d6a3a6f564",
+   "steps": [
+    {
+     "action": "other merchant",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "RECIPIENT_NOT_BOUND_TO_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0111",
+   "ownerSetup": "genuine",
+   "mutation": "amount_leading_zero",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "a65d54eb-f93f-4db7-9935-7d7a1279353f",
+   "steps": [
+    {
+     "action": "leading zero",
+     "outcome": "DENIED",
+     "code": "INVALID_AMOUNT",
+     "detail": "amountYocto"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0112",
+   "ownerSetup": "ttl_too_long",
+   "mutation": "amount_plus_one",
+   "amountYocto": "40000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "ff23d1e6-29c3-4d78-8dae-917205eef076",
+   "steps": [
+    {
+     "action": "+1 yocto",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_TTL_TOO_LONG,AMOUNT_OVER_CAPABILITY"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0113",
+   "ownerSetup": "genuine",
+   "mutation": "recipient_trailing_dot",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "eec7d673-c19e-440d-8cc4-484f68b3027d",
+   "steps": [
+    {
+     "action": "trailing dot",
+     "outcome": "DENIED",
+     "code": "INVALID_ACCOUNT_ID",
+     "detail": "recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0114",
+   "ownerSetup": "bob_policy",
+   "mutation": "missing_arg",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "887facfe-6d51-44f3-9310-94b2df28724f",
+   "steps": [
+    {
+     "action": "missing memo",
+     "outcome": "DENIED",
+     "code": "BAD_ARGS",
+     "detail": "expected amountYocto,asset,capability,memo,recipientId"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0115",
+   "ownerSetup": "genuine",
+   "mutation": "memo_max",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": true,
+   "capId": "8828f5f9-d1de-44eb-8b81-14280848a4b8",
+   "steps": [
+    {
+     "action": "max memo",
+     "outcome": "ACCEPTED",
+     "code": "BUFFERED"
+    }
+   ],
+   "effect": {
+    "authorized": true,
+    "amountYocto": "10000000000000000000000",
+    "recipient": "merchant-b.mock",
+    "status": "SETTLED",
+    "codes": [],
+    "txId": "ee52476822aea4f77323391c6644c824de997ec3378444612f6a6cc9683805e3"
+   },
+   "verdict": "LEGIT_SETTLED"
+  },
+  {
+   "id": "H0116",
+   "ownerSetup": "bob_signed_for_alice",
+   "mutation": "parallel_x5",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-b.mock",
+   "legitimateExpected": false,
+   "capId": "cca8dc65-c6c0-410e-a812-56bc3c21aa6b",
+   "steps": [
+    {
+     "action": "parallel 0",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    },
+    {
+     "action": "parallel 1",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    },
+    {
+     "action": "parallel 2",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    },
+    {
+     "action": "parallel 3",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    },
+    {
+     "action": "parallel 4",
+     "outcome": "DENIED",
+     "code": "BAD_SIGNATURE"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0117",
+   "ownerSetup": "revoked",
+   "mutation": "cap_whitespace",
+   "amountYocto": "10000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "d82d8908-0e81-41f1-837a-426e6055c8bf",
+   "steps": [
+    {
+     "action": "whitespace",
+     "outcome": "DENIED",
+     "code": "NOT_CANONICAL"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0118",
+   "ownerSetup": "genuine",
+   "mutation": "op_lowercase",
+   "amountYocto": "20000000000000000000000",
+   "merchant": "merchant-c.mock",
+   "legitimateExpected": false,
+   "capId": "95092e16-6378-44f7-a451-0ae2d40c05ba",
+   "steps": [
+    {
+     "action": "op lowercase",
+     "outcome": "DENIED",
+     "code": "BAD_OP"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  },
+  {
+   "id": "H0119",
+   "ownerSetup": "expired",
+   "mutation": "none",
+   "amountYocto": "60000000000000000000000",
+   "merchant": "merchant-a.mock",
+   "legitimateExpected": false,
+   "capId": "acfd606b-0645-42df-a6e2-711d05fe5f26",
+   "steps": [
+    {
+     "action": "as owner intended",
+     "outcome": "DENIED",
+     "code": "POLICY_DENY",
+     "detail": "CAPABILITY_EXPIRED"
+    }
+   ],
+   "effect": null,
+   "verdict": "ATTACK_BLOCKED"
+  }
+ ]
+}
