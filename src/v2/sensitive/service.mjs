@@ -249,7 +249,10 @@ export class SensitiveZone {
   #applyLedgerStatus(paymentId, st, out) {
     this.store.tx(() => {
       const cur = this.store.get(paymentId);
-      if (st.status === 'SETTLED') {
+      if (st.status === 'VOIDED') {
+        // Voided by the ledger while frozen (never credited): the payment failed; its reservation is released.
+        this.store.move(paymentId, cur.state, cur.state === 'FROZEN' ? 'CANCELLED' : 'FAILED', 'verifier', { txId: st.txId, ledger: 'VOIDED' }, { tx_id: st.txId, ledger_status: 'VOIDED', reason: 'LEDGER_VOIDED' });
+      } else if (st.status === 'SETTLED') {
         this.store.move(paymentId, cur.state, 'SETTLED', 'verifier', { txId: st.txId }, { tx_id: st.txId, ledger_status: 'SETTLED', settled_at: this.now() });
         out?.settled.push(paymentId);
       } else if (cur.tx_id !== st.txId || cur.ledger_status !== st.status) {

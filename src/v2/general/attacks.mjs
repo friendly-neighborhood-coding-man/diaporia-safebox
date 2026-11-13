@@ -13,7 +13,7 @@ const iso = (t) => new Date(t).toISOString();
 
 function rec(steps, action, r) {
   const s = r && typeof r === 'object' && 'ok' in r
-    ? { action, outcome: r.ok ? 'ACCEPTED' : 'DENIED', code: r.ok ? (r.result?.state ?? 'OK') : r.error.code, paymentId: r.ok ? r.result?.paymentId ?? null : null }
+    ? { action, outcome: r.ok ? 'ACCEPTED' : 'DENIED', code: r.ok ? (r.result?.state ?? 'OK') : r.error.code, detail: r.ok ? undefined : r.error.detail, paymentId: r.ok ? r.result?.paymentId ?? null : null }
     : { action, ...r };
   steps.push(s); return s;
 }

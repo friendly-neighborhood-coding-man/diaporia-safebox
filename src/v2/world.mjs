@@ -33,7 +33,7 @@ export function buildWorld({ dir, clock, injectFlaw = null, settleDelayMs = 0, w
     maxPaymentYocto: '60000000000000000000000', settleDelayMs });
   const lops = ledgerOps(ledger);
   const ledgerExec = new DirectClient(lops.exec), ledgerRead = new DirectClient(lops.read), ledgerAdmin = new DirectClient(lops.admin);
-  const cfg = { trustedOwnerKeys: owner.trustedOwnerKeys(), operatorKey: owner.operatorKey, executorAccount: EXECUTOR_ACCOUNT, minBufferMs: 600_000, leaseMs: 5_000, injectFlaw };
+  let cfg = { trustedOwnerKeys: owner.trustedOwnerKeys(), operatorKey: owner.operatorKey, executorAccount: EXECUTOR_ACCOUNT, minBufferMs: 600_000, leaseMs: 5_000, injectFlaw };
   const openZone = () => new SensitiveZone(cfg, { store: new SensitiveStore(join(dir, 'sensitive.db'), { now, auditFault }), now, wallNow, executorSigner: executor, ledger: ledgerExec });
   let zone = openZone();
   let sops = sensitiveOps(zone);
@@ -42,7 +42,7 @@ export function buildWorld({ dir, clock, injectFlaw = null, settleDelayMs = 0, w
     get zone() { return zone; },
     gz: new DirectClient(sops.gz), ctl: new DirectClient(sops.ctl),
     freezeStore: new FreezeStore(join(dir, 'freeze.jsonl')),
-    restartSensitive() { zone.store.close(); zone = openZone(); sops = sensitiveOps(zone); world.gz = new DirectClient(sops.gz); world.ctl = new DirectClient(sops.ctl); world.watchdog.sensCtl = world.ctl; return zone; },
+    restartSensitive(over = null) { zone.store.close(); if (over) { cfg = { ...cfg, ...over }; world.cfg = cfg; } zone = openZone(); sops = sensitiveOps(zone); world.gz = new DirectClient(sops.gz); world.ctl = new DirectClient(sops.ctl); world.watchdog.sensCtl = world.ctl; return zone; },
   };
   world.watchdog = new Watchdog({ ledgerRead, ledgerAdmin, sensCtl: world.ctl, owner, freezeStore: world.freezeStore, now, wallNow,
     executorKey: executor.publicKey, genesisTotalYocto: GENESIS_TOTAL, ...watchdogOpts });

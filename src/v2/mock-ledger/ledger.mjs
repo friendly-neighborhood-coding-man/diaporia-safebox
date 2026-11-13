@@ -141,6 +141,20 @@ export class MockLedger {
     if (u.target !== 'mock-ledger' || u.frozenAt !== String(this.#meta('frozenAt'))) fail('LEDGER_BAD_UNFREEZE');
     return this.#tx(() => { this.#setMeta('frozen', '0'); this.#journal('UNFROZEN', { statement }); return this.state(); });
   }
+  /** While FROZEN only: void a transfer that is still PENDING (never credited). SETTLED transfers are final and cannot be voided. */
+  voidPending(txId, reason) {
+    return this.#tx(() => {
+      if (this.#meta('frozen') !== '1') fail('LEDGER_NOT_FROZEN');
+      const t = this.db.prepare('SELECT * FROM txs WHERE tx_id=?').get(String(txId));
+      if (!t) fail('LEDGER_UNKNOWN_TX');
+      if (t.status !== 'PENDING') fail('LEDGER_NOT_PENDING', t.status);
+      const from = this.db.prepare('SELECT balance FROM accounts WHERE id=?').get(t.sender);
+      this.db.prepare('UPDATE accounts SET balance=? WHERE id=?').run((BigInt(from.balance) + BigInt(t.amount)).toString(), t.sender);
+      this.db.prepare("UPDATE txs SET status='VOIDED' WHERE tx_id=? AND status='PENDING'").run(t.tx_id);
+      this.#journal('TX_VOIDED', { txId: t.tx_id, reason: String(reason).slice(0, 200) });
+      return this.txStatus(t.tx_id);
+    });
+  }
   state() { return { frozen: this.#meta('frozen') === '1', frozenAt: this.#meta('frozenAt'), frozenReason: this.#meta('frozenReason'), lastKeyNonce: this.#meta('lastKeyNonce'), executorAccount: this.#meta('executorAccount'), maxPaymentYocto: this.#meta('maxPaymentYocto') }; }
 
   txStatus(txId) {
@@ -180,6 +194,7 @@ export function ledgerOps(ledger) {
     FREEZE: { fields: ['reason'], handler: (a) => ledger.freeze(a.reason) },
     UNFREEZE: { fields: ['unfreeze'], types: { unfreeze: 'signed' }, handler: (a) => ledger.unfreeze(a.unfreeze) },
     SETTLE_DUE: { fields: [], handler: () => ({ settled: ledger.settleDue() }) },
+    VOID_PENDING: { fields: ['txId', 'reason'], handler: (a) => ledger.voidPending(a.txId, a.reason) },
   };
   return { exec, read, admin };
 }

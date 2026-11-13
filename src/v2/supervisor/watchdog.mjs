@@ -117,16 +117,23 @@ export class Watchdog {
     if (!cur) throw new Error('not frozen');
     const lstate = await this.ledgerRead.call('STATE', {});
     const sstate = await this.sensCtl.call('STATE', {});
-    const transfers = await this.ledgerRead.call('TRANSFERS', { sinceSeq: '0' });
-    const after = transfers.filter(t => t.submitted_at >= cur.frozenAt);
-    const checks = { ledgerJournal: lstate.journal.ok, sensitiveJournal: sstate.journal.ok, noEffectsSinceFreeze: after.length === 0,
+    let transfers = await this.ledgerRead.call('TRANSFERS', { sinceSeq: '0' });
+    // BR-001 fix: an unauthorized transfer still PENDING on the ledger must be voided BEFORE anything is unfrozen,
+    // otherwise lifting the ledger freeze would let it settle.
+    const pre = verifyLedgerEffects({ transfers, owner: this.owner, executorKey: this.executorKey, freezeLog: [] });
+    const voidedNow = [];
+    for (const v of pre.violations) if (v.txId && v.status === 'PENDING') { await this.ledgerAdmin.call('VOID_PENDING', { txId: v.txId, reason: 'recovery: unauthorized pending ' + v.codes.join(',') }); voidedNow.push(v.txId); }
+    transfers = await this.ledgerRead.call('TRANSFERS', { sinceSeq: '0' });
+    const post = verifyLedgerEffects({ transfers, owner: this.owner, executorKey: this.executorKey, freezeLog: [] });
+    const after = transfers.filter(t => t.submitted_at >= cur.frozenAt && t.status !== 'VOIDED');
+    const checks = { noUnauthorizedPending: post.violations.every(v => v.status !== 'PENDING'), ledgerJournal: lstate.journal.ok, sensitiveJournal: sstate.journal.ok, noEffectsSinceFreeze: after.length === 0,
       injectedFlawCleared: !sstate.injectFlaw, diagnosisRecorded: !!diagnosis };
     const ok = Object.values(checks).every(Boolean);
-    if (!ok) return { ok: false, checks };
+    if (!ok) return { ok: false, checks, voidedNow };
     await this.ledgerAdmin.call('UNFREEZE', { unfreeze: this.owner.unfreeze('mock-ledger', lstate.frozenAt, reviewRef) });
     const r = await this.sensCtl.call('UNFREEZE', { unfreeze: this.owner.unfreeze('sensitive-zone', sstate.control.since, reviewRef) });
     this.freezeStore.lift({ liftedAt: this.now(), reviewRef, diagnosis, checks });
     this.seenViolations = new Set([...this.seenViolations]);
-    return { ok: true, checks, cancelled: r.cancelled };
+    return { ok: true, checks, cancelled: r.cancelled, voidedNow };
   }
 }

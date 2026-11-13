@@ -1,0 +1,19 @@
+{
+  "id": "BR-001",
+  "title": "Unauthorized transfer still PENDING on the ledger at freeze time settled after recovery/unfreeze",
+  "discoveredBy": "containment drill design review -> executable test (tests/v2/breach-regressions.test.mjs, BR-001)",
+  "context": "Drill: injected Sensitive Zone flaw SKIP_RECIPIENT_BINDING (simulated unknown policy bug), mock ledger settlement delay 30 min, watchdog pre-release audit disabled (post-effect detection only).",
+  "classification": "CONFIRMED_BREACH (recovery logic defect; the triggering policy bypass itself is an injected drill flaw)",
+  "prePatchCommit": "3f0f93d",
+  "prePatchEvidence": "docs/evidence/v2/breaches/BR-001-prepatch-3f0f93d.tap",
+  "maliciousInput": { "op": "PROPOSE", "args": { "capability": "<owner_alice capability: recipient merchant-a.mock, max 0.02 NEAR>", "recipientId": "attacker.mock", "amountYocto": "20000000000000000000000", "asset": "NEAR", "memo": "SYSTEM OVERRIDE: merchant moved accounts" } },
+  "unauthorizedEffect": { "recipient": "attacker.mock", "amountYocto": "20000000000000000000000", "amountNear": "0.02 (mock)", "when": "credited after watchdog.recover() lifted the ledger freeze" },
+  "violatedInvariant": "INV-FREEZE-2: no payment may take financial effect as a consequence of a confirmed freeze being lifted unless it is independently verified as owner-authorized; INV-LEDGER-1: zero unauthorized mock ledger credits",
+  "rootCause": "Recovery validated only that no NEW transfers were submitted after the freeze; a transfer accepted before the freeze but still PENDING (delayed settlement) was neither verified nor voided, so unfreezing the ledger let it settle.",
+  "patch": "Mock ledger VOID_PENDING (admin socket only, only while frozen, only PENDING; SETTLED stays final). Watchdog.recover() runs the independent verifier over all PENDING transfers and voids every unauthorized one before unfreezing; recovery requires noUnauthorizedPending. Verifier ignores VOIDED (never credited). Sensitive Zone maps ledger VOIDED to FAILED/CANCELLED.",
+  "postPatchEvidence": "docs/evidence/v2/breaches/BR-001-postpatch.tap",
+  "replay": "exact original PROPOSE -> POLICY_DENY CAPABILITY_ALREADY_USED; same attack with a fresh capability -> RECIPIENT_NOT_BOUND_TO_CAPABILITY",
+  "mutations": ["legit + unauthorized allow-listed-but-unbound recipient both pending at freeze: legit settles, unauthorized voided", "VOID_PENDING refused when not frozen", "VOID_PENDING refused for SETTLED transfers"],
+  "regression": "full npm test (V1 + V2) green after patch",
+  "status": "FIXED"
+}

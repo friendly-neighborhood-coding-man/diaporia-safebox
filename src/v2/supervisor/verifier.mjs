@@ -9,7 +9,9 @@ export function verifyLedgerEffects({ transfers, owner, executorKey, freezeLog =
   const effects = [], violations = [];
   const byCap = new Map(), byPayment = new Map();
   const perPolicy = new Map();
+  const voided = [];
   for (const t of transfers) {
+    if (t.status === 'VOIDED') { voided.push({ txId: t.tx_id, recipient: t.recipient, amountYocto: t.amount }); continue; } // never credited
     const codes = [];
     let tx = null;
     try { tx = parseCanonical(t.statement, 2048); } catch { codes.push('UNPARSEABLE_TX'); }
@@ -56,5 +58,5 @@ export function verifyLedgerEffects({ transfers, owner, executorKey, freezeLog =
     if (!conservation.ok) violations.push({ codes: ['BALANCE_CONSERVATION_BROKEN'], conservation });
   }
   const unauthorizedYocto = violations.reduce((s, v) => s + (v.amountYocto ? BigInt(v.amountYocto) : 0n), 0n);
-  return { effects, violations, unauthorizedCount: violations.length, unauthorizedYocto: unauthorizedYocto.toString(), conservation };
+  return { effects, violations, voided, unauthorizedCount: violations.length, unauthorizedYocto: unauthorizedYocto.toString(), conservation };
 }

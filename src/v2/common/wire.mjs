@@ -42,9 +42,10 @@ export async function dispatch(ops, line, ctx) {
     return { rid, ok: true, result: result ?? null };
   } catch (e) {
     const code = e instanceof SafeBoxError ? e.code : 'INTERNAL_ERROR';
+    const detail = e instanceof SafeBoxError && e.message.startsWith(code + ': ') ? e.message.slice(code.length + 2, code.length + 302) : undefined;
     if (!(e instanceof SafeBoxError) && process.env.SBX2_DEBUG) console.error(e);
     ctx?.onDenied?.(msg?.op ?? null, code);
-    return { rid, ok: false, error: { code } };
+    return { rid, ok: false, error: detail ? { code, detail } : { code } };
   }
 }
 
@@ -106,7 +107,7 @@ export class UnixClient {
     });
   }
   async request(op, args = {}) { const rid = 'r' + (++ridSeq); return this.raw(JSON.stringify({ op, args, rid }), rid); }
-  async call(op, args = {}) { const r = await this.request(op, args); if (!r.ok) throw new SafeBoxError(r.error.code); return r.result; }
+  async call(op, args = {}) { const r = await this.request(op, args); if (!r.ok) throw new SafeBoxError(r.error.code, r.error.detail); return r.result; }
   close() { this.sock?.destroy(); }
 }
 
@@ -115,6 +116,6 @@ export class DirectClient {
   constructor(ops, ctx = {}) { this.ops = ops; this.ctx = ctx; }
   async raw(line) { const r = await dispatch(this.ops, line, this.ctx); return JSON.parse(JSON.stringify(r)); }
   async request(op, args = {}) { const rid = 'd' + (++ridSeq); return this.raw(JSON.stringify({ op, args, rid })); }
-  async call(op, args = {}) { const r = await this.request(op, args); if (!r.ok) throw new SafeBoxError(r.error.code); return r.result; }
+  async call(op, args = {}) { const r = await this.request(op, args); if (!r.ok) throw new SafeBoxError(r.error.code, r.error.detail); return r.result; }
   close() {}
 }
