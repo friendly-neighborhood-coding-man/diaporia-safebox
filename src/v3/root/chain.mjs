@@ -96,7 +96,11 @@ export function verifyApprovals(state, action, approvals, ruleName, { subject = 
   }
   const ok = rule.anyOf.some(alt => satisfies(alt, approvers, { subject, countMode: state.matrix.countMode }));
   if (!ok) fail('QUORUM_NOT_SATISFIED', ruleName);
-  if (rule.uv === '1' && !approvers.some(a => a.uv)) fail('USER_VERIFICATION_REQUIRED', ruleName);
+  // uv='1': every passkey approval must carry UV (enforced in verifyAssertion) and multi-signer actions need >= 1 UV
+  // assertion. Single-signer narrow scopes (recovery consent/withdraw/cancel) may be signed by an external hardware key
+  // alone: otherwise K3/K5 hardware keys could never consent and recovery would be impossible (found by the 0..5 sweep).
+  const multi = rule.anyOf.every(alt => Object.values(alt).reduce((x, n) => x + Number(n), 0) >= 2);
+  if (rule.uv === '1' && multi && !approvers.some(a => a.uv)) fail('USER_VERIFICATION_REQUIRED', ruleName);
   return { approvers: approvers.map(a => a.credId), signCounts, digestHex: dig.toString('hex') };
 }
 
@@ -549,6 +553,12 @@ const HANDLERS = {
     if (!surv.length || !surv.every(x => cs.consents[x])) fail('OVERRIDE_NEEDS_ALL_SURVIVOR_CONSENTS');
     if (Object.keys(cs.guardians).length < Number(s.config.reconGuardianQuorum)) fail('OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM');
     if (!Object.keys(cs.identity).length) fail('OVERRIDE_NEEDS_IDENTITY');
+    // F-V3-01 repair: an objection signed by an allegedly lost key is evidence too. It may be overridden (thief case)
+    // only when the consenting survivors strictly OUTNUMBER the distinct objecting "lost" keys. Otherwise one stolen
+    // key + a colluding guardian/IDV quorum could claim the real owner's keys lost and override the owner's objections.
+    const subjectObjectors = new Set(cs.disputes.filter(d => d.kind === 'subject').map(d => d.by));
+    if (subjectObjectors.size && cs.path !== 'RECOVERY') fail('OVERRIDE_NOT_ALLOWED_IN_RECONSTITUTION', 'survivors are a minority; a claimed-lost key objecting cannot be outvoted');
+    if (subjectObjectors.size && !(surv.length > subjectObjectors.size)) fail('OVERRIDE_OUTNUMBERED_BY_OBJECTING_KEYS', `${surv.length} survivors vs ${subjectObjectors.size} objecting keys`);
     cs.disputes = cs.disputes.filter(d => !(d.kind === 'channel' || d.kind === 'subject'));
     cs.overrides = (cs.overrides ?? 0) + overridable.length;
     if (!cs.disputes.length && cs.state === 'HOLD') { cs.state = cs.prior; cs.prior = null; }
@@ -615,6 +625,11 @@ const HANDLERS = {
     requireCommon(s, cs, at, { guardianNeed: Number(s.config.reconGuardianQuorum), idNeed: Number(s.config.reconIdentityAttestations), early: false });
     const la = lossAssessment(s, cs, at);
     if (la.survivors.length < Number(s.config.reconMinSurvivors)) fail('RECOVERY_IMPOSSIBLE_NO_SURVIVOR');
+    // F-V3-01 hardening: the subject holder's own channels must positively acknowledge (majority), so a reconstitution
+    // cannot be driven through while the owner is silent unless the attacker ALSO controls most of the owner's channels.
+    const subjCh = Object.keys(s.channels).filter(c => s.channels[c].holderId === cs.subjectHolderId);
+    const acked = subjCh.filter(c => cs.acks[c] === 'NO_OBJECTION').length;
+    if (subjCh.length && acked * 2 <= subjCh.length) fail('RECONSTITUTION_NEEDS_OWNER_CHANNEL_ACKS', `${acked}/${subjCh.length}`);
     // retire the WHOLE old authorization environment; assets, purpose and audit history are preserved
     for (const c of Object.values(s.creds)) if (isLive(c)) { c.status = 'retired'; c.retiredAt = at; c.retiredBy = 'reconstitution:' + cs.caseId; }
     for (const c of cs.plan) s.creds[c.credId] = { ...c, status: 'active', epochAdded: s.epoch + 1, provisionalUntil: 0 };
