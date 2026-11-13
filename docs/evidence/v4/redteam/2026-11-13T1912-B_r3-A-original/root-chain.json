@@ -1,0 +1,40 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "freezeId": "fz-1",
+   "source": "owner",
+   "reason": "security"
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k3-root-hw"
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k5-recovery-hw"
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop"
+  ]
+ }
+]

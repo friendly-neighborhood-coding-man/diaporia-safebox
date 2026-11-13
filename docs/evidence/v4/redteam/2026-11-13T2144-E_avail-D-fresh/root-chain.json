@@ -1,0 +1,76 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-dos-1",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone"
+   ],
+   "subjectHolderId": "alice",
+   "note": "owner lost phone, initiating recovery",
+   "plan": [
+    {
+     "credId": "atk-daily-e5b7cf2e",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-e5b7cf2e-6f79da",
+      "seedCommitment": "60a3c6a8bcfd63a4fe161e25ae8800c76531639114bf692eb479e898601befba",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAuiTJZxkfRrYK0Zy5uGlT08AIONzIqbcqG0_mLnWkYLQtILznLxLIhyTDKwlh6F0P1gkpQECAyYgASFYIEMbpeyjQsbzaVLwGBHfVZRoekEPaWefg7ytmnfDq5Y_IlggOUT-9jAgQ-SQwhsMeYMZHp7maxd0invWaga-XfKn2hM",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoibXdBZTFfNFFzMWlzSGF0T1lRdEpraUlLRnZQZktXRnVKSE1MdWtqMnhFayIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "atk-root-186c8b0a",
+     "role": "ROOT",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "ed25519",
+     "provenance": {
+      "deviceId": "dev-atk-root-186c8b0a-0e130a",
+      "seedCommitment": "b29f0425ebf8937a527701b7a376b68b243026f6a50bec9d4cf1dede712917f7",
+      "syncProvider": "none"
+     },
+     "publicKey": "ed25519:Re3evSliE0a3YzGXzEL1B9jbmMbTBeATbBxoH0IPJ_M",
+     "pop": "4EgdaMM1XKRf5_NtNodTg4YHi0gOBXmIxMG9-Vn2TRXWWTT8K1FualLN4A0clbhb3tpS4lc64qitfc4biOuPCQ"
+    }
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-dos-1",
+   "caseDigest": "77bff7f5f46ed7dd2856a5f0eb9bf5851ac347cd84d2cb81073ac74435454763",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T19:00:00.000Z",
+  "type": "RECOVERY_ORC_CANCEL",
+  "body": {
+   "caseId": "case-dos-1",
+   "caseDigest": "77bff7f5f46ed7dd2856a5f0eb9bf5851ac347cd84d2cb81073ac74435454763"
+  },
+  "approvers": [
+   "orc-1"
+  ]
+ }
+]

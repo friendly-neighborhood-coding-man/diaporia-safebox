@@ -1,0 +1,98 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-1",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone"
+   ],
+   "subjectHolderId": "alice",
+   "note": "device lost",
+   "plan": [
+    {
+     "credId": "atk-daily-f256cd75",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-f256cd75-17a3a9",
+      "seedCommitment": "ec05e435be445cf037757bfa75c13845498cf9a2a35397160bcae0c623849c92",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAn4uCmyeIWfczfz9Rs8dq9gAIAhfQxnFtnaZKyCWtKJHjKYd9rt3LLAzwBMkLaP8wvCppQECAyYgASFYIFGTpvw5ieyImiAuoDNEkJpwvdTs55ETPNL8RazdD6ZZIlgga7UUvkwC6XBciTLdSMtosWOwQdE4kODbA9x3jJY4rXw",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiOFpINmF1N2c5RFhEblNyWFFfUVlTNGhTaS1zeEV3QmRUMDRwT0UtRjktcyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "atk-root-c37295d2",
+     "role": "ROOT",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "ed25519",
+     "provenance": {
+      "deviceId": "dev-atk-root-c37295d2-551f00",
+      "seedCommitment": "e09bbf1bc38feb0ccb2235be9fa7598660b544406e9bddca3b29454368489860",
+      "syncProvider": "none"
+     },
+     "publicKey": "ed25519:WUkVBrYBsZ4wxZs-BjnRshdoF5udhk7QSv1bwtzCY1M",
+     "pop": "tv0ydcXrVtM-bwcXZ-96stcd5FB6YVLcYY97mF6b01CWdaYUT5hOQp6U00Ms7dNb48iTZ4vc_y-7Oa3rGLDQDg"
+    }
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-1",
+   "caseDigest": "4ec37fedcaedeaa0e0e8e2beeef42a4fe34bd8043d7cd4f25e94f65951f73aa7",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T22:00:00.000Z",
+  "type": "RECOVERY_ORC_CANCEL",
+  "body": {
+   "caseId": "case-1",
+   "caseDigest": "4ec37fedcaedeaa0e0e8e2beeef42a4fe34bd8043d7cd4f25e94f65951f73aa7"
+  },
+  "approvers": [
+   "orc-1"
+  ]
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k1-phone"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k4-freeze"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ }
+]

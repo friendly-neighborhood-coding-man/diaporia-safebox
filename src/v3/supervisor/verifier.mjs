@@ -2,13 +2,15 @@
 // what it can verify cryptographically. It replays the Root chain itself, then checks every ledger effect against the
 // capability evidence (fetched from the vault, i.e. untrusted, but verified here) and the Root state AT THAT TIME.
 // It also lists every authority change so a campaign can compare it against the owner's ground-truth intent.
-import { genesisState, applyTransition, actionDigest } from '../root/chain.mjs';
+import * as V3CHAIN from '../root/chain.mjs';
+const { actionDigest } = V3CHAIN;
 import { verifyPaycap } from '../vault/paycap.mjs';
 import { purposeViolations } from '../root/capsule.mjs';
 
-const AUTHORITY_TYPES = new Set(['AMEND_PURPOSE', 'AMEND_MATRIX', 'UNFREEZE', 'ROTATE', 'REVOKE', 'REPLACE_VACANT', 'UNSUSPEND', 'RATIFY_BASELINE', 'RECOVERY_COMPLETE', 'RECONSTITUTE', 'RECOVERY_CANCEL']);
+export const AUTHORITY_TYPES = new Set(['AMEND_PURPOSE', 'AMEND_MATRIX', 'UNFREEZE', 'ROTATE', 'REVOKE', 'REPLACE_VACANT', 'UNSUSPEND', 'RATIFY_BASELINE', 'RECOVERY_COMPLETE', 'RECONSTITUTE', 'RECOVERY_CANCEL']);
 
-export function verifyV3({ genesis, pinnedChainId, transitions, ledgerTxs = [], evidence = [], minBufferMs = 600_000, ownerIntents = null, attackerCaseIds = new Set() }) {
+export function verifyV3({ genesis, pinnedChainId, transitions, ledgerTxs = [], evidence = [], minBufferMs = 600_000, ownerIntents = null, attackerCaseIds = new Set(), chain = V3CHAIN, authorityTypes = AUTHORITY_TYPES, takeoverTypes = ['RECOVERY_COMPLETE', 'RECONSTITUTE'] }) {
+  const { genesisState, applyTransition } = chain;
   const out = { chainValid: true, chainError: null, financial: { effects: 0, authorized: 0, violations: [] }, authority: { changes: [], unauthorized: [] }, purpose: { versions: [], violations: [] }, takeovers: [] };
   let st;
   try { st = genesisState(genesis, { pinnedChainId }); } catch (e) { out.chainValid = false; out.chainError = 'GENESIS:' + (e.code ?? e.message); return out; }
@@ -23,14 +25,14 @@ export function verifyV3({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
       if (type !== 'AMEND_PURPOSE') out.purpose.violations.push({ seq: tr.seq, type, code: 'PURPOSE_CHANGED_WITHOUT_AMENDMENT' });
       out.purpose.versions.push({ version: st.purpose.version, digest: st.purposeDigest, seq: Number(tr.seq) });
     }
-    if (AUTHORITY_TYPES.has(type) || (type === 'RECOVERY_CANCEL' && r.effects.some(e => e.type === 'RECOVERY_CLOSED'))) {
+    if (authorityTypes.has(type) || (type === 'RECOVERY_CANCEL' && r.effects.some(e => e.type === 'RECOVERY_CLOSED'))) {
       const d = actionDigest(tr.action).toString('hex');
-      const caseId = tr.action.body?.caseId ?? null;
+      const caseId = tr.action.body?.caseId ?? tr.action.body?.gcaseId ?? null;
       const ch = { seq: tr.seq, type, digest: d, caseId, epoch: st.epoch, effects: r.effects.map(e => e.type) };
       out.authority.changes.push(ch);
       const attackerCase = caseId && attackerCaseIds.has(caseId);
-      if ((type === 'RECOVERY_COMPLETE' || type === 'RECONSTITUTE') && attackerCase) { out.takeovers.push(ch); out.authority.unauthorized.push({ ...ch, code: 'RECOVERY_TAKEOVER' }); }
-      else if (ownerIntents && !ownerIntents.has(d) && !(type === 'RECOVERY_COMPLETE' || type === 'RECONSTITUTE')) out.authority.unauthorized.push({ ...ch, code: 'AUTHORITY_CHANGE_NOT_INTENDED_BY_OWNER' });
+      if (takeoverTypes.includes(type) && attackerCase) { out.takeovers.push(ch); out.authority.unauthorized.push({ ...ch, code: 'RECOVERY_TAKEOVER' }); }
+      else if (ownerIntents && !ownerIntents.has(d) && !takeoverTypes.includes(type)) out.authority.unauthorized.push({ ...ch, code: 'AUTHORITY_CHANGE_NOT_INTENDED_BY_OWNER' });
     }
   }
   out.finalState = st;

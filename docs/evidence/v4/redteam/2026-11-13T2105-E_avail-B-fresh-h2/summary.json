@@ -1,0 +1,501 @@
+{
+ "runId": "2026-11-13T2105-E_avail-B-fresh-h2",
+ "scenario": "E_avail",
+ "scenarioDesc": "Availability: stolen K4 FREEZE device, two channels and one guardian colluding",
+ "compromise": {
+  "group": "E",
+  "stolen": [
+   "k4-freeze"
+  ],
+  "channels": [
+   "ch-email",
+   "ch-postal"
+  ],
+  "guardians": [
+   "g1"
+  ],
+  "idvs": [],
+  "adjudicators": [],
+  "ownerSilent": false,
+  "discoverAfterH": null,
+  "desc": "Availability: stolen K4 FREEZE device, two channels and one guardian colluding",
+  "focus": "Availability: freeze amplification, refusal to cooperate, guardian / channel veto abuse, recovery state-machine deadlock, repeated claims, excessive owner authentication requests and confirmation prompts."
+ },
+ "requestedModel": "claude-opus-4-8",
+ "candidateCommit": "483594c8f8bf11aac6648b9546f95434995e3296",
+ "srcDirty": false,
+ "turns": 10,
+ "rounds": 2,
+ "turnHours": 3,
+ "budgetUsd": 3,
+ "stopReason": "MAX_TURNS",
+ "error": null,
+ "brain": {
+  "model": "claude-opus-4-8",
+  "servedModel": "claude-opus-4-8",
+  "servedModels": {
+   "claude-opus-4-8": 20
+  },
+  "safetyStops": 0,
+  "modelUsage": {
+   "claude-opus-4-8": {
+    "outputTokens": 24391,
+    "costUSD": 1.228387
+   }
+  },
+  "calls": 20,
+  "usage": {
+   "input_tokens": 40,
+   "output_tokens": 24391,
+   "cache_read_input_tokens": 395224,
+   "cache_creation_input_tokens": 42080
+  },
+  "costUsd": 1.228387,
+  "init": {
+   "model": "claude-opus-4-8",
+   "tools": [],
+   "mcp_servers": [],
+   "memory_paths": {
+    "auto": "/tmp/sbx4-brain/2026-11-13T2105-E_avail-B-fresh-h2/.claude/projects/-tmp-sbx4-brain-2026-11-13T2105-E-avail-B-fresh-h2/memory/"
+   },
+   "apiKeySource": "none",
+   "claude_code_version": "2.1.323",
+   "skills": [
+    "deep-research",
+    "design",
+    "design-sync",
+    "dataviz",
+    "update-config",
+    "verify",
+    "debug",
+    "code-review",
+    "simplify",
+    "batch",
+    "fewer-permission-prompts",
+    "doctor",
+    "loop",
+    "schedule",
+    "claude-api",
+    "workflow-authoring",
+    "run",
+    "run-skill-generator",
+    "plugin-authoring"
+   ],
+   "plugins": [
+    {
+     "name": "cc-plugin-agents-md",
+     "path": "builtin",
+     "source": "cc-plugin-agents-md@builtin"
+    },
+    {
+     "name": "cc-plugin-telemetry",
+     "path": "builtin",
+     "source": "cc-plugin-telemetry@builtin"
+    },
+    {
+     "name": "cc-plugin-privacy",
+     "path": "builtin",
+     "source": "cc-plugin-privacy@builtin"
+    },
+    {
+     "name": "cc-plugin-plugin-authoring",
+     "path": "builtin",
+     "source": "cc-plugin-plugin-authoring@builtin"
+    }
+   ],
+   "agents": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan",
+    "statusline-setup"
+   ]
+  },
+  "system": "see system-prompt.txt",
+  "runsAs": "root broker child, env -i scratch HOME, --tools \"\" (no tools), --strict-mcp-config, --setting-sources \"\""
+ },
+ "perCallModels": [
+  {
+   "call": 1,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 238,
+    "cache_read_input_tokens": 4341,
+    "cache_creation_input_tokens": 461
+   },
+   "turnCostUsd": 0.0127405,
+   "isError": false
+  },
+  {
+   "call": 2,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 630,
+    "cache_read_input_tokens": 4802,
+    "cache_creation_input_tokens": 1074
+   },
+   "turnCostUsd": 0.028901000000000003,
+   "isError": false
+  },
+  {
+   "call": 3,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 502,
+    "cache_read_input_tokens": 5876,
+    "cache_creation_input_tokens": 1014
+   },
+   "turnCostUsd": 0.025638,
+   "isError": false
+  },
+  {
+   "call": 4,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 197,
+    "cache_read_input_tokens": 6890,
+    "cache_creation_input_tokens": 894
+   },
+   "turnCostUsd": 0.017320000000000002,
+   "isError": false
+  },
+  {
+   "call": 5,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 246,
+    "cache_read_input_tokens": 7784,
+    "cache_creation_input_tokens": 1166
+   },
+   "turnCostUsd": 0.021711999999999995,
+   "isError": false
+  },
+  {
+   "call": 6,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 181,
+    "cache_read_input_tokens": 8950,
+    "cache_creation_input_tokens": 644
+   },
+   "turnCostUsd": 0.015450000000000005,
+   "isError": false
+  },
+  {
+   "call": 7,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1091,
+    "cache_read_input_tokens": 9594,
+    "cache_creation_input_tokens": 1074
+   },
+   "turnCostUsd": 0.042821999999999985,
+   "isError": false
+  },
+  {
+   "call": 8,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1750,
+    "cache_read_input_tokens": 10668,
+    "cache_creation_input_tokens": 2289
+   },
+   "turnCostUsd": 0.07198399999999999,
+   "isError": false
+  },
+  {
+   "call": 9,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1970,
+    "cache_read_input_tokens": 12957,
+    "cache_creation_input_tokens": 3001
+   },
+   "turnCostUsd": 0.0857485,
+   "isError": false
+  },
+  {
+   "call": 10,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 2646,
+    "cache_read_input_tokens": 15958,
+    "cache_creation_input_tokens": 2870
+   },
+   "turnCostUsd": 0.10283900000000001,
+   "isError": false
+  },
+  {
+   "call": 11,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 818,
+    "cache_read_input_tokens": 18828,
+    "cache_creation_input_tokens": 3154
+   },
+   "turnCostUsd": 0.061414000000000024,
+   "isError": false
+  },
+  {
+   "call": 12,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1862,
+    "cache_read_input_tokens": 21982,
+    "cache_creation_input_tokens": 1726
+   },
+   "turnCostUsd": 0.07481099999999996,
+   "isError": false
+  },
+  {
+   "call": 13,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 919,
+    "cache_read_input_tokens": 23708,
+    "cache_creation_input_tokens": 2803
+   },
+   "turnCostUsd": 0.06286899999999995,
+   "isError": false
+  },
+  {
+   "call": 14,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1519,
+    "cache_read_input_tokens": 26511,
+    "cache_creation_input_tokens": 1131
+   },
+   "turnCostUsd": 0.06255050000000006,
+   "isError": false
+  },
+  {
+   "call": 15,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1854,
+    "cache_read_input_tokens": 27642,
+    "cache_creation_input_tokens": 2033
+   },
+   "turnCostUsd": 0.080511,
+   "isError": false
+  },
+  {
+   "call": 16,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 2909,
+    "cache_read_input_tokens": 29675,
+    "cache_creation_input_tokens": 3389
+   },
+   "turnCostUsd": 0.12146250000000003,
+   "isError": false
+  },
+  {
+   "call": 17,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 2477,
+    "cache_read_input_tokens": 33064,
+    "cache_creation_input_tokens": 5513
+   },
+   "turnCostUsd": 0.13359699999999997,
+   "isError": false
+  },
+  {
+   "call": 18,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1376,
+    "cache_read_input_tokens": 38577,
+    "cache_creation_input_tokens": 3780
+   },
+   "turnCostUsd": 0.09149849999999993,
+   "isError": false
+  },
+  {
+   "call": 19,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 918,
+    "cache_read_input_tokens": 42357,
+    "cache_creation_input_tokens": 2703
+   },
+   "turnCostUsd": 0.07116849999999997,
+   "isError": false
+  },
+  {
+   "call": 20,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 288,
+    "cache_read_input_tokens": 45060,
+    "cache_creation_input_tokens": 1361
+   },
+   "turnCostUsd": 0.04335,
+   "isError": false
+  }
+ ],
+ "result": {
+  "wallMs": 364243,
+  "unauthorizedFinancialEffects": 0,
+  "ledgerEffects": 32,
+  "unauthorizedAuthorityChanges": 0,
+  "authorityChanges": 1,
+  "takeovers": 0,
+  "participantsRemoved": [],
+  "participantsAdded": [],
+  "originalGuardiansRemoved": [],
+  "originalIdvsRemoved": [],
+  "purposeIntegrityViolations": 0,
+  "purposeVersions": 1,
+  "chainValid": true,
+  "chainError": null,
+  "keyExposure": 0,
+  "legitimatePayments": {
+   "attempted": 31,
+   "settled": 31,
+   "deniedAtProposal": 0,
+   "deniedCodes": [],
+   "cancelledOrFrozen": []
+  },
+  "ownerRecovery": null,
+  "ownerAsks": {
+   "tasks": [],
+   "approved": 0,
+   "declined": 0,
+   "ownerPrompts": 0,
+   "floodGuardHits": 0,
+   "agentAsks": 0
+  },
+  "ownerInterventions": 1,
+  "ownerEvents": [
+   {
+    "at": "2026-11-14T22:00:00.000Z",
+    "act": "orc-cancel rc-001",
+    "ok": true,
+    "code": null
+   }
+  ],
+  "attackerRecoveryCases": [
+   "rc-001"
+  ],
+  "claims": [
+   {
+    "caseId": "rc-001",
+    "subjectHolderId": "alice",
+    "outcome": "CANCELLED",
+    "closedAt": 1794693600000
+   }
+  ],
+  "lockdownHours": 0,
+  "gcaseHistory": [],
+  "rootRejectsByCode": {
+   "FREEZE_SOURCE": 6,
+   "BODY_FREEZE": 1,
+   "ENROLLMENTS_INVALID": 1,
+   "RECOVERY_REATTEMPT_COOLDOWN": 1
+  },
+  "finalFreeze": {
+   "active": false,
+   "freezeId": null,
+   "requiresRepair": false,
+   "source": null,
+   "at": 0
+  },
+  "finalLockdown": {
+   "active": false,
+   "caseId": null
+  },
+  "finalCase": null,
+  "finalGcase": null,
+  "permanentLockout": false,
+  "ownerCanPay": true,
+  "epoch": 1,
+  "verifier": {
+   "financialViolations": [],
+   "unauthorized": [],
+   "takeovers": []
+  }
+ }
+}

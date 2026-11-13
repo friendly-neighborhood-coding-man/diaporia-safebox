@@ -24,7 +24,14 @@
     "build:contract-v3": "cargo build --manifest-path contract-v3/Cargo.toml --release --target wasm32-unknown-unknown",
     "v3:os": "node scripts/v3/os-matrix.mjs",
     "v3:check-deployment": "node scripts/v3/check-deployment.mjs",
-    "v3:redteam": "node --disable-warning=ExperimentalWarning scripts/v3/run-redteam.mjs"
+    "v3:redteam": "node --disable-warning=ExperimentalWarning scripts/v3/run-redteam.mjs",
+    "v4:test": "node --disable-warning=ExperimentalWarning --test tests/v4/*.test.mjs",
+    "test:contract-v4": "cargo test --manifest-path contract-v4/Cargo.toml",
+    "build:contract-v4": "cargo build --manifest-path contract-v4/Cargo.toml --release --target wasm32-unknown-unknown",
+    "v4:matrix": "node --disable-warning=ExperimentalWarning scripts/v4/recovery-matrix.mjs",
+    "v4:redteam": "node --disable-warning=ExperimentalWarning scripts/v4/run-redteam.mjs",
+    "v4:os": "node scripts/v4/os-matrix.mjs",
+    "v4:mutations": "node scripts/v4/mutations.mjs"
   },
   "dependencies": {
     "near-api-js": "7.5.3"

@@ -1,0 +1,213 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-2",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "UNFREEZE",
+  "body": {
+   "freezeId": "fz-2"
+  },
+  "approvers": [
+   "k1-phone",
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T12:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-6",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-14T12:00:00.000Z",
+  "type": "UNFREEZE",
+  "body": {
+   "freezeId": "fz-6"
+  },
+  "approvers": [
+   "k1-phone",
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-7",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "6",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "rc-1",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone"
+   ],
+   "subjectHolderId": "alice",
+   "plan": [
+    {
+     "credId": "atk-daily-93f46682",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-93f46682-e13d2d",
+      "seedCommitment": "d6be16370791e6a42019844cd712baa71831c7139faeecf90df8da1377c87e8e",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAo-l9JcRHqh-8dSzJ34AkUoAIO-fAlAt3AcZfBDKuou3AaVVS5x0wNdMeAU3BYmZsaIwpQECAyYgASFYIMScQEgCDCSCCRItPaMNZ1yz8XRfm0C5OeLcgCd4CgDiIlggHi_VqZ0I2v2GSgvfMhVB7jgh_sdoCbpmAlCofCRABdA",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiaDJNSkdQV2hvNG0xN2hXeDlMM1BLNzB4c2d3VTFTSmIzR3ItMS1mbVZmYyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ],
+   "note": "device lost"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "7",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "rc-1",
+   "caseDigest": "3128ed79b23938bf81e13b017ee293e38bcd59a012f047d2dc6a548be679b875",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "8",
+  "at": "2026-11-14T18:00:00.000Z",
+  "type": "UNFREEZE",
+  "body": {
+   "freezeId": "fz-7"
+  },
+  "approvers": [
+   "k1-phone",
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "9",
+  "at": "2026-11-14T19:00:00.000Z",
+  "type": "RECOVERY_ORC_CANCEL",
+  "body": {
+   "caseId": "rc-1",
+   "caseDigest": "3128ed79b23938bf81e13b017ee293e38bcd59a012f047d2dc6a548be679b875"
+  },
+  "approvers": [
+   "orc-1"
+  ]
+ },
+ {
+  "seq": "10",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-8",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "11",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-9",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "12",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-10",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "13",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "UNFREEZE",
+  "body": {
+   "freezeId": "fz-8"
+  },
+  "approvers": [
+   "k1-phone",
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "14",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "reason": "security-incident",
+   "freezeId": "fz-12",
+   "source": "owner"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "15",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "UNFREEZE",
+  "body": {
+   "freezeId": "fz-12"
+  },
+  "approvers": [
+   "k1-phone",
+   "k3-root-hw"
+  ]
+ }
+]

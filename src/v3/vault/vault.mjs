@@ -10,7 +10,7 @@ import { fail, SafeBoxError, iso, exactFields } from '../common/canon.mjs';
 import { V2_DOMAINS, digestOf } from '../../v2/common/crypto.mjs';
 import { LEDGER_TX_VERSION } from '../../v2/mock-ledger/ledger.mjs';
 import { SensitiveStore } from '../../v2/sensitive/store.mjs';
-import { genesisState, applyTransition, rootView, transitionHash } from '../root/chain.mjs';
+import * as V3CHAIN from '../root/chain.mjs';
 import { verifyPaycap } from './paycap.mjs';
 import { purposeViolations } from '../root/capsule.mjs';
 
@@ -37,6 +37,7 @@ export class ExecutionVault {
    */
   constructor(cfg, { store, now, wallNow = () => Date.now(), executorSigner, ledger }) {
     this.cfg = Object.freeze({ minBufferMs: 600_000, bufferMs: 600_000, leaseMs: 5_000, ...cfg });
+    this.C = cfg.chain ?? V3CHAIN; // protocol state machine the vault replays itself (V3 default, V4 passes its own)
     if (this.cfg.bufferMs < this.cfg.minBufferMs) fail('BUFFER_BELOW_FLOOR');
     this.store = store; this.now = now; this.wallNow = wallNow; this.executor = executorSigner; this.ledger = ledger;
     this.store.db.exec(EXTRA);
@@ -46,9 +47,9 @@ export class ExecutionVault {
 
   // ------------------------------------------------ Root replica (independent verification)
   #rebuild() {
-    let st = genesisState(this.cfg.genesis, { pinnedChainId: this.cfg.pinnedChainId });
+    let st = this.C.genesisState(this.cfg.genesis, { pinnedChainId: this.cfg.pinnedChainId });
     for (const r of this.store.db.prepare('SELECT * FROM root_chain ORDER BY seq').all()) {
-      st = applyTransition(st, JSON.parse(r.tr)).state; // a tampered replica fails here: the vault refuses to start
+      st = this.C.applyTransition(st, JSON.parse(r.tr)).state; // a tampered replica fails here: the vault refuses to start
       if (st.head !== r.head) fail('ROOT_REPLICA_CORRUPT');
     }
     this.root = st;
@@ -69,7 +70,7 @@ export class ExecutionVault {
         continue;
       }
       let r;
-      try { r = applyTransition(this.root, t); }
+      try { r = this.C.applyTransition(this.root, t); }
       catch (e) { this.#alarm('ROOT_TRANSITION_REJECTED', `${t?.action?.type}:${e.code ?? e.message}`); out.alarm = 'ROOT_TRANSITION_REJECTED:' + (e.code ?? 'ERR'); return out; }
       if (Date.parse(t.at) > this.now() + Number(this.root.config.skewMs)) { this.#alarm('ROOT_TIME_AHEAD', t.seq); out.alarm = 'ROOT_TIME_AHEAD'; return out; }
       this.store.tx(() => {
@@ -102,7 +103,7 @@ export class ExecutionVault {
       for (const r of this.store.byState(['FROZEN'])) if (!r.tx_statement) this.store.move(r.payment_id, 'FROZEN', 'CANCELLED', 'root', { reason: 'cancelled on unfreeze' }, { reason: 'CANCELLED_AFTER_FREEZE' });
     }
   }
-  view() { return { ...rootView(this.root), now: this.now() }; }
+  view() { return { ...this.C.rootView(this.root), now: this.now() }; }
 
   #spent() {
     const rows = this.store.db.prepare(`SELECT amount, proposed_at FROM payments WHERE state IN (${[...HOLDING, 'SETTLED'].map(() => '?').join(',')})`).all(...HOLDING, 'SETTLED');
@@ -283,7 +284,7 @@ export class ExecutionVault {
 
   state() {
     const counts = Object.fromEntries(this.store.db.prepare('SELECT state, COUNT(*) n FROM payments GROUP BY state').all().map(r => [r.state, r.n]));
-    return { control: this.store.control(), counts, root: rootView(this.root), rootAlarm: this.rootAlarm(), leaseFresh: this.wallNow() <= this.leaseUntil, journal: this.store.verifyJournal() };
+    return { control: this.store.control(), counts, root: this.C.rootView(this.root), rootAlarm: this.rootAlarm(), leaseFresh: this.wallNow() <= this.leaseUntil, journal: this.store.verifyJournal() };
   }
   evidence() { return this.store.db.prepare('SELECT cap_id, payment_id, cap, approval, cred_id, epoch FROM cap_evidence ORDER BY payment_id').all(); }
   payments() { return this.store.db.prepare('SELECT payment_id, cap_id, recipient, amount, state, proposed_at, release_at, released_at, settled_at, tx_id, reason FROM payments ORDER BY proposed_at, payment_id').all(); }

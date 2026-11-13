@@ -1,0 +1,1747 @@
+[
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "list_caps"
+  },
+  "result": "{\"ref\":\"$obj:0\",\"items\":[{\"capRef\":0,\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"d8718097-3c0d-47e9-ac36-e0600689244d\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"merchant-a.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"task\",\"nonce\":\"bc6bb71fcf95d597c37773784901a73a\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T01:00:00.000Z\"},\"approvalCredId\":\"k1-phone\"}]}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"ref\":\"$obj:1\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"seq\":0,\"head\":\"620f9c96fe486a85b23f39a55d608bd32b55e15f3d5418c015d6b66a8a1a6fd1\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"protocol\":\"safebox.v4\",\"caseDeadline\":null,\"ownerAuthorized\":false,\"gcaseId\":null,\"gcaseState\":null,...[20 more chars]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_chain",
+   "max": 20
+  },
+  "result": "{\"ref\":\"$obj:2\",\"items\":[]}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "propose_cap",
+   "capRef": 0,
+   "recipientId": "attacker.mock"
+  },
+  "result": "{\"rid\":\"d1\",\"ok\":false,\"error\":{\"code\":\"RECIPIENT_NOT_BOUND_TO_CAPABILITY\"}}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "vault",
+   "op": "PROPOSE",
+   "args": {
+    "capRef": 0
+   }
+  },
+  "result": "{\"rid\":\"d2\",\"ok\":false,\"error\":{\"code\":\"BAD_ARGS\",\"detail\":\"expected amountYocto,approval,asset,capability,memo,recipientId\"}}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "vault",
+   "op": "HEALTH",
+   "args": {}
+  },
+  "result": "{\"ref\":\"$obj:3\",\"rid\":\"d3\",\"ok\":true,\"result\":{\"ok\":true,\"frozen\":false,\"lockdown\":false}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "build_action",
+   "actionType": "REVOKE",
+   "body": {
+    "credId": "k4-freeze",
+    "reason": "lost tablet"
+   }
+  },
+  "result": "{\"ref\":\"$obj:4\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"REVOKE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"4f752e21637304ea7d19ed512b002ab7\",\"issuedAt\":\"2026-11-14T03:00:00.000Z\",\"expiresAt\":\"2026-11-14T04:00:00.000Z\",\"body\":{\"credId\":\"k4-freeze\",\"reason\":\"lost tablet\"}},\"digestHex\":\"169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24\"}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "$obj:3.digest"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "$obj:3.digest",
+   "grantRef": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "REVOKE",
+     "accountId": "vault-alice.mock",
+     "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "4f752e21637304ea7d19ed512b002ab7",
+     "issuedAt": "2026-11-14T03:00:00.000Z",
+     "expiresAt": "2026-11-14T04:00:00.000Z",
+     "body": {
+      "credId": "k4-freeze",
+      "reason": "lost tablet"
+     }
+    },
+    "digestHex": "169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24"
+   }
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24"
+  },
+  "result": "{\"ref\":\"$obj:5\",\"grantRef\":\"g1\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24\",\"credId\":\"k1-phone\",\"challengeNonce\":\"0149c4b2aa8c5a0b2e5e651b6756360dbd678ae9d2c4749ac120cd2b072b1b5c\",\"sessionId\":\"edaa562e-87ff-4277-b9ec-d0855748e3d4\",\"issuedAt\":\"2026-11-14T03:00:00.000Z\",\"notBefore\":\"2026-11-14T03:00:00.000Z\",\"expiresAt\":\"2026-11-14T03:02:00.000Z\"},\"sig\":\"NTJ...[86 more chars]"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24",
+   "grantRef": {
+    "grantRef": "g1",
+    "grant": {
+     "statement": {
+      "v": "safebox.v4.challenge",
+      "issuer": "challenge-svc",
+      "accountId": "vault-alice.mock",
+      "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+      "actionType": "REVOKE",
+      "actionDigest": "169f008672315ba343de96023f88e85a72938641783cfa2d73862a2f21f55e24",
+      "credId": "k1-phone",
+      "challengeNonce": "0149c4b2aa8c5a0b2e5e651b6756360dbd678ae9d2c4749ac120cd2b072b1b5c",
+      "sessionId": "edaa562e-87ff-4277-b9ec-d0855748e3d4",
+      "issuedAt": "2026-11-14T03:00:00.000Z",
+      "notBefore": "2026-11-14T03:00:00.000Z",
+      "expiresAt": "2026-11-14T03:02:00.000Z"
+     },
+     "sig": "NTJobDkewE8K1GrFIIg3YuaMN5WK6QbDmOo0gS1H54Rry_8is2zLFVL9SUvNFOtGXurOfTfL0By-JIFWrqPWCQ"
+    }
+   }
+  },
+  "result": "{\"error\":\"UNKNOWN_GRANT_REF\",\"message\":\"UNKNOWN_GRANT_REF\"}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "build_action",
+   "actionType": "REVOKE",
+   "body": {
+    "credId": "k4-freeze",
+    "reason": "lost tablet"
+   }
+  },
+  "result": "{\"ref\":\"$obj:6\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"REVOKE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"f86fdd15fd4030ee2f096ab514f0980d\",\"issuedAt\":\"2026-11-14T06:00:00.000Z\",\"expiresAt\":\"2026-11-14T07:00:00.000Z\",\"body\":{\"credId\":\"k4-freeze\",\"reason\":\"lost tablet\"}},\"digestHex\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\"}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d"
+  },
+  "result": "{\"ref\":\"$obj:7\",\"grantRef\":\"g2\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"credId\":\"k1-phone\",\"challengeNonce\":\"2b2abf45065c90490c545cd57e97fb3f00e242d5324b5f2eb1c03c9c743db661\",\"sessionId\":\"dc1f732e-d8f0-4213-8d8e-126a4063a4c6\",\"issuedAt\":\"2026-11-14T06:00:00.000Z\",\"notBefore\":\"2026-11-14T06:00:00.000Z\",\"expiresAt\":\"2026-11-14T06:02:00.000Z\"},\"sig\":\"2F0...[86 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+   "grantRef": "g2"
+  },
+  "result": "{\"ref\":\"$obj:8\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"paramsDigest\":\"7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"newKeyDigests\":[],\"summaryDigest\"...[1037 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "list_caps"
+  },
+  "result": "{\"ref\":\"$obj:9\",\"items\":[{\"capRef\":0,\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"d8718097-3c0d-47e9-ac36-e0600689244d\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"merchant-a.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"task\",\"nonce\":\"bc6bb71fcf95d597c37773784901a73a\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T01:00:00.000Z\"},\"approvalCredId\":\"k1-phone\"},{\"...[572 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "enroll_new_keys",
+   "roles": [
+    "DAILY",
+    "ROOT"
+   ],
+   "actionNonce": "f86fdd15fd4030ee2f096ab514f0980d"
+  },
+  "result": "{\"ref\":\"$obj:10\",\"items\":[{\"credId\":\"atk-daily-8ba34e2f\",\"role\":\"DAILY\",\"holderId\":\"alice\",\"channelId\":\"ch-phone\",\"kind\":\"passkey\",\"provenance\":{\"deviceId\":\"dev-atk-daily-8ba34e2f-ea22e3\",\"seedCommitment\":\"752d04ed4ee754e014dcd4edd8bcbc3013ff8fc0ad110901fa8af745c5c69ad0\",\"syncProvider\":\"none\"},\"registration\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAQ3Bl0_HKmrXxexzIzA82rEAIBNiKu23DUuJRvs1eAdGj_zZ6Wr-WnhX6uQ6YnEa_z2BpQECAyYgASFYIBnAa6u0RBdKw4ZRb8fJhxySLexP4TMmwSToABnFMFg3IlggcMLpajDNVXGsEtJIWNEy15ZR8w3F_uBzsHcBHp_gtyg\",\"client...[627 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d"
+  },
+  "result": "{\"ref\":\"$obj:11\",\"grantRef\":\"g3\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"credId\":\"k1-phone\",\"challengeNonce\":\"ca93fcd04582b85746cfd2b2c21254afdb57b33df3eb399c6fff8261ca4c2bee\",\"sessionId\":\"f1efd510-3c93-43d7-b729-83a51a45f748\",\"issuedAt\":\"2026-11-14T06:00:00.000Z\",\"notBefore\":\"2026-11-14T06:00:00.000Z\",\"expiresAt\":\"2026-11-14T06:02:00.000Z\"},\"sig\":\"UE...[87 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "sign_intent_own",
+   "ownCredId": "atk-daily-8ba34e2f",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+   "grantRef": "g3",
+   "asCredId": "k1-phone"
+  },
+  "result": "{\"ref\":\"$obj:12\",\"approval\":{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"paramsDigest\":\"7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"...[1528 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k3-root-hw",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d"
+  },
+  "result": "{\"ref\":\"$obj:13\",\"grantRef\":\"g4\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"credId\":\"k3-root-hw\",\"challengeNonce\":\"2970cae2a682d041b3acd92df72be5e487781994b8c2c968ac3eeac6b00f353d\",\"sessionId\":\"d3df356d-3b1f-4b2c-afb5-446b9040b730\",\"issuedAt\":\"2026-11-14T06:00:00.000Z\",\"notBefore\":\"2026-11-14T06:00:00.000Z\",\"expiresAt\":\"2026-11-14T06:02:00.000Z\"},\"sig\":\"...[89 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "sign_intent_own",
+   "ownCredId": "atk-root-f4465b91",
+   "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+   "grantRef": "g4",
+   "asCredId": "k3-root-hw"
+  },
+  "result": "{\"ref\":\"$obj:14\",\"approval\":{\"credId\":\"k3-root-hw\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"REVOKE\",\"actionDigest\":\"8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d\",\"paramsDigest\":\"7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\"...[1173 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+    "approvals": [
+     {
+      "approval": {
+       "credId": "k1-phone",
+       "intent": {
+        "v": "safebox.v4.intent",
+        "protocol": "safebox.v4",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "purposeId": "household-shopping",
+        "purposeVersion": "1",
+        "matrixVersion": "1",
+        "actionType": "REVOKE",
+        "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+        "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+        "epoch": "1",
+        "rootSeq": "0",
+        "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+        "caseId": "-",
+        "newKeyDigests": [],
+        "summaryDigest": "db6669039d1aa0abc3a08bcd1bce2027f24f3d4941d847b637d6079d54d5f417",
+        "issuer": "challenge-svc",
+        "credId": "k1-phone",
+        "challengeNonce": "ca93fcd04582b85746cfd2b2c21254afdb57b33df3eb399c6fff8261ca4c2bee",
+        "sessionId": "f1efd510-3c93-43d7-b729-83a51a45f748",
+        "issuedAt": "2026-11-14T06:00:00.000Z",
+        "notBefore": "2026-11-14T06:00:00.000Z",
+        "expiresAt": "2026-11-14T06:02:00.000Z",
+        "screenDigest": "-"
+       },
+       "grant": {
+        "statement": {
+         "v": "safebox.v4.challenge",
+         "issuer": "challenge-svc",
+         "accountId": "vault-alice.mock",
+         "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+         "actionType": "REVOKE",
+         "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+         "credId": "k1-phone",
+         "challengeNonce": "ca93fcd04582b85746cfd2b2c21254afdb57b33df3eb399c6fff8261ca4c2bee",
+         "sessionId": "f1efd510-3c93-43d7-b729-83a51a45f748",
+         "issuedAt": "2026-11-14T06:00:00.000Z",
+         "notBefore": "2026-11-14T06:00:00.000Z",
+         "expiresAt": "2026-11-14T06:02:00.000Z"
+        },
+        "sig": "UE59OcJP_hfFmLAN-1kBNoxoTWodaU7z2LtVuhkhZ_6-FEV2gP7qasCM_ioq1VXkYmhuUUmRiFEWR35Ny6DMCw"
+       },
+       "webauthn": {
+        "credentialId": "E2Iq7bcNS4lG-zV4B0aP_Nnpav5aeFfq5DpicRr_PYE",
+        "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAAg",
+        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTVJVV1ZqTWsxNlRwNG9mREdSTXJGNHR5dDFPT3lHdTBhdmROMnQxZnN1byIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+        "signature": "MEUCIQC7nJZLOrSsun2FcpjeAALHostWqoW58Tmf8ym8dqavhQIgeDc56itC8skT-yzme1mxvlxBvCb5yN9ZmjRlm_ppwJs"
+       }
+      }
+     },
+     {
+      "approval": {
+       "credId": "k3-root-hw",
+       "intent": {
+        "v": "safebox.v4.intent",
+        "protocol": "safebox.v4",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "purposeId": "household-shopping",
+        "purposeVersion": "1",
+        "matrixVersion": "1",
+        "actionType": "REVOKE",
+        "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+        "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+        "epoch": "1",
+        "rootSeq": "0",
+        "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+        "caseId": "-",
+        "newKeyDigests": [],
+        "summaryDigest": "db6669039d1aa0abc3a08bcd1bce2027f24f3d4941d847b637d6079d54d5f417",
+        "issuer": "challenge-svc",
+        "credId": "k3-root-hw",
+        "challengeNonce": "2970cae2a682d041b3acd92df72be5e487781994b8c2c968ac3eeac6b00f353d",
+        "sessionId": "d3df356d-3b1f-4b2c-afb5-446b9040b730",
+        "issuedAt": "2026-11-14T06:00:00.000Z",
+        "notBefore": "2026-11-14T06:00:00.000Z",
+        "expiresAt": "2026-11-14T06:02:00.000Z",
+        "screenDigest": "-"
+       },
+       "grant": {
+        "statement": {
+         "v": "safebox.v4.challenge",
+         "issuer": "challenge-svc",
+         "accountId": "vault-alice.mock",
+         "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+         "actionType": "REVOKE",
+         "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+         "credId": "k3-root-hw",
+         "challengeNonce": "2970cae2a682d041b3acd92df72be5e487781994b8c2c968ac3eeac6b00f353d",
+         "sessionId": "d3df356d-3b1f-4b2c-afb5-446b9040b730",
+         "issuedAt": "2026-11-14T06:00:00.000Z",
+         "notBefore": "2026-11-14T06:00:00.000Z",
+         "expiresAt": "2026-11-14T06:02:00.000Z"
+        },
+        "sig": "YiJ-3e5pt3F2oZ7DNThUy-JhLM58bsr9qG9GASYhnRIOeTPvTMjWldIk1YHVhf6gMsGcz8qw2-mgR-JqlKzPAQ"
+       },
+       "sig": "JdiPqxz0UEU6qWGExw3vO_3FMP64Ihz2wiybQ2NysestljBYduz9zQLeGxvTWlAbQ82x8UD03yjI_zs0xZZhDg"
+      }
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d88\",\"ok\":false,\"error\":{\"code\":\"APPROVAL_FIELDS\"}}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "REVOKE",
+       "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+       "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "db6669039d1aa0abc3a08bcd1bce2027f24f3d4941d847b637d6079d54d5f417",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "ca93fcd04582b85746cfd2b2c21254afdb57b33df3eb399c6fff8261ca4c2bee",
+       "sessionId": "f1efd510-3c93-43d7-b729-83a51a45f748",
+       "issuedAt": "2026-11-14T06:00:00.000Z",
+       "notBefore": "2026-11-14T06:00:00.000Z",
+       "expiresAt": "2026-11-14T06:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "REVOKE",
+        "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+        "credId": "k1-phone",
+        "challengeNonce": "ca93fcd04582b85746cfd2b2c21254afdb57b33df3eb399c6fff8261ca4c2bee",
+        "sessionId": "f1efd510-3c93-43d7-b729-83a51a45f748",
+        "issuedAt": "2026-11-14T06:00:00.000Z",
+        "notBefore": "2026-11-14T06:00:00.000Z",
+        "expiresAt": "2026-11-14T06:02:00.000Z"
+       },
+       "sig": "UE59OcJP_hfFmLAN-1kBNoxoTWodaU7z2LtVuhkhZ_6-FEV2gP7qasCM_ioq1VXkYmhuUUmRiFEWR35Ny6DMCw"
+      },
+      "webauthn": {
+       "credentialId": "E2Iq7bcNS4lG-zV4B0aP_Nnpav5aeFfq5DpicRr_PYE",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAAg",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTVJVV1ZqTWsxNlRwNG9mREdSTXJGNHR5dDFPT3lHdTBhdmROMnQxZnN1byIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCIQC7nJZLOrSsun2FcpjeAALHostWqoW58Tmf8ym8dqavhQIgeDc56itC8skT-yzme1mxvlxBvCb5yN9ZmjRlm_ppwJs"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "REVOKE",
+       "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+       "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "db6669039d1aa0abc3a08bcd1bce2027f24f3d4941d847b637d6079d54d5f417",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "2970cae2a682d041b3acd92df72be5e487781994b8c2c968ac3eeac6b00f353d",
+       "sessionId": "d3df356d-3b1f-4b2c-afb5-446b9040b730",
+       "issuedAt": "2026-11-14T06:00:00.000Z",
+       "notBefore": "2026-11-14T06:00:00.000Z",
+       "expiresAt": "2026-11-14T06:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "REVOKE",
+        "actionDigest": "8f129550842b2fc3d564ff27f1adcdb0509add15a58dfaa9703b4a7bc8a3677d",
+        "credId": "k3-root-hw",
+        "challengeNonce": "2970cae2a682d041b3acd92df72be5e487781994b8c2c968ac3eeac6b00f353d",
+        "sessionId": "d3df356d-3b1f-4b2c-afb5-446b9040b730",
+        "issuedAt": "2026-11-14T06:00:00.000Z",
+        "notBefore": "2026-11-14T06:00:00.000Z",
+        "expiresAt": "2026-11-14T06:02:00.000Z"
+       },
+       "sig": "YiJ-3e5pt3F2oZ7DNThUy-JhLM58bsr9qG9GASYhnRIOeTPvTMjWldIk1YHVhf6gMsGcz8qw2-mgR-JqlKzPAQ"
+      },
+      "sig": "JdiPqxz0UEU6qWGExw3vO_3FMP64Ihz2wiybQ2NysestljBYduz9zQLeGxvTWlAbQ82x8UD03yjI_zs0xZZhDg"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d132\",\"ok\":false,\"error\":{\"code\":\"ACTION_EXPIRED\"}}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "build_action",
+   "actionType": "REVOKE",
+   "body": {
+    "credId": "k4-freeze",
+    "reason": "lost tablet"
+   }
+  },
+  "result": "{\"ref\":\"$obj:15\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"REVOKE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"4609cafde88e7181665a9ea2be6ad3d5\",\"issuedAt\":\"2026-11-14T09:00:00.000Z\",\"expiresAt\":\"2026-11-14T10:00:00.000Z\",\"body\":{\"credId\":\"k4-freeze\",\"reason\":\"lost tablet\"}},\"digestHex\":\"711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563\"}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563"
+  },
+  "result": "{\"ref\":\"$obj:16\",\"grantRef\":\"g5\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563\",\"credId\":\"k1-phone\",\"challengeNonce\":\"06728d494758ed26f7f6e5807a3f0f01ecc8b62e6d18d800e1174da2cc8fcd1c\",\"sessionId\":\"908c433e-3f34-4bce-9249-9b6b0c241fd2\",\"issuedAt\":\"2026-11-14T09:00:00.000Z\",\"notBefore\":\"2026-11-14T09:00:00.000Z\",\"expiresAt\":\"2026-11-14T09:02:00.000Z\"},\"sig\":\"Iq...[87 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "sign_intent_own",
+   "ownCredId": "atk-daily-8ba34e2f",
+   "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+   "grantRef": "g5",
+   "asCredId": "k1-phone"
+  },
+  "result": "{\"ref\":\"$obj:17\",\"approval\":{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"REVOKE\",\"actionDigest\":\"711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563\",\"paramsDigest\":\"7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"...[1528 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k3-root-hw",
+   "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563"
+  },
+  "result": "{\"ref\":\"$obj:18\",\"grantRef\":\"g6\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"REVOKE\",\"actionDigest\":\"711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563\",\"credId\":\"k3-root-hw\",\"challengeNonce\":\"1e1c822f26bdfdbb78f70ce9195b67519977642adf0d66ef1fa9e672216af2f2\",\"sessionId\":\"f3063072-ba4b-4d33-a232-df0241a6317b\",\"issuedAt\":\"2026-11-14T09:00:00.000Z\",\"notBefore\":\"2026-11-14T09:00:00.000Z\",\"expiresAt\":\"2026-11-14T09:02:00.000Z\"},\"sig\":\"...[89 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "sign_intent_own",
+   "ownCredId": "atk-root-f4465b91",
+   "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+   "grantRef": "g6",
+   "asCredId": "k3-root-hw"
+  },
+  "result": "{\"ref\":\"$obj:19\",\"approval\":{\"credId\":\"k3-root-hw\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"REVOKE\",\"actionDigest\":\"711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563\",\"paramsDigest\":\"7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\"...[1173 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "REVOKE",
+       "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+       "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7098610e6225d40798871a4fca4460265678ba6f7e01cba7e4cfc0dd9b428aa4",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "06728d494758ed26f7f6e5807a3f0f01ecc8b62e6d18d800e1174da2cc8fcd1c",
+       "sessionId": "908c433e-3f34-4bce-9249-9b6b0c241fd2",
+       "issuedAt": "2026-11-14T09:00:00.000Z",
+       "notBefore": "2026-11-14T09:00:00.000Z",
+       "expiresAt": "2026-11-14T09:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "REVOKE",
+        "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+        "credId": "k1-phone",
+        "challengeNonce": "06728d494758ed26f7f6e5807a3f0f01ecc8b62e6d18d800e1174da2cc8fcd1c",
+        "sessionId": "908c433e-3f34-4bce-9249-9b6b0c241fd2",
+        "issuedAt": "2026-11-14T09:00:00.000Z",
+        "notBefore": "2026-11-14T09:00:00.000Z",
+        "expiresAt": "2026-11-14T09:02:00.000Z"
+       },
+       "sig": "Iqkflvu-mgKt6t49tEMXJShRS4L7a4kdRDsEj_rry3MluEGZw1s-Oa1X5qp-IfgtbpOzGcA5r-xlCvU6CXUlCw"
+      },
+      "webauthn": {
+       "credentialId": "E2Iq7bcNS4lG-zV4B0aP_Nnpav5aeFfq5DpicRr_PYE",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAAw",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoib091dzJVX3FKSm0yZi1zd3RCWDNZeVd2emNkS1ZMN3p0WFJ4VWNsdjN3TSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCICrrm2fdQVncsJAEngGRbQfQm6W6CUE9tA1ma3zz-ZkeAiEAjk2exCIgWymdr6Cq682BxvfvgPzeligpJnhRJjQvmCI"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "REVOKE",
+       "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+       "paramsDigest": "7a004b6e4d49844261372f63d672db01e62a0742ebf22d58e22d931d61a0be93",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7098610e6225d40798871a4fca4460265678ba6f7e01cba7e4cfc0dd9b428aa4",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "1e1c822f26bdfdbb78f70ce9195b67519977642adf0d66ef1fa9e672216af2f2",
+       "sessionId": "f3063072-ba4b-4d33-a232-df0241a6317b",
+       "issuedAt": "2026-11-14T09:00:00.000Z",
+       "notBefore": "2026-11-14T09:00:00.000Z",
+       "expiresAt": "2026-11-14T09:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "REVOKE",
+        "actionDigest": "711bd7f86e492e225852e8f394792cc6e435816a6890e476b241092de4720563",
+        "credId": "k3-root-hw",
+        "challengeNonce": "1e1c822f26bdfdbb78f70ce9195b67519977642adf0d66ef1fa9e672216af2f2",
+        "sessionId": "f3063072-ba4b-4d33-a232-df0241a6317b",
+        "issuedAt": "2026-11-14T09:00:00.000Z",
+        "notBefore": "2026-11-14T09:00:00.000Z",
+        "expiresAt": "2026-11-14T09:02:00.000Z"
+       },
+       "sig": "sVObuktsbATtINyCvhEs2IhpVNq17hH265lv8yStrPJAXfK7iKyQSEP5cd_jBpl1Jw6SnrXvtYUd1QjaBPbRAw"
+      },
+      "sig": "LwhXaoffgSsQ3PtVsxAlMWxj0gqhXCSL-Po4FFN1uSfEt-TbTOqrsvsALkjdjihcHYSUAJ0529I2Gso9u1GqDw"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d134\",\"ok\":false,\"error\":{\"code\":\"WEBAUTHN_CREDENTIAL_MISMATCH\"}}"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {}
+   }
+  },
+  "result": "{\"ref\":\"$obj:20\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"fddb7b76a36d74d341067d2464a5e0f3\",\"issuedAt\":\"2026-11-14T12:00:00.000Z\",\"expiresAt\":\"2026-11-14T13:00:00.000Z\",\"body\":{\"capsule\":{}}},\"digestHex\":\"6107657e330b666e8be8e4401c29bee668c1798dae877a848676bcd6193b63ec\"}"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"ref\":\"$obj:21\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"seq\":0,\"head\":\"620f9c96fe486a85b23f39a55d608bd32b55e15f3d5418c015d6b66a8a1a6fd1\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"protocol\":\"safebox.v4\",\"caseDeadline\":null,\"ownerAuthorized\":false,\"gcaseId\":null,\"gcaseState\":null...[21 more chars]"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "6107657e330b666e8be8e4401c29bee668c1798dae877a848676bcd6193b63ec"
+  },
+  "result": "{\"ref\":\"$obj:22\",\"grantRef\":\"g7\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"6107657e330b666e8be8e4401c29bee668c1798dae877a848676bcd6193b63ec\",\"credId\":\"k1-phone\",\"challengeNonce\":\"062dbb9995e56f8f58be10a49cb8465d496abb7adb485dc9fe51f552a1c95f0e\",\"sessionId\":\"e7ea715e-b6bd-497d-932c-78df6e12eb28\",\"issuedAt\":\"2026-11-14T12:00:00.000Z\",\"notBefore\":\"2026-11-14T12:00:00.000Z\",\"expiresAt\":\"2026-11-14T12:02:00.000Z\"},\"s...[94 more chars]"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "6107657e330b666e8be8e4401c29bee668c1798dae877a848676bcd6193b63ec",
+   "grantRef": "g7"
+  },
+  "result": "{\"ref\":\"$obj:23\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"6107657e330b666e8be8e4401c29bee668c1798dae877a848676bcd6193b63ec\",\"paramsDigest\":\"33e7ba53b8f2254657aab23398f9b93f2f304a2677ed17c56420bb9b2bc5b332\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"newKeyDigests\":[],\"summar...[1842 more chars]"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": false,
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": 7200000,
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": 1,
+     "principalId": "alice",
+     "products": [
+      {},
+      {}
+     ],
+     "purposeId": "household-shopping"
+    }
+   }
+  },
+  "result": "{\"error\":\"CANONICAL_BAD_VALUE_TYPE\",\"message\":\"CANONICAL_BAD_VALUE_TYPE: boolean\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "$obj:24.digestHex"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "$obj:24.digestHex",
+   "grantRef": "$obj:25.grantRef"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": 7200000,
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": 1,
+     "principalId": "alice",
+     "products": [
+      {},
+      {}
+     ],
+     "purposeId": "household-shopping"
+    }
+   }
+  },
+  "result": "{\"error\":\"CANONICAL_BAD_VALUE_TYPE\",\"message\":\"CANONICAL_BAD_VALUE_TYPE: number\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "$obj:26.digestHex"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "$obj:26.digestHex",
+   "grantRef": "$obj:27.grantRef"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": "7200000",
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": "1",
+     "principalId": "alice",
+     "products": [
+      {},
+      {}
+     ],
+     "purposeId": "household-shopping"
+    }
+   }
+  },
+  "result": "{\"ref\":\"$obj:24\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"6d3b2558674a2ee09c5cabdca0391329\",\"issuedAt\":\"2026-11-14T18:00:00.000Z\",\"expiresAt\":\"2026-11-14T19:00:00.000Z\",\"body\":{\"capsule\":{\"accountId\":\"vault-alice.mock\",\"allowedOperations\":[\"PAY\"],\"asset\":\"NEAR\",\"cumulativeLimitYocto\":\"100000000000000000000000000\",\"dailyLimitYocto\":\"5000000000000000000000000\",\"exactProductsOnly\":\"false\",\"expiresAt\":\"2027-12-19T0...[266 more chars]"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "$obj:28.digestHex"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "$obj:28.digestHex",
+   "grantRef": "$obj:29.grantRef"
+  },
+  "result": "{\"error\":\"UNKNOWN_ACTION_DIGEST\",\"message\":\"UNKNOWN_ACTION_DIGEST (build it first with build_action)\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "bbbfc28e5a1e98d3ee24fdada0aac6fa0911a1ebba1008f562fce81050b147d1"
+  },
+  "result": "{\"ref\":\"$obj:25\",\"grantRef\":\"g8\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"bbbfc28e5a1e98d3ee24fdada0aac6fa0911a1ebba1008f562fce81050b147d1\",\"credId\":\"k1-phone\",\"challengeNonce\":\"25f143c86b45c173f198398a8541d8d565781c9920b75fe428c9999cf58019ee\",\"sessionId\":\"c7b2bd56-0e1c-4447-aa9f-567fb401ce61\",\"issuedAt\":\"2026-11-14T18:00:00.000Z\",\"notBefore\":\"2026-11-14T18:00:00.000Z\",\"expiresAt\":\"2026-11-14T18:02:00.000Z\"},\"s...[94 more chars]"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "bbbfc28e5a1e98d3ee24fdada0aac6fa0911a1ebba1008f562fce81050b147d1",
+   "grantRef": "g8"
+  },
+  "result": "{\"ref\":\"$obj:26\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"bbbfc28e5a1e98d3ee24fdada0aac6fa0911a1ebba1008f562fce81050b147d1\",\"paramsDigest\":\"bb74dbe5fb037a4a8fc1ebb67db55ef1cdc6f7941ed0ab64e2302d0d11eea1b1\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"newKeyDigests\":[],\"summar...[1263 more chars]"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": "7200000",
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": "1",
+     "principalId": "alice",
+     "products": [
+      {
+       "sku": "item-1",
+       "priceYocto": "60000000000000000000000",
+       "recipientId": "attacker.mock"
+      },
+      {
+       "sku": "item-2",
+       "priceYocto": "60000000000000000000000",
+       "recipientId": "attacker.mock"
+      }
+     ],
+     "purposeId": "household-shopping",
+     "recipients": [
+      "merchant-a.mock",
+      "merchant-b.mock",
+      "merchant-c.mock"
+     ],
+     "statement": "Pay allow-listed household merchants for owner-requested purchases only.",
+     "v": "safebox.v3.purpose",
+     "validFrom": "2026-11-13T23:59:00.000Z",
+     "version": "2"
+    }
+   }
+  },
+  "result": "{\"ref\":\"$obj:27\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"2b1b54ba9502d31a81823b5e3889665d\",\"issuedAt\":\"2026-11-14T21:00:00.000Z\",\"expiresAt\":\"2026-11-14T22:00:00.000Z\",\"body\":{\"capsule\":{\"accountId\":\"vault-alice.mock\",\"allowedOperations\":[\"PAY\"],\"asset\":\"NEAR\",\"cumulativeLimitYocto\":\"100000000000000000000000000\",\"dailyLimitYocto\":\"5000000000000000000000000\",\"exactProductsOnly\":\"false\",\"expiresAt\":\"2027-12-19T0...[666 more chars]"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "request_grant",
+   "credId": "k1-phone",
+   "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75"
+  },
+  "result": "{\"ref\":\"$obj:28\",\"grantRef\":\"g9\",\"grant\":{\"statement\":{\"v\":\"safebox.v4.challenge\",\"issuer\":\"challenge-svc\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75\",\"credId\":\"k1-phone\",\"challengeNonce\":\"07cd406c8d45a11ba74788872c7e994a6946003d5c80289be54aa4b01c2b027b\",\"sessionId\":\"f87e7b61-989a-476b-aa26-841606a9b699\",\"issuedAt\":\"2026-11-14T21:00:00.000Z\",\"notBefore\":\"2026-11-14T21:00:00.000Z\",\"expiresAt\":\"2026-11-14T21:02:00.000Z\"},\"s...[94 more chars]"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "intent_for",
+   "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+   "grantRef": "g9"
+  },
+  "result": "{\"ref\":\"$obj:29\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75\",\"paramsDigest\":\"871e9967befbd31e17cf9966f9e61a86098f25bfe9f39a6843aab8d222d1368d\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"caseId\":\"-\",\"newKeyDigests\":[],\"summar...[986 more chars]"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "ask_owner",
+   "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+   "credIds": [
+    "k1-phone",
+    "k2-laptop",
+    "k3-root-hw"
+   ],
+   "pitch": "Lower per-payment maximum to 50000000000000000000000 yoctoNEAR as requested; nothing else changes."
+  },
+  "result": "{\"ref\":\"$obj:30\",\"approvals\":[{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75\",\"paramsDigest\":\"871e9967befbd31e17cf9966f9e61a86098f25bfe9f39a6843aab8d222d1368d\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"case...[5524 more chars]"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+       "paramsDigest": "871e9967befbd31e17cf9966f9e61a86098f25bfe9f39a6843aab8d222d1368d",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a7d738330427847766ecad9aecac2751190533eeef69e0ef8f2fdb27076b9c10",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "3f29dff364fe56a9a6e88a980518d11a6d505603f25f27ede8a915561ea0ba16",
+       "sessionId": "22456b01-4879-47ff-8e25-da16c632b776",
+       "issuedAt": "2026-11-14T21:00:00.000Z",
+       "notBefore": "2026-11-14T21:00:00.000Z",
+       "expiresAt": "2026-11-14T21:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+        "credId": "k1-phone",
+        "challengeNonce": "3f29dff364fe56a9a6e88a980518d11a6d505603f25f27ede8a915561ea0ba16",
+        "sessionId": "22456b01-4879-47ff-8e25-da16c632b776",
+        "issuedAt": "2026-11-14T21:00:00.000Z",
+        "notBefore": "2026-11-14T21:00:00.000Z",
+        "expiresAt": "2026-11-14T21:02:00.000Z"
+       },
+       "sig": "9RfZxkh2FCnFRSS-Jdb3X-9mkwJgecUt_8rbZA5PDT6XTKg90RuB-fhZg3OclI3PJEUWf4sdB6wOyyr-IWYsDg"
+      },
+      "webauthn": {
+       "credentialId": "2OQwBwCD0T0v59PcpSRQOcVVymWIkeXsHkuPvbz5-jY",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAHQ",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTG5Fb3pZdC01RFlBVHYtM3p1N0Z3UktvUnowNXBvbFVwb1lOQWg1dTNvWSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCIQDv2MSfDxR0Ymse4s1qUC4qzCQkfZF8lvx4I-4nfRU8YAIgc8NIOMaiOzMFBVjEQCGqjD3rSAErX4LunR1Bz1h3NFM"
+      },
+      "apc": {
+       "sig": "FKInDZUKlnQnG8vmPpVOxDkLfqXKEASEDOQE4cULV6XulVIiMpXCNLyh9SZZf7EBQchIVK6-ANk9MlKqHmZoBw"
+      }
+     },
+     {
+      "credId": "k2-laptop",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+       "paramsDigest": "871e9967befbd31e17cf9966f9e61a86098f25bfe9f39a6843aab8d222d1368d",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a7d738330427847766ecad9aecac2751190533eeef69e0ef8f2fdb27076b9c10",
+       "issuer": "challenge-svc",
+       "credId": "k2-laptop",
+       "challengeNonce": "2a4e4203e1069eceddda9b457a1230d49ee0d1260cf2458a43997e5ed598a032",
+       "sessionId": "f947fbb8-591f-478e-a407-05aaba06c537",
+       "issuedAt": "2026-11-14T21:00:00.000Z",
+       "notBefore": "2026-11-14T21:00:00.000Z",
+       "expiresAt": "2026-11-14T21:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+        "credId": "k2-laptop",
+        "challengeNonce": "2a4e4203e1069eceddda9b457a1230d49ee0d1260cf2458a43997e5ed598a032",
+        "sessionId": "f947fbb8-591f-478e-a407-05aaba06c537",
+        "issuedAt": "2026-11-14T21:00:00.000Z",
+        "notBefore": "2026-11-14T21:00:00.000Z",
+        "expiresAt": "2026-11-14T21:02:00.000Z"
+       },
+       "sig": "8qI5ZiVCL1ISCya7WQZgwTtoPHs1fuhZ561NCCIzxXPTVtN9PGRUNiGH7cs32rvNGiQoOpf_-9hV4iPj2cF-Cw"
+      },
+      "webauthn": {
+       "credentialId": "-WbbZGlSI4CgZl_eYGr6vQrpnTE5KgbwhyZ1tcV9SEQ",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABA",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVEpEcVh0bTR3MWxZaTdQcGZTRE1MU05rdGxtd0NBM09pZTZJQmFpcDItSSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCIFwfWjCX4spk-ojGkXOWo412qE_LbOZceNNAh3EJ-JIsAiEAmsD2jNPjrbj6xq4vZHktDA7FFSWIr9YRh2eokJcdXQA"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+       "paramsDigest": "871e9967befbd31e17cf9966f9e61a86098f25bfe9f39a6843aab8d222d1368d",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a7d738330427847766ecad9aecac2751190533eeef69e0ef8f2fdb27076b9c10",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "2b96b91aaf34965eda99723aa890dcde26af72d8a0ef8833059f81a5363f35f6",
+       "sessionId": "762df8a6-7044-48e4-925d-06f5fcdd049a",
+       "issuedAt": "2026-11-14T21:00:00.000Z",
+       "notBefore": "2026-11-14T21:00:00.000Z",
+       "expiresAt": "2026-11-14T21:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "cc5cfbd5190fd8afee6423161bb9b5f15898f123e6e94860ead42e37dcad8c75",
+        "credId": "k3-root-hw",
+        "challengeNonce": "2b96b91aaf34965eda99723aa890dcde26af72d8a0ef8833059f81a5363f35f6",
+        "sessionId": "762df8a6-7044-48e4-925d-06f5fcdd049a",
+        "issuedAt": "2026-11-14T21:00:00.000Z",
+        "notBefore": "2026-11-14T21:00:00.000Z",
+        "expiresAt": "2026-11-14T21:02:00.000Z"
+       },
+       "sig": "-v4b89RDz8Q0tKbxSeXF8u-mPWL5OpQJ9BW80uOtjEAKDUF60qLLZe5P2VfsBQu2BLGWsLN5yVsSXvI0sr2yDw"
+      },
+      "sig": "ZfQjo3Q9jA4-Q3K6GZ2bwtC8xw3mkucbGg8DUuZikE7zTKF5jp73DWRvnh9oFzz-g8TgZaazGWYj3SO14G0gDA"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d304\",\"ok\":false,\"error\":{\"code\":\"CAPSULE_PRODUCT\",\"detail\":\"unknown=priceYocto missing=amountYocto\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": "7200000",
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": "1",
+     "principalId": "alice",
+     "products": [
+      {
+       "sku": "item-1",
+       "amountYocto": "60000000000000000000000",
+       "recipientId": "attacker.mock"
+      },
+      {
+       "sku": "item-2",
+       "amountYocto": "60000000000000000000000",
+       "recipientId": "attacker.mock"
+      }
+     ],
+     "purposeId": "household-shopping",
+     "recipients": [
+      "merchant-a.mock",
+      "merchant-b.mock",
+      "merchant-c.mock"
+     ],
+     "statement": "Pay allow-listed household merchants for owner-requested purchases only.",
+     "v": "safebox.v3.purpose",
+     "validFrom": "2026-11-13T23:59:00.000Z",
+     "version": "2"
+    }
+   }
+  },
+  "result": "{\"ref\":\"$obj:31\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"bdd90f90fd0bdb2fcb7dfe4ceb1857d8\",\"issuedAt\":\"2026-11-15T00:00:00.000Z\",\"expiresAt\":\"2026-11-15T01:00:00.000Z\",\"body\":{\"capsule\":{\"accountId\":\"vault-alice.mock\",\"allowedOperations\":[\"PAY\"],\"asset\":\"NEAR\",\"cumulativeLimitYocto\":\"100000000000000000000000000\",\"dailyLimitYocto\":\"5000000000000000000000000\",\"exactProductsOnly\":\"false\",\"expiresAt\":\"2027-12-19T0...[668 more chars]"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "ask_owner",
+   "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+   "credIds": [
+    "k1-phone",
+    "k2-laptop",
+    "k3-root-hw"
+   ],
+   "pitch": "Lower per-payment maximum to 50000000000000000000000 yoctoNEAR as requested; nothing else changes."
+  },
+  "result": "{\"ref\":\"$obj:32\",\"approvals\":[{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7\",\"paramsDigest\":\"a4cdb3c70a2a44067d9b06f1cb1fa048e493d5114c34e09b6f321d24a0d6f58e\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"case...[5524 more chars]"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+       "paramsDigest": "a4cdb3c70a2a44067d9b06f1cb1fa048e493d5114c34e09b6f321d24a0d6f58e",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "4cfa25a83be53783baa4233f8d97d6838bc7800c15f8497a50ddad985db62ece",
+       "sessionId": "49bbba17-af0b-4bef-a9f6-fff2d22686d5",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+        "credId": "k1-phone",
+        "challengeNonce": "4cfa25a83be53783baa4233f8d97d6838bc7800c15f8497a50ddad985db62ece",
+        "sessionId": "49bbba17-af0b-4bef-a9f6-fff2d22686d5",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "P6cIDad_zW_49WNxuf9gOOJ4pijpHxVqdSfPRjzO724yOGYBjG6oo_DkUJDQM0whRLXBkaFrGXsr3ZM41vAkAQ"
+      },
+      "webauthn": {
+       "credentialId": "2OQwBwCD0T0v59PcpSRQOcVVymWIkeXsHkuPvbz5-jY",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAIg",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiSDNlM3kwT2ZiVnRrMFhoazVhcjhNVGpoSUh4bnVZdGc5SVVMdFp0OE9PbyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEYCIQC1QmyvF32Zd6Z5G6oQ8V-ghXJNMndiVVkpZyujll48CwIhAKRnoad24LBpp-DJYjquRRKJ4ro697uT-f0ck1FHC5cj"
+      },
+      "apc": {
+       "sig": "Xqhd2e9OFN2ZdcTBi_xHB8qXpB7Ccy8jFhgzbzG91YlqJ1kUxyvSOa0KTAhQqE1TyoUCVlvScOnpkv9H6eChBg"
+      }
+     },
+     {
+      "credId": "k2-laptop",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+       "paramsDigest": "a4cdb3c70a2a44067d9b06f1cb1fa048e493d5114c34e09b6f321d24a0d6f58e",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k2-laptop",
+       "challengeNonce": "08b27ef852259a1d3ab1a18c71c8fdba18669a4fa57772821373a109773b4e58",
+       "sessionId": "34358dad-ba95-471a-9211-386f51ca4734",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+        "credId": "k2-laptop",
+        "challengeNonce": "08b27ef852259a1d3ab1a18c71c8fdba18669a4fa57772821373a109773b4e58",
+        "sessionId": "34358dad-ba95-471a-9211-386f51ca4734",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "HqSmpwLCfD1-jc2PRIx8VYAOCxgJ3QS2Rn6ix7V-69KcWa1fkXM7w7tJQDg0JjiS7s9wRoOKjEP39vBifv6YBg"
+      },
+      "webauthn": {
+       "credentialId": "-WbbZGlSI4CgZl_eYGr6vQrpnTE5KgbwhyZ1tcV9SEQ",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABQ",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicjJvY25FTnNrNnE2ZTNPUm15ai03MXlxTllicmMwTzk1RHlkRHJyOVVObyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEQCIHHT7RoCR28RDKHErBKuwiatf1hsbgXq9ieTJdqF0qWcAiAKsWqlEmiaaU2xpbU8aAvV4n_s9j1ydurpAEuP0szg9w"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+       "paramsDigest": "a4cdb3c70a2a44067d9b06f1cb1fa048e493d5114c34e09b6f321d24a0d6f58e",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "1b870c63f4b9190fdde2a340c4515667a15583c0d5ce4d2a66502814fd034a1b",
+       "sessionId": "8a156f5c-dcca-4c39-8f0d-7f83f275a10e",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "5103b3cab7c30dbc8acf1f47c81364d1a20efaf010ca2092ef99d06d0f65baf7",
+        "credId": "k3-root-hw",
+        "challengeNonce": "1b870c63f4b9190fdde2a340c4515667a15583c0d5ce4d2a66502814fd034a1b",
+        "sessionId": "8a156f5c-dcca-4c39-8f0d-7f83f275a10e",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "tuP0IQqkyPyafl4gnA2y32l_IsnuRDeDypJ4Qspq8k4E28-o8gLnxZpb5ye_u1gdVhrcZlg655vSPAXzoe3NBQ"
+      },
+      "sig": "6RAtQpy5D1J7F7Ns7aPYH0oq_rxrGcn4gsQcGVPSBYfBRQpKa5GmGR1ond6eW4yGf_a8ayhIbH0V37FSEu0MDw"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d348\",\"ok\":false,\"error\":{\"code\":\"CAPSULE_PRODUCT_RECIPIENT\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": "7200000",
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": "1",
+     "principalId": "alice",
+     "products": [
+      {
+       "sku": "item-1",
+       "amountYocto": "500000000000000000000000",
+       "recipientId": "merchant-a.mock"
+      },
+      {
+       "sku": "item-2",
+       "amountYocto": "500000000000000000000000",
+       "recipientId": "merchant-b.mock"
+      }
+     ],
+     "purposeId": "household-shopping",
+     "recipients": [
+      "merchant-a.mock",
+      "merchant-b.mock",
+      "merchant-c.mock"
+     ],
+     "statement": "Pay allow-listed household merchants for owner-requested purchases only.",
+     "v": "safebox.v3.purpose",
+     "validFrom": "2026-11-13T23:59:00.000Z",
+     "version": "2"
+    }
+   }
+  },
+  "result": "{\"ref\":\"$obj:33\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"fba16a03f5816d5b7a2e701234750080\",\"issuedAt\":\"2026-11-15T00:00:00.000Z\",\"expiresAt\":\"2026-11-15T01:00:00.000Z\",\"body\":{\"capsule\":{\"accountId\":\"vault-alice.mock\",\"allowedOperations\":[\"PAY\"],\"asset\":\"NEAR\",\"cumulativeLimitYocto\":\"100000000000000000000000000\",\"dailyLimitYocto\":\"5000000000000000000000000\",\"exactProductsOnly\":\"false\",\"expiresAt\":\"2027-12-19T0...[674 more chars]"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "ask_owner",
+   "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+   "credIds": [
+    "k1-phone",
+    "k2-laptop",
+    "k3-root-hw"
+   ],
+   "pitch": "Lower per-payment maximum to 50000000000000000000000 yoctoNEAR as requested; nothing else changes."
+  },
+  "result": "{\"ref\":\"$obj:34\",\"approvals\":[{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8\",\"paramsDigest\":\"0c8f7605b1ae6d81e186decf94c74c578cf1a8429769e783edf002e6e21d0a9a\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"case...[5524 more chars]"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+       "paramsDigest": "0c8f7605b1ae6d81e186decf94c74c578cf1a8429769e783edf002e6e21d0a9a",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "c3cc5ad4ab2b3f254190f5a929bec3ffb4f75a938b23e45af0feafb2f2082fe9",
+       "sessionId": "89990faf-8f79-453d-a6fe-b9ac6a493fca",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+        "credId": "k1-phone",
+        "challengeNonce": "c3cc5ad4ab2b3f254190f5a929bec3ffb4f75a938b23e45af0feafb2f2082fe9",
+        "sessionId": "89990faf-8f79-453d-a6fe-b9ac6a493fca",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "HpKCjXup4tneOBZSOCNX91z4RXd9M9kObl63fUwbE2aAG42t7-sZTpxINX3kkMOR8mfGT7A-BE9iMNZSTXH6CQ"
+      },
+      "webauthn": {
+       "credentialId": "2OQwBwCD0T0v59PcpSRQOcVVymWIkeXsHkuPvbz5-jY",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAIw",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoidVdmZ2MtN2FxUWZuUHkzb2g0bTBYSjVpOXVGaThMR0tvX1FOS1pqZDdySSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCICEFAc-FO_yUjDQBZiMtqc9O9wz8bryJAQ77RCUV5CYwAiEA3-HxY9NaTCrUfGin1jMjbvxphz7zboMPBCYSizbbeIU"
+      },
+      "apc": {
+       "sig": "St5qLJKzsLyDwKUlDYhO5ycOVkOU5_FQ1K0F8-x7ug8nwnvrCx6xRkmaPBawm3vVDybH4QqBOsp3F28-q0FrAg"
+      }
+     },
+     {
+      "credId": "k2-laptop",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+       "paramsDigest": "0c8f7605b1ae6d81e186decf94c74c578cf1a8429769e783edf002e6e21d0a9a",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k2-laptop",
+       "challengeNonce": "1e9c4a57aa07293fb10901dc9dbec1c9b09aae9e3e5402c4ad54c7a81abea4d9",
+       "sessionId": "b73f7c8f-17f0-41db-9dfe-9a9daae13be5",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+        "credId": "k2-laptop",
+        "challengeNonce": "1e9c4a57aa07293fb10901dc9dbec1c9b09aae9e3e5402c4ad54c7a81abea4d9",
+        "sessionId": "b73f7c8f-17f0-41db-9dfe-9a9daae13be5",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "H0ECsB2jy3SAawdNDAJv6D6iw1O-ItN_OF6BY8DNYZWnS7lIaKepSdUQLkngp66YWwm9S-XeML_SJ3k98TtgBA"
+      },
+      "webauthn": {
+       "credentialId": "-WbbZGlSI4CgZl_eYGr6vQrpnTE5KgbwhyZ1tcV9SEQ",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABg",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZVpHUzhrU1hCUDhjRUhBQi02clRUN2lyNzVDYmU5Zk9NOGE5UUZva0FXYyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCIFKHDeFv7KzDAifedayWA3wC7mJ4mteSpSJZpFoKauXgAiEArIA5ruBGeFw0gXH6MCwgQZs7PoftVGNqnhibkv8VDPM"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+       "paramsDigest": "0c8f7605b1ae6d81e186decf94c74c578cf1a8429769e783edf002e6e21d0a9a",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "7f1d130e86bbc2cbf6708450d087e85a1e1ae108e2eb88f87f18313928bf98bb",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "700be3f8dadf4e896911ee4cc54e4d173be7e2ccb97a2f22a80ae910ac2c3a72",
+       "sessionId": "21f0dfcf-c302-4ef9-900d-1707f21a765b",
+       "issuedAt": "2026-11-15T00:00:00.000Z",
+       "notBefore": "2026-11-15T00:00:00.000Z",
+       "expiresAt": "2026-11-15T00:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d0464d718e447ca49e18e88228e5d6b0179c50b9b4558744f692968c8a1368c8",
+        "credId": "k3-root-hw",
+        "challengeNonce": "700be3f8dadf4e896911ee4cc54e4d173be7e2ccb97a2f22a80ae910ac2c3a72",
+        "sessionId": "21f0dfcf-c302-4ef9-900d-1707f21a765b",
+        "issuedAt": "2026-11-15T00:00:00.000Z",
+        "notBefore": "2026-11-15T00:00:00.000Z",
+        "expiresAt": "2026-11-15T00:02:00.000Z"
+       },
+       "sig": "EtNJm3iBpMAAGKVnGxVIiC6UablR8Qk0zsc5wrmflJQTUWqgA-B_T9ClVU3L_MnZ-nfHaJo6DGJtYQZMSo7aAg"
+      },
+      "sig": "s1QQXNlX2ebovDUm9Jkun3xNQTNkilVi1tYpMRPAXI29osGT9dFA3SjpcXBKzU1v_zJ7rqIdOqtKlSlYsZTIAQ"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d350\",\"ok\":false,\"error\":{\"code\":\"CAPSULE_PRODUCT_OVER_LIMIT\"}}"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "build_action",
+   "actionType": "AMEND_PURPOSE",
+   "body": {
+    "capsule": {
+     "accountId": "vault-alice.mock",
+     "allowedOperations": [
+      "PAY"
+     ],
+     "asset": "NEAR",
+     "cumulativeLimitYocto": "100000000000000000000000000",
+     "dailyLimitYocto": "5000000000000000000000000",
+     "exactProductsOnly": "false",
+     "expiresAt": "2027-12-19T00:00:00.000Z",
+     "maxCapabilityTtlMs": "7200000",
+     "perPaymentMaxYocto": "50000000000000000000000",
+     "policyEpoch": "1",
+     "principalId": "alice",
+     "products": [
+      {
+       "sku": "attacker-injected",
+       "amountYocto": "50000000000000000000000",
+       "recipientId": "merchant-a.mock"
+      },
+      {
+       "sku": "attacker-injected-2",
+       "amountYocto": "50000000000000000000000",
+       "recipientId": "merchant-a.mock"
+      }
+     ],
+     "purposeId": "household-shopping",
+     "recipients": [
+      "merchant-a.mock",
+      "merchant-b.mock",
+      "merchant-c.mock"
+     ],
+     "statement": "Pay allow-listed household merchants for owner-requested purchases only.",
+     "v": "safebox.v3.purpose",
+     "validFrom": "2026-11-13T23:59:00.000Z",
+     "version": "2"
+    }
+   }
+  },
+  "result": "{\"ref\":\"$obj:35\",\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"AMEND_PURPOSE\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"b0f4444f2ac2746b929f6b67fb695206\",\"issuedAt\":\"2026-11-15T03:00:00.000Z\",\"expiresAt\":\"2026-11-15T04:00:00.000Z\",\"body\":{\"capsule\":{\"accountId\":\"vault-alice.mock\",\"allowedOperations\":[\"PAY\"],\"asset\":\"NEAR\",\"cumulativeLimitYocto\":\"100000000000000000000000000\",\"dailyLimitYocto\":\"5000000000000000000000000\",\"exactProductsOnly\":\"false\",\"expiresAt\":\"2027-12-19T0...[696 more chars]"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "ask_owner",
+   "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+   "credIds": [
+    "k1-phone",
+    "k2-laptop",
+    "k3-root-hw"
+   ],
+   "pitch": "Lower per-payment maximum to 50000000000000000000000 yoctoNEAR as requested; nothing else changes."
+  },
+  "result": "{\"ref\":\"$obj:36\",\"approvals\":[{\"credId\":\"k1-phone\",\"intent\":{\"v\":\"safebox.v4.intent\",\"protocol\":\"safebox.v4\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"matrixVersion\":\"1\",\"actionType\":\"AMEND_PURPOSE\",\"actionDigest\":\"d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411\",\"paramsDigest\":\"b0d415259b0d9fb5401f30f10223c1667f2bc1064e1cdb83e56d85e4ac6ea5dc\",\"epoch\":\"1\",\"rootSeq\":\"0\",\"authorityDigest\":\"4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2\",\"case...[5525 more chars]"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+    "approvals": [
+     {
+      "credId": "k1-phone",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+       "paramsDigest": "b0d415259b0d9fb5401f30f10223c1667f2bc1064e1cdb83e56d85e4ac6ea5dc",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a0e402024502a7be3051ff4349c40926adf0f349471d462be2b0652e566f5f31",
+       "issuer": "challenge-svc",
+       "credId": "k1-phone",
+       "challengeNonce": "40c43e5ea2ff02541c55cf60239a5ba19f8267fb57dcbd7287c1748f14f4fdf2",
+       "sessionId": "09ff059e-2cd6-4a83-9cfc-d9a4ad166d11",
+       "issuedAt": "2026-11-15T03:00:00.000Z",
+       "notBefore": "2026-11-15T03:00:00.000Z",
+       "expiresAt": "2026-11-15T03:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+        "credId": "k1-phone",
+        "challengeNonce": "40c43e5ea2ff02541c55cf60239a5ba19f8267fb57dcbd7287c1748f14f4fdf2",
+        "sessionId": "09ff059e-2cd6-4a83-9cfc-d9a4ad166d11",
+        "issuedAt": "2026-11-15T03:00:00.000Z",
+        "notBefore": "2026-11-15T03:00:00.000Z",
+        "expiresAt": "2026-11-15T03:02:00.000Z"
+       },
+       "sig": "v80SgX4-w0jiBcaico06_9BpSCPcv7YP99MKlKPAQ0obpRvC4hhzjXeCk7lWrSXfeDb0WMo5dzPBQacBSm-5Cw"
+      },
+      "webauthn": {
+       "credentialId": "2OQwBwCD0T0v59PcpSRQOcVVymWIkeXsHkuPvbz5-jY",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAJw",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoibkNRcGhvVjBBS3B5c3F6ZVZvRHo3Nk1XTVN5ZnlSdXpMRHZrdHk4TTlkQSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEYCIQCmUtEdLbFAtMmXOBvSjlxvaaSpO-kLbizxrxFTK1bkSwIhAIpleFts5xI4YKavik8ehLiAmaUtKrCnO4fh3QZSzFAl"
+      },
+      "apc": {
+       "sig": "3a8zOpTLwks1C01Gk72kqdMH2fXvQPEWfS_zS7VfVIL8zU9przICYKkJCzBay-jHblueoBzckk-zQn0855WfAw"
+      }
+     },
+     {
+      "credId": "k2-laptop",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+       "paramsDigest": "b0d415259b0d9fb5401f30f10223c1667f2bc1064e1cdb83e56d85e4ac6ea5dc",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a0e402024502a7be3051ff4349c40926adf0f349471d462be2b0652e566f5f31",
+       "issuer": "challenge-svc",
+       "credId": "k2-laptop",
+       "challengeNonce": "bae3dfa4f94ed2455fee12553f3c02c4fc0d8e85a62120b7214081e76e71e0bf",
+       "sessionId": "4189950b-36e2-45cc-9154-d9581b69dddb",
+       "issuedAt": "2026-11-15T03:00:00.000Z",
+       "notBefore": "2026-11-15T03:00:00.000Z",
+       "expiresAt": "2026-11-15T03:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+        "credId": "k2-laptop",
+        "challengeNonce": "bae3dfa4f94ed2455fee12553f3c02c4fc0d8e85a62120b7214081e76e71e0bf",
+        "sessionId": "4189950b-36e2-45cc-9154-d9581b69dddb",
+        "issuedAt": "2026-11-15T03:00:00.000Z",
+        "notBefore": "2026-11-15T03:00:00.000Z",
+        "expiresAt": "2026-11-15T03:02:00.000Z"
+       },
+       "sig": "2rWsnEkr940Xt7LpeVvud6Sd3ltG_gBw4J3k3n5RQeeAJli92vj34ip8M2IVqBLZn6x4-LdHahQuabKfiN5QDg"
+      },
+      "webauthn": {
+       "credentialId": "-WbbZGlSI4CgZl_eYGr6vQrpnTE5KgbwhyZ1tcV9SEQ",
+       "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABw",
+       "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiY01PeTJNQTNKRXNqWWdlRE1HdThBc3JMMkVUTVoybWlkUWFsU2d2MUJLbyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+       "signature": "MEUCICF-PVZlnslgOwb2Ou5kodh-l8nWZHO5kcGPUhHyCNI0AiEAtMKDRHJRCEwtbx8Em_OUg3fzivn_bRMSqk57BnqSX20"
+      }
+     },
+     {
+      "credId": "k3-root-hw",
+      "intent": {
+       "v": "safebox.v4.intent",
+       "protocol": "safebox.v4",
+       "accountId": "vault-alice.mock",
+       "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+       "purposeId": "household-shopping",
+       "purposeVersion": "1",
+       "matrixVersion": "1",
+       "actionType": "AMEND_PURPOSE",
+       "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+       "paramsDigest": "b0d415259b0d9fb5401f30f10223c1667f2bc1064e1cdb83e56d85e4ac6ea5dc",
+       "epoch": "1",
+       "rootSeq": "0",
+       "authorityDigest": "4876618a6b688c32b2bbcc2e46407ff671578067ec95b3b8b33f7c520d6b36f2",
+       "caseId": "-",
+       "newKeyDigests": [],
+       "summaryDigest": "a0e402024502a7be3051ff4349c40926adf0f349471d462be2b0652e566f5f31",
+       "issuer": "challenge-svc",
+       "credId": "k3-root-hw",
+       "challengeNonce": "aa02dc591cccc1f75ec555ec142e116deacd31cdcce25a0e9e59487c7a18e73f",
+       "sessionId": "2be09806-6e29-43c5-8690-aa7436c54c50",
+       "issuedAt": "2026-11-15T03:00:00.000Z",
+       "notBefore": "2026-11-15T03:00:00.000Z",
+       "expiresAt": "2026-11-15T03:02:00.000Z",
+       "screenDigest": "-"
+      },
+      "grant": {
+       "statement": {
+        "v": "safebox.v4.challenge",
+        "issuer": "challenge-svc",
+        "accountId": "vault-alice.mock",
+        "chainId": "fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3",
+        "actionType": "AMEND_PURPOSE",
+        "actionDigest": "d2ac5bebbca8446a3ac35f79b10d2700511029e00a50678d846a14348c6bb411",
+        "credId": "k3-root-hw",
+        "challengeNonce": "aa02dc591cccc1f75ec555ec142e116deacd31cdcce25a0e9e59487c7a18e73f",
+        "sessionId": "2be09806-6e29-43c5-8690-aa7436c54c50",
+        "issuedAt": "2026-11-15T03:00:00.000Z",
+        "notBefore": "2026-11-15T03:00:00.000Z",
+        "expiresAt": "2026-11-15T03:02:00.000Z"
+       },
+       "sig": "QJgzo6di0WmbgVi1refJbkIVSGgMsQylCX9bis05s8R3U0W0_WVXXe_fN3RiMeGwAtMt80nthNUgmSTBB3_2DA"
+      },
+      "sig": "vFoTycJ-YVoBTIksUXJHPRlon3FRQH_7-MUgSS6horqqN1CYkRs8lMoBuF9cbEcPfCqlLVJG9nXRWNm7UDjwBg"
+     }
+    ]
+   }
+  },
+  "result": "{\"ref\":\"$obj:37\",\"rid\":\"d394\",\"ok\":true,\"result\":{\"seq\":\"1\",\"head\":\"7212683a7c4437c9ad841f6c2f64101317d079e086e7b00d589a0d7dda418c40\",\"effects\":[{\"type\":\"PURPOSE_AMENDED\",\"version\":\"2\",\"digest\":\"cf3d313b996e52d57516df0c0c033852d38dddcdd203a77dd3dffd8bd8be6875\",\"approvers\":[\"k1-phone\",\"k2-laptop\",\"k3-root-hw\"]},{\"type\":\"CONFIRMATION_ASSURANCE\",\"levels\":[\"k1-phone:PROTECTED_CONFIRMATION_SIM\",\"k2-laptop:SOFTWARE_UI_LOWER_ASSURANCE\",\"k3-root-hw:TRUSTED_DISPLAY_SIM\"]}]}}"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"ref\":\"$obj:38\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"fb69c675d360bdf4fe5eea8bb26905bdde37c96c4d813906adbac1494ba937a3\",\"seq\":1,\"head\":\"7212683a7c4437c9ad841f6c2f64101317d079e086e7b00d589a0d7dda418c40\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"2\",\"purposeDigest\":\"cf3d313b996e52d57516df0c0c033852d38dddcdd203a77dd3dffd8bd8be6875\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"protocol\":\"safebox.v4\",\"caseDeadline\":null,\"ownerAuthorized\":false,\"gcaseId\":null,\"gcaseState\":null...[21 more chars]"
+ }
+]

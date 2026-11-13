@@ -1,0 +1,62 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "rc-001",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone"
+   ],
+   "subjectHolderId": "alice",
+   "note": "loss",
+   "plan": [
+    {
+     "credId": "atk-daily-7880f2c3",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-7880f2c3-768e12",
+      "seedCommitment": "a92e63aca2f6e7fedc417ac4cd22e65c348c58c12053b27ece32144386aeab04",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAqorxiyuI9Q7-fwnYR8zfUQAIO4jhM7cxCOyrVTYI3eGign2l_vmHTc5STrkbUwh7Y6BpQECAyYgASFYILpjOvTKlk3PKq5ouiUDy4Z9vB8li3eDNVtr57H26T5bIlggINanIsa8w7uJgnflSfZ0f-IHBuDmBJnfZ7Y9IEFbOAk",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQVJmQzBRYlIzSmhYSlUtcFBDai1KSFV4VWJmM0R6QjlpenAzSHliZ2pBcyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "rc-001",
+   "caseDigest": "f001a07597e62d664da49b9e716b7c38bf6f873f472574280ddca397fc0b28e6",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T22:00:00.000Z",
+  "type": "RECOVERY_ORC_CANCEL",
+  "body": {
+   "caseId": "rc-001",
+   "caseDigest": "f001a07597e62d664da49b9e716b7c38bf6f873f472574280ddca397fc0b28e6"
+  },
+  "approvers": [
+   "orc-1"
+  ]
+ }
+]
