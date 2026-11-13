@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+ok 1 - BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+  ---
+  duration_ms: 116.193879
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+ok 2 - BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+  ---
+  duration_ms: 128.585697
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+ok 3 - BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+  ---
+  duration_ms: 48.586161
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 435.764879

@@ -1,0 +1,11 @@
+{
+  "id": "FP-002",
+  "title": "Holdout harness outlived the owner policy: every legitimate case after #141 denied POLICY_NOT_ACTIVE",
+  "kind": "EVALUATION-HARNESS DEFECT (availability measurement invalid after expiry), not a SafeBox security defect",
+  "discoveredBy": "final evaluation of frozen dc71bb1 (docs/evidence/v2/final/dc71bb1/holdout.json)",
+  "observed": "500 cases x 11 virtual minutes = ~92 h, but the owner policy is valid for 26 h. From case H0142 on, 72 cases were denied POLICY_NOT_ACTIVE: 32 legitimate cases (counted FALSE_POSITIVE_LEGIT_BLOCKED) and 40 attack cases (counted ATTACK_BLOCKED, but blocked by expiry rather than by the specific defense under test). All 11 legitimate cases before H0142 settled.",
+  "securityBehaviour": "Correct: SafeBox fails closed when the owner policy is expired. 0 unauthorized ledger transfers in the run.",
+  "fix": "scripts/v2/holdout.mjs: owner policies are issued with a validity covering the whole run (policies are immutable per policyId, so mid-run renewal is not possible without new policy ids). Commit 8e4abe3.",
+  "verification": "Fresh holdout on 8e4abe3 (seed = sha256(8e4abe3...), never run before): 500 cases, 0 FALSE_POSITIVE, 0 unauthorized, LEGIT_SETTLED 34, ATTACK_BLOCKED 409, OWNER_INTENDED_PAYMENT_ONLY 57 (docs/evidence/v2/final/8e4abe3/holdout.json).",
+  "integrityNote": "The dc71bb1 holdout result is preserved unchanged. The 8e4abe3 run is a separate, supplementary run on a different commit; it is not spliced into the dc71bb1 results."
+}

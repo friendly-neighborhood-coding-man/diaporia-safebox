@@ -115,3 +115,14 @@ see the [operator guide](docs/near-v1-operator-guide.md) (`npm run demo:testnet`
 
 **Security warning:** experimental Testnet prototype. Never use mainnet accounts or real funds. The V0 mock
 approval method is deliberately unauthenticated; never connect it to anything real.
+
+## V2 — Independent Sensitive Zone (mock milestone)
+
+Branch `feature/v2-isolated-sensitive-zone`. V2 runs the Sensitive Zone, the Mock NEAR Ledger, the Independent
+Supervisor and the (assumed compromised) General Zone as **separate OS principals** with kernel-enforced socket and
+file ACLs, buffered (delayed) release, an independent ledger-effect verifier, a persistent emergency freeze, and an
+automated failure-repair workflow. Mock only: synthetic keys and a Mock NEAR Ledger; no real transactions.
+
+* Architecture, threat model, invariants, IPC contract, enforced-vs-simulated: [docs/v2/ARCHITECTURE.md](docs/v2/ARCHITECTURE.md)
+* Reproduction: [docs/v2/RUNBOOK.md](docs/v2/RUNBOOK.md)
+* Security evaluation and evidence: [docs/v2/SECURITY-EVALUATION.md](docs/v2/SECURITY-EVALUATION.md), `docs/evidence/v2/`

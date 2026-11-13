@@ -30,3 +30,16 @@ jobs:
           targets: wasm32-unknown-unknown
       - run: cargo test --manifest-path contract/Cargo.toml
       - run: cargo build --manifest-path contract/Cargo.toml --release --target wasm32-unknown-unknown
+  v2-os-isolation:
+    # Real multi-principal deployment needs root to create OS users; GitHub-hosted runners provide passwordless sudo.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Copy to a root-owned path (zone users must be able to read but not write the code)
+        run: sudo cp -a "$GITHUB_WORKSPACE" /opt/sbx2 && sudo chown -R root:root /opt/sbx2 && sudo chmod -R go-w /opt/sbx2
+      - name: OS isolation matrix + 24-technique suite + repair drill
+        run: cd /opt/sbx2 && sudo "$(command -v node)" --disable-warning=ExperimentalWarning --test tests/v2/os-isolation.test.mjs
