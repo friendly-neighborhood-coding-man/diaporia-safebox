@@ -3,7 +3,7 @@
 // (standing limits) and owner-signed single-use task capabilities (one per intended payment).
 // The owner's issuance log is the independent verifier's ground truth of "authorized".
 import { randomUUID } from 'node:crypto';
-import { appendFileSync, readFileSync, existsSync } from 'node:fs';
+import { appendFileSync, existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
 import { V2_DOMAINS, newSigner, makeSigner } from '../common/crypto.mjs';
 import { POLICY_V, CAP_V, REVOKE_V, UNFREEZE_V } from '../sensitive/statements.mjs';
 
@@ -27,9 +27,15 @@ export class OwnerSimulator {
   static view(logPath) {
     const v = { issued: new Map(), revoked: new Map(), policies: new Map(), offset: 0,
       refresh() {
+        // Incremental: read only bytes appended since the last refresh (the log is append-only).
         if (!existsSync(logPath)) return v;
-        const text = readFileSync(logPath, 'utf8');
-        const lines = text.slice(v.offset).split('\n'); const last = lines.pop(); v.offset = text.length - last.length;
+        const size = statSync(logPath).size;
+        if (size === v.offset) return v;
+        const fd = openSync(logPath, 'r'); const buf = Buffer.alloc(size - v.offset);
+        readSync(fd, buf, 0, buf.length, v.offset); closeSync(fd);
+        const text = buf.toString('utf8'); const cut = text.lastIndexOf('\n') + 1;
+        v.offset += Buffer.byteLength(text.slice(0, cut));
+        const lines = text.slice(0, cut).split('\n');
         for (const l of lines) { if (!l) continue; const r = JSON.parse(l);
           if (r.type === 'CAP') v.issued.set(r.cap.capId, { cap: r.cap, issuedAtMs: r.issuedAtMs });
           else if (r.type === 'REVOKE') v.revoked.set(r.capId, r.at);
