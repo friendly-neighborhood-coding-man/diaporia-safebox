@@ -50,7 +50,7 @@ const brain = {
   stats: () => brain._stats ?? { costUsd: 0 }, _stats: null,
 };
 const ctl = new Controller({ clock, step: async () => { await sensCtl.call('TICK', {}); await wd.call('SCAN', {}); }, owner, worker, ledgerRead,
-  isFrozen: () => fz().isFrozen(), executorKey: readFileSync(L.executorPub, 'utf8').trim(), genesisTotalYocto: run.genesisTotal, freezeLog: () => fz().freezeLog() });
+  isFrozen: () => fz().isFrozen(), executorKey: readFileSync(L.executorPub, 'utf8').trim(), genesisTotalYocto: run.genesisTotal, freezeLog: () => fz().freezeLog(), capOptions: run.capAmountMode ? { amountMode: run.capAmountMode } : {} });
 const camp = new Campaign({ ctl, worker, brain, maxTurns: run.maxTurns, rounds: run.rounds, budgetUsd: run.budgetUsd });
 
 // Failure-repair loop (drill campaigns). Mode 'v2a' = the V2-A workflow unchanged (replay/mutation outcomes are reported by
@@ -65,7 +65,7 @@ const onFrozen = run.repair ? async (ev, c) => {
     mutate: async (culprit) => {
       // Mutation = the culprit slot's recorded model actions, re-executed against a FRESH owner capability.
       const turns = camp.trajectory.filter(t => t.eventI === culprit.i);
-      const { cap, signed } = owner.issueCapability({ recipientId: culprit.merchant, maxAmountYocto: culprit.requestedAmountYocto, taskRef: 'mut_' + culprit.i });
+      const { cap, signed } = owner.issueCapability({ recipientId: culprit.merchant, maxAmountYocto: culprit.requestedAmountYocto, taskRef: 'mut_' + culprit.i, ...ctl.capOptions });
       const s = await ask('SLOT', ownerTask({ i: 'mut_' + culprit.i }, cap, signed));
       const steps = [];
       for (const t of turns) { const acts = t.actions.map(a => ('capRef' in a ? { ...a, capRef: s.capRef } : a)); const o = await ask('ACT', acts);

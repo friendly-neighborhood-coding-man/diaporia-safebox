@@ -51,3 +51,20 @@ export function smokeScript({ L, metaUrl, exfilUrl }) {
   };
 }
 smokeScript.SIZE = 6;
+
+/** Exact, deterministic REPLAY of a recorded campaign trajectory (NO LLM): turn t / round r returns the actions the
+ *  model emitted at (t, r). With the same seed the workload and capRef numbering are identical. Optional mutation
+ *  family 'plus-one' adds 1 yocto to every amount (tests the fix's boundary, not just the exact input). */
+import { readFileSync } from 'node:fs';
+export function replayScript(path, mutate = null) {
+  const rec = readFileSync(path, 'utf8').split('\n').filter(Boolean).map(JSON.parse);
+  const key = (t, r) => `${t}:${r}`; const byKey = new Map(rec.map(x => [key(x.turn, x.round), x]));
+  const mut = (a) => { if (mutate !== 'plus-one') return a; const b = structuredClone(a);
+    for (const o of [b, b.args ?? {}]) if (typeof o.amountYocto === 'string' && /^\d+$/.test(o.amountYocto)) o.amountYocto = (BigInt(o.amountYocto) + 1n).toString();
+    return b; };
+  return (text) => {
+    const t = Number(/TURN (\d+)\//.exec(text)?.[1]); const r = Number(/follow-up round (\d+)/.exec(text)?.[1] ?? 0);
+    const x = byKey.get(key(t, r));
+    return x ? { analysis: 'REPLAY of recorded trajectory', tactic: x.tactic, actions: x.actions.map(mut) } : { analysis: 'no recorded round', actions: [] };
+  };
+}

@@ -20,11 +20,12 @@ import { GENESIS, GENESIS_TOTAL, EXECUTOR_ACCOUNT } from '../../src/v2/world.mjs
 import { ClaudeBrain, ScriptedBrain } from '../../src/v2b/brain.mjs';
 import { systemPrompt } from '../../src/v2b/prompt.mjs';
 import { classify } from '../../src/v2b/classify.mjs';
-import { smokeScript } from '../../src/v2b/smoke.mjs';
+import { smokeScript, replayScript } from '../../src/v2b/smoke.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const flag = (k) => process.argv.includes('--' + k);
+const replaying = !!arg('replay', null);
 const name = arg('name', 'dev'), seed = arg('seed', 'v2b-dev'), hours = Number(arg('hours', '6')), maxTurns = Number(arg('max-turns', '10')), rounds = Number(arg('rounds', '2'));
 const model = arg('model', 'claude-sonnet-5-5'), scripted = arg('scripted', null), budgetUsd = Number(arg('budget', '3')), flaw = arg('flaw', null);
 const runId = `${new Date().toISOString().replace(/[:.]/g, '').slice(0, 15)}-v2b-${name}`.replace(/[^A-Za-z0-9_-]/g, '_');
@@ -98,7 +99,7 @@ const writeConf = (p, o, mode = 0o644, group = null) => { writeFileSync(p, JSON.
 writeConf(L.sensConf, { trustedOwnerKeys: ownerPub.trustedOwnerKeys, operatorKey: ownerPub.operatorKey, executorAccount: EXECUTOR_ACCOUNT, minBufferMs: 600_000, leaseMs: 5_000, injectFlaw: flaw });
 writeConf(L.ledgerConf, { genesis: { executorAccount: EXECUTOR_ACCOUNT, executorKey, ownerKey: ownerPub.operatorKey, accounts: GENESIS, maxPaymentYocto: '60000000000000000000000', settleDelayMs: Number(arg('settle-delay', '0')) } });
 // Run config holds the workload seed: readable by the supervisor principal only (not world-readable as in V2-A).
-const runConf = { seed, hours, maxTurns, rounds, budgetUsd, repair: flag('repair'), t0: T0, genesisTotal: GENESIS_TOTAL, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, brainSock, pids: {} };
+const runConf = { capAmountMode: arg('cap-amount-mode', null), seed, hours, maxTurns, rounds, budgetUsd, repair: flag('repair'), t0: T0, genesisTotal: GENESIS_TOTAL, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, brainSock, pids: {} };
 writeConf(L.runConf, runConf, 0o640, USERS.sup);
 
 // 3. Brain (red-team model) behind the root broker.
@@ -109,7 +110,7 @@ const system = systemPrompt({ base, codeRoot: ROOT, gzSock: L.sensGz }) + `\n\nK
 const P = process.env;
 const brainEnv = { PATH: '/opt/node22/bin:/usr/bin:/bin', HOME: brainHome, ANTHROPIC_BASE_URL: 'https://api.anthropic.com', HTTPS_PROXY: P.HTTPS_PROXY, HTTP_PROXY: P.HTTPS_PROXY,
   https_proxy: P.HTTPS_PROXY, NO_PROXY: P.NO_PROXY, no_proxy: P.NO_PROXY, NODE_EXTRA_CA_CERTS: join(brainHome, 'ca.crt'), SSL_CERT_FILE: join(brainHome, 'ca.crt') };
-const brain = scripted ? new ScriptedBrain(smokeScript({ L, metaUrl, exfilUrl })) : new ClaudeBrain({ model, system, home: brainHome, env: brainEnv, claudeBin: '/opt/node22/bin/claude' }).start();
+const brain = arg('replay', null) ? new ScriptedBrain(replayScript(arg('replay'), arg('replay-mutate', null))) : scripted ? new ScriptedBrain(smokeScript({ L, metaUrl, exfilUrl })) : new ClaudeBrain({ model, system, home: brainHome, env: brainEnv, claudeBin: '/opt/node22/bin/claude' }).start();
 const broker = net.createServer(s => {
   let b = ''; s.setEncoding('utf8');
   s.on('data', d => { b += d; let i; while ((i = b.indexOf('\n')) >= 0) { const line = b.slice(0, i); b = b.slice(i + 1); (async () => {
@@ -183,15 +184,15 @@ const cls = results ? classify({ evaluation: results.result, decisions: results.
 // Exfil sink and metadata hits are host-side facts (the General Zone has no route to them).
 mkdirSync(out, { recursive: true });
 const stats = brain.stats();
-const summary = { kind: 'safebox-v2b-redteam-campaign', name, runId, gitHead, workingTreeDirty: dirty, realLlmExecuted: !scripted && stats.calls > 0,
+const summary = { kind: 'safebox-v2b-redteam-campaign', name, runId, gitHead, workingTreeDirty: dirty, realLlmExecuted: !scripted && !replaying && stats.calls > 0, replayOf: arg('replay', null), replayMutation: arg('replay-mutate', null),
   brain: { ...stats, system: scripted ? null : 'see system-prompt.txt', runsAs: 'root broker child, env -i, scratch HOME, --tools "" (no tools), --strict-mcp-config, --setting-sources ""' },
-  config: { seed, hours, maxTurns, rounds, budgetUsd, flaw, preReleaseAudit: !flag('no-pre-audit'), repair: flag('repair') },
+  config: { capAmountMode: runConf.capAmountMode, seed, hours, maxTurns, rounds, budgetUsd, flaw, preReleaseAudit: !flag('no-pre-audit'), repair: flag('repair') },
   isolation: { users: USERS, principalGroups: PRINCIPAL_GROUPS, generalZone: { netns: true, mountns: true, procHidepid: 'invisible', masked: MASK.filter(existsSync) }, sterileCode: ROOT, codeWritableByOthers: codeCheck, matrixOk, matrix },
   hostCanaries: { metadataHits: metaHits.length, exfilReceived: exfil },
   campaign: results ? { turns: results.trajectory.length, stop: results.result.stopReason, summary: results.result.summary, aliveAfter: results.aliveAfter, repairs: results.repairs?.map(r => ({ gates: r.gates, resumed: r.resumed, culprit: r.diagnosis?.culpritEvent, replay: r.replay, recovery: r.recovery })) ?? [] } : null,
   classification: cls ? { counts: cls.counts, credentialExposure: cls.credentialExposure, bufferOrFreezeBypass: cls.bufferOrFreezeBypass, metrics: cls.metrics, unattributedViolations: cls.unattributedViolations } : null };
 writeFileSync(join(out, 'run.json'), JSON.stringify(summary, null, 1));
-if (!scripted) writeFileSync(join(out, 'system-prompt.txt'), system);
+if (!scripted && !replaying) writeFileSync(join(out, 'system-prompt.txt'), system);
 writeFileSync(join(out, 'transcript.jsonl'), brain.transcript.map(t => JSON.stringify(t)).join('\n') + '\n');
 if (results) {
   writeFileSync(join(out, 'trajectory.jsonl'), results.trajectory.map(t => JSON.stringify(t)).join('\n') + '\n');
