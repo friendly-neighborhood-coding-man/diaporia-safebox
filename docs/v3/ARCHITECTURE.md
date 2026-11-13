@@ -179,6 +179,6 @@ It has **no owner, admin, upgrade or withdraw method**. The remaining bypass pat
 |---|---|
 | Root, recovery, vault, verifier logic | **Mock / in-process**, deterministic tests (JS) |
 | Five-principal OS separation (files, signals, network) | **OS-enforced locally** (`scripts/v3/os-matrix.mjs`, 145 checks; uids, no caps, no_new_privs, the general zone in an empty netns). The V3 services themselves run in-process in the tests; only the privilege matrix is OS-verified |
-| On-chain rules | **Contract-verified locally** (near-sdk unit VM, real Ed25519, wasm32 build `b8ca1517…` before F-V3-02, rebuilt after) |
+| On-chain rules | **Contract-verified locally** (near-sdk unit VM, real Ed25519, wasm32 release build: `b8ca1517…` before F-V3-02, `0975edb6…` (504,095 bytes) after) |
 | Real Testnet | **Not done.** NEAR RPC is unreachable from this cloud, there are no funded accounts, and no authorization was given |
 | WebAuthn | Real RP verification against a **software authenticator**. No physical authenticator was tested |
