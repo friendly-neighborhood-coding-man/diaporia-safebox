@@ -45,6 +45,8 @@ export function buildV3({ dir, clock, profile = 'personal', config = {}, capsule
   w.root = openRoot();
   w.rootOps = rootOps(w.root);
   w.admin = new DirectClient(w.rootOps.admin);
+  // PUBLIC Root port used by untrusted parties (the General Zone in red-team runs): same SUBMIT verification, nothing else.
+  w.publicRoot = { request: (op, a) => new DirectClient({ SUBMIT: w.rootOps.admin.SUBMIT, VIEW: w.rootOps.admin.VIEW }).request(op, a) };
   const openVault = () => new ExecutionVault({ genesis, pinnedChainId: owner.chainId, executorAccount: ACCOUNT, bufferMs, minBufferMs: 600_000 },
     { store: new SensitiveStore(join(dir, 'vault.db'), { now }), now, wallNow: () => wall.now(), executorSigner: executor, ledger: ledgerExec });
   w.vault = openVault();
