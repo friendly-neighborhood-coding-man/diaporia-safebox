@@ -114,7 +114,7 @@ export async function openGov(w, { procedure = 'GUARDIAN_EMERGENCY_REPLACE', acc
   const kind = procedure === 'GUARDIAN_EMERGENCY_REPLACE' ? 'guardian' : 'idv';
   const reps = replacements ?? accused.map((x, i) => w.owner.newParticipant(kind, `${kind === 'guardian' ? 'g' : 'idv'}-new-${seq}-${i}`, `${kind}-holder-${seq}-${i}`, id));
   const ev = evidence ?? (ground === 'COMPROMISE' || ground === 'MISCONDUCT' ? accused.flatMap(x => verdicts(w, x, adj, { finding: ground === 'COMPROMISE' ? 'COMPROMISED' : 'MISCONDUCT' }))
-    : ground === 'WITHDRAWAL' ? accused.map(x => w.owner.withdrawal(x)) : []);
+    : ground === 'WITHDRAWAL' ? accused.map(x => w.owner.withdrawal(x, id)) : []);
   const r = await w.ownerAct('GOV_CASE_OPEN', { gcaseId: id, procedure, accused, ground, evidence: ev, replacements: reps }, owners, { authOpts });
   return { r, gcaseId: id, replacements: reps };
 }

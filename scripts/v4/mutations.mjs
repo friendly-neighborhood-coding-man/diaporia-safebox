@@ -22,6 +22,9 @@ const M = [
   ['R-3: replacement PoP removed', 'src/v4/root/chain.mjs', "r.pop, r.publicKey)) fail('REPLACEMENT_POP_INVALID', r.id);", "r.pop, r.publicKey) && false) fail('REPLACEMENT_POP_INVALID', r.id);"],
   ['R-3: security delay removed', 'src/v4/root/chain.mjs', "if (at < g.executeAfter) fail('GOV_SECURITY_DELAY_OPEN');", ""],
   ['R-3: empty electorate allowed', 'src/v4/root/chain.mjs', "if (!electorate.length) fail('EMERGENCY_ELECTORATE_EMPTY'", "if (false) fail('EMERGENCY_ELECTORATE_EMPTY'"],
+  ['F-V4-01: suspended survivor consent not counted', 'src/v4/root/chain.mjs', "if (!suspendedSurvivorConsent(s, a, tr, at, fx)) H3.RECOVERY_CONSENT", "H3.RECOVERY_CONSENT"],
+  ['F-V4-01: protective actions of revoked keys not lifted at completion', 'src/v4/root/chain.mjs', "installPlanMeta(s, cs);\n    liftProtectiveActionsOfLost(s, cs.lost, fx);\n  },\n  RECONSTITUTE", "installPlanMeta(s, cs);\n  },\n  RECONSTITUTE"],
+  ['F-V4-01: owner-imposed suspensions lifted too (over-broad repair)', 'src/v4/root/chain.mjs', "by.length && by.every(x => L.has(x))", "by.length"],
 ];
 const rows = [];
 for (const [name, file, from, to] of M) {
@@ -29,7 +32,7 @@ for (const [name, file, from, to] of M) {
   if (!orig.includes(from)) { rows.push({ name, file, error: 'PATTERN_NOT_FOUND' }); continue; }
   writeFileSync(file, orig.replace(from, to));
   try {
-    const r = spawnSync(process.execPath, ['--disable-warning=ExperimentalWarning', '--test', 'tests/v4/r1-closure.test.mjs', 'tests/v4/r3-governance.test.mjs', 'tests/v4/intent-ui.test.mjs', 'tests/v4/ballot-integration.test.mjs', 'tests/v4/mutation-kills.test.mjs'], { encoding: 'utf8', timeout: 600_000 });
+    const r = spawnSync(process.execPath, ['--disable-warning=ExperimentalWarning', '--test', 'tests/v4/r1-closure.test.mjs', 'tests/v4/r3-governance.test.mjs', 'tests/v4/intent-ui.test.mjs', 'tests/v4/ballot-integration.test.mjs', 'tests/v4/mutation-kills.test.mjs', 'tests/v4/f01-suspension-lockout.test.mjs'], { encoding: 'utf8', timeout: 600_000 });
     const fail = Number(/# fail (\d+)/.exec(r.stdout)?.[1] ?? -1);
     rows.push({ name, file, caught: fail > 0, failingTests: fail });
   } finally { writeFileSync(file, orig); }

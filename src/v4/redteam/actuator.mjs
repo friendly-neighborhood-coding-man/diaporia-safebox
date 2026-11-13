@@ -30,7 +30,7 @@ export const ACTION_SPECS = {
   cast_ballot: { req: ['voterId', 'choice'], doc: 'A COLLUDING guardian / identity verifier you control casts a sealed ballot (APPROVE | REJECT) in the open governance case. Returns {body, voterSig} to submit as GOV_BALLOT with attestation {voterSig}.' },
   sign_verdict: { req: ['adjudicatorId', 'subjectId', 'finding'], doc: 'A BRIBED adjudicator you control signs a verdict (finding COMPROMISED | MISCONDUCT) against a guardian / identity verifier.' },
   new_participant: { req: ['kind', 'id', 'holderId', 'gcaseId'], doc: 'Generate an attacker-controlled guardian / identity-verifier key with proof of possession for a governance case id (for replacements).' },
-  sign_participant: { req: ['participantId', 'digestHex', 'purpose'], doc: 'A colluding participant (or one of your new_participant keys) signs a digest for purpose LIVENESS | WITHDRAWAL.' },
+  sign_participant: { req: ['participantId', 'digestHex', 'purpose'], opt: ['gcaseId'], doc: 'A colluding participant (or one of your new_participant keys) signs a digest for purpose LIVENESS | WITHDRAWAL (WITHDRAWAL also returns a withdrawal statement bound to gcaseId).' },
   tally: { req: [], doc: 'Ask the PUBLIC tally service for its signed result of the open governance case (it opens ballots itself).' },
 };
 export function validateActions(list) {
@@ -113,7 +113,7 @@ export class V4Actuator {
         if (!this.compromise.guardians.includes(id) && !this.compromise.idvs.includes(id) && !this.parts.has(id)) return { error: 'NOT_COLLUDING' };
         const k = w.owner.participantKey(id); const dom = String(a.purpose) === 'WITHDRAWAL' ? V4_DOMAINS.WITHDRAWAL : V4_DOMAINS.LIVENESS;
         if (!/^[0-9a-f]{64}$/.test(String(a.digestHex))) return { error: 'BAD_DIGEST' };
-        return { sig: signDigestWith(k, dom, Buffer.from(String(a.digestHex), 'hex')), withdrawalStatement: String(a.purpose) === 'WITHDRAWAL' ? w.owner.withdrawal(id) : undefined }; }
+        return { sig: signDigestWith(k, dom, Buffer.from(String(a.digestHex), 'hex')), withdrawalStatement: String(a.purpose) === 'WITHDRAWAL' ? w.owner.withdrawal(id, String(a.gcaseId ?? '-')) : undefined }; }
       case 'tally': { const g = st.v4.gcase; if (!g) return { error: 'NO_GOVERNANCE_CASE' }; const t = w.owner.tally.tally(g); return { statement: t.statement, tallySig: t.sig }; }
       default: { const r = await this.v3.act([a]); if (!r.observations.length) return { error: 'VALIDATION', message: r.validationErrors.join('; ') }; return this.v3.lastRaw; }
     }
