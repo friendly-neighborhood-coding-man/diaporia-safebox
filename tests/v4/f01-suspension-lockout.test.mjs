@@ -13,7 +13,7 @@ import { H, ok, deny } from './helpers.mjs';
 const status = (w) => Object.fromEntries(Object.values(w.root.state.creds).map(c => [c.credId, c.status]));
 async function lockout(w, thief, act) {
   ok(await act('FREEZE', { freezeId: 'fz-1', reason: 'x', source: 'owner' }, thief));
-  for (const k of ['k2-laptop', 'k3-root-hw', 'k4-freeze', 'k5-recovery-hw'].filter(k => !thief.includes(k))) ok(await act('SUSPEND', { credId: k }, [thief[0]]));
+  for (const k of ['k1-phone', 'k2-laptop', 'k3-root-hw', 'k4-freeze', 'k5-recovery-hw'].filter(k => !thief.includes(k))) ok(await act('SUSPEND', { credId: k }, [thief[0]]));
 }
 
 test('F-V4-01 BASELINE: on V3 one stolen key suspends the others and the owner can no longer recover', async () => {
@@ -37,12 +37,13 @@ test('F-V4-01 REPLAY (campaign B shape): two stolen DAILY keys freeze + suspend 
   assert.equal((await w.verify()).authority.unauthorized.length, 0);
 });
 
-test('F-V4-01 single stolen key suspends ALL four others => owner still recovers', async () => {
+for (const thief of ['k1-phone', 'k4-freeze']) test(`F-V4-01 single stolen key (${thief}; campaign E shape for k4) suspends ALL four others => owner still recovers`, async () => {
   const w = buildV4();
-  await lockout(w, ['k1-phone'], (t, b, c) => w.legacyAct(t, b, c, { notIntended: true }));
-  const r = await legitimateRecoveryV4(w, ['k1-phone']);
+  await lockout(w, [thief], (t, b, c) => w.legacyAct(t, b, c, { notIntended: true }));
+  const r = await legitimateRecoveryV4(w, [thief]);
   assert.equal(r.outcome, 'RECOVERED', JSON.stringify(r));
-  assert.ok(Object.entries(status(w)).every(([k, s]) => k === 'k1-phone' ? s !== 'active' : s === 'active'), JSON.stringify(status(w)));
+  assert.ok(Object.entries(status(w)).every(([k, s]) => k === thief ? s !== 'active' : s === 'active'), JSON.stringify(status(w)));
+  assert.equal(w.root.state.freeze.active, false);
 });
 
 test('F-V4-01 narrowness: owner-imposed suspensions survive; a suspended key consent is intent-bound; an attacker case still cannot complete', async () => {

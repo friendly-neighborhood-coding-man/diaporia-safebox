@@ -43,6 +43,8 @@ export class OwnerSimV4 {
   }
   log(e) { this.events.push({ at: new Date(this.w.now()).toISOString(), ...e }); }
   ownerKeys() { const st = this.w.root.state; return Object.values(st.creds).filter(c => c.status === 'active' && !this.sc.stolen.includes(c.credId) && this.w.owner.devices.some(d => d.credId === c.credId && !d.lost)); }
+  /** keys the owner still physically holds (a suspended key can still consent to its own recovery). */
+  heldKeys() { const st = this.w.root.state; return Object.values(st.creds).filter(c => (c.status === 'active' || c.status === 'suspended') && !this.sc.stolen.includes(c.credId) && this.w.owner.devices.some(d => d.credId === c.credId && !d.lost)); }
   key(role, except = []) { return this.ownerKeys().find(c => c.role === role && !except.includes(c.credId))?.credId ?? null; }
   async act(label, p) { let r; try { r = await p; } catch (e) { r = { ok: false, error: { code: e.code ?? e.message } }; } this.interventions++; this.log({ act: label, ok: r.ok, code: r.ok ? null : (r.error?.code ?? r.code) }); return r; }
   /** The owner's devices render the Root-derived summary; the owner approves only what matches an outstanding owner intent. */
@@ -97,8 +99,10 @@ export class OwnerSimV4 {
       if (root && daily) await this.act('unfreeze ' + st.freeze.freezeId, w.ownerAct('UNFREEZE', { freezeId: st.freeze.freezeId }, [daily, root]));
     }
     // discover stolen devices: suspend them, then recover
-    if (this.sc.discoverAfterH !== null && !this.recovery && now - this.t0 >= this.sc.discoverAfterH * H && !w.root.state.case) {
-      for (const k of this.sc.stolen) { w.owner.dev(k).lost = true; const other = this.key('DAILY') ?? this.key('ROOT'); if (w.root.state.creds[k].status === 'active' && other) await this.act('suspend ' + k, w.legacyAct('SUSPEND', { credId: k }, [other])); }
+    // the owner notices (suspension notices go to every channel) when one of the keys it holds is suspended
+    const noticed = this.heldKeys().some(c => c.status === 'suspended');
+    if (!this.recovery && !w.root.state.case && ((this.sc.discoverAfterH !== null && now - this.t0 >= this.sc.discoverAfterH * H) || noticed)) {
+      for (const k of this.sc.stolen) { w.owner.dev(k).lost = true; const other = this.key('DAILY') ?? this.key('ROOT') ?? this.key('RECOVERY'); if (w.root.state.creds[k]?.status === 'active' && other) await this.act('suspend ' + k, w.legacyAct('SUSPEND', { credId: k }, [other])); }
       const o = await openCaseV4(w, { lost: this.sc.stolen, full: this.sc.stolen.length * 2 > w.root.state.baseline.credIds.length });
       this.interventions++; this.log({ act: 'open recovery', ok: o.r.ok, code: o.r.ok ? null : o.r.error.code });
       if (o.r.ok) { this.myCases.add(o.caseId); this.recovery = { caseId: o.caseId, startedAt: now, done: false }; }
@@ -113,7 +117,7 @@ export class OwnerSimV4 {
     const tryStep = async (label, p) => { if (rc.tried?.has(label)) return; (rc.tried ??= new Set()).add(label); await this.act(label, p); };
     if (!Object.keys(cs.identity).length && honestIdv[0]) await tryStep('identity', E.identity(w, honestIdv[0]));
     if (cs.state === 'RECONSTITUTION' && honestIdv[1]) await tryStep('identity-2', E.identity(w, honestIdv[1]));
-    for (const c of survivors(w.root.state, cs, w.now())) if (!cs.consents[c] && this.ownerKeys().some(k => k.credId === c)) await tryStep('consent ' + c, E.consent(w, c));
+    for (const c of survivors(w.root.state, cs, w.now())) if (!cs.consents[c] && this.heldKeys().some(k => k.credId === c)) await tryStep('consent ' + c, E.consent(w, c));
     for (const g of honestG) if (!cs.guardians[g]) await tryStep('guardian ' + g, E.guardian(w, g));
     for (const ch of Object.keys(w.root.state.channels).filter(c => !this.sc.channels.includes(c))) if (!cs.acks[ch]) await tryStep('ack ' + ch, E.ack(w, ch));
     const c2 = w.root.state.case;
