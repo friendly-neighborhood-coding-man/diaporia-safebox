@@ -18,7 +18,13 @@
     "v2:test": "node --disable-warning=ExperimentalWarning --test tests/v2/*.test.mjs",
     "v2:holdout": "node --disable-warning=ExperimentalWarning scripts/v2/holdout.mjs",
     "v2:os": "node --disable-warning=ExperimentalWarning scripts/v2/run-isolated.mjs",
-    "v2:evaluate": "node --disable-warning=ExperimentalWarning scripts/v2/evaluate.mjs"
+    "v2:evaluate": "node --disable-warning=ExperimentalWarning scripts/v2/evaluate.mjs",
+    "v3:test": "node --disable-warning=ExperimentalWarning --test tests/v3/*.test.mjs",
+    "test:contract-v3": "cargo test --manifest-path contract-v3/Cargo.toml",
+    "build:contract-v3": "cargo build --manifest-path contract-v3/Cargo.toml --release --target wasm32-unknown-unknown",
+    "v3:os": "node scripts/v3/os-matrix.mjs",
+    "v3:check-deployment": "node scripts/v3/check-deployment.mjs",
+    "v3:redteam": "node --disable-warning=ExperimentalWarning scripts/v3/run-redteam.mjs"
   },
   "dependencies": {
     "near-api-js": "7.5.3"

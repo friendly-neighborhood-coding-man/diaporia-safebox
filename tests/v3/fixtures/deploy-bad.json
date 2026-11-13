@@ -1,0 +1,5 @@
+{ "accountId": "vault-alice.testnet", "codeHash": "HASH_OTHER",
+  "keys": [ { "public_key": "ed25519:deployer", "access_key": { "nonce": 1, "permission": "FullAccess" } },
+            { "public_key": "ed25519:wild", "access_key": { "nonce": 1, "permission": { "FunctionCall": { "allowance": null, "receiver_id": "vault-alice.testnet", "method_names": [] } } } },
+            { "public_key": "ed25519:reinit", "access_key": { "nonce": 1, "permission": { "FunctionCall": { "allowance": null, "receiver_id": "vault-alice.testnet", "method_names": ["new"] } } } },
+            { "public_key": "ed25519:foreign", "access_key": { "nonce": 1, "permission": { "FunctionCall": { "allowance": null, "receiver_id": "evil.testnet", "method_names": ["ft_transfer"] } } } } ] }

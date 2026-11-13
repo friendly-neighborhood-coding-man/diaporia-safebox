@@ -156,3 +156,4 @@ safebox.config.json
 *.key.json
 keys/
 contract/target/
+contract-v3/target/
