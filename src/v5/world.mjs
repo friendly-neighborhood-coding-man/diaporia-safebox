@@ -60,15 +60,15 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
     engineQueue: [], rejects: [], near };
   const openRoot = () => new RootService({ genesis, pinnedChainId: owner.chainId5, dbPath: join(dir, 'root.db'), now, chain: V5, onEffects: (fx, t) => { w.pendingEffects.push({ fx, t }); } });
   w.root = openRoot(); w.rootOps = rootOps(w.root); w.admin = new DirectClient(w.rootOps.admin);
-  const keyContext = (state) => {
+  const keyContext = (state, affected = null) => {
     const out = {};
-    for (const c of Object.values(state.creds)) (out[c.holderId] ??= []).push(`${c.credId} (${c.role}, ${c.status})`);
+    for (const c of Object.values(state.creds)) (out[c.holderId] ??= []).push(`${c.credId === affected ? 'AFFECTED ' : 'enrolled '}${c.credId} (${c.role}, ${c.status})`);
     return out;
   };
   const onIncident = ({ incident, ev, root }) => {
     const hasOwners = V5.ownerPrincipals(root).length > 0;
     notify.enqueue(root, { incident: { incidentId: incident.incident_id, reason: 'unusual spending pattern', pattern: ev.reasons.map(r => r.code).join(', ') },
-      kind: 'INCIDENT', keyContextByHolder: keyContext(root), delayStatus: `unsettled payments of the affected flow are delayed up to ${Math.round(Number(ev.policy?.delay?.anomalyDelayMs ?? 21_600_000) / 3600_000)} h; settled payments cannot be stopped`, rapidAvailable: hasOwners });
+      kind: 'INCIDENT', keyContextByHolder: keyContext(root, incident.cred_id), delayStatus: `unsettled payments of the affected flow are delayed up to ${Math.round(Number(ev.policy?.delay?.anomalyDelayMs ?? 21_600_000) / 3600_000)} h; settled payments cannot be stopped`, rapidAvailable: hasOwners });
   };
   const onRapidRule = ({ grantId, ruleId, evidence }) => { w.engineQueue.push({ grantId, ruleId, evidence }); };
   const openVault = () => new ExecutionVaultV5({ genesis, pinnedChainId: owner.chainId5, executorAccount: ACCOUNT, bufferMs, minBufferMs: 600_000, chain: V5 },

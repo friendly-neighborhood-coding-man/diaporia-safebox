@@ -21,7 +21,7 @@ import { RISK_POLICY_V1 } from '../risk/detector.mjs';
 const HOLDING = ['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN', 'FROZEN'];
 const V5_SCHEMA = `
 CREATE TABLE IF NOT EXISTS v5_pay (payment_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, delegation_id TEXT, recipient TEXT NOT NULL, amount TEXT NOT NULL,
-  proposed_at INTEGER NOT NULL, anomaly TEXT NOT NULL, delay_ms INTEGER NOT NULL, incident_id TEXT, rapid_grant TEXT, baseline_eligible INTEGER NOT NULL, decision TEXT, settled_before_detection INTEGER NOT NULL DEFAULT 0);
+  proposed_at INTEGER NOT NULL, anomaly TEXT NOT NULL, delay_ms INTEGER NOT NULL, incident_id TEXT, rapid_grant TEXT, baseline_eligible INTEGER NOT NULL, decision TEXT, settled_before_detection INTEGER NOT NULL DEFAULT 0, cap_expires_orig INTEGER);
 CREATE TABLE IF NOT EXISTS v5_incidents (incident_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, opened_at INTEGER NOT NULL, state TEXT NOT NULL,
   last_trigger_at INTEGER NOT NULL, delayed_count INTEGER NOT NULL, reasons TEXT NOT NULL, closed_at INTEGER, settled_before INTEGER NOT NULL, exposure_before TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS v5_security (n INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, type TEXT NOT NULL);
@@ -95,7 +95,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const amt = uint(op.amountYocto, 'amountYocto'); if (amt <= 0n || amt > BigInt(d.perOpMaxYocto)) deny('OVER_DELEGATION_PER_OP');
     const ia = isoMs(op.issuedAt, 'issuedAt'); if (ia > now + 300_000 || now - ia > 600_000) deny('DELEGATED_OP_STALE');
     const seq = Number(uint(op.seq, 'seq'));
-    const used = this.store.db.prepare('SELECT COUNT(*) n, COALESCE(SUM(CAST(amount AS INTEGER)),0) s FROM v5_deleg_use WHERE delegation_id=?').get(d.delegationId);
+    const used = this.store.db.prepare('SELECT COUNT(*) n FROM v5_deleg_use WHERE delegation_id=?').get(d.delegationId);
     const usedAmt = this.store.db.prepare('SELECT amount FROM v5_deleg_use WHERE delegation_id=?').all(d.delegationId).reduce((t, r) => t + BigInt(r.amount), 0n);
     if (used.n + 1 > Number(d.maxUses)) deny('DELEGATION_MAX_USES_EXHAUSTED');
     if (usedAmt + amt > BigInt(d.cumulativeMaxYocto)) deny('OVER_DELEGATION_CUMULATIVE');
@@ -167,8 +167,10 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const ms = Math.min(delayMs, MAX_DELAY_MS); // the vault enforces its own cap whatever the engine asks
     const release = r.proposed_at + this.cfg.bufferMs + ms;
     this.store.tx(() => {
-      this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(release, this.now(), paymentId);
-      this.store.db.prepare("UPDATE v5_pay SET anomaly='ANOMALY_PAYMENT_DELAY', delay_ms=?, incident_id=?, baseline_eligible=0 WHERE payment_id=?").run(ms, incidentId, paymentId);
+      // the authorization was validated at proposal; the delay must not silently turn into a cancellation, so the
+      // capability's release window follows the bounded delay (epoch / Purpose / credential re-checks still apply at release)
+      this.store.db.prepare("UPDATE payments SET release_at=?, cap_expires_at=MAX(cap_expires_at, ?), updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(release, r.cap_expires_at + (release - r.release_at), this.now(), paymentId); // the window shifts by the added delay
+      this.store.db.prepare("UPDATE v5_pay SET anomaly='ANOMALY_PAYMENT_DELAY', delay_ms=?, incident_id=?, baseline_eligible=0, cap_expires_orig=COALESCE(cap_expires_orig, ?) WHERE payment_id=?").run(ms, incidentId, r.cap_expires_at, paymentId);
       this.store.db.prepare('UPDATE v5_incidents SET delayed_count=delayed_count+1 WHERE incident_id=?').run(incidentId);
       this.store.journal(paymentId, 'BUFFERED', 'BUFFERED', 'risk-engine', { event: 'ANOMALY_PAYMENT_DELAY', incidentId, releaseAt: release, delayMs: ms, unchanged: 'recipient,amount,asset,purpose,authorization' });
     });

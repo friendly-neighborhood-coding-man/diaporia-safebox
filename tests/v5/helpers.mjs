@@ -18,3 +18,13 @@ export const release = (w, creds, id, extra = {}) => w.cmd('HOLD_RELEASE', { hol
 export const contest = (w, suspect, holdIds, creds = ['orc-1', 'k3-root-hw'], id = 'c-' + suspect) => w.cmd('CONTEST_PROTECTIVE_HOLD', { contestId: id, holdIds, suspectCredId: suspect, reason: 'stolen key froze my vault' }, creds);
 export const status = (w) => Object.fromEntries(Object.values(w.root.state.creds).map(c => [c.credId, c.status]));
 export const active = (w) => w.effectiveHolds().map(h => h.holdId).sort();
+export const scopeOf = (w, { credIds = ['k1-phone'], delegationIds = [], recipients = null, sessionCapYocto = '-' } = {}) => {
+  const p = w.root.state.purpose;
+  return { credIds, delegationIds, recipients: recipients ?? [...p.recipients], asset: p.asset, purposeId: p.purposeId, purposeVersion: p.version,
+    perPaymentMaxYocto: p.perPaymentMaxYocto, dailyLimitYocto: p.dailyLimitYocto, cumulativeLimitYocto: p.cumulativeLimitYocto, sessionCapYocto };
+};
+export const rapidRequest = (w, by, { id = 'rq-1', scope = null, durationMs = 4 * 3600_000, incidentId = '-', explanation = 'urgent purchases are mine' } = {}) =>
+  w.cmd('RAPID_USE_REQUEST', { requestId: id, scope: scope ?? scopeOf(w), delayException: 'REMOVE_ANOMALY_DELAY', durationMs: String(durationMs), explanation, incidentId }, [by]);
+export const rapidVote = (w, by, id = 'rq-1', decision = 'APPROVE') => w.cmd('RAPID_USE_APPROVE', { requestId: id, requestDigest: w.root.state.v5.rapid.requests[id].digest, decision }, [by]);
+export const rapidActivate = (w, id = 'rq-1') => w.submit({ action: w.action('RAPID_USE_ACTIVATE', { requestId: id, requestDigest: w.root.state.v5.rapid.requests[id].digest }) });
+export const burst = async (w, n, { credId = 'k1-phone', step = 60_000, amountYocto } = {}) => { const out = []; for (let i = 0; i < n; i++) { const r = await w.pay({ credId, ...(amountYocto ? { amountYocto } : {}) }); out.push(r); await w.advance(step); } return out; };
