@@ -45,7 +45,16 @@ export class Watchdog {
     const report = { scan: this.scans, at: this.now(), breaches: [], anomalies: [], actions: [] };
     // 1. Ledger effects, verified independently.
     let lstate, transfers, balances;
-    try { lstate = await this.ledgerRead.call('STATE', {}); transfers = await this.ledgerRead.call('TRANSFERS', { sinceSeq: '0' }); balances = await this.ledgerRead.call('BALANCES', {}); }
+    try {
+      lstate = await this.ledgerRead.call('STATE', {});
+      // Incremental read: new rows since the last seen sequence, plus a status refresh of cached PENDING rows.
+      this.cache ??= [];
+      const fresh = await this.ledgerRead.call('TRANSFERS', { sinceSeq: String(this.cache.at(-1)?.seq ?? 0) });
+      for (const t of this.cache) if (t.status === 'PENDING') { const st = await this.ledgerRead.call('TX_STATUS', { txId: t.tx_id }); t.status = st.status; t.settled_at = st.settledAt; }
+      this.cache.push(...fresh);
+      transfers = this.cache;
+      balances = await this.ledgerRead.call('BALANCES', {});
+    }
     catch (e) { report.anomalies.push('LEDGER_UNREADABLE:' + (e.code ?? e.name)); }
     if (lstate && !lstate.journal.ok) report.breaches.push({ code: 'LEDGER_JOURNAL_TAMPERED', seq: lstate.journal.seq });
     if (transfers) {
@@ -68,7 +77,7 @@ export class Watchdog {
         // Use of the buffer: independently audit every payment the Sensitive Zone accepted BEFORE it can be released,
         // against the owner's own issuance log (not against the Sensitive Zone's policy decision).
         let rows = [];
-        try { rows = await this.sensCtl.call('PAYMENTS', {}); } catch (e) { report.anomalies.push('SENSITIVE_PAYMENTS_UNREADABLE'); }
+        try { rows = await this.sensCtl.call('ACTIVE_PAYMENTS', {}); } catch (e) { report.anomalies.push('SENSITIVE_PAYMENTS_UNREADABLE'); }
         for (const p of rows) {
           if (!['BUFFERED', 'RESERVED', 'AUTHORIZED', 'RELEASED', 'UNKNOWN'].includes(p.state)) continue;
           const k = 'pre:' + p.payment_id; if (this.seenViolations.has(k)) continue;

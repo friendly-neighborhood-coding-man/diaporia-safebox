@@ -301,7 +301,10 @@ export class SensitiveZone {
     return { control: this.store.control(), counts, leaseFresh: this.wallNow() <= this.leaseUntil, injectFlaw: this.cfg.injectFlaw,
       journal: this.store.verifyJournal(), executorPublicKey: this.executor.publicKey };
   }
-  payments() { return this.store.db.prepare('SELECT payment_id, cap_id, principal_id, recipient, amount, state, proposed_at, release_at, released_at, settled_at, tx_id, reason FROM payments ORDER BY proposed_at, payment_id').all(); }
+  payments({ activeOnly = false } = {}) {
+    const where = activeOnly ? "WHERE state IN ('PROPOSED','AUTHORIZED','RESERVED','BUFFERED','RELEASED','UNKNOWN')" : '';
+    return this.store.db.prepare(`SELECT payment_id, cap_id, principal_id, recipient, amount, state, proposed_at, release_at, released_at, settled_at, tx_id, reason FROM payments ${where} ORDER BY proposed_at, payment_id`).all();
+  }
 }
 
 import { digestOf } from '../common/crypto.mjs';
@@ -326,6 +329,7 @@ export function sensitiveOps(zone) {
     TICK: { fields: [], handler: () => zone.tick() },
     STATE: { fields: [], handler: () => zone.state() },
     PAYMENTS: { fields: [], handler: () => zone.payments() },
+    ACTIVE_PAYMENTS: { fields: [], handler: () => zone.payments({ activeOnly: true }) },
     JOURNAL: { fields: ['sinceSeq'], handler: (a) => zone.store.journalRows(Number(a.sinceSeq) || 0) },
     DECISIONS: { fields: [], handler: () => zone.store.db.prepare('SELECT * FROM decisions ORDER BY seq').all() },
   };
