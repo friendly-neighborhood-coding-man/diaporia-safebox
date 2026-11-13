@@ -103,7 +103,14 @@ export class OwnerSimV4 {
     const noticed = this.heldKeys().some(c => c.status === 'suspended');
     if (!this.recovery && !w.root.state.case && ((this.sc.discoverAfterH !== null && now - this.t0 >= this.sc.discoverAfterH * H) || noticed)) {
       for (const k of this.sc.stolen) { w.owner.dev(k).lost = true; const other = this.key('DAILY') ?? this.key('ROOT') ?? this.key('RECOVERY'); if (w.root.state.creds[k]?.status === 'active' && other) await this.act('suspend ' + k, w.legacyAct('SUSPEND', { credId: k }, [other])); }
-      const o = await openCaseV4(w, { lost: this.sc.stolen, full: this.sc.stolen.length * 2 > w.root.state.baseline.credIds.length });
+      const full = this.sc.stolen.length * 2 > w.root.state.baseline.credIds.length;
+      let o = await openCaseV4(w, { lost: this.sc.stolen, full });
+      // an attacker's cancelled claim starts the per-subject cooldown; the genuine owner uses an ORC-attested open
+      if (!o.r.ok && /RECOVERY_REATTEMPT_COOLDOWN|RECOVERY_CLAIM_BUDGET_EXHAUSTED/.test(o.r.error.code) && !w.owner.lostOrcs.has('orc-1')) {
+        this.log({ act: 'open recovery', ok: false, code: o.r.error.code });
+        w.owner.devices.splice(w.owner.devices.length - o.devices.length, o.devices.length);
+        o = await openCaseV4(w, { lost: this.sc.stolen, full, orcAttest: 'orc-1' });
+      }
       this.interventions++; this.log({ act: 'open recovery', ok: o.r.ok, code: o.r.ok ? null : o.r.error.code });
       if (o.r.ok) { this.myCases.add(o.caseId); this.recovery = { caseId: o.caseId, startedAt: now, done: false }; }
     }
