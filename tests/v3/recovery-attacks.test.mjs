@@ -62,14 +62,16 @@ test('compromised notification channel: its forged OBJECTION is overridable by f
   ok((await ownerOpenCase(w, { lost: ['k1-phone'] })).r);
   ok(await E.identity(w));
   for (const c of survivors(w.root.state, cs(w), w.now())) ok(await E.consent(w, c));
-  ok(await E.guardian(w, 'g1')); ok(await E.guardian(w, 'g2'));
+  ok(await E.guardian(w, 'g1'));
   ok(await E.ack(w, 'ch-email')); // attacker controls ch-email: acks, then objects to stall
   await w.advance(2 * H, H);
   deny((await w.recovery.tryComplete(w.root.state)).ok ? { ok: true } : { ok: false, error: { code: 'OBJECTION_WINDOW_OPEN' } }, 'OBJECTION_WINDOW_OPEN'); // only 1 of 3 channels acked
   ok(await E.ack(w, 'ch-email', 'OBJECTION'));
   assert.equal(cs(w).state, 'HOLD');
-  deny(await E.override(w), 'OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM');
-  ok(await E.guardian(w, 'g3'));
+  // F-V3-02 repair: on the RECOVERY path the normal guardian quorum (2) + every survivor's consent overrides a channel
+  // objection (previously the reconstitution quorum 3 was required, which let one bad guardian make the HOLD permanent)
+  deny(await E.override(w), 'OVERRIDE_NEEDS_GUARDIAN_QUORUM');
+  ok(await E.guardian(w, 'g2'));
   ok(await E.override(w));
   assert.equal(cs(w).state, 'RECOVERY_CHALLENGE');
   await w.advance(72 * H, H);

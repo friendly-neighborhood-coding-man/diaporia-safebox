@@ -384,3 +384,35 @@ fn recovery_plan_keys_must_be_independent() {
   let k2pk = pkh(h.sk("k2"));
   assert_fails!(fails(|| { h.c.recovery_open("c1".into(), vec!["k1".into()], vec![Cred { id: "n1".into(), role: Role::Daily, pk: k2pk, active: true }]); }), "NOT_INDEPENDENT");
 }
+
+#[test]
+fn f_v3_02_stolen_lost_key_objection_overridable_only_with_full_evidence() {
+  let mut h = H::new();
+  let p = plan(&mut h, &[("n1", Role::Daily, 95)]);
+  h.c.recovery_open("c1".into(), vec!["k1".into()], p);
+  h.object("k1"); // thief holding the lost key objects
+  assert_fails!(fails(|| h.c.recovery_override()), "OVERRIDE_NEEDS_ALL_SURVIVOR_CONSENTS");
+  for s in ["k2", "k3", "k4", "k5"] { h.consent(s); }
+  assert_fails!(fails(|| h.c.recovery_override()), "OVERRIDE_NEEDS_GUARDIAN_QUORUM");
+  h.guardian(1); h.guardian(2);
+  assert_fails!(fails(|| h.c.recovery_override()), "OVERRIDE_NEEDS_IDENTITY");
+  h.identity(0);
+  h.c.recovery_override();
+  h.at(72 * HOUR); h.c.recovery_complete();
+  assert!(!h.active("k1") && h.active("n1"));
+}
+
+#[test]
+fn f_v3_02_survivor_objection_and_reconstitution_never_overridable() {
+  let mut h = H::new();
+  let p = plan(&mut h, &[("n1", Role::Daily, 96)]);
+  h.c.recovery_open("c1".into(), vec!["k1".into()], p);
+  for s in ["k2", "k3", "k4", "k5"] { h.consent(s); } h.guardian(0); h.guardian(1); h.identity(0);
+  h.object("k2");
+  assert_fails!(fails(|| h.c.recovery_override()), "SURVIVOR_OBJECTION_NOT_OVERRIDABLE");
+  let mut h = H::new();
+  let p = plan(&mut h, &[("r1", Role::Daily, 97)]);
+  h.c.recovery_open("c1".into(), vec!["k1".into(), "k2".into(), "k3".into()], p);
+  h.object("k1");
+  assert_fails!(fails(|| h.c.recovery_override()), "OVERRIDE_NOT_ALLOWED_IN_RECONSTITUTION");
+}

@@ -65,7 +65,9 @@ export class OwnerSim {
     for (const g of honestG) if (!cs.guardians[g]) await tryStep('guardian ' + g, E.guardian(w, g));
     for (const ch of Object.keys(w.root.state.channels).filter(c => !this.sc.channels.includes(c))) if (!cs.acks[ch]) await tryStep('ack ' + ch, E.ack(w, ch));
     const c2 = w.root.state.case;
-    if (c2?.state === 'HOLD' && c2.disputes.some(d => d.kind === 'subject' || d.kind === 'channel') && !rc.tried?.has('override@' + c2.disputes.length)) { (rc.tried ??= new Set()).add('override@' + c2.disputes.length); await this.act('override', E.override(w)); }
+    // retry the override whenever the evidence or the dispute set changed (F-V3-02: guardian objections are overridable on the RECOVERY path)
+    const okey = c2 && `override@${c2.disputes.map(d => d.by).join(',')}|${Object.keys(c2.consents).length}|${Object.keys(c2.guardians).length}|${Object.keys(c2.identity).length}`;
+    if (c2?.state === 'HOLD' && c2.disputes.some(d => ['subject', 'channel', 'guardian'].includes(d.kind)) && !rc.tried?.has(okey)) { (rc.tried ??= new Set()).add(okey); await this.act('override', E.override(w)); }
     const r = await w.recovery.tryComplete(w.root.state); await w.pump();
     if (r.ok) { this.log({ act: 'recovery completed' }); }
   }

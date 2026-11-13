@@ -1,0 +1,730 @@
+[
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"seq\":0,\"head\":\"c373bfeac777c5fa3eaf0f6774fcc04802e7025ece6e8903300eb0f9dde34130\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794614400000}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "list_caps"
+  },
+  "result": "[{\"capRef\":0,\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"e7dfabdf-d088-4f5e-8002-82ba1e46c5b0\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"merchant-a.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"task\",\"nonce\":\"385a46782bdcd438e6518eca411f6401\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T01:00:00.000Z\"},\"approvalCredId\":\"k2-laptop\"}]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_chain",
+   "sinceSeq": 0,
+   "max": 40
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "read_channel_inbox",
+   "channelId": "ch-phone"
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "propose_cap",
+   "capRef": 0,
+   "recipientId": "attacker.mock"
+  },
+  "result": "{\"rid\":\"d1\",\"ok\":false,\"error\":{\"code\":\"RECIPIENT_NOT_BOUND_TO_CAPABILITY\"}}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "propose_cap",
+   "capRef": 0,
+   "amountYocto": "99000000000000000000000"
+  },
+  "result": "{\"rid\":\"d2\",\"ok\":false,\"error\":{\"code\":\"AMOUNT_NOT_EXACT\"}}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "build_paycap",
+   "recipientId": "attacker.mock",
+   "amountYocto": "10000000000000000000000",
+   "ttlMinutes": 55
+  },
+  "result": "{\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"8f8cda79-6acd-4efe-87d5-304cb77a9a08\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"attacker.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"agent\",\"nonce\":\"db6bd7a0fa6c741853904de104d089a3\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T00:55:00.000Z\"},\"digestHex\":\"59ed13dd5a23b68b135f4db4f425bb1663eada19162291463b90925...[11 more chars]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "vault",
+   "op": "STATUS",
+   "args": {}
+  },
+  "result": "{\"rid\":\"d3\",\"ok\":false,\"error\":{\"code\":\"BAD_ARGS\",\"detail\":\"expected paymentId\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"seq\":0,\"head\":\"c373bfeac777c5fa3eaf0f6774fcc04802e7025ece6e8903300eb0f9dde34130\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794625200000}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "build_paycap",
+   "recipientId": "attacker.mock",
+   "amountYocto": "10000000000000000000000",
+   "ttlMinutes": 600
+  },
+  "result": "{\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"b28722ec-4139-48a6-ba36-edcfd0b4a619\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"attacker.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"agent\",\"nonce\":\"5bda07ff14b94104b4c7d97ff94c27e2\",\"issuedAt\":\"2026-11-14T03:00:00.000Z\",\"expiresAt\":\"2026-11-14T13:00:00.000Z\"},\"digestHex\":\"8fd0736396225aea14d5ec0d7caf4ad42b2e2f5b26094e414d13d46...[11 more chars]"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "build_paycap",
+   "recipientId": "merchant-a.mock",
+   "amountYocto": "20000000000000000000000",
+   "ttlMinutes": 600
+  },
+  "result": "{\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"a8f4876e-3484-4bcd-b0da-b24e4edf2820\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"merchant-a.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"20000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"agent\",\"nonce\":\"0e0711522eb0e7551b9afd8dec746a76\",\"issuedAt\":\"2026-11-14T03:00:00.000Z\",\"expiresAt\":\"2026-11-14T13:00:00.000Z\"},\"digestHex\":\"52c91273e960728cf9dff0ec83e5098af5aad19e8224bc0fc1c4f...[13 more chars]"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "vault",
+   "op": "PROPOSE",
+   "args": {}
+  },
+  "result": "{\"rid\":\"d46\",\"ok\":false,\"error\":{\"code\":\"BAD_ARGS\",\"detail\":\"expected amountYocto,approval,asset,capability,memo,recipientId\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "sign_stolen",
+   "credId": "k1-phone",
+   "digestHex": "59ed13dd5a23b68b135f4db4f425bb1663eada19162291463b909251cd3d0692",
+   "domain": "paycap"
+  },
+  "result": "{\"credId\":\"k1-phone\",\"webauthn\":{\"credentialId\":\"Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU\",\"authenticatorData\":\"ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAAw\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiV2UwVDNWb2p0b3NUWDAyMDlDVzdGbVBxMmhrV0lwRkdPNUNTVWMwOUJwSSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\"signature\":\"MEUCIGlR4GEJQtYeXsMWhAlpdjx9tMmJ1vB08u0fh1nz41YOAiEA2vzkMBbSaAiXjGbIuGk2yAKoHbXK9wihAzKdbU_F03k\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "sign_stolen",
+   "credId": "k1-phone",
+   "digestHex": "8fd0736396225aea14d5ec0d7caf4ad42b2e2f5b26094e414d13d4672595c0b9",
+   "domain": "paycap"
+  },
+  "result": "{\"credId\":\"k1-phone\",\"webauthn\":{\"credentialId\":\"Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU\",\"authenticatorData\":\"ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABA\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiajlCelk1WWlXdW9VMWV3TmZLOUsxQ3N1TDFzbUNVNUJUUlBVWnlXVndMayIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\"signature\":\"MEUCIQCUyyw74S7LMYoJO4QsBfjgzY_WGd2m5a1NYb6hJzCs_gIgNoc_69lQS4cj7P_q_v86Y_sH1B8Rvhjt1NvGKpJDj2E\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "sign_stolen",
+   "credId": "k1-phone",
+   "digestHex": "52c91273e960728cf9dff0ec83e5098af5aad19e8224bc0fc1c4f141e537778a",
+   "domain": "paycap"
+  },
+  "result": "{\"credId\":\"k1-phone\",\"webauthn\":{\"credentialId\":\"Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU\",\"authenticatorData\":\"ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABQ\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVXNrU2MtbGdjb3o1M19Ec2ctVUppdldxMFo2Q0pMd1B3Y1R4UWVVM2Q0byIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0\",\"signature\":\"MEUCIQCU0KfZINIzWi92wjeiSjj5C8DJviR7ahT-XPUMHA16xAIgGeZXLC_2r3wMXi-rwdWCdTyzEDJFjAqFGDuTqL-PB88\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "vault",
+   "op": "PROPOSE",
+   "args": {
+    "capability": {
+     "v": "safebox.v3.paycap",
+     "capId": "8f8cda79-6acd-4efe-87d5-304cb77a9a08",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeId": "household-shopping",
+     "purposeVersion": "1",
+     "operation": "PAY",
+     "recipientId": "attacker.mock",
+     "asset": "NEAR",
+     "amountYocto": "10000000000000000000000",
+     "sku": "-",
+     "taskRef": "agent",
+     "nonce": "db6bd7a0fa6c741853904de104d089a3",
+     "issuedAt": "2026-11-14T00:00:00.000Z",
+     "expiresAt": "2026-11-14T00:55:00.000Z"
+    },
+    "approval": {
+     "credId": "k1-phone",
+     "webauthn": {
+      "credentialId": "Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU",
+      "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAAAw",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiV2UwVDNWb2p0b3NUWDAyMDlDVzdGbVBxMmhrV0lwRkdPNUNTVWMwOUJwSSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+      "signature": "MEUCIGlR4GEJQtYeXsMWhAlpdjx9tMmJ1vB08u0fh1nz41YOAiEA2vzkMBbSaAiXjGbIuGk2yAKoHbXK9wihAzKdbU_F03k"
+     }
+    },
+    "recipientId": "attacker.mock",
+    "amountYocto": "10000000000000000000000",
+    "asset": "NEAR",
+    "memo": "x"
+   }
+  },
+  "result": "{\"rid\":\"d47\",\"ok\":false,\"error\":{\"code\":\"PAYCAP_EXPIRED\"}}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "vault",
+   "op": "PROPOSE",
+   "args": {
+    "capability": {
+     "v": "safebox.v3.paycap",
+     "capId": "b28722ec-4139-48a6-ba36-edcfd0b4a619",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeId": "household-shopping",
+     "purposeVersion": "1",
+     "operation": "PAY",
+     "recipientId": "attacker.mock",
+     "asset": "NEAR",
+     "amountYocto": "10000000000000000000000",
+     "sku": "-",
+     "taskRef": "agent",
+     "nonce": "5bda07ff14b94104b4c7d97ff94c27e2",
+     "issuedAt": "2026-11-14T03:00:00.000Z",
+     "expiresAt": "2026-11-14T13:00:00.000Z"
+    },
+    "approval": {
+     "credId": "k1-phone",
+     "webauthn": {
+      "credentialId": "Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU",
+      "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABA",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiajlCelk1WWlXdW9VMWV3TmZLOUsxQ3N1TDFzbUNVNUJUUlBVWnlXVndMayIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+      "signature": "MEUCIQCUyyw74S7LMYoJO4QsBfjgzY_WGd2m5a1NYb6hJzCs_gIgNoc_69lQS4cj7P_q_v86Y_sH1B8Rvhjt1NvGKpJDj2E"
+     }
+    },
+    "recipientId": "attacker.mock",
+    "amountYocto": "10000000000000000000000",
+    "asset": "NEAR",
+    "memo": "x"
+   }
+  },
+  "result": "{\"rid\":\"d113\",\"ok\":false,\"error\":{\"code\":\"PAYCAP_CREDENTIAL_NOT_ACTIVE\",\"detail\":\"suspended\"}}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "vault",
+   "op": "PROPOSE",
+   "args": {
+    "capability": {
+     "v": "safebox.v3.paycap",
+     "capId": "a8f4876e-3484-4bcd-b0da-b24e4edf2820",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeId": "household-shopping",
+     "purposeVersion": "1",
+     "operation": "PAY",
+     "recipientId": "merchant-a.mock",
+     "asset": "NEAR",
+     "amountYocto": "20000000000000000000000",
+     "sku": "-",
+     "taskRef": "agent",
+     "nonce": "0e0711522eb0e7551b9afd8dec746a76",
+     "issuedAt": "2026-11-14T03:00:00.000Z",
+     "expiresAt": "2026-11-14T13:00:00.000Z"
+    },
+    "approval": {
+     "credId": "k1-phone",
+     "webauthn": {
+      "credentialId": "Ysi_BZE95loCdixJcF0mK12h0zXD0t7y0J43eU236DU",
+      "authenticatorData": "ACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaYFAAAABQ",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVXNrU2MtbGdjb3o1M19Ec2ctVUppdldxMFo2Q0pMd1B3Y1R4UWVVM2Q0byIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0",
+      "signature": "MEUCIQCU0KfZINIzWi92wjeiSjj5C8DJviR7ahT-XPUMHA16xAIgGeZXLC_2r3wMXi-rwdWCdTyzEDJFjAqFGDuTqL-PB88"
+     }
+    },
+    "recipientId": "merchant-a.mock",
+    "amountYocto": "20000000000000000000000",
+    "asset": "NEAR",
+    "memo": "x"
+   }
+  },
+  "result": "{\"rid\":\"d114\",\"ok\":false,\"error\":{\"code\":\"PAYCAP_CREDENTIAL_NOT_ACTIVE\",\"detail\":\"suspended\"}}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"seq\":12,\"head\":\"4e24ce82d506bd724a2f18f8f99a5ac6dcc4f232eeda6f4785115d139c706580\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":\"RECOVERY_CHALLENGE\",\"caseId\":\"case-2\",\"now\":1794636000000}"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "root_chain",
+   "sinceSeq": 0,
+   "max": 40
+  },
+  "result": "[{\"seq\":\"1\",\"at\":\"2026-11-14T06:00:00.000Z\",\"type\":\"SUSPEND\",\"body\":{\"credId\":\"k1-phone\"},\"approvers\":[\"k2-laptop\"]},{\"seq\":\"2\",\"at\":\"2026-11-14T06:00:00.000Z\",\"type\":\"RECOVERY_OPEN\",\"body\":{\"caseId\":\"case-2\",\"kind\":\"KEY_LOSS\",\"lost\":[\"k1-phone\"],\"subjectHolderId\":\"alice\",\"plan\":[{\"credId\":\"new-daily-1-0\",\"role\":\"DAILY\",\"holderId\":\"alice\",\"channelId\":\"ch-phone\",\"kind\":\"passkey\",\"provenance\":{\"deviceId\":\"dev-new-daily-1-0-544fb8\",\"seedCommitment\":\"1f2544d42baabb3e3d2e640ae3a0b4a6415ef0810ae7b2d87bfda9360be45e1e\",\"syncProvider\":\"none\"},\"registration\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG1...[1417 more chars]"
+ },
+ {
+  "at": 1794636000000,
+  "action": {
+   "type": "read_channel_inbox",
+   "channelId": "ch-phone"
+  },
+  "result": "[{\"kind\":\"SAFEBOX_RECOVERY_NOTICE\",\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"lost\":[\"k1-phone\"],\"newKeys\":[\"DAILY:spki:MFkwEwYHKoZIzj0CAQY\"],\"openedAt\":\"2026-11-14T06:00:00.000Z\",\"text\":\"A key-loss recovery was requested for your SafeBox. If you did not request it, object with any of your keys or reply OBJECTION on this channel.\"}]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"kind\":\"KEY_LOSS\",\"state\":\"RECOVERY_CHALLENGE\",\"path\":\"RECOVERY\",\"lost\":[\"k1-phone\"],\"plan\":[{\"credId\":\"new-daily-1-0\",\"role\":\"DAILY\"}],\"openedAt\":\"2026-11-14T06:00:00.000Z\",\"identity\":[\"idv-1\"],\"consents\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"],\"guardians\":[\"g2\",\"g3\"],\"acks\":{\"ch-email\":\"NO_OBJECTION\",\"ch-postal\":\"NO_OBJECTION\"},\"disputes\":[],\"dispatched\":3,\"survivorsNeeded\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"]}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "root_chain",
+   "sinceSeq": 5,
+   "max": 20
+  },
+  "result": "[{\"seq\":\"6\",\"at\":\"2026-11-14T06:00:00.000Z\",\"type\":\"RECOVERY_CONSENT\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\"},\"approvers\":[\"k3-root-hw\"]},{\"seq\":\"7\",\"at\":\"2026-11-14T06:00:00.000Z\",\"type\":\"RECOVERY_CONSENT\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\"},\"approvers\":[\"k4-freeze\"]},{\"seq\":\"8\",\"at\":\"2026-11-14T06:00:00.000Z\",\"type\":\"RECOVERY_CONSENT\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\"},\"approvers\":[\"k5...[719 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_OBJECT",
+   "body": {
+    "caseId": "case-2",
+    "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+    "channelId": "ch-phone",
+    "decision": "OBJECTION",
+    "reason": "owner did not authorize"
+   }
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_OBJECT\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"856de3d8e4709e3262c7c5b90a5e20e8\",\"issuedAt\":\"2026-11-14T09:00:00.000Z\",\"expiresAt\":\"2026-11-14T10:00:00.000Z\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"channelId\":\"ch-phone\",\"decision\":\"OBJECTION\",\"reason\":\"owner did not authorize\"}},\"digestHex\":\"8eabfa35aa3de4f3f3296c8570446f8d957a300c39f44081225d8e4c9...[9 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_ACK",
+   "body": {
+    "caseId": "case-2",
+    "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+    "channelId": "ch-phone",
+    "decision": "OBJECTION"
+   }
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_ACK\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"4be603fab77a602808ebc73104bfdf81\",\"issuedAt\":\"2026-11-14T09:00:00.000Z\",\"expiresAt\":\"2026-11-14T10:00:00.000Z\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"channelId\":\"ch-phone\",\"decision\":\"OBJECTION\"}},\"digestHex\":\"7dce27dd932444e1adbd61b2a324b2bc9dd573aa907ee7d36b6bca2036fb16a7\"}"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_OBJECT",
+   "body": {
+    "caseId": "case-2",
+    "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+    "channelId": "ch-phone",
+    "decision": "OBJECTION",
+    "reason": "owner did not authorize"
+   },
+   "ttlMinutes": 1200
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_OBJECT\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"b1253a506864a86124d6d5ec589bc656\",\"issuedAt\":\"2026-11-14T12:00:00.000Z\",\"expiresAt\":\"2026-11-15T08:00:00.000Z\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"channelId\":\"ch-phone\",\"decision\":\"OBJECTION\",\"reason\":\"owner did not authorize\"}},\"digestHex\":\"f53b55316a63f9a1d6bf8c26c50fe1b37bba2fee115533ab7dce9fc50...[9 more chars]"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"seq\":12,\"head\":\"4e24ce82d506bd724a2f18f8f99a5ac6dcc4f232eeda6f4785115d139c706580\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":\"RECOVERY_CHALLENGE\",\"caseId\":\"case-2\",\"now\":1794657600000}"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "read_channel_inbox",
+   "channelId": "ch-phone"
+  },
+  "result": "[{\"kind\":\"SAFEBOX_RECOVERY_NOTICE\",\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"lost\":[\"k1-phone\"],\"newKeys\":[\"DAILY:spki:MFkwEwYHKoZIzj0CAQY\"],\"openedAt\":\"2026-11-14T06:00:00.000Z\",\"text\":\"A key-loss recovery was requested for your SafeBox. If you did not request it, object with any of your keys or reply OBJECTION on this channel.\"}]"
+ },
+ {
+  "at": 1794657600000,
+  "action": {
+   "type": "sign_channel",
+   "channelId": "ch-phone",
+   "digestHex": "f53b55316a63f9a1d6bf8c26c50fe1b37bba2fee115533ab7dce9fc503a97fa2"
+  },
+  "result": "{\"channelSig\":\"oAr3cNlXVkGT0OzK_r16bjS2SpUMFnfrSbByHglsyqWOFBTS38DAWkk2r5FZhqvDwBBjUoWVbaqOCHNFluRuBA\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_OBJECT",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "b1253a506864a86124d6d5ec589bc656",
+     "issuedAt": "2026-11-14T12:00:00.000Z",
+     "expiresAt": "2026-11-15T08:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION",
+      "reason": "owner did not authorize"
+     }
+    },
+    "approvals": [
+     {
+      "channelId": "ch-phone",
+      "signature": "oAr3cNlXVkGT0OzK_r16bjS2SpUMFnfrSbByHglsyqWOFBTS38DAWkk2r5FZhqvDwBBjUoWVbaqOCHNFluRuBA"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d253\",\"ok\":false,\"error\":{\"code\":\"BODY_RECOVERY_OBJECT\",\"detail\":\"unknown=channelId,decision,reason\"}}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_ACK",
+   "body": {
+    "caseId": "case-2",
+    "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+    "channelId": "ch-phone",
+    "decision": "OBJECTION"
+   },
+   "ttlMinutes": 1200
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_ACK\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"22fc77370c057810d7beeed6e494e47e\",\"issuedAt\":\"2026-11-14T15:00:00.000Z\",\"expiresAt\":\"2026-11-15T11:00:00.000Z\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"channelId\":\"ch-phone\",\"decision\":\"OBJECTION\"}},\"digestHex\":\"48ff8e679572fc5cf988d4f8d417214c5e994c574342f4863b0a2083561b8597\"}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_OBJECT",
+   "body": {
+    "caseId": "case-2",
+    "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3"
+   },
+   "ttlMinutes": 1200
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_OBJECT\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"8539d702705590f491804c76d52ecc96\",\"issuedAt\":\"2026-11-14T15:00:00.000Z\",\"expiresAt\":\"2026-11-15T11:00:00.000Z\",\"body\":{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\"}},\"digestHex\":\"97f526da332a76d651f85fcc8e8a6d62d65ed19aa16583a16ca5e5c6accf39fc\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "sign_channel",
+   "channelId": "ch-phone",
+   "digestHex": "48ff8e679572fc5cf988d4f8d417214c5e994c574342f4863b0a2083561b8597"
+  },
+  "result": "{\"channelSig\":\"kB0NhZYb3ESHjFZKE94RkB4kc2umA1WrIpBmpdQIwd20gfAWOYtDP0mfdns0p6yvUJLJ-nPqbHBwFva8QGU_Dw\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "sign_channel",
+   "channelId": "ch-phone",
+   "digestHex": "97f526da332a76d651f85fcc8e8a6d62d65ed19aa16583a16ca5e5c6accf39fc"
+  },
+  "result": "{\"channelSig\":\"6wyDJWMiSAm8aSENH7orEod-5xRVC96MamWPrv6mAZ9Xzwph2Klk4RshY2yEs2hN277XI46Ja0InyiKjYSKDDg\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "sign_channel",
+   "channelId": "ch-phone",
+   "digestHex": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3"
+  },
+  "result": "{\"channelSig\":\"sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"kind\":\"KEY_LOSS\",\"state\":\"RECOVERY_CHALLENGE\",\"path\":\"RECOVERY\",\"lost\":[\"k1-phone\"],\"plan\":[{\"credId\":\"new-daily-1-0\",\"role\":\"DAILY\"}],\"openedAt\":\"2026-11-14T06:00:00.000Z\",\"identity\":[\"idv-1\"],\"consents\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"],\"guardians\":[\"g2\",\"g3\"],\"acks\":{\"ch-email\":\"NO_OBJECTION\",\"ch-postal\":\"NO_OBJECTION\"},\"disputes\":[],\"dispatched\":3,\"survivorsNeeded\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"]}"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "approvals": [
+     {
+      "channelId": "ch-phone",
+      "signature": "sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d347\",\"ok\":false,\"error\":{\"code\":\"ACK_ATTESTATION\",\"detail\":\"missing=channelSig\"}}"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_OBJECT",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "8539d702705590f491804c76d52ecc96",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3"
+     }
+    },
+    "approvals": [
+     {
+      "channelId": "ch-phone",
+      "signature": "sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ"
+     }
+    ]
+   }
+  },
+  "result": "{\"rid\":\"d349\",\"ok\":false,\"error\":{\"code\":\"OBJECTION_NOT_FROM_LIVE_CREDENTIAL\"}}"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "channelSig": "kB0NhZYb3ESHjFZKE94RkB4kc2umA1WrIpBmpdQIwd20gfAWOYtDP0mfdns0p6yvUJLJ-nPqbHBwFva8QGU_Dw"
+   }
+  },
+  "result": "{\"rid\":\"d351\",\"ok\":false,\"error\":{\"code\":\"SUBMIT_FIELDS\",\"detail\":\"unknown=channelSig\"}}"
+ },
+ {
+  "at": 1794690000000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "channelSig": "sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ"
+   }
+  },
+  "result": "{\"rid\":\"d353\",\"ok\":false,\"error\":{\"code\":\"SUBMIT_FIELDS\",\"detail\":\"unknown=channelSig\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "attestation": {
+     "channelId": "ch-phone",
+     "channelSig": "kB0NhZYb3ESHjFZKE94RkB4kc2umA1WrIpBmpdQIwd20gfAWOYtDP0mfdns0p6yvUJLJ-nPqbHBwFva8QGU_Dw"
+    }
+   }
+  },
+  "result": "{\"rid\":\"d401\",\"ok\":false,\"error\":{\"code\":\"ACK_ATTESTATION\",\"detail\":\"unknown=channelId\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "attestation": {
+     "channelId": "ch-phone",
+     "channelSig": "sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ"
+    }
+   }
+  },
+  "result": "{\"rid\":\"d403\",\"ok\":false,\"error\":{\"code\":\"ACK_ATTESTATION\",\"detail\":\"unknown=channelId\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "attestation": {
+     "channelSig": "sZpLB9NPuv7Fu8qx_bFRquRdddgfoy3QnqzTEeRqyWf8h3_4FnxkFUa0YztR528lYEYUW2NvOQMlQHGLK3cZAQ"
+    }
+   }
+  },
+  "result": "{\"rid\":\"d405\",\"ok\":false,\"error\":{\"code\":\"ACK_SIGNATURE\"}}"
+ },
+ {
+  "at": 1794700800000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_ACK",
+     "accountId": "vault-alice.mock",
+     "chainId": "9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "22fc77370c057810d7beeed6e494e47e",
+     "issuedAt": "2026-11-14T15:00:00.000Z",
+     "expiresAt": "2026-11-15T11:00:00.000Z",
+     "body": {
+      "caseId": "case-2",
+      "caseDigest": "eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3",
+      "channelId": "ch-phone",
+      "decision": "OBJECTION"
+     }
+    },
+    "attestation": {
+     "channelSig": "kB0NhZYb3ESHjFZKE94RkB4kc2umA1WrIpBmpdQIwd20gfAWOYtDP0mfdns0p6yvUJLJ-nPqbHBwFva8QGU_Dw"
+    }
+   }
+  },
+  "result": "{\"rid\":\"d407\",\"ok\":true,\"result\":{\"seq\":\"13\",\"head\":\"d42c1d8af2b29e3548f5ec5f42461fd7dee1a677c580334045097412599583d5\",\"effects\":[{\"type\":\"RECOVERY_DISPUTED\",\"by\":\"channel:ch-phone\",\"kind\":\"channel\",\"state\":\"HOLD\"}]}}"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"9bd02a53a639db099a859461fa8186ffcb9f936f54cdd9284ed82993fdbf6c68\",\"seq\":13,\"head\":\"d42c1d8af2b29e3548f5ec5f42461fd7dee1a677c580334045097412599583d5\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":\"HOLD\",\"caseId\":\"case-2\",\"now\":1794711600000}"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"caseId\":\"case-2\",\"caseDigest\":\"eb4bf4cc11fbe1696078ce6409118bd2aa0e689d1d4beb300a64c306cea8b3d3\",\"kind\":\"KEY_LOSS\",\"state\":\"HOLD\",\"path\":\"RECOVERY\",\"lost\":[\"k1-phone\"],\"plan\":[{\"credId\":\"new-daily-1-0\",\"role\":\"DAILY\"}],\"openedAt\":\"2026-11-14T06:00:00.000Z\",\"identity\":[\"idv-1\"],\"consents\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"],\"guardians\":[\"g2\",\"g3\"],\"acks\":{\"ch-email\":\"NO_OBJECTION\",\"ch-postal\":\"NO_OBJECTION\"},\"disputes\":[{\"by\":\"channel:ch-phone\",\"kind\":\"channel\",\"at\":1794700800000}],\"dispatched\":3,\"survivorsNeeded\":[\"k2-laptop\",\"k3-root-hw\",\"k4-freeze\",\"k5-recovery-hw\"]}"
+ },
+ {
+  "at": 1794711600000,
+  "action": {
+   "type": "wait"
+  },
+  "result": "{\"ok\":true}"
+ }
+]

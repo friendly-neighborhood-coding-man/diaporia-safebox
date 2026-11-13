@@ -236,6 +236,21 @@ impl SafeBoxV3 {
     require!(!self.lockdown, "LOCKDOWN_CANCEL_NEEDS_GOVERNANCE_QUORUM_OFFCHAIN_ROOT"); // conservative on-chain
     self.case = None;
   }
+  /// F-V3-02 (ported): on the minority-loss path, objections signed by an allegedly LOST key (possibly a thief) can be
+  /// overridden only by the full evidence set: every survivor consented, the guardian quorum, identity, and the survivors
+  /// strictly outnumber the objecting lost keys. A surviving key's objection is never overridable; reconstitution never.
+  pub fn recovery_override(&mut self) {
+    let c = self.case.clone().unwrap_or_else(|| env::panic_str("NO_CASE"));
+    require!(!c.reconstitution, "OVERRIDE_NOT_ALLOWED_IN_RECONSTITUTION");
+    require!(!c.disputes.is_empty(), "NOTHING_TO_OVERRIDE");
+    require!(c.disputes.iter().all(|d| c.lost.contains(d)), "SURVIVOR_OBJECTION_NOT_OVERRIDABLE");
+    let surv = self.survivors(&c);
+    require!(!surv.is_empty() && surv.iter().all(|s| c.consents.contains(s)), "OVERRIDE_NEEDS_ALL_SURVIVOR_CONSENTS");
+    require!(c.guardians.len() as u32 >= self.guardian_quorum, "OVERRIDE_NEEDS_GUARDIAN_QUORUM");
+    require!(!c.identities.is_empty(), "OVERRIDE_NEEDS_IDENTITY");
+    require!(surv.len() > c.disputes.len(), "OVERRIDE_OUTNUMBERED_BY_OBJECTING_KEYS");
+    self.case.as_mut().unwrap().disputes.clear();
+  }
   /// Anyone may call; the contract checks every requirement. The timer alone never completes anything.
   pub fn recovery_complete(&mut self) {
     let c = self.case.clone().unwrap_or_else(|| env::panic_str("NO_CASE"));

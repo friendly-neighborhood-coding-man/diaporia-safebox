@@ -547,11 +547,25 @@ const HANDLERS = {
     const cs = s.case; if (!cs) fail('NO_RECOVERY_CASE');
     body(a, ['caseId', 'caseDigest']);
     if (a.body.caseId !== cs.caseId || a.body.caseDigest !== cs.digest) fail('RECOVERY_CASE_MISMATCH');
-    const overridable = cs.disputes.filter(d => d.kind === 'channel' || d.kind === 'subject');
+    // F-V3-02 repair: on the RECOVERY path (<= 50 % lost) EVERY surviving credential must consent, and those survivors
+    // are a majority of the baseline. That is stronger ownership evidence than one notification channel or a minority of
+    // guardians, so channel, claimed-lost-key and MINORITY guardian objections are overridable with the normal guardian
+    // quorum (approvals must strictly outnumber guardian objections). Before the repair the reconstitution quorum was
+    // required, so one compromised guardian of three (or a stolen channel plus one guardian) vetoed recovery forever,
+    // which for a lost ROOT/RECOVERY key meant permanent loss of governance. The reconstitution path is unchanged:
+    // there the survivors are a minority, so only channel objections are overridable, with the reconstitution quorum.
+    const recoveryPath = cs.path === 'RECOVERY';
+    const overridableKind = (d) => d.kind === 'channel' || d.kind === 'subject' || (recoveryPath && d.kind === 'guardian');
+    const overridable = cs.disputes.filter(overridableKind);
     if (!overridable.length) fail('NOTHING_TO_OVERRIDE');
     const surv = survivors(s, cs, at);
     if (!surv.length || !surv.every(x => cs.consents[x])) fail('OVERRIDE_NEEDS_ALL_SURVIVOR_CONSENTS');
-    if (Object.keys(cs.guardians).length < Number(s.config.reconGuardianQuorum)) fail('OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM');
+    const objectingG = new Set(cs.disputes.filter(d => d.kind === 'guardian').map(d => d.by.slice('guardian:'.length)));
+    const approving = Object.keys(cs.guardians).filter(g => !objectingG.has(g)).length; // a guardian that objects is not also counted as approving
+    if (recoveryPath) {
+      if (approving < Number(s.config.guardianQuorum)) fail('OVERRIDE_NEEDS_GUARDIAN_QUORUM');
+      if (!(approving > objectingG.size)) fail('OVERRIDE_GUARDIAN_OBJECTIONS_NOT_OUTNUMBERED', `${approving} approve vs ${objectingG.size} object`);
+    } else if (approving < Number(s.config.reconGuardianQuorum)) fail('OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM');
     if (!Object.keys(cs.identity).length) fail('OVERRIDE_NEEDS_IDENTITY');
     // F-V3-01 repair: an objection signed by an allegedly lost key is evidence too. It may be overridden (thief case)
     // only when the consenting survivors strictly OUTNUMBER the distinct objecting "lost" keys. Otherwise one stolen
@@ -559,7 +573,7 @@ const HANDLERS = {
     const subjectObjectors = new Set(cs.disputes.filter(d => d.kind === 'subject').map(d => d.by));
     if (subjectObjectors.size && cs.path !== 'RECOVERY') fail('OVERRIDE_NOT_ALLOWED_IN_RECONSTITUTION', 'survivors are a minority; a claimed-lost key objecting cannot be outvoted');
     if (subjectObjectors.size && !(surv.length > subjectObjectors.size)) fail('OVERRIDE_OUTNUMBERED_BY_OBJECTING_KEYS', `${surv.length} survivors vs ${subjectObjectors.size} objecting keys`);
-    cs.disputes = cs.disputes.filter(d => !(d.kind === 'channel' || d.kind === 'subject'));
+    cs.disputes = cs.disputes.filter(d => !overridableKind(d));
     cs.overrides = (cs.overrides ?? 0) + overridable.length;
     if (!cs.disputes.length && cs.state === 'HOLD') { cs.state = cs.prior; cs.prior = null; }
     fx.push({ type: 'RECOVERY_DISPUTES_OVERRIDDEN', count: overridable.length });
