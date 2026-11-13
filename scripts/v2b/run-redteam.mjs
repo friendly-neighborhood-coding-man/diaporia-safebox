@@ -99,7 +99,7 @@ const writeConf = (p, o, mode = 0o644, group = null) => { writeFileSync(p, JSON.
 writeConf(L.sensConf, { trustedOwnerKeys: ownerPub.trustedOwnerKeys, operatorKey: ownerPub.operatorKey, executorAccount: EXECUTOR_ACCOUNT, minBufferMs: 600_000, leaseMs: 5_000, injectFlaw: flaw });
 writeConf(L.ledgerConf, { genesis: { executorAccount: EXECUTOR_ACCOUNT, executorKey, ownerKey: ownerPub.operatorKey, accounts: GENESIS, maxPaymentYocto: '60000000000000000000000', settleDelayMs: Number(arg('settle-delay', '0')) } });
 // Run config holds the workload seed: readable by the supervisor principal only (not world-readable as in V2-A).
-const runConf = { capAmountMode: arg('cap-amount-mode', null), seed, hours, maxTurns, rounds, budgetUsd, repair: flag('repair'), t0: T0, genesisTotal: GENESIS_TOTAL, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, brainSock, pids: {} };
+const runConf = { trustedReplay: flag('trusted-replay'), capAmountMode: arg('cap-amount-mode', null), seed, hours, maxTurns, rounds, budgetUsd, repair: flag('repair'), t0: T0, genesisTotal: GENESIS_TOTAL, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, brainSock, pids: {} };
 writeConf(L.runConf, runConf, 0o640, USERS.sup);
 
 // 3. Brain (red-team model) behind the root broker.
@@ -186,7 +186,7 @@ mkdirSync(out, { recursive: true });
 const stats = brain.stats();
 const summary = { kind: 'safebox-v2b-redteam-campaign', name, runId, gitHead, workingTreeDirty: dirty, realLlmExecuted: !scripted && !replaying && stats.calls > 0, replayOf: arg('replay', null), replayMutation: arg('replay-mutate', null),
   brain: { ...stats, system: scripted ? null : 'see system-prompt.txt', runsAs: 'root broker child, env -i, scratch HOME, --tools "" (no tools), --strict-mcp-config, --setting-sources ""' },
-  config: { capAmountMode: runConf.capAmountMode, seed, hours, maxTurns, rounds, budgetUsd, flaw, preReleaseAudit: !flag('no-pre-audit'), repair: flag('repair') },
+  config: { trustedReplay: runConf.trustedReplay, capAmountMode: runConf.capAmountMode, seed, hours, maxTurns, rounds, budgetUsd, flaw, preReleaseAudit: !flag('no-pre-audit'), repair: flag('repair') },
   isolation: { users: USERS, principalGroups: PRINCIPAL_GROUPS, generalZone: { netns: true, mountns: true, procHidepid: 'invisible', masked: MASK.filter(existsSync) }, sterileCode: ROOT, codeWritableByOthers: codeCheck, matrixOk, matrix },
   hostCanaries: { metadataHits: metaHits.length, exfilReceived: exfil },
   campaign: results ? { turns: results.trajectory.length, stop: results.result.stopReason, summary: results.result.summary, aliveAfter: results.aliveAfter, repairs: results.repairs?.map(r => ({ gates: r.gates, resumed: r.resumed, culprit: r.diagnosis?.culpritEvent, replay: r.replay, recovery: r.recovery })) ?? [] } : null,
