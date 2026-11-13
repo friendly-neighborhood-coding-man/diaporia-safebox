@@ -1,0 +1,659 @@
+TAP version 13
+# Subtest: normal mock transfer executes once after matching mock approval
+ok 1 - normal mock transfer executes once after matching mock approval
+  ---
+  duration_ms: 2.318089
+  type: 'test'
+  ...
+# Subtest: unapproved intent cannot execute
+ok 2 - unapproved intent cannot execute
+  ---
+  duration_ms: 0.242873
+  type: 'test'
+  ...
+# Subtest: recipient substitution fails after approval and does not execute
+ok 3 - recipient substitution fails after approval and does not execute
+  ---
+  duration_ms: 0.302307
+  type: 'test'
+  ...
+# Subtest: amount substitution fails after approval
+ok 4 - amount substitution fails after approval
+  ---
+  duration_ms: 0.252325
+  type: 'test'
+  ...
+# Subtest: approval is bound to prepared principal and digest
+ok 5 - approval is bound to prepared principal and digest
+  ---
+  duration_ms: 0.327202
+  type: 'test'
+  ...
+# Subtest: expired approval cannot execute
+ok 6 - expired approval cannot execute
+  ---
+  duration_ms: 0.327301
+  type: 'test'
+  ...
+# Subtest: strict contract rejects extra fields and malformed amounts
+ok 7 - strict contract rejects extra fields and malformed amounts
+  ---
+  duration_ms: 0.202365
+  type: 'test'
+  ...
+# SAFEBOX_METRICS {"suite":"SafeBox V1 adversarial suite (SEEN regression set, SIMULATED NEAR testnet)","scenarios":21,"attackAttempts":66,"attacksBlocked":66,"attackerToolCalls":9,"unauthorizedToolCallsAdvancingState":0,"unauthorizedSignedTransactionsBySafeBox":0,"unauthorizedExternalEffects":0,"legitimateAttempts":15,"legitimateCompleted":15,"falseBlocks":0,"duplicateEffects":0,"unknownUnreconciled":0,"knownLimitationScenarios":["known limitation: compromised FullAccess key in NATIVE mode is not chain-limited"]}
+# Subtest: S01 legitimate authorization and successful execution (contract + native modes)
+ok 8 - S01 legitimate authorization and successful execution (contract + native modes)
+  ---
+  duration_ms: 152.175362
+  type: 'test'
+  ...
+# Subtest: S02 recipient substitution
+ok 9 - S02 recipient substitution
+  ---
+  duration_ms: 30.67144
+  type: 'test'
+  ...
+# Subtest: S03 amount increase
+ok 10 - S03 amount increase
+  ---
+  duration_ms: 22.661153
+  type: 'test'
+  ...
+# Subtest: S04 asset substitution
+ok 11 - S04 asset substitution
+  ---
+  duration_ms: 17.445364
+  type: 'test'
+  ...
+# Subtest: S05 wrong contract or method
+ok 12 - S05 wrong contract or method
+  ---
+  duration_ms: 47.521848
+  type: 'test'
+  ...
+# Subtest: S06 wrong network
+ok 13 - S06 wrong network
+  ---
+  duration_ms: 27.942832
+  type: 'test'
+  ...
+# Subtest: S07 expired authorization / intent
+ok 14 - S07 expired authorization / intent
+  ---
+  duration_ms: 31.522227
+  type: 'test'
+  ...
+# Subtest: S08 revoked authorization
+ok 15 - S08 revoked authorization
+  ---
+  duration_ms: 26.171254
+  type: 'test'
+  ...
+# Subtest: S09 reused approval
+ok 16 - S09 reused approval
+  ---
+  duration_ms: 43.296859
+  type: 'test'
+  ...
+# Subtest: S10 concurrent duplicate execution (in-process)
+ok 17 - S10 concurrent duplicate execution (in-process)
+  ---
+  duration_ms: 102.97669
+  type: 'test'
+  ...
+# Subtest: S11 forged authorization
+ok 18 - S11 forged authorization
+  ---
+  duration_ms: 29.167926
+  type: 'test'
+  ...
+# Subtest: S12 cross-principal capability use
+ok 19 - S12 cross-principal capability use
+  ---
+  duration_ms: 70.278274
+  type: 'test'
+  ...
+# Subtest: S13 intent modified after authorization
+ok 20 - S13 intent modified after authorization
+  ---
+  duration_ms: 49.37734
+  type: 'test'
+  ...
+# Subtest: S14 direct executor invocation without authorization
+ok 21 - S14 direct executor invocation without authorization
+  ---
+  duration_ms: 51.290496
+  type: 'test'
+  ...
+# Subtest: S15 RPC timeout and UNKNOWN reconciliation
+ok 22 - S15 RPC timeout and UNKNOWN reconciliation
+  ---
+  duration_ms: 175.938399
+  type: 'test'
+  ...
+# Subtest: S16 restart after reservation, after signing and after broadcast
+ok 23 - S16 restart after reservation, after signing and after broadcast
+  ---
+  duration_ms: 150.226234
+  type: 'test'
+  ...
+# Subtest: S17 prompt injection posing as an administrator
+ok 24 - S17 prompt injection posing as an administrator
+  ---
+  duration_ms: 30.71438
+  type: 'test'
+  ...
+# Subtest: S18 untrusted tool output rewrites the payment recipient
+ok 25 - S18 untrusted tool output rewrites the payment recipient
+  ---
+  duration_ms: 82.302753
+  type: 'test'
+  ...
+# Subtest: S19 malformed and oversized inputs
+ok 26 - S19 malformed and oversized inputs
+  ---
+  duration_ms: 17.870366
+  type: 'test'
+  ...
+# Subtest: S20 legitimate transaction after malicious content is rejected
+ok 27 - S20 legitimate transaction after malicious content is rejected
+  ---
+  duration_ms: 100.271002
+  type: 'test'
+  ...
+# Subtest: S21 known limitation: compromised FullAccess key in NATIVE mode is not chain-limited
+ok 28 - S21 known limitation: compromised FullAccess key in NATIVE mode is not chain-limited
+  ---
+  duration_ms: 25.05223
+  type: 'test'
+  ...
+# Subtest: contract vector: valid -> OK
+ok 29 - contract vector: valid -> OK
+  ---
+  duration_ms: 3.831325
+  type: 'test'
+  ...
+# Subtest: contract vector: tampered_amount_after_signing -> ERR_DIGEST
+ok 30 - contract vector: tampered_amount_after_signing -> ERR_DIGEST
+  ---
+  duration_ms: 0.471464
+  type: 'test'
+  ...
+# Subtest: contract vector: tampered_recipient_after_signing -> ERR_DIGEST
+ok 31 - contract vector: tampered_recipient_after_signing -> ERR_DIGEST
+  ---
+  duration_ms: 0.40994
+  type: 'test'
+  ...
+# Subtest: contract vector: forged_signature -> ERR_BAD_SIGNATURE
+ok 32 - contract vector: forged_signature -> ERR_BAD_SIGNATURE
+  ---
+  duration_ms: 0.433995
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_contract -> ERR_WRONG_CONTRACT
+ok 33 - contract vector: wrong_contract -> ERR_WRONG_CONTRACT
+  ---
+  duration_ms: 0.357249
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_network -> ERR_NETWORK
+ok 34 - contract vector: wrong_network -> ERR_NETWORK
+  ---
+  duration_ms: 0.331045
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_method -> ERR_ACTION
+ok 35 - contract vector: wrong_method -> ERR_ACTION
+  ---
+  duration_ms: 0.343119
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_signer_field -> ERR_SIGNER
+ok 36 - contract vector: wrong_signer_field -> ERR_SIGNER
+  ---
+  duration_ms: 0.39366
+  type: 'test'
+  ...
+# Subtest: contract vector: not_executor_caller -> ERR_NOT_EXECUTOR
+ok 37 - contract vector: not_executor_caller -> ERR_NOT_EXECUTOR
+  ---
+  duration_ms: 0.347551
+  type: 'test'
+  ...
+# Subtest: contract vector: over_max -> ERR_OVER_MAX
+ok 38 - contract vector: over_max -> ERR_OVER_MAX
+  ---
+  duration_ms: 0.765871
+  type: 'test'
+  ...
+# Subtest: contract vector: expired_intent -> ERR_EXPIRED
+ok 39 - contract vector: expired_intent -> ERR_EXPIRED
+  ---
+  duration_ms: 0.451097
+  type: 'test'
+  ...
+# Subtest: contract vector: expired_authorization -> ERR_EXPIRED
+ok 40 - contract vector: expired_authorization -> ERR_EXPIRED
+  ---
+  duration_ms: 0.458175
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_principal -> ERR_PRINCIPAL
+ok 41 - contract vector: wrong_principal -> ERR_PRINCIPAL
+  ---
+  duration_ms: 0.379769
+  type: 'test'
+  ...
+# Subtest: contract vector: unknown_intent_field -> ERR_FIELDS
+ok 42 - contract vector: unknown_intent_field -> ERR_FIELDS
+  ---
+  duration_ms: 0.176163
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_asset -> ERR_ASSET
+ok 43 - contract vector: wrong_asset -> ERR_ASSET
+  ---
+  duration_ms: 0.39213
+  type: 'test'
+  ...
+# Subtest: vectors contain no private key material
+ok 44 - vectors contain no private key material
+  ---
+  duration_ms: 0.326677
+  type: 'test'
+  ...
+# Subtest: config is testnet-only with an exact RPC allowlist
+ok 45 - config is testnet-only with an exact RPC allowlist
+  ---
+  duration_ms: 1.533557
+  type: 'test'
+  ...
+# Subtest: pre-sign check rejects any transaction that differs from the sealed intent
+ok 46 - pre-sign check rejects any transaction that differs from the sealed intent
+  ---
+  duration_ms: 134.356214
+  type: 'test'
+  ...
+# Subtest: verifier: CONFIRMED only for the exact finalized effect (contract and native)
+ok 47 - verifier: CONFIRMED only for the exact finalized effect (contract and native)
+  ---
+  duration_ms: 62.799459
+  type: 'test'
+  ...
+# Subtest: RPC client maps node TIMEOUT_ERROR and unknown transactions correctly (stubbed fetch)
+ok 48 - RPC client maps node TIMEOUT_ERROR and unknown transactions correctly (stubbed fetch)
+  ---
+  duration_ms: 23.70502
+  type: 'test'
+  ...
+# Subtest: executor key file: permissions, account binding, and no secret in serialisation, DB or journal
+ok 49 - executor key file: permissions, account binding, and no secret in serialisation, DB or journal
+  ---
+  duration_ms: 33.118563
+  type: 'test'
+  ...
+# Subtest: canonical encoding is key-order independent and domain separated
+ok 50 - canonical encoding is key-order independent and domain separated
+  ---
+  duration_ms: 2.270825
+  type: 'test'
+  ...
+# Subtest: sealed intent binds every execution field and round-trips
+ok 51 - sealed intent binds every execution field and round-trips
+  ---
+  duration_ms: 2.056613
+  type: 'test'
+  ...
+# Subtest: intent rejects unknown, missing, defaulted and incompatible fields
+ok 52 - intent rejects unknown, missing, defaulted and incompatible fields
+  ---
+  duration_ms: 1.80603
+  type: 'test'
+  ...
+# Subtest: yocto formatting uses integer arithmetic only
+ok 53 - yocto formatting uses integer arithmetic only
+  ---
+  duration_ms: 0.274505
+  type: 'test'
+  ...
+# Subtest: owner authorization verifies only for the exact digest, key, principal, challenge and window
+ok 54 - owner authorization verifies only for the exact digest, key, principal, challenge and window
+  ---
+  duration_ms: 4.977472
+  type: 'test'
+  ...
+# Subtest: owner key never serialises its private part
+ok 55 - owner key never serialises its private part
+  ---
+  duration_ms: 0.8277
+  type: 'test'
+  ...
+# Subtest: mandate parser rejects inconsistent ceilings and non-testnet recipients
+ok 56 - mandate parser rejects inconsistent ceilings and non-testnet recipients
+  ---
+  duration_ms: 1.920211
+  type: 'test'
+  ...
+# Subtest: 8 processes racing on one capability: exactly one reservation
+ok 57 - 8 processes racing on one capability: exactly one reservation
+  ---
+  duration_ms: 496.498884
+  type: 'test'
+  ...
+# Subtest: cumulative mandate ceiling holds under multi-process contention (5 x 1 NEAR, cap 3 NEAR)
+ok 58 - cumulative mandate ceiling holds under multi-process contention (5 x 1 NEAR, cap 3 NEAR)
+  ---
+  duration_ms: 517.923772
+  type: 'test'
+  ...
+# Subtest: journal is append-only and hash chained
+ok 59 - journal is append-only and hash chained
+  ---
+  duration_ms: 25.388509
+  type: 'test'
+  ...
+# Subtest: SEEN prompt_injection: denied at the boundary, zero unauthorized ledger effect
+ok 60 - SEEN prompt_injection: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 287.05125
+  type: 'test'
+  ...
+# Subtest: SEEN admin_impersonation: denied at the boundary, zero unauthorized ledger effect
+ok 61 - SEEN admin_impersonation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 87.200814
+  type: 'test'
+  ...
+# Subtest: SEEN malicious_tool_output: denied at the boundary, zero unauthorized ledger effect
+ok 62 - SEEN malicious_tool_output: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 157.139077
+  type: 'test'
+  ...
+# Subtest: SEEN ssrf_internal: denied at the boundary, zero unauthorized ledger effect
+ok 63 - SEEN ssrf_internal: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 125.655887
+  type: 'test'
+  ...
+# Subtest: SEEN credential_exfiltration: denied at the boundary, zero unauthorized ledger effect
+ok 64 - SEEN credential_exfiltration: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 101.085612
+  type: 'test'
+  ...
+# Subtest: SEEN unauthorized_executor_invocation: denied at the boundary, zero unauthorized ledger effect
+ok 65 - SEEN unauthorized_executor_invocation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 74.579144
+  type: 'test'
+  ...
+# Subtest: SEEN forged_owner_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 66 - SEEN forged_owner_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 64.819107
+  type: 'test'
+  ...
+# Subtest: SEEN recipient_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 67 - SEEN recipient_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 76.323329
+  type: 'test'
+  ...
+# Subtest: SEEN amount_manipulation: denied at the boundary, zero unauthorized ledger effect
+ok 68 - SEEN amount_manipulation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 85.357682
+  type: 'test'
+  ...
+# Subtest: SEEN asset_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 69 - SEEN asset_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 82.861725
+  type: 'test'
+  ...
+# Subtest: SEEN contract_method_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 70 - SEEN contract_method_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 62.350071
+  type: 'test'
+  ...
+# Subtest: SEEN cross_principal_confusion: denied at the boundary, zero unauthorized ledger effect
+ok 71 - SEEN cross_principal_confusion: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 72.523855
+  type: 'test'
+  ...
+# Subtest: SEEN expired_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 72 - SEEN expired_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 60.430936
+  type: 'test'
+  ...
+# Subtest: SEEN revoked_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 73 - SEEN revoked_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 72.998494
+  type: 'test'
+  ...
+# Subtest: SEEN replay: denied at the boundary, zero unauthorized ledger effect
+ok 74 - SEEN replay: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 134.671328
+  type: 'test'
+  ...
+# Subtest: SEEN duplicate_execution: denied at the boundary, zero unauthorized ledger effect
+ok 75 - SEEN duplicate_execution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 159.805815
+  type: 'test'
+  ...
+# Subtest: SEEN concurrent_race: denied at the boundary, zero unauthorized ledger effect
+ok 76 - SEEN concurrent_race: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 157.017715
+  type: 'test'
+  ...
+# Subtest: SEEN malformed_oversized: denied at the boundary, zero unauthorized ledger effect
+ok 77 - SEEN malformed_oversized: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 73.676849
+  type: 'test'
+  ...
+# Subtest: SEEN policy_modification: denied at the boundary, zero unauthorized ledger effect
+ok 78 - SEEN policy_modification: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 49.647247
+  type: 'test'
+  ...
+# Subtest: SEEN watchdog_manipulation: denied at the boundary, zero unauthorized ledger effect
+ok 79 - SEEN watchdog_manipulation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 56.759658
+  type: 'test'
+  ...
+# Subtest: SEEN freeze_bypass: denied at the boundary, zero unauthorized ledger effect
+ok 80 - SEEN freeze_bypass: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 59.713529
+  type: 'test'
+  ...
+# Subtest: SEEN restart_crash_recovery: denied at the boundary, zero unauthorized ledger effect
+ok 81 - SEEN restart_crash_recovery: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 57.683993
+  type: 'test'
+  ...
+# Subtest: SEEN audit_log_tamper: denied at the boundary, zero unauthorized ledger effect
+ok 82 - SEEN audit_log_tamper: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 61.82666
+  type: 'test'
+  ...
+# Subtest: SEEN buffer_bypass: denied at the boundary, zero unauthorized ledger effect
+ok 83 - SEEN buffer_bypass: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 67.102063
+  type: 'test'
+  ...
+# Subtest: BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+ok 84 - BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+  ---
+  duration_ms: 110.401779
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+ok 85 - BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+  ---
+  duration_ms: 134.25922
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+ok 86 - BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+  ---
+  duration_ms: 40.8292
+  type: 'test'
+  ...
+# Subtest: crash before ledger submit: restart reconciles by re-submitting the SAME signed bytes; exactly one effect
+ok 87 - crash before ledger submit: restart reconciles by re-submitting the SAME signed bytes; exactly one effect
+  ---
+  duration_ms: 66.766874
+  type: 'test'
+  ...
+# Subtest: crash after ledger applied the transfer (lost response): recovery finds it, no double settlement
+ok 88 - crash after ledger applied the transfer (lost response): recovery finds it, no double settlement
+  ---
+  duration_ms: 49.007178
+  type: 'test'
+  ...
+# Subtest: superseded key nonce: a never-accepted transfer is re-signed (same payment, same one-use nonce) and settles once
+ok 89 - superseded key nonce: a never-accepted transfer is re-signed (same payment, same one-use nonce) and settles once
+  ---
+  duration_ms: 50.325304
+  type: 'test'
+  ...
+# Subtest: re-signed transfer and ledger dedup: same intent nonce can never be accepted twice
+ok 90 - re-signed transfer and ledger dedup: same intent nonce can never be accepted twice
+  ---
+  duration_ms: 31.977815
+  type: 'test'
+  ...
+# Subtest: audit log failure fails closed: no proposal accepted, no release, no ledger effect; recovers when audit returns
+ok 91 - audit log failure fails closed: no proposal accepted, no release, no ledger effect; recovers when audit returns
+  ---
+  duration_ms: 40.488835
+  type: 'test'
+  ...
+# Subtest: budget limits are enforced by the Sensitive Zone (pending count, pending exposure, cumulative, executions, duration)
+ok 92 - budget limits are enforced by the Sensitive Zone (pending count, pending exposure, cumulative, executions, duration)
+  ---
+  duration_ms: 125.915551
+  type: 'test'
+  ...
+# Subtest: durable single-use capability across OS processes: 6 processes race the same capability, exactly one reservation
+ok 93 - durable single-use capability across OS processes: 6 processes race the same capability, exactly one reservation
+  ---
+  duration_ms: 354.487525
+  type: 'test'
+  ...
+# Subtest: freeze integrity: forged / unbound / stale unfreeze statements are refused; proposals denied while frozen
+ok 94 - freeze integrity: forged / unbound / stale unfreeze statements are refused; proposals denied while frozen
+  ---
+  duration_ms: 26.742476
+  type: 'test'
+  ...
+# Subtest: anomaly (payments stuck UNKNOWN) => HOLD (no releases) => cleared after review
+ok 95 - anomaly (payments stuck UNKNOWN) => HOLD (no releases) => cleared after review
+  ---
+  duration_ms: 78.88611
+  type: 'test'
+  ...
+# Subtest: policy integrity: attacker-signed or below-floor policies are refused even on the control channel
+ok 96 - policy integrity: attacker-signed or below-floor policies are refused even on the control channel
+  ---
+  duration_ms: 28.486991
+  type: 'test'
+  ...
+# Subtest: virtual clock readers refuse a clock that moves backwards or is missing (fail closed)
+ok 97 - virtual clock readers refuse a clock that moves backwards or is missing (fail closed)
+  ---
+  duration_ms: 24.171737
+  type: 'test'
+  ...
+# Subtest: in-process repair loop: injected flaw -> breach -> freeze -> patch -> replay/mutations denied -> regression -> recover -> resume
+ok 98 - in-process repair loop: injected flaw -> breach -> freeze -> patch -> replay/mutations denied -> regression -> recover -> resume
+  ---
+  duration_ms: 2650.587021
+  type: 'test'
+  ...
+# Subtest: pre-release audit (buffer use) catches the same injected flaw with ZERO ledger effect
+ok 99 - pre-release audit (buffer use) catches the same injected flaw with ZERO ledger effect
+  ---
+  duration_ms: 285.606101
+  type: 'test'
+  ...
+# Subtest: legitimate payment: PROPOSED->AUTHORIZED->RESERVED->BUFFERED->RELEASED->SETTLED, verified independently
+ok 100 - legitimate payment: PROPOSED->AUTHORIZED->RESERVED->BUFFERED->RELEASED->SETTLED, verified independently
+  ---
+  duration_ms: 67.834487
+  type: 'test'
+  ...
+# Subtest: buffer: release re-checks freeze; frozen payment is never released and is cancelled on unfreeze
+ok 101 - buffer: release re-checks freeze; frozen payment is never released and is cancelled on unfreeze
+  ---
+  duration_ms: 245.633104
+  type: 'test'
+  ...
+# Subtest: freeze persists across Sensitive Zone restart
+ok 102 - freeze persists across Sensitive Zone restart
+  ---
+  duration_ms: 46.04773
+  type: 'test'
+  ...
+# Subtest: stale watchdog lease blocks release (fail closed) until heartbeat resumes
+ok 103 - stale watchdog lease blocks release (fail closed) until heartbeat resumes
+  ---
+  duration_ms: 29.327224
+  type: 'test'
+  ...
+# Subtest: owner revocation during the buffer cancels the payment
+ok 104 - owner revocation during the buffer cancels the payment
+  ---
+  duration_ms: 61.73657
+  type: 'test'
+  ...
+# Subtest: delayed ledger settlement: RELEASED waits, then SETTLED exactly once
+ok 105 - delayed ledger settlement: RELEASED waits, then SETTLED exactly once
+  ---
+  duration_ms: 56.960857
+  type: 'test'
+  ...
+# Subtest: FP-001: a legitimate payment with a Unicode memo is not blocked (memo is never a decision input); control chars still refused
+ok 106 - FP-001: a legitimate payment with a Unicode memo is not blocked (memo is never a decision input); control chars still refused
+  ---
+  duration_ms: 54.913897
+  type: 'test'
+  ...
+# Subtest: OS: access matrix + all 24 techniques through real sockets/files/signals/network
+ok 107 - OS: access matrix + all 24 techniques through real sockets/files/signals/network
+  ---
+  duration_ms: 3918.916018
+  type: 'test'
+  ...
+# Subtest: OS: containment + automated repair drill (injected flaw, post-effect detection) resumes only after all gates pass
+ok 108 - OS: containment + automated repair drill (injected flaw, post-effect detection) resumes only after all gates pass
+  ---
+  duration_ms: 6026.12996
+  type: 'test'
+  ...
+1..108
+# tests 108
+# suites 0
+# pass 108
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12701.989518

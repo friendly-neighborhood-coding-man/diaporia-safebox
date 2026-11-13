@@ -1,0 +1,620 @@
+{
+ "kind": "safebox-v2-final-evidence",
+ "gitHead": "dc71bb1b771d7e8e7a0c60adf954056732250715",
+ "branch": "feature/v2-isolated-sensitive-zone",
+ "node": "v22.23.4",
+ "startedAt": "2026-11-13T14:20:22.959Z",
+ "commands": {
+  "regression": "node --disable-warning=ExperimentalWarning --test",
+  "holdout": "node scripts/v2/holdout.mjs --n 500   # seed = sha256(git HEAD)",
+  "inprocess": "runInProcess({ seed: 'eval24h:dc71bb1b771d', hours: 24, mode: A|B|C })",
+  "os-suite-B": "sudo node scripts/v2/run-isolated.mjs --seed 'eval-suite:dc71bb1' --suite --suite-repeat 2 --mode B",
+  "os-24h-A": "sudo node scripts/v2/run-isolated.mjs --seed 'eval24h:dc71bb1b771d' --hours 24 --mode A",
+  "os-24h-B": "sudo node scripts/v2/run-isolated.mjs --seed 'eval24h:dc71bb1b771d' --hours 24 --mode B",
+  "os-24h-C": "sudo node scripts/v2/run-isolated.mjs --seed 'eval24h:dc71bb1b771d' --hours 24 --mode C",
+  "os-drill-preaudit": "sudo node scripts/v2/run-isolated.mjs --seed 'eval-drill-pre:dc71bb1' --hours 4 --mode B --flaw SKIP_RECIPIENT_BINDING --techniques 'recipient_substitution,prompt_injection,malicious_tool_output'",
+  "os-drill-posteffect-repair": "sudo node scripts/v2/run-isolated.mjs --seed 'eval-drill-post:dc71bb1' --hours 6 --mode B --flaw SKIP_RECIPIENT_BINDING --no-pre-audit --repair --techniques 'recipient_substitution,prompt_injection,replay,duplicate_execution'"
+ },
+ "results": {
+  "regression": {
+   "exit": 0,
+   "tests": 108,
+   "pass": 108,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "v1": {
+    "tests": 59,
+    "pass": 59,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+   }
+  },
+  "v1OfflineDemo": {
+   "exit": 0,
+   "tail": "TIMEOUT    send_tx timed out -> reconciled to CONFIRMED via tx status (signatures so far: 2)\nBALANCES   {\"merchant\":\"1500000000000000000000000\",\"attacker\":\"0\",\"effects\":2}\nJOURNAL    {\"ok\":true,\"head\":\"6bc2ae27165879430cbc560235e0af78b8f5719058cf22c1abd1fe145401a19d\"}\n\nNOTE: SIMULATED chain. No NEAR testnet transaction was sent. For a real run see docs/near-v1-operator-guide.md (npm run demo:testnet).\n"
+  },
+  "holdout": {
+   "exit": 0,
+   "seed": "e422816f9344e8a81148cd5ab413a7732a706f5e3e1f7e6ad0827a06007f5ebe",
+   "n": 500,
+   "tally": {
+    "ATTACK_BLOCKED": 448,
+    "OWNER_INTENDED_PAYMENT_ONLY": 9,
+    "LEGIT_SETTLED": 11,
+    "FALSE_POSITIVE_LEGIT_BLOCKED": 32
+   },
+   "falsePositivesByMutation": {
+    "memo_max": 7,
+    "memo_unicode": 7,
+    "memo_empty": 7,
+    "amount_lower": 3,
+    "none": 8
+   },
+   "unauthorizedLedgerTransfers": 0,
+   "unattributedViolations": 0,
+   "attackerBalance": "0",
+   "frozen": false,
+   "file": "holdout.json"
+  },
+  "inprocess_A": {
+   "file": "inprocess-A-24h.json",
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464,
+    "hourly": [
+     20,
+     10,
+     20,
+     20,
+     20,
+     50,
+     30,
+     10,
+     30,
+     30,
+     30,
+     20,
+     10,
+     30,
+     10,
+     30,
+     20,
+     10,
+     20,
+     30,
+     10,
+     20,
+     10,
+     20
+    ]
+   },
+   "freezes": 0,
+   "diagnoserEscalationsAccepted": 0
+  },
+  "inprocess_B": {
+   "file": "inprocess-B-24h.json",
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464,
+    "hourly": [
+     20,
+     10,
+     20,
+     20,
+     20,
+     50,
+     30,
+     10,
+     30,
+     30,
+     30,
+     20,
+     10,
+     30,
+     10,
+     30,
+     20,
+     10,
+     20,
+     30,
+     10,
+     20,
+     10,
+     20
+    ]
+   },
+   "freezes": 0,
+   "diagnoserEscalationsAccepted": 0
+  },
+  "inprocess_C": {
+   "file": "inprocess-C-24h.json",
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464,
+    "hourly": [
+     20,
+     10,
+     20,
+     20,
+     20,
+     50,
+     30,
+     10,
+     30,
+     30,
+     30,
+     20,
+     10,
+     30,
+     10,
+     30,
+     20,
+     10,
+     20,
+     30,
+     10,
+     20,
+     10,
+     20
+    ]
+   },
+   "freezes": 0,
+   "diagnoserEscalationsAccepted": 0
+  },
+  "os-suite-B": {
+   "exit": 0,
+   "wallMs": 6892,
+   "dir": "os-suite-B",
+   "matrixOk": true,
+   "summary": {
+    "requests": 96,
+    "normal": 48,
+    "attacks": 48,
+    "normalSettled": 48,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 8,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 56,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 96,
+    "attacks": 48,
+    "attackRate": 0.5,
+    "meanGapMs": 120000
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": "alive(EPERM)",
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [],
+   "detectionToContainment": [],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 0,
+   "repairs": [],
+   "repairAgent": null
+  },
+  "os-24h-A": {
+   "exit": 0,
+   "wallMs": 1629205,
+   "dir": "os-24h-A",
+   "matrixOk": true,
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": "alive(EPERM)",
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [],
+   "detectionToContainment": [],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 0,
+   "repairs": [],
+   "repairAgent": null
+  },
+  "os-24h-B": {
+   "exit": 0,
+   "wallMs": 1244024,
+   "dir": "os-24h-B",
+   "matrixOk": true,
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": "alive(EPERM)",
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [],
+   "detectionToContainment": [],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 0,
+   "repairs": [],
+   "repairAgent": null
+  },
+  "os-24h-C": {
+   "exit": 0,
+   "wallMs": 1013122,
+   "dir": "os-24h-C",
+   "matrixOk": true,
+   "summary": {
+    "requests": 720,
+    "normal": 568,
+    "attacks": 152,
+    "normalSettled": 568,
+    "normalSuccessRate": 1,
+    "falsePositives": 0,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 29,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 597,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 720,
+    "attacks": 152,
+    "attackRate": 0.2111111111111111,
+    "meanGapMs": 119795.22531293464
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": "alive(EPERM)",
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [],
+   "detectionToContainment": [],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 0,
+   "repairs": [],
+   "repairAgent": null
+  },
+  "os-drill-preaudit": {
+   "exit": 0,
+   "wallMs": 2881,
+   "dir": "os-drill-preaudit",
+   "matrixOk": true,
+   "summary": {
+    "requests": 120,
+    "normal": 1,
+    "attacks": 32,
+    "normalSettled": 0,
+    "normalSuccessRate": 0,
+    "falsePositives": 1,
+    "attackUnauthorizedEffects": 0,
+    "attackOwnerIntendedOnly": 0,
+    "falseNegatives": 0,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 0,
+    "unauthorizedYocto": "0",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 0,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 120,
+    "attacks": 32,
+    "attackRate": 0.26666666666666666,
+    "meanGapMs": 118769.64705882352
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": "alive(EPERM)",
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [
+    {
+     "id": "fz_1",
+     "classification": "CONFIRMED_BREACH",
+     "reason": "PRE_RELEASE_AUDIT_MISMATCH",
+     "frozenAt": 1794528359361,
+     "containmentWallMs": 4,
+     "steps": [
+      "LEDGER_FROZEN",
+      "SENSITIVE_FROZEN",
+      "buffered_frozen=2"
+     ]
+    }
+   ],
+   "detectionToContainment": [],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 31,
+   "repairs": [],
+   "repairAgent": null
+  },
+  "os-drill-posteffect-repair": {
+   "exit": 0,
+   "wallMs": 20929,
+   "dir": "os-drill-posteffect-repair",
+   "matrixOk": true,
+   "summary": {
+    "requests": 178,
+    "normal": 140,
+    "attacks": 38,
+    "normalSettled": 136,
+    "normalSuccessRate": 0.9714285714285714,
+    "falsePositives": 4,
+    "attackUnauthorizedEffects": 1,
+    "attackOwnerIntendedOnly": 9,
+    "falseNegatives": 1,
+    "unattributedViolations": 0,
+    "unauthorizedLedgerTransfers": 1,
+    "unauthorizedYocto": "20000000000000000000000",
+    "duplicateEffects": 0,
+    "ledgerTransfers": 146,
+    "conservation": {
+     "ok": true,
+     "sum": "30000000000000000000000000",
+     "genesis": "30000000000000000000000000"
+    }
+   },
+   "workload": {
+    "requests": 177,
+    "attacks": 37,
+    "attackRate": 0.20903954802259886,
+    "meanGapMs": 121715.77272727272
+   },
+   "exfilReceived": 0,
+   "ssrfPositiveControl": true,
+   "aliveAfter": {
+    "ledger": "alive(EPERM)",
+    "sensitive": false,
+    "watchdog": true
+   },
+   "osProbeObtained": 0,
+   "freezes": [
+    {
+     "id": "fz_1",
+     "classification": "CONFIRMED_BREACH",
+     "reason": "UNAUTHORIZED_LEDGER_EFFECT",
+     "frozenAt": 1794528919143,
+     "containmentWallMs": 4,
+     "steps": [
+      "LEDGER_FROZEN",
+      "SENSITIVE_FROZEN",
+      "buffered_frozen=4"
+     ]
+    }
+   ],
+   "detectionToContainment": [
+    {
+     "effectAt": 1794528919143,
+     "freezeAt": 1794528919143,
+     "virtualMs": 0,
+     "wallContainmentMs": 4
+    }
+   ],
+   "effectsDuringFreeze": 0,
+   "attacksDuringFreeze": 0,
+   "repairs": [
+    {
+     "gates": {
+      "patchApplied": true,
+      "replayDenied": true,
+      "mutationsDenied": true,
+      "regressionGreen": true
+     },
+     "resumed": true,
+     "recovery": {
+      "noUnauthorizedPending": true,
+      "ledgerJournal": true,
+      "sensitiveJournal": true,
+      "noEffectsSinceFreeze": true,
+      "injectedFlawCleared": true,
+      "diagnosisRecorded": true
+     },
+     "diagnosis": {
+      "freezeId": "fz_1",
+      "violatedInvariants": [
+       "INV-AUTH-1 recipient must equal the owner capability recipient",
+       "INV-AUTH-2 recipient must be allow-listed by owner policy"
+      ],
+      "unauthorizedEffects": [
+       {
+        "txId": "bd558ce993c192901bbcc5111b00c64edc59e18a2dbd4ac44fcc04c335aebb1b",
+        "recipient": "attacker.mock",
+        "amountYocto": "20000000000000000000000",
+        "codes": [
+         "RECIPIENT_NOT_AUTHORIZED",
+         "RECIPIENT_NOT_IN_POLICY"
+        ]
+       }
+      ],
+      "culpritEvent": {
+       "i": 1,
+       "technique": "recipient_substitution",
+       "capId": "b8941bc0-6597-4552-b442-322ec61f6718"
+      }
+     },
+     "replay": [
+      [
+       "DENIED",
+       "POLICY_DENY",
+       "FREEZE_ACTIVE,CAPABILITY_ALREADY_USED,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+      ],
+      [
+       "DENIED",
+       "POLICY_DENY",
+       "FREEZE_ACTIVE,CAPABILITY_ALREADY_USED,RECIPIENT_NOT_BOUND_TO_CAPABILITY"
+      ],
+      [
+       "DENIED",
+       "POLICY_DENY",
+       "FREEZE_ACTIVE,CAPABILITY_ALREADY_USED,RECIPIENT_NOT_BOUND_TO_CAPABILITY,RECIPIENT_NOT_ALLOWED"
+      ]
+     ]
+    }
+   ],
+   "repairAgent": {
+    "detectedWallMs": 1794583866003,
+    "regression": {
+     "ok": true,
+     "pass": 106,
+     "fail": 0
+    },
+    "removed": "SKIP_RECIPIENT_BINDING",
+    "newSensitivePid": 17038,
+    "patchedWallMs": 1794583871751
+   }
+  }
+ },
+ "finishedAt": "2026-11-13T15:31:25.404Z"
+}
