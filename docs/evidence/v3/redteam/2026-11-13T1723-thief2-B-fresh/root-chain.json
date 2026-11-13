@@ -1,0 +1,149 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k1-phone"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k4-freeze"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-3",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone",
+    "k4-freeze"
+   ],
+   "subjectHolderId": "alice",
+   "plan": [
+    {
+     "credId": "new-daily-1-0",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-new-daily-1-0-deb9f8",
+      "seedCommitment": "9742c50e2b8fdaac395008dd60615172c39af78e0d808e9a16993611aefee325",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAWNRs2He03oqgoCYdGJQ5TkAIKLzhMCaFfhWCeUS4jTpwzXzP8OWUi99S-nBqkvgFW9jpQECAyYgASFYIB7UGESW9s_TrmpdgkuQKdsukXk9jCxG_VsJWm_P-LHzIlggkvSXxwlScSCBOp6LxH5G98snde5iuQltW6oiLEuzfxQ",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiTldIZE95VFQtOGU2OEVlQmdfWU1aWkdNLUJNVzlZcThhLVlhWWluVTV5ZyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "new-freeze-2-1",
+     "role": "FREEZE",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-new-freeze-2-1-f2cfac",
+      "seedCommitment": "17886eb212e4fbbc9fecfce6dc75834a23cac4042df1169af5ad245ddb341b68",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAcHU3rwIlk-qi4ZeDBkDZKEAIHNPXb6EkbZmnasYfVDpohlhN5OyS8Ux6ql3EJh5UWx2pQECAyYgASFYIKXjkhIisE5O22p1V1SdBREQUHMY5gQX9rQOwfgulXP6IlggSrniSFP4oA2bZNtAAHk_g1pwL3ov7Mbea6UZEKGl8VE",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYXVSYWYwY29ZejlxWVBxdUJyd2VPcjZTQ3UyQWVIa3JyZnlieEFPRDNvUSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ],
+   "note": "owner lost devices"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "6",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819"
+  },
+  "approvers": [
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "7",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819"
+  },
+  "approvers": [
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "8",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819",
+   "channelId": "ch-email",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "9",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "6466ff7de970e097a19808501393a275e169d4bb9a06a2c9995e2d775c21a819",
+   "channelId": "ch-postal",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ }
+]

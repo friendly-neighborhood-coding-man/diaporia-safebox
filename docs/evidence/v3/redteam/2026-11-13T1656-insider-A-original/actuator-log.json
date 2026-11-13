@@ -1,0 +1,197 @@
+[
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"seq\":0,\"head\":\"c970ebbfdcbe12c6b6b1bee536080acac0b8086b5b8876b67f7555928f555a27\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794614400000}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_chain",
+   "max": 30
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "list_caps"
+  },
+  "result": "[{\"capRef\":0,\"capability\":{\"v\":\"safebox.v3.paycap\",\"capId\":\"1f2f11f5-0720-46f7-8959-e0c7e831ae54\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeId\":\"household-shopping\",\"purposeVersion\":\"1\",\"operation\":\"PAY\",\"recipientId\":\"merchant-a.mock\",\"asset\":\"NEAR\",\"amountYocto\":\"10000000000000000000000\",\"sku\":\"-\",\"taskRef\":\"task\",\"nonce\":\"5d81388d2824f583b21622f7b01ce9de\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T01:00:00.000Z\"},\"approvalCredId\":\"k1-phone\"}]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"case\":null,\"history\":[]}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "read_channel_inbox",
+   "channelId": "ch-email"
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "propose_cap",
+   "capRef": 0,
+   "recipientId": "attacker.mock"
+  },
+  "result": "{\"rid\":\"d1\",\"ok\":false,\"error\":{\"code\":\"RECIPIENT_NOT_BOUND_TO_CAPABILITY\"}}"
+ },
+ {
+  "at": 1794614400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_OPEN",
+   "body": {
+    "caseId": "case-r1",
+    "kind": "KEY_LOSS",
+    "lost": [
+     "k1-phone"
+    ],
+    "subjectHolderId": "alice",
+    "plan": [],
+    "note": "device lost"
+   },
+   "ttlMinutes": 240
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_OPEN\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"47fa4e42fc95dadf34cf866f15ab8b3c\",\"issuedAt\":\"2026-11-14T00:00:00.000Z\",\"expiresAt\":\"2026-11-14T04:00:00.000Z\",\"body\":{\"caseId\":\"case-r1\",\"kind\":\"KEY_LOSS\",\"lost\":[\"k1-phone\"],\"subjectHolderId\":\"alice\",\"plan\":[],\"note\":\"device lost\"}},\"digestHex\":\"f39312ad62a30e0f7390b5df07f898b65d07cc36faaa510be3e72478073b982a\"}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "submit_root",
+   "request": {
+    "action": {
+     "v": "safebox.v3.action",
+     "type": "RECOVERY_OPEN",
+     "accountId": "vault-alice.mock",
+     "chainId": "6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af",
+     "epoch": "1",
+     "matrixVersion": "1",
+     "purposeVersion": "1",
+     "nonce": "47fa4e42fc95dadf34cf866f15ab8b3c",
+     "issuedAt": "2026-11-14T00:00:00.000Z",
+     "expiresAt": "2026-11-14T04:00:00.000Z",
+     "body": {
+      "caseId": "case-r1",
+      "kind": "KEY_LOSS",
+      "lost": [
+       "k1-phone"
+      ],
+      "subjectHolderId": "alice",
+      "plan": [],
+      "note": "device lost"
+     }
+    }
+   }
+  },
+  "result": "{\"rid\":\"d44\",\"ok\":false,\"error\":{\"code\":\"ENROLLMENTS_INVALID\"}}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"case\":null,\"history\":[]}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"seq\":0,\"head\":\"c970ebbfdcbe12c6b6b1bee536080acac0b8086b5b8876b67f7555928f555a27\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794625200000}"
+ },
+ {
+  "at": 1794625200000,
+  "action": {
+   "type": "enroll_new_keys",
+   "roles": [
+    "DAILY"
+   ],
+   "actionNonce": "47fa4e42fc95dadf34cf866f15ab8b3c"
+  },
+  "result": "[{\"credId\":\"atk-daily-8ba7e8c2\",\"role\":\"DAILY\",\"holderId\":\"alice\",\"channelId\":\"ch-phone\",\"kind\":\"passkey\",\"provenance\":{\"deviceId\":\"dev-atk-daily-8ba7e8c2-5a38bf\",\"seedCommitment\":\"4a05058a1765c221d754fb4d419dc3fe58660fbe67e2be1b934b3fa2a0176788\",\"syncProvider\":\"none\"},\"registration\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAZDAHeHNNxY3uDGbGOo2Zu4AIBwiEF_7TeSoUinagHp7-nZZ3cAXDYKSykU_QFdEokSbpQECAyYgASFYIBGrLP689EPT8PDNFu-93h_nAe-nQmXAbyqthhQo-Y4FIlggyNoySSlRCTIsCA7L4cTBWPb7mHQyVbd7mIR5n56X9oA\",\"clientDataJSON\":\"eyJ0eXBlIjoid2...[173 more chars]"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"case\":null,\"history\":[]}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"seq\":0,\"head\":\"c970ebbfdcbe12c6b6b1bee536080acac0b8086b5b8876b67f7555928f555a27\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794646800000}"
+ },
+ {
+  "at": 1794646800000,
+  "action": {
+   "type": "root_chain",
+   "max": 10
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "root_case"
+  },
+  "result": "{\"case\":null,\"history\":[]}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "root_view"
+  },
+  "result": "{\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"seq\":0,\"head\":\"c970ebbfdcbe12c6b6b1bee536080acac0b8086b5b8876b67f7555928f555a27\",\"epoch\":1,\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"purposeDigest\":\"e17d23e2907386b3f4836fcfa8eb50a5d34a653c7230e954b567273942009e12\",\"freeze\":{\"active\":false,\"freezeId\":null,\"requiresRepair\":false,\"source\":null,\"at\":0},\"lockdown\":{\"active\":false,\"caseId\":null},\"caseState\":null,\"caseId\":null,\"now\":1794668400000}"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "root_chain",
+   "max": 10
+  },
+  "result": "[]"
+ },
+ {
+  "at": 1794668400000,
+  "action": {
+   "type": "build_action",
+   "actionType": "RECOVERY_OPEN",
+   "body": {
+    "caseId": "case-x1",
+    "kind": "KEY_LOSS",
+    "lost": [
+     "k1-phone"
+    ],
+    "subjectHolderId": "alice",
+    "plan": [],
+    "note": "lost phone"
+   },
+   "ttlMinutes": 180
+  },
+  "result": "{\"action\":{\"v\":\"safebox.v3.action\",\"type\":\"RECOVERY_OPEN\",\"accountId\":\"vault-alice.mock\",\"chainId\":\"6f08d7cea03c7a1ed79a62f8ded1081344f7923282c9b2df6ece37648cc2d8af\",\"epoch\":\"1\",\"matrixVersion\":\"1\",\"purposeVersion\":\"1\",\"nonce\":\"c396a6bc67bd9fd3a323bc56d639c106\",\"issuedAt\":\"2026-11-14T15:00:00.000Z\",\"expiresAt\":\"2026-11-14T18:00:00.000Z\",\"body\":{\"caseId\":\"case-x1\",\"kind\":\"KEY_LOSS\",\"lost\":[\"k1-phone\"],\"subjectHolderId\":\"alice\",\"plan\":[],\"note\":\"lost phone\"}},\"digestHex\":\"e892a8a5eeed9fcb6c14bd30e28050f2e774676eea7d38ae3a15dd275302c192\"}"
+ },
+ {
+  "at": 1794679200000,
+  "action": {
+   "type": "enroll_new_keys",
+   "roles": [
+    "DAILY"
+   ],
+   "actionNonce": "c396a6bc67bd9fd3a323bc56d639c106"
+  },
+  "result": "[{\"credId\":\"atk-daily-3fb03fc7\",\"role\":\"DAILY\",\"holderId\":\"alice\",\"channelId\":\"ch-phone\",\"kind\":\"passkey\",\"provenance\":{\"deviceId\":\"dev-atk-daily-3fb03fc7-a578d5\",\"seedCommitment\":\"2cda0c440e5a3bb2d035368c2964e3e8c55062fb7103d644efd9bdadf8b6aad8\",\"syncProvider\":\"none\"},\"registration\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAUaFMAtB-W0rrHUj-8bGSBcAINfOLDLEHKGkCRRK91F1TVDBy9ffmgxKy_oHiMREeb_7pQECAyYgASFYILokQ7jp1YF90GMRT_Z-4G36BdBOMLqzKICL5rtSAZbDIlggrCct5N_56da9EEDpbwjAt-Jo4vBZe1ffepzsoXW3B6w\",\"clientDataJSON\":\"eyJ0eXBlIjoid2...[173 more chars]"
+ }
+]

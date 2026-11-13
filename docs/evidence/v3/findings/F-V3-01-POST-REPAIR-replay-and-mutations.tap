@@ -1,0 +1,48 @@
+TAP version 13
+# (node:6626) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: GUARDIAN COLLUSION + one stolen key: claim the other four keys lost, forge nothing, then override the real owner's objections
+ok 1 - GUARDIAN COLLUSION + one stolen key: claim the other four keys lost, forge nothing, then override the real owner's objections
+  ---
+  duration_ms: 125.452824
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone,k5-recovery-hw} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze}; owner objects only with {k2-laptop}
+ok 2 - F-V3-01 mutation: stolen {k1-phone,k5-recovery-hw} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze}; owner objects only with {k2-laptop}
+  ---
+  duration_ms: 112.085628
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k4-freeze}
+ok 3 - F-V3-01 mutation: stolen {k1-phone} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k4-freeze}
+  ---
+  duration_ms: 87.434982
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k3-root-hw} + colluding guardians/IDVs/channels claim {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}; owner objects only with {k1-phone}
+ok 4 - F-V3-01 mutation: stolen {k3-root-hw} + colluding guardians/IDVs/channels claim {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}; owner objects only with {k1-phone}
+  ---
+  duration_ms: 80.298939
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone,k2-laptop} + colluding guardians/IDVs/channels claim {k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k5-recovery-hw}
+ok 5 - F-V3-01 mutation: stolen {k1-phone,k2-laptop} + colluding guardians/IDVs/channels claim {k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k5-recovery-hw}
+  ---
+  duration_ms: 81.645774
+  type: 'test'
+  ...
+# Subtest: RESIDUAL R-1 (documented, not fixed): owner silent for 72 h + one stolen key + ALL guardians + BOTH identity verifiers + a majority of the owner's channels => takeover
+ok 6 - RESIDUAL R-1 (documented, not fixed): owner silent for 72 h + one stolen key + ALL guardians + BOTH identity verifiers + a majority of the owner's channels => takeover
+  ---
+  duration_ms: 91.121785
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 748.020023

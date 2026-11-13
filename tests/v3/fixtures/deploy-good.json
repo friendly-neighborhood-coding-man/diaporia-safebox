@@ -1,0 +1,2 @@
+{ "accountId": "vault-alice.testnet", "codeHash": "HASH_REVIEWED",
+  "keys": [ { "public_key": "ed25519:relayer", "access_key": { "nonce": 1, "permission": { "FunctionCall": { "allowance": "250000000000000000000000", "receiver_id": "vault-alice.testnet", "method_names": ["release", "recovery_complete"] } } } } ] }

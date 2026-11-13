@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+not ok 1 - F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 80.978525
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:41:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    owner override: {"code":"OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM"}
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    ok (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:15:36)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:45:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+not ok 2 - F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 60.616079
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:41:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    owner override: {"code":"NOTHING_TO_OVERRIDE"}
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    ok (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:15:36)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:45:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+not ok 3 - F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 67.160711
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:41:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    owner override: {"code":"OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM"}
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    ok (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:15:36)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:45:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+not ok 4 - F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 68.984104
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:41:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    owner override: {"code":"OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM"}
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    ok (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:15:36)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:45:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F-V3-02 mutation: missing ONE survivor consent -> override denied
+ok 5 - F-V3-02 mutation: missing ONE survivor consent -> override denied
+  ---
+  duration_ms: 82.223739
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: below the normal guardian quorum -> override denied
+not ok 6 - F-V3-02 mutation: below the normal guardian quorum -> override denied
+  ---
+  duration_ms: 53.955035
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:60:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /OVERRIDE_NEEDS_GUARDIAN_QUORUM/. Input:
+    
+    'OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM:'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'OVERRIDE_NEEDS_RECON_GUARDIAN_QUORUM:'
+  operator: 'match'
+  stack: |-
+    deny (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:16:90)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:63:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+not ok 7 - F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+  ---
+  duration_ms: 64.85467
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:66:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /OVERRIDE_/. Input:
+    
+    'NOTHING_TO_OVERRIDE:'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'NOTHING_TO_OVERRIDE:'
+  operator: 'match'
+  stack: |-
+    deny (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:16:90)
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v3/f-v3-02-recovery-veto.test.mjs:69:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F-V3-02 mutation: a SURVIVING credential objection is never overridable
+ok 8 - F-V3-02 mutation: a SURVIVING credential objection is never overridable
+  ---
+  duration_ms: 55.139794
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+ok 9 - F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+  ---
+  duration_ms: 65.71842
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 3
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 768.061332

@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 1 - F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 124.053119
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 2 - F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 99.488501
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 3 - F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 92.925456
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 4 - F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 99.775437
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: missing ONE survivor consent -> override denied
+ok 5 - F-V3-02 mutation: missing ONE survivor consent -> override denied
+  ---
+  duration_ms: 82.371044
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: below the normal guardian quorum -> override denied
+ok 6 - F-V3-02 mutation: below the normal guardian quorum -> override denied
+  ---
+  duration_ms: 64.405582
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+ok 7 - F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+  ---
+  duration_ms: 61.48468
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: a SURVIVING credential objection is never overridable
+ok 8 - F-V3-02 mutation: a SURVIVING credential objection is never overridable
+  ---
+  duration_ms: 67.353105
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+ok 9 - F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+  ---
+  duration_ms: 59.166716
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: a guardian that approves and then objects is not counted on both sides
+ok 10 - F-V3-02 mutation: a guardian that approves and then objects is not counted on both sides
+  ---
+  duration_ms: 57.253425
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 962.296156

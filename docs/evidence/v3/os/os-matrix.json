@@ -1,0 +1,1323 @@
+{
+ "summary": {
+  "verified": "OS_ENFORCED_LOCAL",
+  "principals": {
+   "sbx3-root": 992,
+   "sbx3-recov": 991,
+   "sbx3-vault": 990,
+   "sbx3-ledger": 989,
+   "sbx3-gen": 988
+  },
+  "checks": 145,
+  "violations": 0,
+  "genNetwork": "DENIED:ENETUNREACH",
+  "errors": []
+ },
+ "matrix": [
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "list",
+   "target": "root/",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "list",
+   "target": "recov/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "list",
+   "target": "vault/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "list",
+   "target": "ledger/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "list",
+   "target": "gen/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "root/root-chain.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "root/root-chain.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "root/service-config.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "root/service-config.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "read",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "write",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "signal",
+   "target": "proc:root",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "signal",
+   "target": "proc:recov",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "signal",
+   "target": "proc:vault",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "signal",
+   "target": "proc:ledger",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "signal",
+   "target": "proc:gen",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-root",
+   "uid": 992,
+   "what": "net",
+   "target": "127.0.0.1:39163",
+   "outcome": "OBTAINED",
+   "expected": "ANY",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "list",
+   "target": "root/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "list",
+   "target": "recov/",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "list",
+   "target": "vault/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "list",
+   "target": "ledger/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "list",
+   "target": "gen/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "recov/notifier-key.secret",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "recov/notifier-key.secret",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "recov/cases.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "recov/cases.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "read",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "write",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "signal",
+   "target": "proc:root",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "signal",
+   "target": "proc:recov",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "signal",
+   "target": "proc:vault",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "signal",
+   "target": "proc:ledger",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "signal",
+   "target": "proc:gen",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-recov",
+   "uid": 991,
+   "what": "net",
+   "target": "127.0.0.1:39163",
+   "outcome": "OBTAINED",
+   "expected": "ANY",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "list",
+   "target": "root/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "list",
+   "target": "recov/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "list",
+   "target": "vault/",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "list",
+   "target": "ledger/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "list",
+   "target": "gen/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "vault/vault.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "vault/vault.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "read",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "write",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "signal",
+   "target": "proc:root",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "signal",
+   "target": "proc:recov",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "signal",
+   "target": "proc:vault",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "signal",
+   "target": "proc:ledger",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "signal",
+   "target": "proc:gen",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-vault",
+   "uid": 990,
+   "what": "net",
+   "target": "127.0.0.1:39163",
+   "outcome": "OBTAINED",
+   "expected": "ANY",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "list",
+   "target": "root/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "list",
+   "target": "recov/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "list",
+   "target": "vault/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "list",
+   "target": "ledger/",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "list",
+   "target": "gen/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "read",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "write",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "signal",
+   "target": "proc:root",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "signal",
+   "target": "proc:recov",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "signal",
+   "target": "proc:vault",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "signal",
+   "target": "proc:ledger",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "signal",
+   "target": "proc:gen",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-ledger",
+   "uid": 989,
+   "what": "net",
+   "target": "127.0.0.1:39163",
+   "outcome": "OBTAINED",
+   "expected": "ANY",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "list",
+   "target": "root/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "list",
+   "target": "recov/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "list",
+   "target": "vault/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "list",
+   "target": "ledger/",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "list",
+   "target": "gen/",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "root/root-chain.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "root/service-config.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "recov/notifier-key.secret",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "recov/cases.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "vault/vault.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "vault/root-replica.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "ledger/ledger.sqlite",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "gen/agent-scratch.txt",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "read",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "write",
+   "target": "trusted/pinned-public-keys.json",
+   "outcome": "DENIED:EACCES",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "signal",
+   "target": "proc:root",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "signal",
+   "target": "proc:recov",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "signal",
+   "target": "proc:vault",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "signal",
+   "target": "proc:ledger",
+   "outcome": "DENIED:EPERM",
+   "expected": "DENIED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "signal",
+   "target": "proc:gen",
+   "outcome": "OBTAINED",
+   "expected": "OBTAINED",
+   "ok": true
+  },
+  {
+   "principal": "sbx3-gen",
+   "uid": 988,
+   "what": "net",
+   "target": "127.0.0.1:39163",
+   "outcome": "DENIED:ENETUNREACH",
+   "expected": "DENIED",
+   "ok": true
+  }
+ ]
+}
