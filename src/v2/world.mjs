@@ -40,9 +40,12 @@ export function buildWorld({ dir, clock, injectFlaw = null, settleDelayMs = 0, w
   const world = {
     dir, clock, now, wallClock, owner, executor, ledger, ledgerRead, ledgerAdmin, ledgerExec, cfg,
     get zone() { return zone; },
-    gz: new DirectClient(sops.gz), ctl: new DirectClient(sops.ctl),
+    // Stable client handles that follow Sensitive Zone restarts (like a socket path would).
+    gz: { request: (o, a) => world._gz.request(o, a), raw: (l, r) => world._gz.raw(l, r), call: (o, a) => world._gz.call(o, a), close() {} },
+    ctl: { request: (o, a) => world._ctl.request(o, a), raw: (l, r) => world._ctl.raw(l, r), call: (o, a) => world._ctl.call(o, a), close() {} },
+    _gz: new DirectClient(sops.gz), _ctl: new DirectClient(sops.ctl),
     freezeStore: new FreezeStore(join(dir, 'freeze.jsonl')),
-    restartSensitive(over = null) { zone.store.close(); if (over) { cfg = { ...cfg, ...over }; world.cfg = cfg; } zone = openZone(); sops = sensitiveOps(zone); world.gz = new DirectClient(sops.gz); world.ctl = new DirectClient(sops.ctl); world.watchdog.sensCtl = world.ctl; return zone; },
+    restartSensitive(over = null) { zone.store.close(); if (over) { cfg = { ...cfg, ...over }; world.cfg = cfg; } zone = openZone(); sops = sensitiveOps(zone); world._gz = new DirectClient(sops.gz); world._ctl = new DirectClient(sops.ctl); return zone; },
   };
   world.watchdog = new Watchdog({ ledgerRead, ledgerAdmin, sensCtl: world.ctl, owner, freezeStore: world.freezeStore, now, wallNow,
     executorKey: executor.publicKey, genesisTotalYocto: GENESIS_TOTAL, ...watchdogOpts });

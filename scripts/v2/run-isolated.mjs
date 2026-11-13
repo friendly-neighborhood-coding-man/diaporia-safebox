@@ -71,7 +71,7 @@ const executorKey = readFileSync(L.executorPub, 'utf8').trim();
 const writeConf = (p, o) => { writeFileSync(p, JSON.stringify(o, null, 1)); chmodSync(p, 0o644); };
 writeConf(L.sensConf, { trustedOwnerKeys: ownerPub.trustedOwnerKeys, operatorKey: ownerPub.operatorKey, executorAccount: EXECUTOR_ACCOUNT, minBufferMs: 600_000, leaseMs: 5_000, injectFlaw: flaw });
 writeConf(L.ledgerConf, { genesis: { executorAccount: EXECUTOR_ACCOUNT, executorKey, ownerKey: ownerPub.operatorKey, accounts: GENESIS, maxPaymentYocto: '60000000000000000000000', settleDelayMs: Number(arg('settle-delay', '0')) } });
-const runConf = { seed, hours, mode, suite: flag('suite') ? Number(arg('suite-repeat', '1')) : 0, t0: T0, genesisTotal: GENESIS_TOTAL, codeRoot: ROOT, techniques, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, pids: {} };
+const runConf = { repair: flag('repair'), seed, hours, mode, suite: flag('suite') ? Number(arg('suite-repeat', '1')) : 0, t0: T0, genesisTotal: GENESIS_TOTAL, codeRoot: ROOT, techniques, preReleaseAudit: !flag('no-pre-audit'), drillHideFlawFlag: !!flaw, pids: {} };
 writeConf(L.runConf, runConf);
 
 const ledger = await start('ledger', 'src/v2/launch/serve-ledger.mjs', [base]);
@@ -104,7 +104,7 @@ for (const [label, p] of Object.entries(probes)) for (const [k, v] of Object.ent
   matrix.push({ principal: label, uid: p.uid, groups: p.groups, probe: k, expected: exp, observed: v, ok });
 }
 
-let results = null, controllerOut = '';
+let results = null, controllerOut = '', repairLog = null;
 if (!flag('probe-only')) {
   const ctl = (() => { const [c, a] = cmdFor('sup', 'src/v2/launch/run-controller.mjs', [base]); return spawn(c, a, { env: env('sup'), cwd: '/', stdio: ['ignore', 'pipe', 'pipe'] }); })();
   procs.push(ctl);
@@ -113,6 +113,23 @@ if (!flag('probe-only')) {
   const gen = (() => { const [c, a] = cmdFor('gen', 'src/v2/launch/run-general.mjs', [base, mode]); return spawn(c, a, { env: env('gen'), cwd: '/', stdio: ['ignore', 'pipe', 'pipe'] }); })();
   procs.push(gen);
   gen.stderr.on('data', d => process.stderr.write('[general] ' + d));
+
+  if (flag('repair')) {
+    // Repair agent (root, trusted): on a persisted freeze, run the regression suite, then PATCH = restart the Sensitive
+    // Zone from corrected trusted config (drill flaw removed). It never touches ledger/supervisor state or evidence.
+    const { FreezeStore } = await import('../../src/v2/supervisor/watchdog.mjs');
+    (async () => {
+      while (!new FreezeStore(L.freeze).isFrozen()) await new Promise(r => setTimeout(r, 100));
+      const detected = Date.now();
+      const reg = spawnSync(NODE, ['--disable-warning=ExperimentalWarning', '--test'], { cwd: ROOT, encoding: 'utf8', env: { ...process.env, SBX2_NESTED_REGRESSION: '1' } }); // OS tests excluded inside a live drill (they would nest deployments)
+      const regression = { ok: reg.status === 0, pass: Number(/# pass (\d+)/.exec(reg.stdout)?.[1]), fail: Number(/# fail (\d+)/.exec(reg.stdout)?.[1]) };
+      sens.proc.removeAllListeners('exit'); sens.proc.kill('SIGTERM'); await new Promise(r => sens.proc.once('exit', r));
+      const conf = JSON.parse(readFileSync(L.sensConf, 'utf8')); const removed = conf.injectFlaw; conf.injectFlaw = null; writeConf(L.sensConf, conf);
+      const s2 = await start('sens', 'src/v2/launch/serve-sensitive.mjs', [base]);
+      repairLog = { detectedWallMs: detected, regression, removed, newSensitivePid: s2.info.pid, patchedWallMs: Date.now() };
+      writeConf(join(base, 'conf', 'patch.json'), { patch: 'trusted config injectFlaw ' + removed + ' -> null; Sensitive Zone restarted', regression, at: repairLog.patchedWallMs });
+    })().catch(e => console.error('repair agent failed', e));
+  }
   const code = await new Promise(r => ctl.on('exit', r));
   if (code !== 0) console.error('controller exit code', code);
   results = existsSync(L.results) ? JSON.parse(readFileSync(L.results, 'utf8')) : null;
@@ -123,7 +140,7 @@ for (const p of procs) try { p.kill('SIGTERM'); } catch {}
 mkdirSync(out, { recursive: true });
 const gitHead = spawnSync('git', ['-C', ROOT, 'rev-parse', 'HEAD']).stdout.toString().trim();
 const dirty = spawnSync('git', ['-C', ROOT, 'status', '--porcelain', 'src', 'scripts']).stdout.toString().trim() !== '';
-const evidence = { kind: 'safebox-v2-os-isolated-run', runId, gitHead, workingTreeDirty: dirty, argv: process.argv.slice(2), node: process.version, kernel: sh('uname', ['-r']).trim(),
+const evidence = { kind: 'safebox-v2-os-isolated-run', runId, repairAgent: repairLog, gitHead, workingTreeDirty: dirty, argv: process.argv.slice(2), node: process.version, kernel: sh('uname', ['-r']).trim(),
   isolation: { users: USERS, principalGroups: PRINCIPAL_GROUPS, generalNetworkNamespace: true, noNewPrivs: true, capabilities: 'none (bounding+inheritable cleared)',
     codeWritableByOthers: codeCheck.trim(), matrixOk, matrix }, results };
 writeFileSync(join(out, 'run.json'), JSON.stringify(evidence, null, 1));

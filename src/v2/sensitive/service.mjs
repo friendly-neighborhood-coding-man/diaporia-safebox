@@ -193,7 +193,8 @@ export class SensitiveZone {
       const d = evaluateRelease({ control: this.store.control(), leaseFresh: this.wallNow() <= this.leaseUntil, policy: pol?.policy ?? null,
         policyDigest: pol?.digest ?? null, row, now, capRevoked: this.#capRevoked(row.cap_id), executions: this.store.usage(row.principal_id).executions });
       if (d.decision !== 'ALLOW') {
-        if (d.deny.length === 1 && d.deny[0] === 'CAPABILITY_EXPIRED') {
+        if (d.deny.includes('CAPABILITY_EXPIRED') && !d.deny.includes('FREEZE_ACTIVE')) {
+          // The owner capability can never become valid again: expire and release the reservation.
           this.store.move(paymentId, 'BUFFERED', 'EXPIRED', 'policy', { deny: d.deny }, { reason: 'CAPABILITY_EXPIRED' });
           return { expired: true };
         }

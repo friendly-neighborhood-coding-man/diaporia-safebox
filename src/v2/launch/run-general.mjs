@@ -27,6 +27,7 @@ sock.on('data', (d) => {
       }
       if (m.kind === 'TASK') return send({ id: m.id, result: await zone.handleTask(m.payload) });
       if (m.kind === 'ATTACK') return send({ id: m.id, result: await zone.runAttack(m.payload) });
+      if (m.kind === 'REPLAY') return send({ id: m.id, result: await zone.replay(m.payload.eventId) });
       if (m.kind === 'EXIT') { send({ id: m.id, result: { bye: true } }); setTimeout(() => process.exit(0), 50); }
     })().catch(e => send({ id: m.id, result: { kind: 'ERROR', error: String(e.message).slice(0, 200) } }));
   }

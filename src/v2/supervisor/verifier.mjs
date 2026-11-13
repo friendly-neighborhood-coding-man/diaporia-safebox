@@ -44,7 +44,12 @@ export function verifyLedgerEffects({ transfers, owner, executorKey, freezeLog =
     }
     if (byPayment.has(t.payment_id)) codes.push('DUPLICATE_EFFECT_FOR_PAYMENT');
     byPayment.set(t.payment_id, t.tx_id);
-    for (const f of freezeLog) if (t.submitted_at >= f.frozenAt && (f.liftedAt == null || t.submitted_at < f.liftedAt)) codes.push('EFFECT_DURING_FREEZE');
+    // Ordering uses the ledger sequence observed at freeze time (virtual time has ms granularity: the breaching
+    // transfer and its detection can share a timestamp). Without a sequence, fall back to strict time ordering.
+    for (const f of freezeLog) {
+      const after = f.ledgerSeqAtFreeze != null ? t.seq > f.ledgerSeqAtFreeze : t.submitted_at > f.frozenAt;
+      if (after && (f.liftedAt == null || t.submitted_at < f.liftedAt)) codes.push('EFFECT_DURING_FREEZE');
+    }
     const rec = { seq: t.seq, txId: t.tx_id, paymentId: t.payment_id, capId: tx?.capId ?? null, recipient: t.recipient, amountYocto: t.amount,
       status: t.status, submittedAt: t.submitted_at, settledAt: t.settled_at, authorized: codes.length === 0, codes };
     effects.push(rec);

@@ -16,7 +16,7 @@ export class FreezeStore {
   isFrozen() { return !!this.current(); }
   freezeLog() {
     const out = []; let open = null;
-    for (const r of this.records) { if (r.type === 'FREEZE' && !open) { open = { frozenAt: r.frozenAt, liftedAt: null, id: r.id }; out.push(open); } if (r.type === 'LIFT' && open) { open.liftedAt = r.liftedAt; open = null; } }
+    for (const r of this.records) { if (r.type === 'FREEZE' && !open) { open = { frozenAt: r.frozenAt, ledgerSeqAtFreeze: r.ledgerSeqAtFreeze ?? null, liftedAt: null, id: r.id }; out.push(open); } if (r.type === 'LIFT' && open) { open.liftedAt = r.liftedAt; open = null; } }
     return out;
   }
 }
@@ -33,7 +33,7 @@ export class Watchdog {
     const steps = [];
     try { await this.ledgerAdmin.call('FREEZE', { reason: `${classification}: ${reason}`.slice(0, 200) }); steps.push('LEDGER_FROZEN'); } catch (e) { steps.push('LEDGER_FREEZE_FAILED:' + e.code); }
     try { const r = await this.sensCtl.call('FREEZE', { reason: reason.slice(0, 200), classification }); steps.push('SENSITIVE_FROZEN', `buffered_frozen=${r.frozenNow.length}`); } catch (e) { steps.push('SENSITIVE_FREEZE_FAILED:' + e.code); }
-    const rec = { id: 'fz_' + (this.freezeStore.records.length + 1), classification, reason, frozenAt: detectedAt, detectedAt,
+    const rec = { id: 'fz_' + (this.freezeStore.records.length + 1), classification, reason, frozenAt: detectedAt, detectedAt, ledgerSeqAtFreeze: this.lastSeq ?? 0,
       wallDetectedMs: detectedWall, wallContainedMs: this.wallNow(), containmentWallMs: this.wallNow() - detectedWall, steps, evidence };
     if (!this.freezeStore.isFrozen()) this.freezeStore.freeze(rec);
     this.events.push({ type: 'CONTAIN', ...rec });
@@ -49,6 +49,7 @@ export class Watchdog {
     catch (e) { report.anomalies.push('LEDGER_UNREADABLE:' + (e.code ?? e.name)); }
     if (lstate && !lstate.journal.ok) report.breaches.push({ code: 'LEDGER_JOURNAL_TAMPERED', seq: lstate.journal.seq });
     if (transfers) {
+      this.lastSeq = transfers.reduce((m, t) => Math.max(m, t.seq), this.lastSeq ?? 0);
       const v = verifyLedgerEffects({ transfers, owner: this.owner, executorKey: this.executorKey, freezeLog: this.freezeStore.freezeLog(), genesisTotalYocto: this.genesisTotalYocto, balances });
       report.verification = { effects: v.effects.length, unauthorized: v.unauthorizedCount, unauthorizedYocto: v.unauthorizedYocto, conservation: v.conservation };
       for (const x of v.violations) { const k = x.txId ?? JSON.stringify(x.codes); if (!this.seenViolations.has(k)) { this.seenViolations.add(k); report.breaches.push({ code: 'UNAUTHORIZED_LEDGER_EFFECT', ...x }); } }
@@ -77,7 +78,8 @@ export class Watchdog {
             if (p.recipient !== iss.cap.recipientId) codes.push('RECIPIENT_NOT_AUTHORIZED');
             if (BigInt(p.amount) > BigInt(iss.cap.maxAmountYocto)) codes.push('AMOUNT_OVER_AUTHORIZED');
             if (iss.cap.principalId !== p.principal_id) codes.push('PRINCIPAL_MISMATCH');
-            if (this.owner.revoked.has(p.cap_id) && p.state === 'BUFFERED') codes.push('REVOKED_CAPABILITY_STILL_BUFFERED');
+            // (A revoked-but-still-buffered payment is not a breach: the release re-check refuses it, and the
+            //  post-effect verifier flags EXECUTED_AFTER_REVOCATION should it ever reach the ledger.)
           }
           if (codes.length) { this.seenViolations.add(k); report.breaches.push({ code: 'PRE_RELEASE_AUDIT_MISMATCH', paymentId: p.payment_id, capId: p.cap_id, recipient: p.recipient, amountYocto: p.amount, state: p.state, codes }); }
         }
@@ -125,7 +127,7 @@ export class Watchdog {
     for (const v of pre.violations) if (v.txId && v.status === 'PENDING') { await this.ledgerAdmin.call('VOID_PENDING', { txId: v.txId, reason: 'recovery: unauthorized pending ' + v.codes.join(',') }); voidedNow.push(v.txId); }
     transfers = await this.ledgerRead.call('TRANSFERS', { sinceSeq: '0' });
     const post = verifyLedgerEffects({ transfers, owner: this.owner, executorKey: this.executorKey, freezeLog: [] });
-    const after = transfers.filter(t => t.submitted_at >= cur.frozenAt && t.status !== 'VOIDED');
+    const after = transfers.filter(t => (cur.ledgerSeqAtFreeze != null ? t.seq > cur.ledgerSeqAtFreeze : t.submitted_at > cur.frozenAt) && t.status !== 'VOIDED');
     const checks = { noUnauthorizedPending: post.violations.every(v => v.status !== 'PENDING'), ledgerJournal: lstate.journal.ok, sensitiveJournal: sstate.journal.ok, noEffectsSinceFreeze: after.length === 0,
       injectedFlawCleared: !sstate.injectFlaw, diagnosisRecorded: !!diagnosis };
     const ok = Object.values(checks).every(Boolean);

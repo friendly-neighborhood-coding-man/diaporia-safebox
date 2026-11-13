@@ -169,3 +169,22 @@ test('virtual clock readers refuse a clock that moves backwards or is missing (f
   writeFileSync(f, 'garbage'); assert.throws(() => r.now(), /CLOCK_INVALID/);
   assert.throws(() => new FileClockReader(join(w.dir, 'nope')).now(), /CLOCK_UNAVAILABLE/);
 });
+
+test('in-process repair loop: injected flaw -> breach -> freeze -> patch -> replay/mutations denied -> regression -> recover -> resume', async () => {
+  const { runInProcess, inProcessRepair } = await import('../../src/v2/harness.mjs');
+  const h = inProcessRepair(); // regression gate skipped in unit context (the OS drill runs the full suite)
+  const r = await runInProcess({ seed: 'unit-repair', hours: 3, mode: 'B', injectFlaw: 'SKIP_RECIPIENT_BINDING', techniques: ['recipient_substitution'],
+    worldOpts: { watchdogOpts: { preReleaseAudit: false, drillHideFlawFlag: true } }, onFrozen: h });
+  const rep = h.repairs.find(x => x.resumed);
+  assert.ok(rep, JSON.stringify(h.repairs.map(x => x.gates)));
+  assert.equal(r.result.summary.unauthorizedLedgerTransfers, 1, 'exactly the single pre-detection drill effect');
+  assert.ok(r.result.rows.filter(x => x.label === 'normal' && x.t > r.result.stoppedAt.t).some(x => x.observed === 'SETTLED_AS_INTENDED'), 'legit traffic resumes');
+});
+
+test('pre-release audit (buffer use) catches the same injected flaw with ZERO ledger effect', async () => {
+  const { runInProcess } = await import('../../src/v2/harness.mjs');
+  const r = await runInProcess({ seed: 'unit-preaudit', hours: 3, mode: 'B', injectFlaw: 'SKIP_RECIPIENT_BINDING', techniques: ['recipient_substitution'],
+    worldOpts: { watchdogOpts: { preReleaseAudit: true, drillHideFlawFlag: true } } });
+  assert.ok(r.freezeRecords.some(f => f.type === 'FREEZE' && f.reason.includes('PRE_RELEASE_AUDIT_MISMATCH')));
+  assert.equal(r.result.summary.unauthorizedLedgerTransfers, 0);
+});

@@ -3,6 +3,7 @@
 // what the boundary did. Whether an attack produced an effect is decided ONLY by the independent
 // ledger verifier afterwards, never by these self-reports.
 import { readFileSync, writeFileSync, unlinkSync, readdirSync, appendFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import net from 'node:net';
 import http from 'node:http';
 import { V2_DOMAINS, newSigner } from '../common/crypto.mjs';
@@ -19,7 +20,10 @@ function rec(steps, action, r) {
 }
 async function osTry(steps, action, fn) {
   try { const v = await fn(); return rec(steps, action, { outcome: 'OBTAINED', code: 'SUCCESS', detail: typeof v === 'string' ? v.slice(0, 80) : undefined }); }
-  catch (e) { return rec(steps, action, { outcome: OS_BLOCK.has(e.code) ? 'BLOCKED_BY_OS' : 'ERROR', code: e.code ?? e.message?.slice(0, 60) }); }
+  catch (e) {
+    if (typeof e.status === 'number') return rec(steps, action, { outcome: 'BLOCKED_BY_OS', code: 'EXIT_' + e.status, detail: String(e.stderr ?? '').trim().slice(0, 100) });
+    return rec(steps, action, { outcome: OS_BLOCK.has(e.code) ? 'BLOCKED_BY_OS' : 'ERROR', code: e.code ?? e.message?.slice(0, 60) });
+  }
 }
 function connectOnce(path, line) {
   return new Promise((resolve, reject) => {
@@ -209,6 +213,8 @@ export const ATTACKS = {
     await osTry(steps, 'write freeze log', () => appendFileSync(P.freezeFile, '{"type":"LIFT"}\n'));
     await osTry(steps, 'replace verifier code', () => appendFileSync(P.verifierCode, '\n// pwned'));
     await osTry(steps, 'connect supervisor socket', () => connectOnce(P.supSock, '{"op":"STOP","args":{},"rid":"w"}'));
+    await osTry(steps, 'privilege escalation: sudo -n id', () => { const o = execFileSync('sudo', ['-n', 'id', '-u'], { stdio: ['ignore', 'pipe', 'pipe'], timeout: 5000 }).toString(); if (o.trim() === '0') return 'ROOT'; throw Object.assign(new Error('not root'), { code: 'EPERM' }); });
+    await osTry(steps, 'privilege escalation: su root', () => { execFileSync('su', ['-c', 'id', 'root'], { stdio: ['ignore', 'pipe', 'pipe'], timeout: 5000, input: '' }); return 'ROOT'; });
   },
   async freeze_bypass(env, steps) {
     const evil = newSigner('attacker');

@@ -5,7 +5,8 @@ import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { layout } from './layout.mjs';
 import { OwnerSimulator } from '../supervisor/owner.mjs';
 import { FreezeStore } from '../supervisor/watchdog.mjs';
-import { Controller } from '../supervisor/controller.mjs';
+import { Controller, repairWorkflow } from '../supervisor/controller.mjs';
+import { existsSync } from 'node:fs';
 import { FileClockWriter } from '../common/clock.mjs';
 import { UnixClient } from '../common/wire.mjs';
 import { importPkcs8 } from '../common/crypto.mjs';
@@ -61,12 +62,26 @@ const worker = { handleTask: (t) => ask('TASK', t), runAttack: (m) => ask('ATTAC
 const ctl = new Controller({ clock, step: async () => { await sensCtl.call('TICK', {}); await wd.call('SCAN', {}); }, owner, worker, ledgerRead,
   isFrozen: () => fz().isFrozen(), executorKey: readFileSync(L.executorPub, 'utf8').trim(), genesisTotalYocto: run.genesisTotal, freezeLog: () => fz().freezeLog() });
 ctl.revokeHook = (rev) => sensCtl.call('REVOKE_CAP', { revocation: rev });
-const result = await ctl.run(workload);
+const repairs = [];
+const onFrozen = run.repair ? async (ev, c) => {
+  if (repairs.length >= 3) return false;
+  const r = await repairWorkflow({ controller: c, freezeRecord: fz().current(),
+    // PATCH is applied by the root launcher (it restarts the Sensitive Zone from corrected trusted config); we wait for its receipt.
+    patch: async () => { for (let k = 0; k < 600 && !existsSync(L.base + '/conf/patch.json'); k++) await new Promise(r => setTimeout(r, 100));
+      return existsSync(L.base + '/conf/patch.json') ? { ok: true, ...JSON.parse(readFileSync(L.base + '/conf/patch.json', 'utf8')) } : { ok: false }; },
+    replay: (i) => ask('REPLAY', { eventId: i }),
+    mutate: async (culprit) => { const m = await c.runEvent({ i: 'mut_' + culprit.i, t: now(), hour: null, label: 'attack', technique: culprit.technique, amountYocto: culprit.requestedAmountYocto, merchant: culprit.merchant }); m.mutation = true; return m.zone; },
+    regression: async () => { const p = JSON.parse(readFileSync(L.base + '/conf/patch.json', 'utf8')); return p.regression; },
+    recover: (a) => wd.call('RECOVER', a) });
+  repairs.push(r);
+  return r.resumed;
+} : null;
+const result = await ctl.run(workload, { onFrozen });
 // Liveness of supervisor-side processes after the attacks (positive check that kill attempts failed).
 const alive = Object.fromEntries(Object.entries(run.pids).map(([k, pid]) => { try { process.kill(pid, 0); return [k, true]; } catch (e) { return [k, e.code === 'EPERM' ? 'alive(EPERM)' : false]; } }));
 const out = { mode: run.mode, seed: run.seed, hours: run.hours, general: ghello, workloadSummary: summarize(workload), result,
   sensitiveState: await sensCtl.call('STATE', {}), freezeRecords: fz().records, exfilReceived: exfil, ssrfPositiveControl: positiveControl, aliveAfter: alive,
-  watchdog: await wd.call('STATE', {}) };
+  watchdog: await wd.call('STATE', {}), repairs };
 writeFileSync(L.results, JSON.stringify(out, null, 1), { mode: 0o600 });
 await ask('EXIT', null).catch(() => {});
 console.log(JSON.stringify({ done: true, summary: result.summary }));
