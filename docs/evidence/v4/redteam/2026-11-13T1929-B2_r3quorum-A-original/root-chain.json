@@ -1,0 +1,126 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "GOV_CASE_OPEN",
+  "body": {
+   "gcaseId": "gc-r3-1",
+   "procedure": "GUARDIAN_EMERGENCY_REPLACE",
+   "accused": [
+    "g3"
+   ],
+   "ground": "COMPROMISE",
+   "evidence": [
+    {
+     "kind": "VERDICT",
+     "subjectId": "g3",
+     "adjudicatorId": "adj-1",
+     "statement": {
+      "v": "safebox.v4.verdict",
+      "accountId": "vault-alice.mock",
+      "chainId": "6ef569068de83ce158d57dcfa3b55034171a0c40013f4e400172b44824e832e9",
+      "subjectKind": "guardian",
+      "subjectId": "g3",
+      "subjectKey": "ed25519:guHcxncQrWwJbaFwQpFDI6njCfH_yBlq8Nq-DeeRshA",
+      "finding": "COMPROMISED",
+      "evidenceRef": "case-file-g3",
+      "issuedAt": "2026-11-14T00:00:00.000Z",
+      "expiresAt": "2026-11-21T00:00:00.000Z"
+     },
+     "sig": "YC0YAMRAppEhtFVrHq2yAdvMwSht0qq5qDlICn0lfk-tW4NbRsGOD9Y77mQES6EPtt6bcuxxsmSA5w3t4oLzBQ"
+    },
+    {
+     "kind": "VERDICT",
+     "subjectId": "g3",
+     "adjudicatorId": "adj-2",
+     "statement": {
+      "v": "safebox.v4.verdict",
+      "accountId": "vault-alice.mock",
+      "chainId": "6ef569068de83ce158d57dcfa3b55034171a0c40013f4e400172b44824e832e9",
+      "subjectKind": "guardian",
+      "subjectId": "g3",
+      "subjectKey": "ed25519:guHcxncQrWwJbaFwQpFDI6njCfH_yBlq8Nq-DeeRshA",
+      "finding": "COMPROMISED",
+      "evidenceRef": "case-file-g3",
+      "issuedAt": "2026-11-14T00:00:00.000Z",
+      "expiresAt": "2026-11-21T00:00:00.000Z"
+     },
+     "sig": "25NvjKWHyWFjymFHyvgsiFFacvL310KTHhaQFOwWNyr5LxgX0wtTMuJOqMf9JWreZ6u1frVgiu1O4AiV18zjAg"
+    }
+   ],
+   "replacements": [
+    {
+     "id": "g-att-1",
+     "holderId": "guardian-ext-1",
+     "publicKey": "ed25519:2tKj8C7QOm82ozw_-f0wIeEXfUBa0OSdZcXwYWB3-vo",
+     "pop": "kMRyhbu6l6KCGnXK1nhCCVD6hUW-tkdpzwzc98DTfGYXcAkfGQ56u5t2C9e3kX5fcViMflgzGtd497R7d01SCg"
+    }
+   ]
+  },
+  "approvers": [
+   "k1-phone",
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "GOV_DISPATCH",
+  "body": {
+   "gcaseId": "gc-r3-1",
+   "gcaseDigest": "4a8ba493cd998d41a929e43a127a0416281742b675f409436631dad641811ecd",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "GOV_BALLOT",
+  "body": {
+   "gcaseId": "gc-r3-1",
+   "gcaseDigest": "4a8ba493cd998d41a929e43a127a0416281742b675f409436631dad641811ecd",
+   "voterId": "idv-1",
+   "commitment": "9b5144c825b0a2127d6c65f7f6fdfac89d7d0df110a9ff0ddb1f46c89e7a86d6",
+   "sealed": {
+    "epk": "YSUazkKyYmq4G8GasuaIptdvGGvSgwnMMGiYjN1yAhI",
+    "iv": "jWllcOq5Jw8WRNgT",
+    "ct": "QIJinQq-3Qgy3omr7XnpT39i1W5T2I8g8MewrKVOwKl329mLd14eMBq_CZFuTmULgik2FdlXeeRXu-EJMBEYQhHwDPO982AikJADRTM"
+   }
+  },
+  "approvers": []
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "GOV_BALLOT",
+  "body": {
+   "gcaseId": "gc-r3-1",
+   "gcaseDigest": "4a8ba493cd998d41a929e43a127a0416281742b675f409436631dad641811ecd",
+   "voterId": "idv-2",
+   "commitment": "5f5565d5cabf67981b5d3e15f8d8f115e3d3fcc080eb73119cc42a5a808998a2",
+   "sealed": {
+    "epk": "8_dsilSXq1j-8VDzeaGRMyuqU-RBdJY_v1k_PGQvCQ0",
+    "iv": "goqkCdY3Cr94hXxx",
+    "ct": "A48tL96VBwEZilAR6pBrU7B5bw1pH-TM-jXH45a2YWZi7HRSP_aRx0oJuw_FjAmCmzJ37fUFzyt-Blcw7qk-YcJTC21IW5a4HRl8Z4Q"
+   }
+  },
+  "approvers": []
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-14T10:00:00.000Z",
+  "type": "GOV_CASE_CANCEL",
+  "body": {
+   "gcaseId": "gc-r3-1",
+   "gcaseDigest": "4a8ba493cd998d41a929e43a127a0416281742b675f409436631dad641811ecd"
+  },
+  "approvers": [
+   "orc-1"
+  ]
+ }
+]
