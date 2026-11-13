@@ -14,7 +14,11 @@
     "demo:v1": "node --disable-warning=ExperimentalWarning demo/offline-v1.mjs",
     "demo:testnet": "node --disable-warning=ExperimentalWarning demo/testnet-v1.mjs",
     "evidence": "SAFEBOX_WRITE_EVIDENCE=1 node --disable-warning=ExperimentalWarning --test tests/v1/adversarial.test.mjs",
-    "vectors": "node scripts/gen-contract-vectors.mjs"
+    "vectors": "node scripts/gen-contract-vectors.mjs",
+    "v2:test": "node --disable-warning=ExperimentalWarning --test tests/v2/*.test.mjs",
+    "v2:holdout": "node --disable-warning=ExperimentalWarning scripts/v2/holdout.mjs",
+    "v2:os": "node --disable-warning=ExperimentalWarning scripts/v2/run-isolated.mjs",
+    "v2:evaluate": "node --disable-warning=ExperimentalWarning scripts/v2/evaluate.mjs"
   },
   "dependencies": {
     "near-api-js": "7.5.3"
