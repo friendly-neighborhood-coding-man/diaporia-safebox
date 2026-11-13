@@ -1,0 +1,121 @@
+{
+ "generatedBy": "scripts/v4/mutations.mjs",
+ "caught": 19,
+ "total": 19,
+ "rows": [
+  {
+   "name": "R-1: RECONSTITUTE without ORC authorization",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 4
+  },
+  {
+   "name": "R-1: ORC authorization not bound to the case digest",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-1: reattempt cooldown removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-1: plan-key burn removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-1: claim budget removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-1: expiry allowed before the deadline",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Intent: canonical intent equality removed",
+   "file": "src/v4/intent/intent.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Intent: challenge single-use removed",
+   "file": "src/v4/intent/intent.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Intent: challenge expiry removed",
+   "file": "src/v4/intent/intent.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Intent: grant bound to action removed",
+   "file": "src/v4/intent/intent.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Intent: APC prompt check removed",
+   "file": "src/v4/intent/intent.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "Confirmation: CRITICAL trusted-path requirement removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-3: accused not excluded from electorate",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 4
+  },
+  {
+   "name": "R-3: adjudicator quorum removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 2
+  },
+  {
+   "name": "R-3: owner quorum distinct roles removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 3
+  },
+  {
+   "name": "R-3: tally openings not checked",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-3: replacement PoP removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-3: security delay removed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "R-3: empty electorate allowed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  }
+ ]
+}
