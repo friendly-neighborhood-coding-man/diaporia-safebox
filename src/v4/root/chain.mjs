@@ -174,7 +174,7 @@ export function genesisState(gen, { pinnedChainId = null } = {}) {
   st.head = sha3hex(Buffer.concat([Buffer.from(V3_DOMAINS.TRANSITION), Buffer.from(ZERO), Buffer.from(canon({ seq: '0', at: gen.v3.at, actionDigest: chainId }))]));
   st.usedNonces[a.nonce] = 0;
   st.v4 = { config, orcs, displays, confirmers, adjudicators, tally: { ...b.tally }, challengeIssuer: { ...b.challengeIssuer },
-    usedChallenges: {}, screenDigests: {}, claims: [], burnedPlanKeys: {}, lockdowns: [], gcase: null, gcaseHistory: [], disqualified: {}, retired: {}, removedIdvs: {}, liveness: {} };
+    usedChallenges: {}, screenDigests: {}, claims: [], burnedPlanKeys: {}, lockdowns: [], gcase: null, gcaseHistory: [], disqualified: {}, retired: {}, removedIdvs: {}, liveness: {}, suspendedBy: {}, freezeBy: null };
   return st;
 }
 
@@ -242,7 +242,7 @@ const HANDLERS4 = {
     fx.push({ type: 'RECOVERY_DEADLINE', caseId: cs.caseId, deadline: iso(cs.v4.deadline), ownerAttested });
   },
   RECOVERY_CONSENT(s, a, tr, at, fx) {
-    H3.RECOVERY_CONSENT(s, a, tr, at, fx);
+    if (!suspendedSurvivorConsent(s, a, tr, at, fx)) H3.RECOVERY_CONSENT(s, a, tr, at, fx);
     const lv = s.v4.tx.levels.at(-1); if (lv) s.case.v4.consentLevels[lv.credId] = lv.level;
   },
   RECOVERY_REPLAN(s, a, tr, at, fx) {
@@ -270,6 +270,7 @@ const HANDLERS4 = {
     if (!trusted) fail('NO_TRUSTED_CONFIRMATION_IN_CASE', 'at least one consent through a trusted display / protected confirmation, or ORC authorization');
     H3.RECOVERY_COMPLETE(s, a, tr, at, fx);
     installPlanMeta(s, cs);
+    liftProtectiveActionsOfLost(s, cs.lost, fx);
   },
   RECONSTITUTE(s, a, tr, at, fx) {
     const cs = s.case; if (!cs) fail('NO_RECOVERY_CASE');
@@ -279,6 +280,7 @@ const HANDLERS4 = {
     if (at >= cs.v4.deadline + Number(s.v4.config.completionGraceMs)) fail('RECOVERY_CASE_EXPIRED');
     H3.RECONSTITUTE(s, a, tr, at, fx);
     installPlanMeta(s, cs);
+    liftProtectiveActionsOfLost(s, cs.lost, fx);
   },
   RECOVERY_EXPIRE(s, a, tr, at, fx) {
     body(a, ['caseId', 'caseDigest']);
@@ -326,6 +328,19 @@ const HANDLERS4 = {
   },
 
   // ---------------------------------------------- R-3: governance (participant) cases
+  // F-V4-01: protective actions are recorded with their approvers, so that a recovery which revokes those approvers
+  // (a completed, owner-confirmed case) also undoes the suspensions / owner-source freeze they alone imposed.
+  SUSPEND(s, a, tr, at, fx) {
+    H3.SUSPEND(s, a, tr, at, fx);
+    s.v4.suspendedBy[a.body.credId] = (tr.approvals ?? []).map(x => x.credId).sort();
+  },
+  UNSUSPEND(s, a, tr, at, fx) { H3.UNSUSPEND(s, a, tr, at, fx); delete s.v4.suspendedBy[a.body.credId]; },
+  FREEZE(s, a, tr, at, fx) {
+    const was = s.freeze.active;
+    H3.FREEZE(s, a, tr, at, fx);
+    if (!was && s.freeze.active) s.v4.freezeBy = s.freeze.source === 'owner' ? (tr.approvals ?? []).map(x => x.credId).sort() : null;
+  },
+  UNFREEZE(s, a, tr, at, fx) { H3.UNFREEZE(s, a, tr, at, fx); s.v4.freezeBy = null; },
   GOV_CASE_OPEN(s, a, tr, at, fx) {
     body(a, ['gcaseId', 'procedure', 'accused', 'ground', 'evidence', 'replacements']);
     noCase(s, 'RECOVERY_CASE_OPEN'); noLockdown(s);
@@ -493,6 +508,41 @@ const HANDLERS4 = {
   },
 };
 
+/**
+ * F-V4-01: V3 lets a SUSPENDED survivor consent (allowSuspendedSelf), but its quorum counting excludes the subject, so
+ * that consent never counted: any single stolen key could suspend every other key and make the owner's recovery
+ * impossible. Here a suspended survivor's own single-signer consent counts, verified exactly like any consent
+ * (AuthorizationIntent, UV, one-time challenge, confirmation level). Returns false when the V3 path applies.
+ */
+function suspendedSurvivorConsent(s, a, tr, at, fx) {
+  const cs = s.case; const aps = tr.approvals ?? [];
+  if (!cs || aps.length !== 1 || tr.guardianApprovals || tr.attestation) return false;
+  const c = s.creds[aps[0]?.credId];
+  if (!c || c.status !== 'suspended' || !V3.survivors(s, cs, at).includes(c.credId)) return false;
+  body(a, ['caseId', 'caseDigest']);
+  if (a.body.caseId !== cs.caseId || a.body.caseDigest !== cs.digest) fail('RECOVERY_CASE_MISMATCH');
+  if (!('intent' in aps[0])) fail('AUTHORIZATION_INTENT_REQUIRED', a.type);
+  const r = verifyIntentApproval(s, a, aps[0], c, at, { requireUV: true });
+  if (r.signCount !== null && r.signCount !== undefined) c.signCount = r.signCount;
+  cs.consents[c.credId] = true;
+  fx.push({ type: 'RECOVERY_CONSENT', credId: c.credId, suspended: true });
+  return true;
+}
+/** F-V4-01: suspensions and an owner-source freeze imposed only by credentials this completed recovery revokes are lifted. */
+function liftProtectiveActionsOfLost(s, lost, fx) {
+  const L = new Set(lost);
+  for (const [cid, by] of Object.entries(s.v4.suspendedBy)) {
+    const c = s.creds[cid];
+    if (c && c.status === 'suspended' && by.length && by.every(x => L.has(x))) { c.status = 'active'; delete c.suspendedAt; fx.push({ type: 'SUSPENSION_LIFTED', credId: cid, by }); }
+    if (!c || c.status !== 'suspended') delete s.v4.suspendedBy[cid];
+  }
+  const fb = s.v4.freezeBy;
+  if (s.freeze.active && s.freeze.source === 'owner' && !s.freeze.requiresRepair && Array.isArray(fb) && fb.length && fb.every(x => L.has(x))) {
+    fx.push({ type: 'FREEZE_LIFTED', freezeId: s.freeze.freezeId, by: fb });
+    s.freeze = { active: false, freezeId: null, requiresRepair: false, source: null, at: s.lastAt };
+    s.v4.freezeBy = null;
+  }
+}
 function gcaseMatch(s, a) { const g = s.v4.gcase; if (!g) fail('NO_GOVERNANCE_CASE'); if (a.body?.gcaseId !== g.gcaseId || a.body?.gcaseDigest !== g.digest) fail('GOVERNANCE_CASE_MISMATCH'); return g; }
 function closeGcase(s, g, outcome, at, fx) {
   s.v4.gcaseHistory.push({ gcaseId: g.gcaseId, procedure: g.procedure, accused: g.accused, ground: g.ground, outcome, openedAt: g.openedAt, closedAt: at, ballots: Object.keys(g.ballots).length, electorate: g.electorate.length });
@@ -512,7 +562,7 @@ function proveGround(s, b, x, member, kind, at) {
     const w = ev.find(e => e.kind === 'WITHDRAWAL');
     if (!w) fail('WITHDRAWAL_NOT_SIGNED', x);
     exactFields(w, ['kind', 'subjectId', 'sig'], [], 'WITHDRAWAL_EVIDENCE');
-    if (!verifyObj(V4_DOMAINS.WITHDRAWAL, { v: WITHDRAWAL_V, accountId: s.accountId, chainId: s.chainId, subjectId: x, subjectKey: member.publicKey }, w.sig, member.publicKey)) fail('WITHDRAWAL_SIGNATURE', x);
+    if (!verifyObj(V4_DOMAINS.WITHDRAWAL, { v: WITHDRAWAL_V, accountId: s.accountId, chainId: s.chainId, gcaseId: b.gcaseId, subjectId: x, subjectKey: member.publicKey }, w.sig, member.publicKey)) fail('WITHDRAWAL_SIGNATURE', x);
     return;
   }
   // COMPROMISE: a cryptographic equivocation proof by the member's own key, or the adjudicator quorum.
@@ -544,7 +594,7 @@ function proveGround(s, b, x, member, kind, at) {
   if (ok.size < Number(s.v4.config.adjudicatorQuorum)) fail('ACCUSATION_NOT_ESTABLISHED', `${x}: ${ok.size}/${s.v4.config.adjudicatorQuorum} independent verdicts`);
 }
 
-const V3_PASSTHROUGH = new Set(['AMEND_PURPOSE', 'AMEND_MATRIX', 'FREEZE', 'UNFREEZE', 'REVOKE', 'REPLACE_VACANT', 'SUSPEND', 'UNSUSPEND', 'RATIFY_BASELINE',
+const V3_PASSTHROUGH = new Set(['AMEND_PURPOSE', 'AMEND_MATRIX', 'REVOKE', 'REPLACE_VACANT', 'RATIFY_BASELINE',
   'RECOVERY_DISPATCH', 'RECOVERY_ACK', 'RECOVERY_IDENTITY', 'RECOVERY_OFFICIAL', 'RECOVERY_GUARDIAN', 'RECOVERY_OBJECT', 'RECOVERY_WITHDRAW', 'RECOVERY_OVERRIDE', 'RECOVERY_CANCEL']);
 export const ACTION_TYPES = Object.freeze([...V3_PASSTHROUGH, ...Object.keys(HANDLERS4)]);
 

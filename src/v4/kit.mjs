@@ -106,7 +106,8 @@ export class OwnerWorldV4 extends OwnerWorld {
     if (kind === 'guardian') this.guardianKeys[id] = k; else this.idvKeys[id] = k;
     return { id, holderId, publicKey: k.publicKey, pop: signObjWith(k, V4_DOMAINS.PARTICIPANT_POP, { accountId: ACCOUNT, chainId: this.chainId4, gcaseId, id, holderId, publicKey: k.publicKey }) };
   }
-  withdrawal(id) { const k = this.participantKey(id); return { kind: 'WITHDRAWAL', subjectId: id, sig: signObjWith(k, V4_DOMAINS.WITHDRAWAL, { v: WITHDRAWAL_V, accountId: ACCOUNT, chainId: this.chainId4, subjectId: id, subjectKey: k.publicKey }) }; }
+  /** F-V4-02: a withdrawal statement is bound to ONE governance case (a statement signed once is not a standing resignation). */
+  withdrawal(id, gcaseId) { const k = this.participantKey(id); return { kind: 'WITHDRAWAL', subjectId: id, sig: signObjWith(k, V4_DOMAINS.WITHDRAWAL, { v: WITHDRAWAL_V, accountId: ACCOUNT, chainId: this.chainId4, gcaseId: String(gcaseId), subjectId: id, subjectKey: k.publicKey }) }; }
   ballot(gcase, voterId, choice) { return castBallot({ gcaseId: gcase.gcaseId, gcaseDigest: gcase.digest, voterId, signer: this.participantKey(voterId), choice, tallyPublicKey: this.tally.publicKey }); }
   livenessSign(action, id) { return signDigestWith(this.participantKey(id), V4_DOMAINS.LIVENESS, actionDigest(action)); }
   withdrawalSign(action, id) { return signDigestWith(this.participantKey(id), V4_DOMAINS.WITHDRAWAL, actionDigest(action)); }

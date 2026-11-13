@@ -181,7 +181,9 @@ test('UNAVAILABLE is not malice: needs an unanswered liveness ping for 30 days; 
 
 test('WITHDRAWAL needs the member\'s own signature; ordinary rotation needs the owner governance quorum + the outgoing guardian', async () => {
   const w = buildV4();
-  deny((await openGov(w, { accused: ['g3'], ground: 'WITHDRAWAL', evidence: [{ ...w.owner.withdrawal('g2'), subjectId: 'g3' }] })).r, 'WITHDRAWAL_SIGNATURE');
+  deny((await openGov(w, { accused: ['g3'], ground: 'WITHDRAWAL', evidence: [{ ...w.owner.withdrawal('g2', 'gcase-w1'), subjectId: 'g3' }], gcaseId: 'gcase-w1' })).r, 'WITHDRAWAL_SIGNATURE');
+  // F-V4-02: a withdrawal signed for an earlier / other case is not a standing resignation
+  deny((await openGov(w, { accused: ['g3'], ground: 'WITHDRAWAL', evidence: [w.owner.withdrawal('g3', 'gcase-other')], gcaseId: 'gcase-w2' })).r, 'WITHDRAWAL_SIGNATURE');
   assert.equal((await emergencyReplace(w, { accused: ['g3'], ground: 'WITHDRAWAL' })).stage, 'done');
   const rep = w.owner.newParticipant('guardian', 'g-rot', 'holder-rot', '-');
   deny(await w.ownerAct('GUARDIAN_ROTATE', { guardianId: 'g1', replacement: rep, ground: 'ROTATION' }, ['k1-phone', 'k2-laptop', 'k3-root-hw']), 'ATTESTATION|WITHDRAWAL');

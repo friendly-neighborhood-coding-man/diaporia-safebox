@@ -1,7 +1,7 @@
 {
  "generatedBy": "scripts/v4/mutations.mjs",
- "caught": 19,
- "total": 19,
+ "caught": 22,
+ "total": 22,
  "rows": [
   {
    "name": "R-1: RECONSTITUTE without ORC authorization",
@@ -113,6 +113,24 @@
   },
   {
    "name": "R-3: empty electorate allowed",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1
+  },
+  {
+   "name": "F-V4-01: suspended survivor consent not counted",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 3
+  },
+  {
+   "name": "F-V4-01: protective actions of revoked keys not lifted at completion",
+   "file": "src/v4/root/chain.mjs",
+   "caught": true,
+   "failingTests": 3
+  },
+  {
+   "name": "F-V4-01: owner-imposed suspensions lifted too (over-broad repair)",
    "file": "src/v4/root/chain.mjs",
    "caught": true,
    "failingTests": 1
