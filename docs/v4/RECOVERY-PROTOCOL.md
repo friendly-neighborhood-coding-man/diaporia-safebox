@@ -46,7 +46,7 @@ Gestures count physical confirmations including channel acknowledgements; prompt
 
 Procedures: `GUARDIAN_EMERGENCY_REPLACE`, `IDENTITY_VERIFIER_EMERGENCY_REPLACE`. Ordinary voluntary rotation stays `GUARDIAN_ROTATE` (outgoing guardian signs, AMEND_MATRIX quorum).
 
-1. **Open** (`GOV_CASE_OPEN`, CRITICAL): approvals from **two distinct owner roles** among DAILY, ROOT, RECOVERY, ORC (FREEZE excluded; provisional credentials excluded), as AuthorizationIntents; no guardian or attestation evidence mixed in; no recovery case or lockdown open; personal profile only.
+1. **Open** (`GOV_CASE_OPEN`, CRITICAL): approvals from **two distinct owner roles** among DAILY, ROOT, RECOVERY, ORC (FREEZE excluded; provisional credentials excluded; a **suspended** owner credential counts only together with an active ORC approval, F-V4-03), as AuthorizationIntents; no guardian or attestation evidence mixed in; no recovery case or lockdown open; personal profile only.
 2. **Grounds and evidence**, per accused member, independent of the electorate:
    - COMPROMISE / MISCONDUCT: verdicts from `adjudicatorQuorum` = 2 distinct active adjudicators, each signed, bound to the account, chain, subject and subject key, unexpired; or, for COMPROMISE of a guardian, an equivocation proof (the member's own key signed both APPROVE and OBJECT for the same action).
    - UNAVAILABLE: a liveness ping open for 30 days without a pong (pings cannot be reset while open).
