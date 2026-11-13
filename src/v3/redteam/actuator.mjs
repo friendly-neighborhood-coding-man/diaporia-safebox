@@ -62,6 +62,7 @@ export class V3Actuator {
     for (const a of list) {
       let result;
       try { result = await this.#one(a); } catch (e) { result = { error: e.code ?? 'ERROR', message: String(e.message).slice(0, 300) }; }
+      this.lastRaw = result; // (V4 harness reuses the unclipped result for its object references)
       observations.push({ type: a.type, result: clip(result) });
       this.log.push({ at: this.w.now(), action: a, result: clip(result, 600) });
     }
