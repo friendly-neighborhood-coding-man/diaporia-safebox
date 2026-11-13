@@ -1,0 +1,51 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-15T03:00:00.000Z",
+  "type": "AMEND_PURPOSE",
+  "body": {
+   "capsule": {
+    "accountId": "vault-alice.mock",
+    "allowedOperations": [
+     "PAY"
+    ],
+    "asset": "NEAR",
+    "cumulativeLimitYocto": "100000000000000000000000000",
+    "dailyLimitYocto": "5000000000000000000000000",
+    "exactProductsOnly": "false",
+    "expiresAt": "2027-12-19T00:00:00.000Z",
+    "maxCapabilityTtlMs": "7200000",
+    "perPaymentMaxYocto": "50000000000000000000000",
+    "policyEpoch": "1",
+    "principalId": "alice",
+    "products": [
+     {
+      "sku": "attacker-injected",
+      "amountYocto": "50000000000000000000000",
+      "recipientId": "merchant-a.mock"
+     },
+     {
+      "sku": "attacker-injected-2",
+      "amountYocto": "50000000000000000000000",
+      "recipientId": "merchant-a.mock"
+     }
+    ],
+    "purposeId": "household-shopping",
+    "recipients": [
+     "merchant-a.mock",
+     "merchant-b.mock",
+     "merchant-c.mock"
+    ],
+    "statement": "Pay allow-listed household merchants for owner-requested purchases only.",
+    "v": "safebox.v3.purpose",
+    "validFrom": "2026-11-13T23:59:00.000Z",
+    "version": "2"
+   }
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop",
+   "k3-root-hw"
+  ]
+ }
+]

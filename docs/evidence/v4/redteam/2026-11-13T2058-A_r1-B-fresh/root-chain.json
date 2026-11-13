@@ -1,0 +1,77 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-atk-1",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k2-laptop",
+    "k4-freeze"
+   ],
+   "subjectHolderId": "alice",
+   "note": "device loss",
+   "plan": [
+    {
+     "credId": "atk-daily-9c1e4f91",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-9c1e4f91-a8026b",
+      "seedCommitment": "96eaacf85cd69b873b1a6d17cddc1836874ab7da4d39807874ee315cfc703d58",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAA5yJEdUSPFqi1ZSE9J6TQ4sAIDd9GhY7CiqfhOYDpQkfH5qVqvddTsGVRdd1YY_W8OhRpQECAyYgASFYIKhZu1BcPev5zAgBUY5IcRz6kxVG-g2a5ZqMLQ8U88x_IlggGu24wEizJHcRg6LFCaBO_-MsHPmsHs40Rc-7ikmXgXU",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiRGRnTEhjeWJkMEluUUZKRGpCajdQaWJoSmFLN1VUZVNsVDVXb2R2LXdYWSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "atk-freeze-568461d5",
+     "role": "FREEZE",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-freeze-568461d5-8de42d",
+      "seedCommitment": "af4dbe1b1e8cbc90f15db9bfdc8eaf2af6c00d7e28fe21420def7bb0eb52424f",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAA7-A1a758wnU2BbWel3zhg0AIOERLegya7UWPX1wVKmaR6IIeQMtsjL2mH2krPp6karCpQECAyYgASFYINsIJHeBpz5mv2TuK-njG8cd9_pSsHU1OHRGznpNYC4ZIlggBiBSxNwil4PS35GhnZwxlu3Xh-lyw7Y1QYP4vsSJuUA",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWUF3WFVZN0lLcVFlTHZlSFVYVzJMSV9qcDFRSlJvTDZ1MGVEeWhHUVFodyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-atk-1",
+   "caseDigest": "4ee387040b40484a9853ddc3f7db728bbb43d136e79c0065d42c504775d79fea",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-17T21:00:00.000Z",
+  "type": "RECOVERY_EXPIRE",
+  "body": {
+   "caseId": "case-atk-1",
+   "caseDigest": "4ee387040b40484a9853ddc3f7db728bbb43d136e79c0065d42c504775d79fea"
+  },
+  "approvers": []
+ }
+]

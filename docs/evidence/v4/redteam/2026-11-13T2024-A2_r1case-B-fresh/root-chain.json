@@ -1,0 +1,107 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-r1",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k2-laptop",
+    "k3-root-hw",
+    "k4-freeze",
+    "k5-recovery-hw"
+   ],
+   "subjectHolderId": "alice",
+   "note": "lost in travel",
+   "plan": [
+    {
+     "credId": "atk-daily-78451838",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-daily-78451838-2cf7a7",
+      "seedCommitment": "0c3327926de9894a870258cdad5acb2acb705d4734e49352961f030b5eeab660",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAABNvmiNTqGPIXdtHdGRjue1cAIL3uYPAa1qniE6aHggWR-kJjtDaoX-YgijbYteAK3V2EpQECAyYgASFYIDOslA-2LI8x7A9r_mwBVHHSbxWdkW8bT7b534I7FMhtIlgg-8_xR8ET2UxnsyY_USHLfvRKonjxfQiU5lDVZoUgBMo",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicVdTOFh2ZEp4Y28xUUR2VTQyY1RnbnlwdWNvYjc4MTl2VDJJOTFOa1VUdyIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "atk-root-0cc97b0c",
+     "role": "ROOT",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "ed25519",
+     "provenance": {
+      "deviceId": "dev-atk-root-0cc97b0c-d6cd56",
+      "seedCommitment": "1f5f3e21539c559f6958f5300c60c62fec67c94ea6defe307a05fd6214dd19f3",
+      "syncProvider": "none"
+     },
+     "publicKey": "ed25519:IbeWAj22OQdmy-Rqrqh8HtREhISX85V1SpsIhv46p6M",
+     "pop": "5zgHTKrRTWBjz9dFpCRsHzXc7sXHUic0WIegEbWjj-wB1h7pPZh7r2Pkhg4ng9NFtTvz66Fl3-awnAfyH5wlCw"
+    },
+    {
+     "credId": "atk-freeze-f530c40f",
+     "role": "FREEZE",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-atk-freeze-f530c40f-e05a7a",
+      "seedCommitment": "2398e61fd3c22de4c60b9a6e618fe0714cd13abd2304d349fc42ffc26a59a122",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAABOwvaJWZFH1MtFX62F7bg6gAIM4PRnLeAZ2C6_PfG5l1eaoHkB3pi84EgdFIlHZIMshkpQECAyYgASFYIATXV1y6ZUs1_qNNkXtfmpkRtmCfMLsa2bVaV3FDB-oMIlgg8ZLTaPIstzNupBhcE8lcZDwn5ESU2Ad3dQNBNg6RBHM",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiaDVjTEVMRUJlZ2J5QjgxeHZqTlppQ05DaVQyQTVMc2hYMDdiWC1SUnd4WSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "atk-recovery-aea9d779",
+     "role": "RECOVERY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "ed25519",
+     "provenance": {
+      "deviceId": "dev-atk-recovery-aea9d779-776df3",
+      "seedCommitment": "6060f9a2268ea2f58e47bda59783cf5bd56545bae0f95486b718c5ad3ab86887",
+      "syncProvider": "none"
+     },
+     "publicKey": "ed25519:tDUxPeaNs0wcmzUBbwJQCtg3n7WRuXlo_5zCh8B0UdU",
+     "pop": "ntuq-lobIWT9UTQvG28XF1oIj0vcNjBXEA_WxbQZEzHqwtWG0jx1w4DqiZNqbQbwuvcHXSvm7qagqOcn-3abBA"
+    }
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-r1",
+   "caseDigest": "1d87e0a6cdf1d71c4666cd593fc6a01ddf09a0ed1739be27ef1e3f652cb9dc85",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-17T09:00:00.000Z",
+  "type": "RECOVERY_EXPIRE",
+  "body": {
+   "caseId": "case-r1",
+   "caseDigest": "1d87e0a6cdf1d71c4666cd593fc6a01ddf09a0ed1739be27ef1e3f652cb9dc85"
+  },
+  "approvers": []
+ }
+]

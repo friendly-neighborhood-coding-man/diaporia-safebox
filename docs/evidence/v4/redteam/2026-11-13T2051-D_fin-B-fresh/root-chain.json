@@ -1,0 +1,190 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k1-phone"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-2",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone"
+   ],
+   "subjectHolderId": "alice",
+   "plan": [
+    {
+     "credId": "new-daily-1-0",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-new-daily-1-0-7f614c",
+      "seedCommitment": "1541d52dcd73ec1b9026b828294ba5f7fd3cc6f5b819e9dbaf8ef6c2284061e0",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAb2RVBObnX-zUNFZ1WkV6_wAIJqA-R3GC3ZHIsoa9vFTbxq-sg-y5Q3pv3Rw5OxiL4O1pQECAyYgASFYIMQKhJeRHGKsTbGWQgfez8ld4ncUn8TcG2piAOnsypMOIlggTXWR2SigKqfkS0B5yzAGShK2kWpkRWN8FRKviQ84uWk",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNWlqSUc4QkplcmxuNy1EeFMxMFZRX0FwRlRlaEQyd19pWTE1elRmWVdlWSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ],
+   "note": "owner lost devices",
+   "planMeta": {
+    "new-daily-1-0": {
+     "display": "NONE",
+     "confirmer": {
+      "publicKey": "ed25519:2OhSW6tIZPY5dvLUeA27KgBwIvXbcr-w9C9JiaDGOXc",
+      "pop": "ShnsO0MZ8GvyxFOsfkegmCK8IsHOpWXBya8uuWrYWRHPYYVoOQTJo7rOOUYNKmCmsU3txBldvViOmcK6WO7hCQ"
+     }
+    }
+   }
+  },
+  "approvers": []
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_IDENTITY",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "idvId": "idv-1",
+   "holderId": "alice",
+   "method": "document-and-liveness",
+   "result": "VERIFIED"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837"
+  },
+  "approvers": [
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "6",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837"
+  },
+  "approvers": [
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "7",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "8",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837"
+  },
+  "approvers": [
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "9",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_GUARDIAN",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "guardianId": "g2",
+   "decision": "APPROVE"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "10",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_GUARDIAN",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "guardianId": "g3",
+   "decision": "APPROVE"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "11",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "channelId": "ch-email",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "12",
+  "at": "2026-11-14T09:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837",
+   "channelId": "ch-postal",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "13",
+  "at": "2026-11-17T09:00:00.000Z",
+  "type": "RECOVERY_COMPLETE",
+  "body": {
+   "caseId": "case-2",
+   "caseDigest": "a0a622fe8e07c325a138c388cc316027e43ccd4f7091936cc790f46d6bcee837"
+  },
+  "approvers": []
+ }
+]
