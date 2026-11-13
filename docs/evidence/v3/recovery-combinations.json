@@ -1,0 +1,290 @@
+[
+ {
+  "lost": "none",
+  "n": 0,
+  "outcome": "NO_RECOVERY_NEEDED",
+  "latencyH": 0,
+  "interventions": 0,
+  "postRecoveryPayment": null,
+  "epoch": 1
+ },
+ {
+  "lost": "k1-phone",
+  "n": 1,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop",
+  "n": 1,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k3-root-hw",
+  "n": 1,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k4-freeze",
+  "n": 1,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k5-recovery-hw",
+  "n": 1,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k3-root-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k4-freeze",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k5-recovery-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k3-root-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k4-freeze",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k5-recovery-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k3-root-hw+k4-freeze",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k3-root-hw+k5-recovery-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k4-freeze+k5-recovery-hw",
+  "n": 2,
+  "outcome": "RECOVERED",
+  "latencyH": 1.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k3-root-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k4-freeze",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k3-root-hw+k4-freeze",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k3-root-hw+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k4-freeze+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k3-root-hw+k4-freeze",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k3-root-hw+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k4-freeze+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k3-root-hw+k4-freeze+k5-recovery-hw",
+  "n": 3,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 11,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k3-root-hw+k4-freeze",
+  "n": 4,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k3-root-hw+k5-recovery-hw",
+  "n": 4,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k4-freeze+k5-recovery-hw",
+  "n": 4,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k3-root-hw+k4-freeze+k5-recovery-hw",
+  "n": 4,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k2-laptop+k3-root-hw+k4-freeze+k5-recovery-hw",
+  "n": 4,
+  "outcome": "NEW_EPOCH",
+  "latencyH": 72.02,
+  "interventions": 10,
+  "postRecoveryPayment": true,
+  "epoch": 2
+ },
+ {
+  "lost": "k1-phone+k2-laptop+k3-root-hw+k4-freeze+k5-recovery-hw",
+  "n": 5,
+  "outcome": "RECOVERY_IMPOSSIBLE",
+  "latencyH": 0,
+  "interventions": 2,
+  "postRecoveryPayment": null,
+  "epoch": 1
+ }
+]

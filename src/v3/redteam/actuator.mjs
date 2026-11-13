@@ -16,8 +16,8 @@ export const ACTION_SPECS = {
   root_view: { req: [], doc: 'Public Root view: epoch, versions, freeze/lockdown, open recovery case state.' },
   root_chain: { req: [], opt: ['sinceSeq', 'max'], doc: 'Read public Root chain transitions (actions, approvals, attestations are public data).' },
   root_case: { req: [], doc: 'Details of the open recovery case (caseId, caseDigest, lost set, plan roles, evidence collected so far, disputes).' },
-  build_action: { req: ['actionType', 'body'], opt: ['ttlMinutes'], doc: 'Return a correctly-headed Root action {v,type,accountId,chainId,epoch,matrixVersion,purposeVersion,nonce,issuedAt,expiresAt,body} for the CURRENT root view and its digest (hex). You still need valid signatures.' },
-  submit_root: { req: ['request'], doc: 'Submit {action, approvals?, guardianApprovals?, attestation?} to the PUBLIC Root port. The Root verifies everything itself.' },
+  build_action: { req: ['actionType', 'body'], opt: ['ttlMinutes', 'nonce', 'planOwnCredIds', 'newCredentialOwnCredId'], doc: 'Return a correctly-headed Root action {v,type,accountId,chainId,epoch,matrixVersion,purposeVersion,nonce,issuedAt,expiresAt,body} for the CURRENT root view and its digest (hex). You still need valid signatures. Optional: nonce (reuse a 32-hex nonce), planOwnCredIds (put enrollments of YOUR generated keys, bound to this action nonce, into body.plan), newCredentialOwnCredId (same, into body.newCredential). The built action is remembered by its digest.' },
+  submit_root: { req: ['request'], doc: 'Submit {action | actionDigest, approvals?, guardianApprovals?, attestation?} to the PUBLIC Root port. actionDigest refers to an action you built with build_action. The Root verifies everything itself.' },
   enroll_new_keys: { req: ['roles', 'actionNonce'], doc: 'Generate fresh attacker-controlled credentials for the given roles (e.g. ["DAILY","ROOT"]) and return enrollment objects bound to the given action nonce (for RECOVERY_OPEN.plan, ROTATE.newCredential, ...). You then hold these keys (use sign_own).' },
   sign_own: { req: ['credId', 'digestHex'], opt: ['domain'], doc: 'Sign a 32-byte digest with an attacker-generated credential (from enroll_new_keys). domain: "action" (default) or "paycap".' },
   sign_stolen: { req: ['credId', 'digestHex'], opt: ['domain'], doc: 'Use a STOLEN owner device you hold (see your compromise list) to approve a digest. domain "action" or "paycap". Passkeys produce WebAuthn assertions with user verification (you know the PIN).' },
@@ -51,7 +51,7 @@ export class V3Actuator {
   /** w: in-process V3 world. compromise: { stolen: [credId], channels: [channelId], guardians: [gid], idvs: [idvId] } */
   constructor({ w, compromise, onAttackerCase }) {
     this.w = w; this.compromise = compromise; this.onAttackerCase = onAttackerCase;
-    this.caps = []; this.own = new Map(); this.log = [];
+    this.caps = []; this.own = new Map(); this.built = new Map(); this.log = [];
   }
   receiveTask(pc) { this.caps.push(pc); return this.caps.length - 1; }
   #view() { return { ...this.w.root.view(), now: this.w.now() }; }
@@ -79,9 +79,18 @@ export class V3Actuator {
           survivorsNeeded: Object.values(w.root.state.creds).filter(x => (x.status === 'active' || x.status === 'suspended') && !c.lost.includes(x.credId)).map(x => x.credId) }; }
       case 'build_action': { const v = this.#view(); const t = v.now;
         const act = { v: ACTION_V, type: String(a.actionType), accountId: ACCOUNT, chainId: v.chainId, epoch: String(v.epoch), matrixVersion: v.matrixVersion, purposeVersion: v.purposeVersion,
-          nonce: mkNonce(), issuedAt: iso(t), expiresAt: iso(t + Math.min(Number(a.ttlMinutes) || 60, 5760) * 60_000), body: a.body };
-        return { action: act, digestHex: actionDigest(act).toString('hex') }; }
-      case 'submit_root': { const req = a.request ?? {}; const r = await w.publicRoot.request('SUBMIT', { request: req });
+          nonce: /^[0-9a-f]{32}$/.test(String(a.nonce ?? '')) ? String(a.nonce) : mkNonce(), issuedAt: iso(t), expiresAt: iso(t + Math.min(Number(a.ttlMinutes) || 60, 5760) * 60_000), body: a.body };
+        // harness usability (campaign B): the attacker may reference its OWN generated keys instead of copying enrollment blobs
+        const ownEnroll = (id) => { const d = this.own.get(String(id)); if (!d) throw Object.assign(new Error('UNKNOWN_OWN_CREDENTIAL ' + id), { code: 'UNKNOWN_OWN_CREDENTIAL' }); return d.enrollment(ACCOUNT, `${ACCOUNT}:${act.nonce}`); };
+        if (Array.isArray(a.planOwnCredIds)) act.body = { ...(act.body ?? {}), plan: a.planOwnCredIds.slice(0, 6).map(ownEnroll) };
+        if (a.newCredentialOwnCredId) act.body = { ...(act.body ?? {}), newCredential: ownEnroll(a.newCredentialOwnCredId) };
+        const digestHex = actionDigest(act).toString('hex'); this.built.set(digestHex, act); if (this.built.size > 64) this.built.delete(this.built.keys().next().value);
+        const shown = act.body?.plan || act.body?.newCredential ? { ...act, body: { ...act.body, plan: act.body.plan?.map(p => ({ credId: p.credId, role: p.role, enrolled: true })), newCredential: act.body.newCredential ? { credId: act.body.newCredential.credId, enrolled: true } : undefined } } : act;
+        return { action: shown, digestHex }; }
+      case 'submit_root': { const req = { ...(a.request ?? {}) };
+        if (!req.action && req.actionDigest) { req.action = this.built.get(String(req.actionDigest)); if (!req.action) return { error: 'UNKNOWN_ACTION_DIGEST' }; }
+        delete req.actionDigest;
+        const r = await w.publicRoot.request('SUBMIT', { request: req });
         if (r.ok && req.action?.type === 'RECOVERY_OPEN') this.onAttackerCase?.(req.action.body?.caseId);
         await w.pump(); return r; }
       case 'enroll_new_keys': { const roles = Array.isArray(a.roles) ? a.roles.slice(0, 6) : []; const n = String(a.actionNonce);
