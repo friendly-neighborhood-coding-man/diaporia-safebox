@@ -54,7 +54,7 @@ export function buildV3({ dir, clock, profile = 'personal', config = {}, capsule
     deliver: async (ch, msg) => { (inbox[ch] ??= []).push(msg); }, submit: async (req) => w.root.submit(req) });
 
   w.restartVault = () => { w.vault.store.close(); w.vault = openVault(); w.vops = vaultOps(w.vault); w.gz = new DirectClient(w.vops.gz); w.vctl = new DirectClient(w.vops.ctl); return w.vault; };
-  w.restartRoot = () => { w.root.close(); w.root = openRoot(); w.rootOps = rootOps(w.root); w.admin = new DirectClient(w.rootOps.admin); return w.root; };
+  w.restartRoot = () => { try { w.root.close(); } catch {} w.root = openRoot(); w.rootOps = rootOps(w.root); w.admin = new DirectClient(w.rootOps.admin); return w.root; };
   /** Propagate: recovery service reacts to root effects, vault syncs from the Root replica feed. */
   w.pump = async () => {
     for (let i = 0; i < 4 && w.pendingEffects.length; i++) {

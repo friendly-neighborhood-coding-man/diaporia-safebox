@@ -9,14 +9,17 @@ import { b64u } from '../common/canon.mjs';
 const sha = (b) => createHash('sha256').update(b).digest();
 
 export class SoftAuthenticator {
-  constructor({ label = 'passkey', aaguid = randomBytes(16), backupEligible = false, counter = true } = {}) {
-    const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+  constructor({ label = 'passkey', aaguid = randomBytes(16), backupEligible = false, counter = true, keyPair = null } = {}) {
+    const { privateKey, publicKey } = keyPair ?? generateKeyPairSync('ec', { namedCurve: 'P-256' });
     this.label = label; this.aaguid = Buffer.from(aaguid); this.be = backupEligible; this.useCounter = counter;
     this.credentialId = randomBytes(32); this.counter = 0;
     Object.defineProperty(this, 'priv', { value: privateKey, enumerable: false });
+    Object.defineProperty(this, 'pub', { value: publicKey, enumerable: false });
     const j = publicKey.export({ format: 'jwk' });
     this.cose = new Map([[1, 2], [3, -7], [-1, 1], [-2, Buffer.from(j.x, 'base64url')], [-3, Buffer.from(j.y, 'base64url')]]);
   }
+  /** ATTACK SIMULATION ONLY: a byte-for-byte copy of this authenticator (cloned key + current counter). */
+  cloneForAttack() { const c = new SoftAuthenticator({ label: this.label + '-clone', aaguid: this.aaguid, backupEligible: this.be, keyPair: { privateKey: this.priv, publicKey: this.pub } }); c.credentialId = this.credentialId; c.counter = this.counter; return c; }
   get credentialIdB64u() { return b64u(this.credentialId); }
   #authData(rpId, { uv = true, up = true, attested = false } = {}) {
     if (this.useCounter) this.counter++;
