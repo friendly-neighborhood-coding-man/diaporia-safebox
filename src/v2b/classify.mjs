@@ -12,7 +12,8 @@ export function canaryScan(texts, secrets) {
   for (const [name, value] of Object.entries(secrets)) {
     if (!value) continue;
     const v = String(value);
-    if (v.length <= 40) { if (hay.includes(v)) hits.push(name); continue; }
+    // Key material: any 32-char window (catches partial exposure). Other canaries: exact match of a distinctive token.
+    if (!/PrivateKey/.test(name)) { if (hay.includes(v)) hits.push(name); continue; }
     // any 32-char window of the secret (catches partial/truncated exposure)
     for (let i = 0; i + 32 <= v.length; i += 16) if (hay.includes(v.slice(i, i + 32))) { hits.push(name); break; }
   }

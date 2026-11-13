@@ -11,6 +11,7 @@ export class ClaudeBrain {
     Object.assign(this, { model, system, home, env, asUser, claudeBin, cwd, turnTimeoutMs });
     this.proc = null; this.buf = ''; this.waiter = null; this.init = null; this.transcript = []; this.lastCost = 0;
     this.usage = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }; this.costUsd = 0; this.calls = 0;
+    this.safetyStops = 0; this.modelUsage = {}; this.servedModels = {};
   }
   start() {
     const args = ['-p', '--model', this.model, '--tools', '', '--strict-mcp-config', '--no-session-persistence', '--setting-sources', '',
@@ -27,7 +28,7 @@ export class ClaudeBrain {
         const line = this.buf.slice(0, i); this.buf = this.buf.slice(i + 1);
         let m; try { m = JSON.parse(line); } catch { continue; }
         if (m.type === 'system' && m.subtype === 'init') this.init = { model: m.model, tools: m.tools, mcp_servers: m.mcp_servers, memory_paths: m.memory_paths, apiKeySource: m.apiKeySource, claude_code_version: m.claude_code_version, skills: m.skills, plugins: m.plugins, agents: m.agents };
-        if (m.type === 'assistant') this.lastModel = m.message?.model ?? this.lastModel;
+        if (m.type === 'assistant') { this.lastModel = m.message?.model ?? this.lastModel; this.turnModels?.add(this.lastModel); }
         if (m.type === 'result' && this.waiter) { const w = this.waiter; this.waiter = null; w.resolve(m); }
       }
     });
@@ -40,20 +41,25 @@ export class ClaudeBrain {
     const res = await new Promise((resolve, reject) => {
       const timer = setTimeout(() => { this.waiter = null; reject(new Error('brain turn timeout')); }, this.turnTimeoutMs);
       this.waiter = { resolve: (m) => { clearTimeout(timer); resolve(m); }, reject: (e) => { clearTimeout(timer); reject(e); } };
+      this.turnModels = new Set();
       this.proc.stdin.write(JSON.stringify({ type: 'user', message: { role: 'user', content: text } }) + '\n');
     });
     this.calls++;
     const u = res.usage ?? {};
     for (const k of Object.keys(this.usage)) this.usage[k] += u[k] ?? 0;
     const cum = Number(res.total_cost_usd ?? 0); const turnCost = Math.max(0, cum - this.lastCost); this.lastCost = cum; this.costUsd = cum;
+    // Safety-classifier stops: the CLI withholds the stopped response and retries on a fallback model; record both.
+    const stops = Number(res.safety_stops ?? 0); this.safetyStops += stops;
+    for (const [k, v] of Object.entries(res.model_usage_since_last_result ?? {})) { const a = this.modelUsage[k] ??= { outputTokens: 0, costUSD: 0 }; a.outputTokens += v.outputTokens ?? 0; a.costUSD += v.costUSD ?? 0; }
+    const models = [...(this.turnModels ?? [])]; for (const m of models) this.servedModels[m] = (this.servedModels[m] ?? 0) + 1;
     const parsed = parseModelReply(res.result);
     const entry = { at: new Date().toISOString(), wallMs: Date.now() - t0, input: text, reply: res.result, isError: !!res.is_error, stopReason: res.stop_reason ?? null,
-      usage: { input_tokens: u.input_tokens, output_tokens: u.output_tokens, cache_read_input_tokens: u.cache_read_input_tokens, cache_creation_input_tokens: u.cache_creation_input_tokens }, turnCostUsd: turnCost, model: this.lastModel ?? this.model };
+      usage: { input_tokens: u.input_tokens, output_tokens: u.output_tokens, cache_read_input_tokens: u.cache_read_input_tokens, cache_creation_input_tokens: u.cache_creation_input_tokens }, turnCostUsd: turnCost, model: this.lastModel ?? this.model, servedModels: models, safetyStops: stops };
     this.transcript.push(entry);
     return { parsed, reply: res.result, entry };
   }
   stop() { try { this.proc?.stdin.end(); } catch {} setTimeout(() => { try { this.proc?.kill('SIGTERM'); } catch {} }, 2000).unref?.(); }
-  stats() { return { model: this.model, servedModel: this.lastModel ?? null, calls: this.calls, usage: this.usage, costUsd: this.costUsd, init: this.init }; }
+  stats() { return { model: this.model, servedModel: this.lastModel ?? null, servedModels: this.servedModels, safetyStops: this.safetyStops, modelUsage: this.modelUsage, calls: this.calls, usage: this.usage, costUsd: this.costUsd, init: this.init }; }
 }
 
 /** Deterministic stand-in used ONLY for plumbing tests and the scripted smoke suite. NOT an LLM. */

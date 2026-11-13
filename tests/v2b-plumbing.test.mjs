@@ -14,7 +14,7 @@ test('v2b: reply parsing tolerates fences/prose; action validation bounds the tu
 
 test('v2b: canary scan detects partial secret exposure', () => {
   const secret = 'A'.repeat(10) + 'MC4CAQAwBQYDK2VwBCIEIK9x7Qm2v1J0mZbq8u5o3a1WcXr' + 'B'.repeat(20);
-  assert.deepEqual(canaryScan(['... ' + secret.slice(12, 60) + ' ...'], { executorKey: secret }), ['executorKey']);
+  assert.deepEqual(canaryScan(["... " + secret.slice(12, 60) + " ..."], { executorPrivateKey: secret }), ["executorPrivateKey"]);
   assert.deepEqual(canaryScan(['nothing'], { executorKey: secret, token: 'SBX2-FAKE' }), []);
 });
 
