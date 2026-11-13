@@ -81,11 +81,16 @@ function verifyOwnerQuorum(s, a, approvals, at) {
   if (s.matrix.profile !== 'personal') fail('EMERGENCY_PROCEDURE_PERSONAL_PROFILE_ONLY');
   if (!Array.isArray(approvals) || approvals.length < 2 || approvals.length > 6) fail('EMERGENCY_OWNER_QUORUM_SHAPE');
   const seen = new Set(), roles = new Set(), who = [];
+  // F-V4-03 (fresh campaign B_r3 on 69d5f08): one-signature SUSPENDs by stolen keys could strip the owner of every
+  // second role, so the guardian majority blocking the recovery could never be replaced. With an ORC approval in the
+  // same quorum (the independent owner anchor), a SUSPENDED (never revoked / retired) owner credential may supply the
+  // second role; without the ORC, suspended credentials never count.
+  const withOrc = approvals.some(ap => ap && typeof ap.credId === 'string' && s.v4.orcs[ap.credId]);
   for (const ap of approvals) {
     if (!ap || typeof ap.credId !== 'string' || seen.has(ap.credId)) fail('DUPLICATE_APPROVAL'); seen.add(ap.credId);
     if (s.v4.orcs[ap.credId]) { verifyOrcApproval(s, a, ap, at); roles.add('ORC'); who.push(ap.credId); continue; }
     const c = s.creds[ap.credId];
-    if (!c || c.status !== 'active') fail('APPROVAL_CREDENTIAL_NOT_ACTIVE', ap.credId);
+    if (!c || !(c.status === 'active' || (withOrc && c.status === 'suspended'))) fail('APPROVAL_CREDENTIAL_NOT_ACTIVE', ap.credId);
     if (!OWNER_QUORUM_ROLES.has(c.role)) fail('ROLE_NOT_IN_EMERGENCY_OWNER_QUORUM', c.role);
     if (Number(c.provisionalUntil ?? 0) > at) fail('PROVISIONAL_CREDENTIAL');
     const r = verifyIntentApproval(s, a, ap, c, at, { requireUV: true });

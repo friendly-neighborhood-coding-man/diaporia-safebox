@@ -1,0 +1,217 @@
+[
+ {
+  "seq": "1",
+  "at": "2026-11-14T21:00:00.000Z",
+  "type": "FREEZE",
+  "body": {
+   "freezeId": "f-1",
+   "reason": "COMPROMISE",
+   "source": "owner"
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "2",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k3-root-hw"
+  },
+  "approvers": [
+   "k1-phone",
+   "k2-laptop"
+  ]
+ },
+ {
+  "seq": "3",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k1-phone"
+  },
+  "approvers": [
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "4",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "SUSPEND",
+  "body": {
+   "credId": "k2-laptop"
+  },
+  "approvers": [
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "5",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_OPEN",
+  "body": {
+   "caseId": "case-3",
+   "kind": "KEY_LOSS",
+   "lost": [
+    "k1-phone",
+    "k2-laptop"
+   ],
+   "subjectHolderId": "alice",
+   "plan": [
+    {
+     "credId": "new-daily-1-0",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-new-daily-1-0-d58461",
+      "seedCommitment": "1e4e64174ff965701c8dfe62bb16fd15ce162da5ceeb08b28c8f0246fc14d722",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAahTopG0-d6-DTras6qt8S8AIPy6rmMkXGGtjkdppv6x7ffm2wLXNSR5tdMTxzOwG8PzpQECAyYgASFYILZy-_NCLdpTuwW6681lycDWGuagjVAQmyQNMEvUrx_RIlggLHP63KaS_7hjnPY3sk0JXLfkZn1cuWALT3zBR9-fYK8",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiOGJLTU41SWV1Y3QtZ2FGbkVaNExtTDVlU29ZZGFTbXF4U3pNdFNRLVRmNCIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    },
+    {
+     "credId": "new-daily-2-1",
+     "role": "DAILY",
+     "holderId": "alice",
+     "channelId": "ch-phone",
+     "kind": "passkey",
+     "provenance": {
+      "deviceId": "dev-new-daily-2-1-8b8d00",
+      "seedCommitment": "0110a80395f2e0c30e69745032cd0af7fe0c0c42ab620f4d0709acff5bf6d86a",
+      "syncProvider": "none"
+     },
+     "registration": {
+      "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikACAg30-_WIeKS5MfLO-NnYbieQX7YlghbSuwlddbJaZFAAAAAe_IYEXSD0c2DMmpy9ndLf8AIOsodFmGSMwKNiABLHN9uAnBwzYJdU9C2boW8Bsd4LWXpQECAyYgASFYIJ3pnpbGPjmmkHNf2rfcismANvNaC1VbyBBkzGdjROJbIlggqszj3EjwQkIlNlUMlAo_0dk_yOueuIXis6wfxNAqGRg",
+      "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWHBXZ1dKZDV1NEhJeHNmMU1wOHA0Q0phT2RfMmh3SjNKd3dpOGJTS1d2RSIsIm9yaWdpbiI6Imh0dHBzOi8vc2FmZWJveC5sb2NhbCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"
+     }
+    }
+   ],
+   "note": "owner lost devices",
+   "planMeta": {
+    "new-daily-1-0": {
+     "display": "NONE",
+     "confirmer": {
+      "publicKey": "ed25519:I_gji3whhmq5rCt9J7KznqFEPnWnZ6Cq5dDZLF7Ie20",
+      "pop": "pj7nXdBNimslO-Bc3sWleKpbVOZSPiTjGilYUB5k1Og0vNzeooe5ud3sKxdgoFnUu_GT2DHS0yfuvUcYOTpeCg"
+     }
+    },
+    "new-daily-2-1": {
+     "display": "NONE",
+     "confirmer": {
+      "publicKey": "ed25519:tR45kn5YUoPI2sPaoPF1EUsXBv8XEWypcxRqX_eNPCE",
+      "pop": "3Hcg60g_5aC89ok4x8-8rqkT0hrGBGNPWid768vKbkTKW3Tje1a6BI-D-a52hpmjN2O75sWHGBqCk1x90XM-DA"
+     }
+    }
+   }
+  },
+  "approvers": []
+ },
+ {
+  "seq": "6",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_DISPATCH",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209",
+   "channels": [
+    "ch-email",
+    "ch-phone",
+    "ch-postal"
+   ]
+  },
+  "approvers": []
+ },
+ {
+  "seq": "7",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_IDENTITY",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209",
+   "idvId": "idv-1",
+   "holderId": "alice",
+   "method": "document-and-liveness",
+   "result": "VERIFIED"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "8",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209"
+  },
+  "approvers": [
+   "k3-root-hw"
+  ]
+ },
+ {
+  "seq": "9",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209"
+  },
+  "approvers": [
+   "k4-freeze"
+  ]
+ },
+ {
+  "seq": "10",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_CONSENT",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209"
+  },
+  "approvers": [
+   "k5-recovery-hw"
+  ]
+ },
+ {
+  "seq": "11",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_GUARDIAN",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209",
+   "guardianId": "g3",
+   "decision": "APPROVE"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "12",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209",
+   "channelId": "ch-phone",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ },
+ {
+  "seq": "13",
+  "at": "2026-11-15T00:00:00.000Z",
+  "type": "RECOVERY_ACK",
+  "body": {
+   "caseId": "case-3",
+   "caseDigest": "7e52b01a598cc48eb292d0b0b037e7cb700d9a7d0cb4b8c55fd6ac5aeefb6209",
+   "channelId": "ch-postal",
+   "decision": "NO_OBJECTION"
+  },
+  "approvers": []
+ }
+]

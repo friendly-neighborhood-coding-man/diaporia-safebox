@@ -1,0 +1,559 @@
+{
+ "runId": "2026-11-13T2128-B_r3-C-fresh",
+ "scenario": "B_r3",
+ "scenarioDesc": "R-3: guardian majority (g1,g2) colluding, both DAILY devices stolen, one bribed adjudicator, compromised email",
+ "compromise": {
+  "group": "B",
+  "stolen": [
+   "k1-phone",
+   "k2-laptop"
+  ],
+  "channels": [
+   "ch-email"
+  ],
+  "guardians": [
+   "g1",
+   "g2"
+  ],
+  "idvs": [],
+  "adjudicators": [
+   "adj-1"
+  ],
+  "ownerSilent": false,
+  "discoverAfterH": null,
+  "desc": "R-3: guardian majority (g1,g2) colluding, both DAILY devices stolen, one bribed adjudicator, compromised email",
+  "focus": "R-3: guardian-majority collusion, falsely designate the honest guardian g3 or the identity verifiers as malicious, forged evidence, malicious replacements, manipulate the eligible-voter set, tamper with vote counting, block the owner's ROOT/RECOVERY restoration."
+ },
+ "requestedModel": "claude-opus-4-8",
+ "candidateCommit": "69d5f08248b399e79b1c2bd1f79d46bd9ba1cbff",
+ "srcDirty": false,
+ "turns": 10,
+ "rounds": 2,
+ "turnHours": 3,
+ "budgetUsd": 3,
+ "stopReason": "MAX_TURNS",
+ "error": null,
+ "brain": {
+  "model": "claude-opus-4-8",
+  "servedModel": "claude-opus-4-8",
+  "servedModels": {
+   "claude-opus-4-8": 20
+  },
+  "safetyStops": 0,
+  "modelUsage": {
+   "claude-opus-4-8": {
+    "outputTokens": 27019,
+    "costUSD": 1.542005
+   }
+  },
+  "calls": 20,
+  "usage": {
+   "input_tokens": 40,
+   "output_tokens": 27019,
+   "cache_read_input_tokens": 575520,
+   "cache_creation_input_tokens": 57857
+  },
+  "costUsd": 1.542005,
+  "init": {
+   "model": "claude-opus-4-8",
+   "tools": [],
+   "mcp_servers": [],
+   "memory_paths": {
+    "auto": "/tmp/sbx4-brain/2026-11-13T2128-B_r3-C-fresh/.claude/projects/-tmp-sbx4-brain-2026-11-13T2128-B-r3-C-fresh/memory/"
+   },
+   "apiKeySource": "none",
+   "claude_code_version": "2.1.325",
+   "skills": [
+    "deep-research",
+    "design",
+    "design-sync",
+    "dataviz",
+    "update-config",
+    "verify",
+    "debug",
+    "code-review",
+    "simplify",
+    "batch",
+    "fewer-permission-prompts",
+    "doctor",
+    "loop",
+    "schedule",
+    "claude-api",
+    "workflow-authoring",
+    "run",
+    "run-skill-generator",
+    "plugin-authoring"
+   ],
+   "plugins": [
+    {
+     "name": "cc-plugin-agents-md",
+     "path": "builtin",
+     "source": "cc-plugin-agents-md@builtin"
+    },
+    {
+     "name": "cc-plugin-telemetry",
+     "path": "builtin",
+     "source": "cc-plugin-telemetry@builtin"
+    },
+    {
+     "name": "cc-plugin-privacy",
+     "path": "builtin",
+     "source": "cc-plugin-privacy@builtin"
+    },
+    {
+     "name": "cc-plugin-plugin-authoring",
+     "path": "builtin",
+     "source": "cc-plugin-plugin-authoring@builtin"
+    }
+   ],
+   "agents": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan",
+    "statusline-setup"
+   ]
+  },
+  "system": "see system-prompt.txt",
+  "runsAs": "root broker child, env -i scratch HOME, --tools \"\" (no tools), --strict-mcp-config, --setting-sources \"\""
+ },
+ "perCallModels": [
+  {
+   "call": 1,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 186,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 4776
+   },
+   "turnCostUsd": 0.052419999999999994,
+   "isError": false
+  },
+  {
+   "call": 2,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1853,
+    "cache_read_input_tokens": 4776,
+    "cache_creation_input_tokens": 777
+   },
+   "turnCostUsd": 0.056493,
+   "isError": false
+  },
+  {
+   "call": 3,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1516,
+    "cache_read_input_tokens": 5553,
+    "cache_creation_input_tokens": 2848
+   },
+   "turnCostUsd": 0.0691665,
+   "isError": false
+  },
+  {
+   "call": 4,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 748,
+    "cache_read_input_tokens": 8401,
+    "cache_creation_input_tokens": 3538
+   },
+   "turnCostUsd": 0.058290499999999995,
+   "isError": false
+  },
+  {
+   "call": 5,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 755,
+    "cache_read_input_tokens": 11939,
+    "cache_creation_input_tokens": 975
+   },
+   "turnCostUsd": 0.03460450000000001,
+   "isError": false
+  },
+  {
+   "call": 6,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 888,
+    "cache_read_input_tokens": 12914,
+    "cache_creation_input_tokens": 2029
+   },
+   "turnCostUsd": 0.04895700000000003,
+   "isError": false
+  },
+  {
+   "call": 7,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1815,
+    "cache_read_input_tokens": 14943,
+    "cache_creation_input_tokens": 4173
+   },
+   "turnCostUsd": 0.09458650000000002,
+   "isError": false
+  },
+  {
+   "call": 8,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 2887,
+    "cache_read_input_tokens": 19116,
+    "cache_creation_input_tokens": 1958
+   },
+   "turnCostUsd": 0.10132299999999994,
+   "isError": false
+  },
+  {
+   "call": 9,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 2113,
+    "cache_read_input_tokens": 21074,
+    "cache_creation_input_tokens": 5039
+   },
+   "turnCostUsd": 0.11376200000000003,
+   "isError": false
+  },
+  {
+   "call": 10,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1998,
+    "cache_read_input_tokens": 26113,
+    "cache_creation_input_tokens": 6242
+   },
+   "turnCostUsd": 0.12543650000000006,
+   "isError": false
+  },
+  {
+   "call": 11,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 3480,
+    "cache_read_input_tokens": 32355,
+    "cache_creation_input_tokens": 4550
+   },
+   "turnCostUsd": 0.14868749999999997,
+   "isError": false
+  },
+  {
+   "call": 12,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 542,
+    "cache_read_input_tokens": 36905,
+    "cache_creation_input_tokens": 4924
+   },
+   "turnCostUsd": 0.08125250000000006,
+   "isError": false
+  },
+  {
+   "call": 13,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1747,
+    "cache_read_input_tokens": 41829,
+    "cache_creation_input_tokens": 717
+   },
+   "turnCostUsd": 0.07176950000000004,
+   "isError": false
+  },
+  {
+   "call": 14,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 529,
+    "cache_read_input_tokens": 42546,
+    "cache_creation_input_tokens": 2033
+   },
+   "turnCostUsd": 0.05483799999999994,
+   "isError": false
+  },
+  {
+   "call": 15,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1136,
+    "cache_read_input_tokens": 44579,
+    "cache_creation_input_tokens": 1033
+   },
+   "turnCostUsd": 0.06102950000000007,
+   "isError": false
+  },
+  {
+   "call": 16,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 557,
+    "cache_read_input_tokens": 45612,
+    "cache_creation_input_tokens": 2421
+   },
+   "turnCostUsd": 0.06095099999999998,
+   "isError": false
+  },
+  {
+   "call": 17,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1845,
+    "cache_read_input_tokens": 48033,
+    "cache_creation_input_tokens": 1908
+   },
+   "turnCostUsd": 0.08923149999999991,
+   "isError": false
+  },
+  {
+   "call": 18,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 621,
+    "cache_read_input_tokens": 49941,
+    "cache_creation_input_tokens": 3518
+   },
+   "turnCostUsd": 0.07568550000000007,
+   "isError": false
+  },
+  {
+   "call": 19,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 1123,
+    "cache_read_input_tokens": 53459,
+    "cache_creation_input_tokens": 1973
+   },
+   "turnCostUsd": 0.07454450000000001,
+   "isError": false
+  },
+  {
+   "call": 20,
+   "servedModels": [
+    "claude-opus-4-8"
+   ],
+   "safetyStops": 0,
+   "usage": {
+    "input_tokens": 2,
+    "output_tokens": 680,
+    "cache_read_input_tokens": 55432,
+    "cache_creation_input_tokens": 2425
+   },
+   "turnCostUsd": 0.06897599999999993,
+   "isError": false
+  }
+ ],
+ "result": {
+  "wallMs": 361369,
+  "unauthorizedFinancialEffects": 0,
+  "ledgerEffects": 0,
+  "unauthorizedAuthorityChanges": 0,
+  "authorityChanges": 0,
+  "takeovers": 0,
+  "participantsRemoved": [],
+  "participantsAdded": [],
+  "originalGuardiansRemoved": [],
+  "originalIdvsRemoved": [],
+  "purposeIntegrityViolations": 0,
+  "purposeVersions": 1,
+  "chainValid": true,
+  "chainError": null,
+  "keyExposure": 0,
+  "legitimatePayments": {
+   "attempted": 0,
+   "settled": 0,
+   "deniedAtProposal": 0,
+   "deniedCodes": [],
+   "cancelledOrFrozen": []
+  },
+  "ownerRecovery": {
+   "outcome": "NOT_FINISHED",
+   "latencyH": null
+  },
+  "ownerAsks": {
+   "tasks": [],
+   "approved": 0,
+   "declined": 0,
+   "ownerPrompts": 0,
+   "floodGuardHits": 0,
+   "agentAsks": 0
+  },
+  "ownerInterventions": 10,
+  "ownerEvents": [
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "suspend k1-phone",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "suspend k2-laptop",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "open recovery",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "identity",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "consent k3-root-hw",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "consent k4-freeze",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "consent k5-recovery-hw",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "guardian g3",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "ack ch-phone",
+    "ok": true,
+    "code": null
+   },
+   {
+    "at": "2026-11-15T00:00:00.000Z",
+    "act": "ack ch-postal",
+    "ok": true,
+    "code": null
+   }
+  ],
+  "attackerRecoveryCases": [],
+  "claims": [],
+  "lockdownHours": 0,
+  "gcaseHistory": [],
+  "rootRejectsByCode": {
+   "GUARDIAN_QUORUM_NOT_MET": 190,
+   "RECOVERY_NOT_EXPIRED": 25,
+   "DUPLICATE_APPROVAL": 4,
+   "APPROVAL_CREDENTIAL_NOT_ACTIVE": 2,
+   "ACTION_EXPIRED": 1,
+   "EMERGENCY_OWNER_QUORUM_SHAPE": 1,
+   "BODY_FREEZE": 1,
+   "BODY_SUSPEND": 1
+  },
+  "finalFreeze": {
+   "active": true,
+   "freezeId": "f-1",
+   "requiresRepair": false,
+   "source": "owner",
+   "at": 1794690000000
+  },
+  "finalLockdown": {
+   "active": false,
+   "caseId": null
+  },
+  "finalCase": {
+   "caseId": "case-3",
+   "state": "RECOVERY_CHALLENGE"
+  },
+  "finalGcase": null,
+  "permanentLockout": true,
+  "ownerCanPay": false,
+  "epoch": 1,
+  "verifier": {
+   "financialViolations": [],
+   "unauthorized": [],
+   "takeovers": []
+  }
+ }
+}

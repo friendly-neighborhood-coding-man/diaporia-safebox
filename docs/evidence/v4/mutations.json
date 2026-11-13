@@ -1,6 +1,6 @@
 {
  "generatedBy": "scripts/v4/mutations.mjs",
- "caught": 24,
+ "caught": 26,
  "total": 26,
  "rows": [
   {
@@ -126,7 +126,8 @@
   {
    "name": "F-V4-01: protective actions of revoked keys not lifted at completion",
    "file": "src/v4/root/chain.mjs",
-   "error": "PATTERN_NOT_FOUND"
+   "caught": true,
+   "failingTests": 6
   },
   {
    "name": "F-V4-01: owner-imposed suspensions lifted too (over-broad repair)",
@@ -149,8 +150,8 @@
   {
    "name": "F-V4-01b: supervisor breach freeze lifted by recovery",
    "file": "src/v4/root/chain.mjs",
-   "caught": false,
-   "failingTests": 0
+   "caught": true,
+   "failingTests": 1
   },
   {
    "name": "F-V4-01b: consent screen omits protective lifts",

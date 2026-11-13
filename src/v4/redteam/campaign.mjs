@@ -4,7 +4,7 @@
 import { buildV4 } from '../world.mjs';
 import { V4Actuator } from './actuator.mjs';
 import { turnMessage } from './prompt.mjs';
-import { openCaseV4, evidence4 as E } from '../recovery/sim.mjs';
+import { openCaseV4, evidence4 as E, openGov, govVote, govTally } from '../recovery/sim.mjs';
 import { survivors, actionDigest } from '../root/chain.mjs';
 import { buildSummary } from '../intent/summary.mjs';
 
@@ -99,6 +99,16 @@ export class OwnerSimV4 {
       if (root && daily) await this.act('unfreeze ' + st.freeze.freezeId, w.ownerAct('UNFREEZE', { freezeId: st.freeze.freezeId }, [daily, root]));
     }
     // discover stolen devices: suspend them, then recover
+    if (this.r3 && !this.r3.done) {
+      const g = w.root.state.v4.gcase;
+      if (g && g.gcaseId === this.r3.gcaseId && g.state === 'VOTING') {
+        for (const v of g.electorate.filter(v => !this.sc.guardians.includes(v) && !this.sc.idvs.includes(v) && !g.ballots[v])) await this.act('ballot ' + v, govVote(w, v, 'APPROVE'));
+        if (w.root.state.v4.gcase?.electorate.every(v => w.root.state.v4.gcase.ballots[v])) await this.act('tally', govTally(w));
+      } else if (g && g.gcaseId === this.r3.gcaseId && g.state === 'APPROVED' && w.now() >= g.executeAfter) {
+        const x = await w.recovery.tryGovExecute(w.root.state); await w.pump(); this.log({ act: 'execute R-3', ok: !!x.ok, code: x.code ?? null });
+      } else if (!g || g.gcaseId !== this.r3.gcaseId) { this.r3.done = true; this.log({ act: 'R-3 closed', outcome: w.root.state.v4.gcaseHistory.find(h => h.gcaseId === this.r3.gcaseId)?.outcome }); }
+      if (!this.r3.done) return;
+    }
     // the owner notices (suspension notices go to every channel) when one of the keys it holds is suspended
     const noticed = this.heldKeys().some(c => c.status === 'suspended');
     if (!this.recovery && !w.root.state.case && ((this.sc.discoverAfterH !== null && now - this.t0 >= this.sc.discoverAfterH * H) || noticed)) {
@@ -133,6 +143,22 @@ export class OwnerSimV4 {
     if (c2 && (c2.state === 'RECONSTITUTION') && !c2.v4.ownerAuth) await tryStep('orc-authorize', E.orcAuthorize(w));
     const r = await w.recovery.tryComplete(w.root.state); await w.pump();
     if (r.ok) this.log({ act: 'recovery completed' });
+    // R-3: a colluding guardian majority withholds the recovery quorum. After 6 h the owner cancels the stuck case with
+    // the ORC and asks the independent (non-bribed) adjudicators for MISCONDUCT verdicts against the refusing guardians.
+    // ASSUMPTION (reported): honest adjudicators find documented refusal to be misconduct.
+    if (!r.ok && r.code === 'GUARDIAN_QUORUM_NOT_MET') {
+      rc.stuckSince ??= w.now();
+      const refusing = Object.keys(w.root.state.guardians).filter(g => w.root.state.guardians[g].status === 'active' && this.sc.guardians.includes(g));
+      const adj = Object.keys(w.owner.adjudicatorKeys).filter(x => !this.sc.adjudicators.includes(x)).slice(0, 2);
+      if (!this.r3 && w.now() - rc.stuckSince >= 6 * H && refusing.length && adj.length >= 2) {
+        await this.act('orc-cancel own stuck case', E.orcCancel(w));
+        const second = this.heldKeys().find(c => ['ROOT', 'RECOVERY', 'DAILY'].includes(c.role) && w.owner.dev(c.credId)?.kind !== 'passkey')?.credId ?? this.heldKeys().find(c => c.role !== 'FREEZE')?.credId;
+        const o = await openGov(w, { accused: refusing, ground: 'MISCONDUCT', adj, owners: ['orc-1', second] });
+        this.log({ act: 'open R-3 replacement', ok: o.r.ok, code: o.r.ok ? null : o.r.error.code, accused: refusing });
+        if (o.r.ok) { this.myGcases.add(o.gcaseId); this.r3 = { gcaseId: o.gcaseId }; }
+        this.recovery = null; // re-open the recovery after the replacement executes
+      }
+    }
   }
 }
 

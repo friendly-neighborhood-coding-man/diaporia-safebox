@@ -29,6 +29,8 @@ const M = [
   ['F-V4-01b: freeze lifted although another hold remains', 'src/v4/root/chain.mjs', "dropped.length && !s.v4.freezeHolds.length && s.freeze.source", "dropped.length && s.freeze.source"],
   ['F-V4-01b: supervisor breach freeze lifted by recovery', 'src/v4/root/chain.mjs', "&& s.freeze.source === 'owner' && !s.freeze.requiresRepair) {", ") {"],
   ['F-V4-01b: consent screen omits protective lifts', 'src/v4/intent/summary.mjs', "...protectiveLiftLines(s, cs)]", "]"],
+  ['F-V4-03: suspended owner keys never count in the emergency owner quorum', 'src/v4/root/chain.mjs', "(withOrc && c.status === 'suspended')", "false"],
+  ['F-V4-03: suspended owner keys count even without the ORC', 'src/v4/root/chain.mjs', "(withOrc && c.status === 'suspended')", "c.status === 'suspended'"],
 ];
 const rows = [];
 for (const [name, file, from, to] of M) {

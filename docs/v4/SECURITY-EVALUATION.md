@@ -23,17 +23,17 @@ Branch `feature/v4-intent-bound-recovery` (Draft PR #6, never merge), base V3 `f
 | Not implemented | on-chain SUSPEND / UNAVAILABLE / WITHDRAWAL grounds / ballot sealing; ZK tally; hardware attestation | RESIDUAL-RISKS.md |
 | Blocked | Testnet deployment; hardware trusted UI | |
 
-## 2. Test totals (candidate B, `780e676`)
+## 2. Test totals (candidate C, `69d5f08`; candidate B `780e676` had JS 299/299 and 22/22 mutations)
 
 | Suite | Result | Command |
 |---|---|---|
-| All JS (V1, V2, V2-B, V3, V4) | **299 / 299 pass** (V1–V3: 208, unchanged from V3; V4: 91) | `npm test` (as root for the OS tests) |
-| V4 JS | 91 / 91 | `npm run v4:test` |
+| All JS (V1, V2, V2-B, V3, V4) | **302 / 302 pass** (V1–V3: 208, unchanged from V3; V4: 94) | `npm test` (as root for the OS tests) |
+| V4 JS | 94 / 94 | `npm run v4:test` |
 | Rust contract (V1) | 5 / 5 | `npm run test:contract` |
 | Rust contract-v3 | 24 / 24 | `npm run test:contract-v3` |
 | Rust contract-v4 | 34 / 34 | `npm run test:contract-v4` |
-| Mutation testing | **22 / 22 caught** (first run on A: 15 / 19, then 4 targeted tests; F-V4-01 adds 3 mutations) | `npm run v4:mutations`; `docs/evidence/v4/mutations.json`, `mutations-run1.json` |
-| Recovery matrix | 32 / 32 subsets as expected, 11 named scenarios; regenerated on B unchanged | `npm run v4:matrix`; `docs/evidence/v4/recovery-matrix.{json,md}` |
+| Mutation testing | **26 / 26 caught** (first run on A: 15 / 19, then 4 targeted tests; F-V4-01 adds 3 and F-V4-01b 4 mutations) | `npm run v4:mutations`; `docs/evidence/v4/mutations.json`, `mutations-run1.json` |
+| Recovery matrix | 32 / 32 subsets as expected, 11 named scenarios; regenerated on B and C unchanged | `npm run v4:matrix`; `docs/evidence/v4/recovery-matrix.{json,md}` |
 | OS privilege matrix | 360 checks, 0 violations | `sudo npm run v4:os` |
 
 ## 3. R-1 closure (acceptance 1, 4)
@@ -118,7 +118,9 @@ The repair is not FREEZE-based: no denial in the replay relies on a global freez
 3. **Invariant**: owner intent preservation (INV-V4-05 / INV-V4-10 side: an automatic cleanup must not undo a deliberate owner action).
 4. **Fix**: every FREEZE (including a reinforcement) is its own hold with provenance (`s.v4.freezeHolds`: approvers, or `source:supervisor`). A completed recovery drops only the holds placed solely by keys it revokes. The freeze lifts only if no other hold remains, it is an owner-source freeze, and it is not a supervisor breach freeze (that one lifts only with its trusted repair certificate). The consent / ORC screen lists every suspension it would reactivate and every freeze hold it would drop, and whether the freeze stays, so the owner approves those effects explicitly (bound through `summaryDigest`).
 5. **Tests**: REINFORCEMENT (vault stays frozen; the owner unfreezes with K2 + K3); SUPERVISOR (both orders: the breach freeze stays and requires repair); HONEST OWNER FREEZE (a freeze placed with a key that is later rotated stays; one placed with a key later lost is shown, a declining owner keeps it, an approving owner can re-freeze with one tap).
-6. **Mutations**: 4 new (reinforcement not recorded, lift despite another hold, supervisor freeze lifted, disclosure removed).
+6. **Mutations**: 4 new (reinforcement not recorded, lift despite another hold, supervisor freeze lifted, disclosure removed), all caught (the supervisor one only by a defence-in-depth test, since the supervisor's own hold already keeps the freeze).
+7. **Regressions**: JS 302/302; recovery matrix unchanged; contract code unchanged.
+8. **Frozen**: `69d5f08`; fresh campaigns in §6.4.
 
 ### F-V4-02: withdrawal statements were standing resignations (found in self-review)
 

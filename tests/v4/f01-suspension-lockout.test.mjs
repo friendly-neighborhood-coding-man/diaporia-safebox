@@ -136,3 +136,30 @@ test('F-V4-01b HONEST OWNER FREEZE: a freeze placed with a key that is later rot
   ok(await freeze(w3, 'fz-again', ['k2-laptop']));
   assert.equal(w3.root.state.freeze.active, true, 're-freeze with one tap');
 });
+
+// ---- F-V4-03 (fresh campaign B_r3 on 69d5f08): stolen k1+k2 suspend k3/k4/k5 and freeze; guardians g1+g2 collude and
+// refuse the owner's recovery (GUARDIAN_QUORUM_NOT_MET). On 69d5f08 the owner could not open the R-3 replacement either:
+// the emergency owner quorum accepted only ACTIVE credentials, leaving the ORC as the only role.
+const { emergencyReplace } = await import('../../src/v4/recovery/sim.mjs');
+test('F-V4-03 DEADLOCK: suspended owner keys + colluding guardian majority => ORC + suspended K3 open R-3, replace g1/g2, owner recovers', async () => {
+  const w = buildV4();
+  await lockout(w, ['k1-phone', 'k2-laptop'], (t, b, c) => w.legacyAct(t, b, c, { notIntended: true }));
+  // without the ORC a suspended credential never counts
+  const noOrc = await emergencyReplace(w, { accused: ['g1', 'g2'], ground: 'MISCONDUCT', adj: ['adj-2', 'adj-3'], owners: ['k3-root-hw', 'k5-recovery-hw'] });
+  assert.equal(noOrc.stage, 'open'); assert.match(noOrc.code, /APPROVAL_CREDENTIAL_NOT_ACTIVE/);
+  const g = await emergencyReplace(w, { accused: ['g1', 'g2'], ground: 'MISCONDUCT', adj: ['adj-2', 'adj-3'], owners: ['orc-1', 'k3-root-hw'] });
+  assert.equal(g.stage, 'done', JSON.stringify(g)); assert.equal(g.outcome, 'EXECUTED');
+  const r = await legitimateRecoveryV4(w, ['k1-phone', 'k2-laptop']);
+  assert.equal(r.outcome, 'RECOVERED', JSON.stringify(r));
+  for (const k of ['k3-root-hw', 'k4-freeze', 'k5-recovery-hw']) assert.equal(status(w)[k], 'active', k);
+  assert.equal(w.root.state.freeze.active, false);
+  const v = await w.verify(); assert.equal(v.takeovers.length, 0);
+});
+
+test('F-V4-03 narrowness: a thief holding a suspended key and one active role still cannot form the emergency quorum without the ORC', async () => {
+  const w = buildV4();
+  // the owner suspends the stolen K1 with K2; the thief also holds K5
+  ok(await w.legacyAct('SUSPEND', { credId: 'k1-phone' }, ['k2-laptop'], { notIntended: true }));
+  const r = await emergencyReplace(w, { accused: ['g3'], ground: 'COMPROMISE', adj: ['adj-1', 'adj-2'], owners: ['k1-phone', 'k3-root-hw'] });
+  assert.equal(r.stage, 'open'); assert.match(r.code, /APPROVAL_CREDENTIAL_NOT_ACTIVE/);
+});
