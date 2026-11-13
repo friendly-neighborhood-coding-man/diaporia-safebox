@@ -10,13 +10,13 @@ import { RedTeamZone } from './actuator.mjs';
 import { Campaign, TECHNIQUE } from './campaign.mjs';
 import { classify } from './classify.mjs';
 
-export async function runRedTeamInProcess({ seed, hours = 4, brain, maxTurns = 10, rounds = 1, injectFlaw = null, worldOpts = {}, onFrozen = null }) {
+export async function runRedTeamInProcess({ seed, hours = 4, brain, maxTurns = 10, rounds = 1, injectFlaw = null, worldOpts = {}, onFrozen = null, capAmountMode = null }) {
   const w = buildWorld({ injectFlaw, ...worldOpts });
   await w.loadPolicies(); await w.watchdog.scan();
   const zone = new RedTeamZone({ gz: w.gz, now: w.now, makeClient: () => new DirectClient(sensitiveOps(w.zone).gz) });
   const ctl = new Controller({ clock: w.clock, step: async () => { w.wallClock.t += 1; await w.watchdog.scan(); await w.ctl.call('TICK', {}); },
     owner: w.owner, worker: zone, ledgerRead: w.ledgerRead, isFrozen: () => w.freezeStore.isFrozen(), executorKey: w.executor.publicKey,
-    genesisTotalYocto: GENESIS_TOTAL, freezeLog: () => w.freezeStore.freezeLog() });
+    genesisTotalYocto: GENESIS_TOTAL, freezeLog: () => w.freezeStore.freezeLog(), capOptions: capAmountMode ? { amountMode: capAmountMode } : {} });
   const workload = generateWorkload({ seed: 'v2b:' + seed, hours, t0: w.now(), techniques: [TECHNIQUE], merchants: [...MERCHANTS] });
   const worker = { handleTask: (t) => zone.handleTask(t), slot: (t) => zone.receiveSlotTask(t), act: (a) => zone.act(a) };
   const camp = new Campaign({ ctl, worker, brain, maxTurns, rounds, budgetUsd: Infinity });

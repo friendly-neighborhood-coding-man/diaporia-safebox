@@ -33,6 +33,7 @@ export function evaluatePayment(f) {
   try { amt = BigInt(r.amountYocto); } catch { amt = -1n; }
   rule(amt > 0n, 'INVALID_AMOUNT');
   rule(amt <= BigInt(c.maxAmountYocto), 'AMOUNT_OVER_CAPABILITY');
+  if (c.amountMode === 'exact') rule(amt === BigInt(c.maxAmountYocto), 'AMOUNT_NOT_EXACT');
   rule(amt <= BigInt(p.maxPerPaymentYocto), 'AMOUNT_OVER_PER_PAYMENT_LIMIT');
   const u = f.usage;
   rule(BigInt(u.committedYocto) + amt <= BigInt(p.maxCumulativeYocto), 'CUMULATIVE_LIMIT');

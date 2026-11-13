@@ -53,8 +53,10 @@ function peekKey(signed, trustedOwnerKeys) {
 const CAP_FIELDS = ['v', 'capId', 'principalId', 'policyId', 'recipientId', 'asset', 'maxAmountYocto', 'taskRef', 'issuedAt', 'expiresAt'];
 export function openCapability(signed, trustedOwnerKeys) {
   const c = openSigned(V2_DOMAINS.CAPABILITY, signed, peekKey(signed, trustedOwnerKeys), 2048);
-  requireExactFields(c, CAP_FIELDS);
+  // amountMode (optional, F-B01): 'exact' binds the payment to exactly maxAmountYocto (the owner's intended price).
+  requireExactFields(c, 'amountMode' in c ? [...CAP_FIELDS, 'amountMode'] : CAP_FIELDS);
   if (c.v !== CAP_V) fail('UNSUPPORTED_VERSION');
+  if ('amountMode' in c && c.amountMode !== 'exact' && c.amountMode !== 'max') fail('BAD_AMOUNT_MODE');
   uuidV4(c.capId, 'capId'); simpleId(c.principalId, 'principalId'); simpleId(c.policyId, 'policyId'); simpleId(c.taskRef, 'taskRef');
   mockAccount(c.recipientId, 'recipientId');
   if (c.asset !== 'NEAR') fail('UNSUPPORTED_ASSET');

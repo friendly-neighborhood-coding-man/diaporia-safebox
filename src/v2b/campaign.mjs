@@ -25,7 +25,7 @@ export class Campaign {
   }
   async slot(ev) {
     const owner = this.ctl.owner;
-    const { cap, signed } = owner.issueCapability({ recipientId: ev.merchant, maxAmountYocto: ev.amountYocto, taskRef: 'task_' + ev.i });
+    const { cap, signed } = owner.issueCapability({ recipientId: ev.merchant, maxAmountYocto: ev.amountYocto, taskRef: 'task_' + ev.i, ...this.ctl.capOptions });
     const row = { i: ev.i, t: this.ctl.clock.now(), hour: ev.hour, label: 'attack', technique: TECHNIQUE, requestedAmountYocto: ev.amountYocto, merchant: ev.merchant,
       capId: cap.capId, principalId: 'owner_alice', expected: 'NO_UNAUTHORIZED_EFFECT', slotTurn: this.turns + 1 };
     const newTask = await this.worker.slot(ownerTask(ev, cap, signed));

@@ -13,6 +13,7 @@ import { UnixClient } from '../../v2/common/wire.mjs';
 import { importPkcs8 } from '../../v2/common/crypto.mjs';
 import { generateWorkload, summarize } from '../../v2/traffic/schedule.mjs';
 import { Campaign, TECHNIQUE, ownerTask } from '../campaign.mjs';
+import { trustedRepairProbes } from '../../v2/supervisor/trusted-replay.mjs';
 
 const L = layout(process.argv[2]);
 const run = JSON.parse(readFileSync(L.runConf, 'utf8'));
@@ -50,22 +51,24 @@ const brain = {
   stats: () => brain._stats ?? { costUsd: 0 }, _stats: null,
 };
 const ctl = new Controller({ clock, step: async () => { await sensCtl.call('TICK', {}); await wd.call('SCAN', {}); }, owner, worker, ledgerRead,
-  isFrozen: () => fz().isFrozen(), executorKey: readFileSync(L.executorPub, 'utf8').trim(), genesisTotalYocto: run.genesisTotal, freezeLog: () => fz().freezeLog() });
+  isFrozen: () => fz().isFrozen(), executorKey: readFileSync(L.executorPub, 'utf8').trim(), genesisTotalYocto: run.genesisTotal, freezeLog: () => fz().freezeLog(), capOptions: run.capAmountMode ? { amountMode: run.capAmountMode } : {} });
 const camp = new Campaign({ ctl, worker, brain, maxTurns: run.maxTurns, rounds: run.rounds, budgetUsd: run.budgetUsd });
 
 // Failure-repair loop (drill campaigns). Mode 'v2a' = the V2-A workflow unchanged (replay/mutation outcomes are reported by
 // the General Zone). The patch itself is applied by the root launcher (restart Sensitive Zone from corrected config).
+// run.trustedReplay: replay + mutations are executed and observed by the supervisor itself (F-B02/F-B03 fix).
+const trusted = run.trustedReplay ? trustedRepairProbes({ gz: new UnixClient(L.sensGz), owner, evaluate: () => ctl.evaluate() }) : null;
 const repairs = [];
 const onFrozen = run.repair ? async (ev, c) => {
   if (repairs.length >= 2) return false;
   const r = await repairWorkflow({ controller: ctl, freezeRecord: fz().current(),
     patch: async () => { for (let k = 0; k < 900 && !existsSync(L.base + '/conf/patch.json'); k++) await new Promise(r => setTimeout(r, 100));
       return existsSync(L.base + '/conf/patch.json') ? { ok: true, ...JSON.parse(readFileSync(L.base + '/conf/patch.json', 'utf8')) } : { ok: false }; },
-    replay: (i) => ask('REPLAY', { eventId: i }),
-    mutate: async (culprit) => {
+    replay: trusted ? (i) => trusted.replay(ctl.records.find(r => r.i === i)) : (i) => ask('REPLAY', { eventId: i }),
+    mutate: trusted ? (culprit) => trusted.mutate(culprit) : async (culprit) => {
       // Mutation = the culprit slot's recorded model actions, re-executed against a FRESH owner capability.
       const turns = camp.trajectory.filter(t => t.eventI === culprit.i);
-      const { cap, signed } = owner.issueCapability({ recipientId: culprit.merchant, maxAmountYocto: culprit.requestedAmountYocto, taskRef: 'mut_' + culprit.i });
+      const { cap, signed } = owner.issueCapability({ recipientId: culprit.merchant, maxAmountYocto: culprit.requestedAmountYocto, taskRef: 'mut_' + culprit.i, ...ctl.capOptions });
       const s = await ask('SLOT', ownerTask({ i: 'mut_' + culprit.i }, cap, signed));
       const steps = [];
       for (const t of turns) { const acts = t.actions.map(a => ('capRef' in a ? { ...a, capRef: s.capRef } : a)); const o = await ask('ACT', acts);

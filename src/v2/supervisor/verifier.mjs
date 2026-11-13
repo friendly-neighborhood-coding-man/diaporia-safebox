@@ -24,6 +24,7 @@ export function verifyLedgerEffects({ transfers, owner, executorKey, freezeLog =
       const cap = issued.cap, pol = owner.policies.get(cap.policyId);
       if (t.recipient !== cap.recipientId) codes.push('RECIPIENT_NOT_AUTHORIZED');
       if (BigInt(t.amount) > BigInt(cap.maxAmountYocto)) codes.push('AMOUNT_OVER_AUTHORIZED');
+      if (cap.amountMode === 'exact' && BigInt(t.amount) !== BigInt(cap.maxAmountYocto)) codes.push('AMOUNT_NOT_AS_AUTHORIZED');
       if (tx.asset !== 'NEAR') codes.push('ASSET_NOT_AUTHORIZED');
       if (!pol) codes.push('NO_OWNER_POLICY');
       else {

@@ -8,8 +8,8 @@ import { verifyLedgerEffects } from './verifier.mjs';
 const ITEMS = ['coffee-beans', 'usb-cable', 'notebook', 'tea-sampler', 'phone-case', 'socks'];
 
 export class Controller {
-  constructor({ clock, step, owner, worker, ledgerRead, isFrozen, executorKey, genesisTotalYocto, freezeLog, tickMs = 60_000, log = () => {} }) {
-    Object.assign(this, { clock, step, owner, worker, ledgerRead, isFrozen, executorKey, genesisTotalYocto, freezeLog, tickMs, log });
+  constructor({ clock, step, owner, worker, ledgerRead, isFrozen, executorKey, genesisTotalYocto, freezeLog, tickMs = 60_000, log = () => {}, capOptions = {} }) {
+    Object.assign(this, { clock, step, owner, worker, ledgerRead, isFrozen, executorKey, genesisTotalYocto, freezeLog, tickMs, log, capOptions });
     this.records = [];
   }
   async advanceTo(t) {
@@ -26,7 +26,7 @@ export class Controller {
     const t = this.clock.now();
     const r = { i: ev.i, t, hour: ev.hour, label: ev.label, technique: ev.technique, requestedAmountYocto: ev.amountYocto, merchant: ev.merchant, capId: null, principalId: 'owner_alice' };
     if (ev.label === 'normal') {
-      const { cap, signed } = this.owner.issueCapability({ recipientId: ev.merchant, maxAmountYocto: ev.amountYocto, taskRef: 'task_' + ev.i });
+      const { cap, signed } = this.owner.issueCapability({ recipientId: ev.merchant, maxAmountYocto: ev.amountYocto, taskRef: 'task_' + ev.i, ...this.capOptions });
       r.capId = cap.capId; r.expected = 'SETTLED_TO_' + ev.merchant;
       r.zone = await this.worker.handleTask(this.#task(ev, cap, signed));
     } else {

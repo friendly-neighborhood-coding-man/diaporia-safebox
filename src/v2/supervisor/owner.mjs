@@ -60,10 +60,10 @@ export class OwnerSimulator {
     return s.sign(V2_DOMAINS.POLICY, p);
   }
 
-  issueCapability({ principalId = 'owner_alice', policyId, recipientId, maxAmountYocto, taskRef, ttlMs = 30 * 60_000, issuedAt }) {
+  issueCapability({ principalId = 'owner_alice', policyId, recipientId, maxAmountYocto, taskRef, ttlMs = 30 * 60_000, issuedAt, amountMode }) {
     const t = issuedAt ?? this.now();
     const cap = { v: CAP_V, capId: randomUUID(), principalId, policyId: policyId ?? 'pol_' + principalId.replace('owner_', '') + '_1', recipientId, asset: 'NEAR',
-      maxAmountYocto, taskRef, issuedAt: iso(t), expiresAt: iso(t + ttlMs) };
+      maxAmountYocto, taskRef, issuedAt: iso(t), expiresAt: iso(t + ttlMs), ...(amountMode ? { amountMode } : {}) };
     const signed = this.signers[principalId].sign(V2_DOMAINS.CAPABILITY, cap);
     this.issued.set(cap.capId, { cap, signed, issuedAtMs: t });
     this.#log({ type: 'CAP', cap, issuedAtMs: t });
