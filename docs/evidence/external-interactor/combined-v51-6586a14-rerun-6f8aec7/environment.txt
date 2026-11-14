@@ -1,0 +1,5 @@
+date: 2026-11-14T08:33:43Z
+node: v22.23.4
+worktree HEAD: a21ece2ec16ad5d8e2ebe8748981c53c77779730
+parents: 6586a14af5abbce9e8c07e768d138599ad1cabed 6f8aec7dfec075d889e9cf38d25c15014a28ce23
+V5.1 candidate: 6586a14 (PR #10); interactor candidate: 6f8aec7 (PR #9, after verifier fixes)

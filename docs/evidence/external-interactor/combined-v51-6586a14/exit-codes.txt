@@ -1,0 +1,10 @@
+root-npm-ci exit=0
+root-npm-test exit=0
+pkg-npm-ci exit=0
+pkg-typecheck exit=0
+pkg-build exit=0
+pkg-test exit=0
+pkg-demo exit=0
+root-npm-test-with-pkg-built exit=0
+v5-mutations exit=0
+git-status-after-mutations exit=0

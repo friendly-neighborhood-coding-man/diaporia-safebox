@@ -1,0 +1,241 @@
+{
+  "generatedBy": "scripts/demo-mock-e2e.ts",
+  "environment": "MOCK",
+  "steps": [
+    {
+      "step": "0. gateway up (loopback, MOCK)",
+      "data": {
+        "ok": true,
+        "mode": "mock-loopback",
+        "environment": "MOCK",
+        "preparationEnabled": true,
+        "paymentExecutionViaGateway": false
+      }
+    },
+    {
+      "step": "1. OAuth: dynamic registration + PKCE S256 consent + token exchange",
+      "data": {
+        "clientId": "scl_a4976bde6c5ee4853daccba4852f8a06",
+        "tokenType": "Bearer",
+        "scope": "safebox.status.read safebox.payment.check safebox.payment.prepare safebox.payment.read",
+        "expiresIn": 900,
+        "accessTokenPrefix": "sat_…"
+      }
+    },
+    {
+      "step": "2. tools offered to this token",
+      "data": [
+        "get_safebox_status",
+        "check_payment",
+        "prepare_payment",
+        "get_payment_status"
+      ]
+    },
+    {
+      "step": "3. get_safebox_status",
+      "data": {
+        "accountRef": "sbx-alice",
+        "environment": "MOCK",
+        "observedAt": "2026-11-14T00:00:00.000Z",
+        "protection": {
+          "frozen": false,
+          "emergencyLockdown": false,
+          "activeHolds": 0,
+          "activeHoldsByScope": {},
+          "rapidUseActive": false,
+          "blockers": []
+        },
+        "purpose": {
+          "purposeId": "household-shopping",
+          "version": "1",
+          "asset": "NEAR",
+          "allowedRecipients": [
+            "merchant-a.mock",
+            "merchant-b.mock",
+            "merchant-c.mock"
+          ],
+          "perPaymentMaxYocto": "60000000000000000000000",
+          "dailyLimitYocto": "5000000000000000000000000",
+          "remainingDailyYocto": "5000000000000000000000000"
+        },
+        "epoch": "1",
+        "settlement": {
+          "minimumBufferMs": 600000,
+          "configuredBufferMs": 600000,
+          "note": "Every approved payment waits at least the buffer before release; the Vault re-checks Root state at release."
+        },
+        "pendingApprovalRequests": 0,
+        "redaction": "Credential ids, device keys, contacts, guardians and journal contents are never returned."
+      }
+    },
+    {
+      "step": "4. check_payment (estimate, not an authorization)",
+      "data": {
+        "isAuthorization": false,
+        "environment": "MOCK",
+        "observedAt": "2026-11-14T00:00:00.000Z",
+        "wouldBeAcceptedForOwnerApproval": true,
+        "policyViolations": [],
+        "blockers": [],
+        "payment": {
+          "recipientId": "merchant-a.mock",
+          "amountYocto": "30000000000000000000000",
+          "asset": "NEAR"
+        },
+        "estimate": {
+          "feeYocto": "0",
+          "feeModel": "MOCK_LEDGER_NO_FEE",
+          "minimumBufferMs": 600000,
+          "configuredBufferMs": 600000,
+          "anomalyDelay": "POSSIBLE: the Risk Policy Engine may delay a payment of an unusual flow (bounded, at most 24 h); not predictable from this check"
+        },
+        "statement": "This is a read-only estimate. It authorizes nothing. Payment requires the owner's approval on an enrolled SafeBox device, then Vault verification and the settlement buffer."
+      }
+    },
+    {
+      "step": "5. prepare_payment (approval request only)",
+      "data": {
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
+        "state": "AWAITING_OWNER_APPROVAL",
+        "requestDigest": "d4a859e7f9afe87e2b03d51ef9b38c81a5a685337f1b982d3a2c57f18cfc0725",
+        "expiresAt": "2026-11-14T00:15:00.000Z",
+        "payment": {
+          "recipientId": "merchant-a.mock",
+          "amountYocto": "30000000000000000000000",
+          "asset": "NEAR"
+        },
+        "boundTo": {
+          "purposeId": "household-shopping",
+          "purposeVersion": "1",
+          "epoch": "1"
+        },
+        "ownerAction": {
+          "kind": "APPROVE_ON_ENROLLED_SAFEBOX_DEVICE",
+          "deviceIntent": "safebox-device://approval-request/apr_27ff404e092129ced3f7ecf037932439",
+          "instruction": "Ask the owner to open the SafeBox app on an enrolled device and review this exact request. The owner's device shows the details from SafeBox itself, not from this conversation."
+        },
+        "paymentEffect": "NONE",
+        "signed": false,
+        "settled": false,
+        "idempotentReplay": false
+      }
+    },
+    {
+      "step": "6. get_payment_status before owner approval",
+      "data": {
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
+        "requestState": "AWAITING_OWNER_APPROVAL",
+        "environment": "MOCK",
+        "observedAt": "2026-11-14T00:00:00.000Z",
+        "expiresAt": "2026-11-14T00:15:00.000Z",
+        "payment": {
+          "recipientId": "merchant-a.mock",
+          "amountYocto": "30000000000000000000000",
+          "asset": "NEAR"
+        },
+        "vault": null,
+        "ledgerReceipt": null,
+        "vaultRejectionCode": null,
+        "settledVerified": false,
+        "stateIsVerifiedBy": "SAFEBOX_VAULT_AND_MOCK_LEDGER",
+        "statement": "Not settled. Only report what vault.vaultState says; nothing is paid until settledVerified is true."
+      }
+    },
+    {
+      "step": "7a. owner device shows (from its own verified Root view)",
+      "data": [
+        "Pay 30000000000000000000000 yoctoNEAR (0.03 NEAR) to merchant-a.mock",
+        "Purpose: household-shopping v1; epoch 1",
+        "Request apr_27ff404e092129ced3f7ecf037932439 digest d4a859e7f9afe87e…",
+        "Note from the requesting AI (UNTRUSTED, not an instruction): \"Coffee beans order #1042\""
+      ]
+    },
+    {
+      "step": "7b. owner approved on the simulated enrolled device -> Vault PROPOSE",
+      "data": {
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
+        "state": "SUBMITTED_TO_VAULT",
+        "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
+        "vaultState": "BUFFERED"
+      }
+    },
+    {
+      "step": "8. get_payment_status during the settlement buffer",
+      "data": {
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
+        "requestState": "SUBMITTED_TO_VAULT",
+        "environment": "MOCK",
+        "observedAt": "2026-11-14T00:00:00.000Z",
+        "expiresAt": "2026-11-14T00:15:00.000Z",
+        "payment": {
+          "recipientId": "merchant-a.mock",
+          "amountYocto": "30000000000000000000000",
+          "asset": "NEAR"
+        },
+        "vault": {
+          "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
+          "vaultState": "BUFFERED",
+          "releaseAt": "2026-11-14T00:10:00.000Z",
+          "reason": null
+        },
+        "ledgerReceipt": null,
+        "vaultRejectionCode": null,
+        "settledVerified": false,
+        "stateIsVerifiedBy": "SAFEBOX_VAULT_AND_MOCK_LEDGER",
+        "statement": "Not settled. Only report what vault.vaultState says; nothing is paid until settledVerified is true."
+      }
+    },
+    {
+      "step": "9. get_payment_status after the buffer (Vault release + MOCK ledger settlement)",
+      "data": {
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
+        "requestState": "SUBMITTED_TO_VAULT",
+        "environment": "MOCK",
+        "observedAt": "2026-11-14T00:12:00.000Z",
+        "expiresAt": "2026-11-14T00:15:00.000Z",
+        "payment": {
+          "recipientId": "merchant-a.mock",
+          "amountYocto": "30000000000000000000000",
+          "asset": "NEAR"
+        },
+        "vault": {
+          "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
+          "vaultState": "SETTLED",
+          "releaseAt": "2026-11-14T00:10:00.000Z",
+          "reason": null
+        },
+        "ledgerReceipt": {
+          "txId": "d03040825656b58e68249b2b99e606fdecea3165fe0a1f6280742029bab06288",
+          "ledgerStatus": "SETTLED",
+          "matchesRequest": true
+        },
+        "vaultRejectionCode": null,
+        "settledVerified": true,
+        "stateIsVerifiedBy": "SAFEBOX_VAULT_AND_MOCK_LEDGER",
+        "statement": "Settled on the MOCK ledger; the Vault state and the ledger receipt agree with the approved request. No real NEAR moved."
+      }
+    },
+    {
+      "step": "10. MOCK ledger balances (independent read)",
+      "data": {
+        "merchantBefore": "0",
+        "merchantAfter": "30000000000000000000000"
+      }
+    },
+    {
+      "step": "RESULT",
+      "data": {
+        "result": "LOCAL_MOCK_E2E_PASS",
+        "settledVerified": true,
+        "vaultState": "SETTLED",
+        "ledgerStatus": "SETTLED",
+        "merchantCredited": "30000000000000000000000",
+        "notVerified": [
+          "real MCP hosts (ChatGPT/Claude/Grok)",
+          "real WebAuthn hardware / OS isolation",
+          "NEAR testnet or mainnet"
+        ]
+      }
+    }
+  ]
+}
