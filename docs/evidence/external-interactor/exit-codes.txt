@@ -1,0 +1,6 @@
+pkg-npm-ci exit=0
+pkg-typecheck exit=0
+pkg-build exit=0
+pkg-test exit=0
+pkg-demo exit=0
+root-npm-test exit=0

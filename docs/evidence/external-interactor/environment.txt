@@ -1,0 +1,5 @@
+date: 2026-11-14T08:06:37Z
+node: v22.23.4
+npm: 10.9.9
+head: 2701014dc8eb3b4123e4eddb739480142b028f6d
+os: Linux 6.18.44-fc-v470
