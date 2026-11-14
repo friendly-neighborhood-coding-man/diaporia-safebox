@@ -1,0 +1,142 @@
+[
+ {
+  "name": "readCheckedFile: O_NOFOLLOW removed",
+  "unitFailures": 1,
+  "caughtByUnitTests": true,
+  "failingTests": [
+   "verifySlot race: a file swapped for a symlink / another file / a FIFO after the lstat is refused, never read by path"
+  ],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "readCheckedFile: O_NONBLOCK removed",
+  "unitFailures": -1,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "readCheckedFile: dev/ino identity check removed",
+  "unitFailures": 2,
+  "caughtByUnitTests": true,
+  "failingTests": [
+   "verifySlot race: a file swapped for a symlink / another file / a FIFO after the lstat is refused, never read by path",
+   "verifySlot directories: a subdirectory replaced by a symlink to a byte-identical tree is refused (static case; the mid-walk swap is covered by pinDir/stillSame by construction)"
+  ],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "readCheckedFile: read by path again (readFileSync(p))",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "file stillSame after read removed",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SUCCESS",
+   "S2 :SUCCESS",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SUCCESS(INVARIANT BROKEN)",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "directory pinDir removed",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "directory stillSame after walk removed",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "stillSame realpath check removed",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CHANGED_DURING_VERIFY",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SUCCESS(INVARIANT BROKEN)",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ },
+ {
+  "name": "top-level stillSame(slotDir) removed",
+  "unitFailures": 0,
+  "caughtByUnitTests": false,
+  "failingTests": [],
+  "probe": [
+   "S0 :SUCCESS",
+   "S1 :SLOT_CONTAINS_SYMLINK",
+   "S2 :SLOT_CHANGED_DURING_VERIFY",
+   "S3 :SUCCESS(INVARIANT BROKEN)",
+   "S4 :SUCCESS(INVARIANT BROKEN)",
+   "S5 :SLOT_CONTAINS_SYMLINK",
+   "S6 :SUCCESS(INVARIANT BROKEN)"
+  ]
+ }
+]
