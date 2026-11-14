@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, symlinkSync, writeFileSync, readFileSync, existsSync, appendFileSync, chmodSync, lstatSync, renameSync, unlinkSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { realpathSync } from 'node:fs';
+import { sha256 } from '../../src/common/crypto.mjs';
 import { join } from 'node:path';
 import { installToSlot, verifySlot, readCheckedFile } from '../../src/package/install.mjs';
 import { openPackage } from '../../src/package/manifest.mjs';
@@ -76,4 +78,18 @@ test('verifySlot race: a file swapped for a symlink / another file / a FIFO afte
   unlinkSync(p); writeFileSync(p, 'genuine'); chmodSync(p, 0o666); const l2 = lstatSync(p);
   rejects(() => readCheckedFile(p, 'main.mjs', l2), 'SLOT_WRITABLE_BY_OTHERS');
   chmodSync(p, 0o644); rejects(() => readCheckedFile(p, 'main.mjs', lstatSync(p), { expectUid: 4242 }), 'SLOT_WRONG_OWNER');
+});
+
+test('verifySlot directories: a subdirectory replaced by a symlink to a byte-identical tree is refused (static case; the mid-walk swap is covered by pinDir/stillSame by construction)', (t) => {
+  const d = tmp(t); const slot = join(d, 'slot'); mkdirSync(slot); mkdirSync(join(slot, 'sub'));
+  writeFileSync(join(slot, 'sub', 'x.mjs'), 'genuine'); chmodSync(join(slot, 'sub', 'x.mjs'), 0o644);
+  const twin = join(d, 'twin'); mkdirSync(twin); writeFileSync(join(twin, 'x.mjs'), 'genuine'); chmodSync(join(twin, 'x.mjs'), 0o644);
+  const manifest = { files: [{ path: 'sub/x.mjs', sha256: sha256(Buffer.from('genuine')), mode: 0o644 }] };
+  assert.equal(verifySlot(realpathSync(slot), manifest).files, 1);
+  // the file inside a swapped-in directory symlink: the file's own path no longer resolves to itself
+  const lst = lstatSync(join(slot, 'sub', 'x.mjs'));
+  renameSync(join(slot, 'sub'), join(d, 'orig-sub')); symlinkSync(twin, join(slot, 'sub'));
+  rejects(() => verifySlot(realpathSync(slot), manifest), 'SLOT_CONTAINS_SYMLINK');
+  // and readCheckedFile alone would accept the twin (different inode is still caught by the identity check)
+  rejects(() => readCheckedFile(join(slot, 'sub', 'x.mjs'), 'sub/x.mjs', lst), 'SLOT_CHANGED_DURING_VERIFY');
 });
