@@ -55,7 +55,7 @@ export class OwnerWorldV4 extends OwnerWorld {
       challengeIssuer: { id: 'challenge-svc', publicKey: this.issuerSigner.publicKey },
     } };
     const dig = d4(V4_DOMAINS.GENESIS_EXT, action);
-    const approvals = this.devices.map(d => d.kind === 'passkey' ? { credId: d.credId, webauthn: d.auth.assert({ ...RP, challenge: dig, uv: true }) } : { credId: d.credId, sig: signDigestWith(d.signer, V4_DOMAINS.GENESIS_EXT, dig) });
+    const approvals = this.devices.map(d => d.kind === 'passkey' ? { credId: d.credId, webauthn: d.auth.assert({ ...this.rp, challenge: dig, uv: true }) } : { credId: d.credId, sig: signDigestWith(d.signer, V4_DOMAINS.GENESIS_EXT, dig) });
     for (const [k, s] of Object.entries(this.orcs)) approvals.push({ credId: k, sig: signDigestWith(s, V4_DOMAINS.ORC_POP, dig) });
     this.genesis4Record = { v3: gen3, ext: { action, approvals } };
     this.chainId4 = d4(V4_DOMAINS.GENESIS, { v3ChainId, ext: dig.toString('hex') }).toString('hex');
@@ -85,7 +85,7 @@ export class OwnerWorldV4 extends OwnerWorld {
     if (this.orcs[credId]) ap.sig = signDigestWith(this.orcSigner(credId), V4_DOMAINS.INTENT, dig);
     else {
       const d = this.dev(credId);
-      if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...RP, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(text, dig.toString('hex')) }; }
+      if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...this.rp, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(text, dig.toString('hex')) }; }
       else ap.sig = signDigestWith(d.signer, V4_DOMAINS.INTENT, dig);
     }
     if (sc) ap.screen = sc;

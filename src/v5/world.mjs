@@ -40,13 +40,16 @@ const ROOT_EVENT = (type) => ({ FREEZE: 'HOLD_CREATED', HOLD_CREATE: 'HOLD_CREAT
   DELEGATION_GRANT: 'DELEGATION_GRANTED', DELEGATION_REVOKE: 'DELEGATION_REVOKED', RAPID_USE_REQUEST: 'RAPID_USE_REQUESTED', RAPID_USE_APPROVE: 'RAPID_USE_VOTE',
   RAPID_USE_ACTIVATE: 'RAPID_USE_ACTIVATED', RAPID_USE_REVOKE: 'RAPID_USE_REVOKED', RAPID_USE_EXPIRE: 'RAPID_USE_HOUSEKEEPING', INCIDENT_REVIEW: 'INCIDENT_REVIEWED' }[type] ?? 'ROOT_TRANSITION');
 
-export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, capsule = {}, bufferMs = 600_000, ownerWorld = null, transport = null, apcCreds, displays, journalOpts = {} } = {}) {
+// V6 extension points (defaults = V5 exactly): chain = Root state machine module, Vault = vault class, genesisOf /
+// pinnedOf = genesis builder and pinned chain id, notifyClass = notification service class.
+export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, capsule = {}, bufferMs = 600_000, ownerWorld = null, transport = null, apcCreds, displays, journalOpts = {},
+  chain = V5, Vault = ExecutionVaultV5, genesisOf = (o) => o.genesis5(), pinnedOf = (o) => o.chainId5, notifyClass = NotificationService, notifyOpts = {} } = {}) {
   dir ??= mkdtempSync(join(tmpdir(), 'sbx5-'));
   clock ??= new MemoryClock(T0);
   const now = () => clock.now();
   const wall = { t: 1_000_000, now() { return this.t; } };
   const owner = ownerWorld ?? new OwnerWorldV5({ t0: clock.now(), profile: 'personal', config, capsule, config4, config5, apcCreds, displays });
-  const genesis = owner.genesis5();
+  const genesis = genesisOf(owner); const pinned = pinnedOf(owner);
   owner.challengeService(now);
   const executor = newSigner('v5-executor');
   const ledger = new MockLedger(join(dir, 'ledger.db'), { now });
@@ -57,11 +60,11 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   const rootJ = journal.writer('ROOT');
   const engine = new RiskPolicyEngine({ signer: owner.riskEngine, journal: journal.writer('RISK') });
   const mock = transport ?? new MockTransport();
-  const notify = new NotificationService({ path: join(dir, 'outbox.db'), now, transport: mock, addressBook: owner.addressBook, journal: journal.writer('NOTIFY'), accountId: ACCOUNT });
+  const notify = new notifyClass({ path: join(dir, 'outbox.db'), now, transport: mock, addressBook: owner.addressBook, journal: journal.writer('NOTIFY'), accountId: ACCOUNT, ...notifyOpts });
   const inbox = {}; const intents = new Set(); const attackerCaseIds = new Set();
-  const w = { dir, clock, now, wall, owner, genesis, executor, ledger, ledgerRead, inbox, intents, attackerCaseIds, pendingEffects: [], chain: V5, journal, engine, notify, mock, ACCOUNT,
+  const w = { dir, clock, now, wall, owner, genesis, executor, ledger, ledgerRead, inbox, intents, attackerCaseIds, pendingEffects: [], chain, journal, engine, notify, mock, ACCOUNT,
     engineQueue: [], rejects: [], near };
-  const openRoot = () => new RootService({ genesis, pinnedChainId: owner.chainId5, dbPath: join(dir, 'root.db'), now, chain: V5, onEffects: (fx, t) => { w.pendingEffects.push({ fx, t }); } });
+  const openRoot = () => new RootService({ genesis, pinnedChainId: pinned, dbPath: join(dir, 'root.db'), now, chain, onEffects: (fx, t) => { w.pendingEffects.push({ fx, t }); } });
   w.root = openRoot(); w.rootOps = rootOps(w.root); w.admin = new DirectClient(w.rootOps.admin);
   const keyContext = (state, affected = null) => {
     const out = {};
@@ -69,13 +72,13 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
     return out;
   };
   const onIncident = ({ incident, ev, root }) => {
-    const hasOwners = V5.ownerPrincipals(root).length > 0;
+    const hasOwners = chain.ownerPrincipals(root).length > 0;
     notify.enqueue(root, { incident: { incidentId: incident.incident_id, reason: 'unusual spending pattern', pattern: ev.reasons.map(r => r.code).join(', ') },
       kind: 'INCIDENT', keyContextByHolder: keyContext(root, incident.cred_id), delayStatus: `unsettled payments of the affected flow are delayed up to ${Math.round(Number(ev.policy?.delay?.anomalyDelayMs ?? 21_600_000) / 3600_000)} h; settled payments cannot be stopped`, rapidAvailable: hasOwners });
   };
   const onRapidRule = ({ grantId, ruleId, evidence }) => { w.engineQueue.push({ grantId, ruleId, evidence }); };
-  const floor = bufferFloorMs(genesis.ext.action.body.config.bufferPolicy);
-  const openVault = () => new ExecutionVaultV5({ genesis, pinnedChainId: owner.chainId5, executorAccount: ACCOUNT, bufferMs: floor === 600_000 ? bufferMs : floor, minBufferMs: floor, chain: V5 },
+  const floor = bufferFloorMs((genesis.v5 ?? genesis).ext.action.body.config.bufferPolicy);
+  const openVault = () => new Vault({ genesis, pinnedChainId: pinned, executorAccount: ACCOUNT, bufferMs: floor === 600_000 ? bufferMs : floor, minBufferMs: floor, chain },
     { store: new SensitiveStore(join(dir, 'vault.db'), { now }), now, wallNow: () => wall.now(), executorSigner: executor, ledger: ledgerExec,
       engine, enginePublicKey: owner.riskEngine.publicKey, journal, onIncident, onRapidRule });
   w.vault = openVault(); w.vops = vaultOps(w.vault); w.gz = new DirectClient(w.vops.gz); w.vctl = new DirectClient(w.vops.ctl);
@@ -116,7 +119,7 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
       const q = w.engineQueue.shift();
       if (w.root.state.v5.rapid.grants[q.grantId]?.status !== 'ACTIVE') continue;
       const a = owner.action(w.view(), 'RAPID_USE_REVOKE', { grantId: q.grantId, reason: 'risk engine predefined rule ' + q.ruleId });
-      await submitRoot({ action: a, attestation: engine.rapidRevokeAttestation({ digestHex: V5.actionDigest(a).toString('hex') }, q.ruleId, q.evidence) }, { principal: 'risk-engine' });
+      await submitRoot({ action: a, attestation: engine.rapidRevokeAttestation({ digestHex: chain.actionDigest(a).toString('hex') }, q.ruleId, q.evidence) }, { principal: 'risk-engine' });
       await w.vctl.call('SYNC_ROOT', { transitions: w.root.chain(w.vault.root.seq) });
     }
     return r;
@@ -128,7 +131,7 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   /** V5 command (Command Statement approvals) for V5-native operations. */
   w.cmd = async (type, body, credIds, extra = {}) => {
     const a = w.action(type, body, extra.actionOpts ?? {});
-    if (!extra.notIntended) intents.add(V5.actionDigest(a).toString('hex'));
+    if (!extra.notIntended) intents.add(chain.actionDigest(a).toString('hex'));
     const req = { action: a, approvals: owner.authorize5(w.root.state, a, credIds, { at: now(), ...(extra.authOpts ?? {}) }) };
     if (extra.attestation) req.attestation = extra.attestation(a);
     return submit(req);
@@ -136,7 +139,7 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   /** V4 operation inside the V5 chain (V4 AuthorizationIntents, built against the projected state). */
   w.ownerAct = async (type, body, credIds, extra = {}) => {
     const a = w.action(type, body, extra.actionOpts ?? {});
-    if (!extra.notIntended) intents.add(V5.actionDigest(a).toString('hex'));
+    if (!extra.notIntended) intents.add(chain.actionDigest(a).toString('hex'));
     const req = { action: a, approvals: owner.authorize4(w.root.state, a, credIds, { at: now(), ...(extra.authOpts ?? {}) }) };
     if (extra.guardians) req.guardianApprovals = owner.guardianApprovals(a, extra.guardians);
     if (extra.attestation) req.attestation = extra.attestation(a);
@@ -150,8 +153,8 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   };
   w.holdDigest = (holdId) => holdDigest(w.root.state, w.root.state.v5.holds[holdId]);
   w.hold = (holdId) => w.root.state.v5.holds[holdId];
-  w.effectiveHolds = () => V5.effectiveHolds(V5.projectState(w.root.state, now()), now());
-  w.frozen = () => V5.projectState(w.root.state, now()).freeze.active;
+  w.effectiveHolds = () => chain.effectiveHolds(chain.projectState(w.root.state, now()), now());
+  w.frozen = () => chain.projectState(w.root.state, now()).freeze.active;
   w.supervisorFreeze = async (freezeId, reason = 'supervisor: invariant violation observed') =>
     w.submitRaw('FREEZE', { freezeId, reason, source: 'supervisor' }, { attest: (a) => ({ supervisorSig: owner.supervisorFreezeSign(a) }) });
   w.pay = async ({ credId = 'k1-phone', recipientId = 'merchant-a.mock', amountYocto = (3n * 10n ** 22n).toString(), sku = '-', over = {}, request = {} } = {}) => {

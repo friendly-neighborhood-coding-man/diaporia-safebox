@@ -37,7 +37,7 @@ export class OwnerWorldV5 extends OwnerWorldV4 {
     const action = { v: EXT5_V, v4ChainId: this.chainId4, accountId: ACCOUNT, nonce: mkNonce(), issuedAt: iso(this.t0), body: {
       config: this.config5, riskEngine: { id: 'risk-engine', publicKey: this.riskEngine.publicKey }, contacts: this.contactAttestations(this.t0) } };
     const dig = d5(V5_DOMAINS.GENESIS_EXT, action);
-    const approvals = this.devices.map(d => d.kind === 'passkey' ? { credId: d.credId, webauthn: d.auth.assert({ ...RP, challenge: dig, uv: true }) } : { credId: d.credId, sig: signDigest5With(d.signer, V5_DOMAINS.GENESIS_EXT, dig) });
+    const approvals = this.devices.map(d => d.kind === 'passkey' ? { credId: d.credId, webauthn: d.auth.assert({ ...this.rp, challenge: dig, uv: true }) } : { credId: d.credId, sig: signDigest5With(d.signer, V5_DOMAINS.GENESIS_EXT, dig) });
     for (const [k, s] of Object.entries(this.orcs)) approvals.push({ credId: k, sig: signDigest5With(s, V5_DOMAINS.GENESIS_EXT, dig) });
     this.genesis5Record = { v4: gen4, ext: { action, approvals } };
     this.chainId5 = d5(V5_DOMAINS.GENESIS, { v4ChainId: this.chainId4, ext: dig.toString('hex') }).toString('hex');
@@ -59,7 +59,7 @@ export class OwnerWorldV5 extends OwnerWorldV4 {
     if (this.orcs[credId]) ap.sig = signDigest5With(this.orcSigner(credId), V5_DOMAINS.COMMAND, dig);
     else {
       const d = this.dev(credId);
-      if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...RP, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(text, dig.toString('hex')) }; }
+      if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...this.rp, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(text, dig.toString('hex')) }; }
       else ap.sig = signDigest5With(d.signer, V5_DOMAINS.COMMAND, dig);
     }
     return ap;
