@@ -114,6 +114,17 @@ static class WinBioGate {
   const int ArmDelayMs = 1000, MinCaptureMs = 700, MaxDiscards = 25, QuietMs = 3000, QuietMaxS = 30;
   static long LastMs = -1; static byte LastSub = 0; static uint LastReject = 0; static int Discarded = 0; static long ArmedAfterMs = -1; static int Calls = 0; static int InactiveTicks = 0; static int QuietDiscards = 0;
 
+  /** Owner request (run 11): the amount a PAYMENT moves is repeated in bold at the top of every gate window. The line is
+   *  taken verbatim from the owner-side text (built from the Root replica, P0.2); nothing is parsed or reformatted. */
+  static void AddAmount(Form form, Label main, string prompt) {
+    if (prompt == null) return;
+    string line = null;
+    foreach (var l in prompt.Split('\n')) if (l.StartsWith("Pay exactly:")) { line = l; break; }
+    if (line == null) return;
+    var amt = new Label { Dock = DockStyle.Top, Height = 60, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 15f, FontStyle.Bold), ForeColor = Color.DarkRed, Text = line };
+    form.Controls.Add(amt); main.BringToFront(); // the Fill label takes the space left under the bold amount
+  }
+
   /** Phase 1: a window with a Start button (mouse only). Returns true if the owner clicked it before the deadline. */
   static bool ArmByClick(string prompt, DateTime deadline) {
     bool clicked = false; var shown = new System.Diagnostics.Stopwatch();
@@ -121,7 +132,7 @@ static class WinBioGate {
     var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint." };
     var btn = new Button { Text = "Start fingerprint check", TabStop = false, Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
-    form.Controls.Add(label); form.Controls.Add(btn);
+    form.Controls.Add(label); form.Controls.Add(btn); AddAmount(form, label, prompt);
     // mouse only: MouseClick never fires for Space/Enter, so a keystroke typed into the focused gate window cannot arm it
     btn.MouseClick += (o, e) => { if (clicked) return; clicked = true; ArmedAfterMs = shown.ElapsedMilliseconds; form.Close(); };
     var timer = new System.Windows.Forms.Timer { Interval = 150 };
@@ -138,7 +149,7 @@ static class WinBioGate {
     var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 480, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
     var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nTOUCH the fingerprint sensor NOW.\n\nIf nothing happens when you touch it, click this window once, then touch again." };
-    form.Controls.Add(label);
+    form.Controls.Add(label); AddAmount(form, label, prompt);
     Action<string> say = (txt) => { try { form.BeginInvoke((Action)(() => { label.Text = (prompt ?? "") + "\n\n" + txt; })); } catch { } };
     var t = new Thread(() => {
       // QUIET PHASE (run 7 + run 8 finding: a MATCH arrived ~2 s into capture with no touch, each time a few seconds
@@ -198,7 +209,7 @@ static class WinBioGate {
     var no = new Button { Text = "No, I did not touch it", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f) };
     var yes = new Button { Text = "Yes, I touched it: approve", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f, FontStyle.Bold) };
     panel.Controls.Add(no, 0, 0); panel.Controls.Add(yes, 1, 0);
-    form.Controls.Add(label); form.Controls.Add(panel);
+    form.Controls.Add(label); form.Controls.Add(panel); AddAmount(form, label, prompt);
     no.MouseClick += (o, e) => { answer = 2; form.Close(); };
     yes.MouseClick += (o, e) => { answer = 1; form.Close(); };
     var timer = new System.Windows.Forms.Timer { Interval = 150 };

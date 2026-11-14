@@ -90,7 +90,8 @@ async function poll(){
   try{const r=await fetch('/bridge/next',{headers:{'x-bridge-token':TOKEN}}).then(r=>r.json());
     const n=document.getElementById('n'); if(r.notice){n.hidden=false;n.textContent=r.notice;}else{n.hidden=true;}
     if(!r.none&&(!cur||cur.id!==r.id)){cur={...r,title:r.display.split('\\n')[0]};
-      document.getElementById('c').innerHTML='<b>'+txt(cur.title)+'</b><pre>'+txt(r.display)+'</pre><button class="go" id="go">Approve with Windows Hello</button><button id="no">Decline</button>';
+      const amt=r.display.split('\\n').find((l)=>l.startsWith('Pay exactly:'));
+      document.getElementById('c').innerHTML='<b>'+txt(cur.title)+'</b>'+(amt?'<div style="font-size:1.5em;font-weight:700;color:#8b0000;margin:.4em 0">'+txt(amt)+'</div>':'')+'<pre>'+txt(r.display)+'</pre><button class="go" id="go">Approve with Windows Hello</button><button id="no">Decline</button>';
       document.getElementById('go').onclick=act;document.getElementById('no').onclick=decline;}}catch(e){}
   setTimeout(poll,500);}
 poll();
