@@ -149,3 +149,33 @@ test('exploratory EXP_30_HV: a flow reaching half the per-payment maximum within
   assert.equal((await pay(w, { amountYocto: near(0.03) })).buffer_ms, 600_000);
   assert.equal((await verifyWorld(w)).ok, true);
 });
+
+test('P4: the vault refuses an engine statement made for another buffer policy (ENGINE_BUFFER_POLICY_MISMATCH)', async () => {
+  const w = warm();
+  const eng = w.vault.engine; const orig = eng.decide.bind(eng);
+  eng.decide = (p, ctx, o) => orig(p, ctx, { ...o, bufferPolicy: 'FIXED_600' });
+  deny(await w.pay({ amountYocto: near(0.01) }), 'ENGINE_BUFFER_POLICY_MISMATCH');
+});
+
+test('P4 anti-splitting: the tier input counts the flow\'s whole last-hour value, not the single payment', async () => {
+  const w = warm(); let sum = 0n; let last = null;
+  for (let i = 0; i < 6; i++) { const r = await w.pay({ amountYocto: near(0.006) }); if (!r.ok) break; sum += BigInt(near(0.006)); last = w.vault.v5payments().find(p => p.payment_id === r.result.paymentId); await w.advance(12_000, 12_000); }
+  const expect = Number(sum * 10_000n / BigInt(w.root.state.purpose.perPaymentMaxYocto));
+  assert.equal(Number(stmt(last).tierInputs.flowValue1hBps), expect, 'flowValue1hBps = sum of the flow in the hour');
+  assert.ok(expect >= 5_000);
+});
+
+test('P4: a compromised engine that signs (and journals) a tier inconsistent with its own signed inputs is flagged', async () => {
+  const w = warm();
+  const eng = w.vault.engine; const orig = eng.decide.bind(eng);
+  eng.decide = (p, ctx, o) => {
+    const r = orig(p, ctx, o);
+    const statement = { ...r.statement, tier: '0', bufferMs: '30000' };
+    eng.journal.append({ type: 'BUFFER_DECISION', relatedId: p.paymentId, outcome: 'EXP_30', data: { tier: '0', bufferMs: '30000', inputs: statement.tierInputs } });
+    return { ...r, statement, sig: w.owner.riskEngine.signObj('DIAPORIA_SAFEBOX_V5_RISK_ENGINE_DECISION\n', statement) };
+  };
+  const p = await pay(w, { amountYocto: Y(6) });
+  assert.equal(p.buffer_ms, 30_000, 'the vault followed the signed tier');
+  await w.advance(2 * MIN, 10_000);
+  assert.ok(codes(await verifyWorld(w)).includes('BUFFER_DECISION_INVALID'));
+});
