@@ -68,6 +68,14 @@ test('static cases still refused: symlinked subdirectory, symlinked file, extra 
     rejects(() => verifySlot(slot, manifest), 'SLOT_CONTAINS_SYMLINK'); }
   { const { slot, manifest } = slotWorld(t); writeFileSync(join(slot, 'sub/extra'), 'x'); chmodSync(join(slot, 'sub/extra'), 0o644); rejects(() => verifySlot(slot, manifest), 'SLOT_FILE_SET_MISMATCH'); }
   { const { slot, manifest } = slotWorld(t); writeFileSync(join(slot, 'sub/x.mjs'), 'EVIL!!!\n'); rejects(() => verifySlot(slot, manifest), 'SLOT_DIGEST_MISMATCH'); }
+  // Manifest without sizes: a file larger than any packaged file is refused before it is read (review round 2, R2-2).
+  { const { slot, manifest } = slotWorld(t); writeFileSync(join(slot, 'sub/x.mjs'), Buffer.alloc((4 << 20) + 1)); chmodSync(join(slot, 'sub/x.mjs'), 0o644);
+    const code = `import fs from 'node:fs'; import { syncBuiltinESMExports } from 'node:module'; let big = 0; const R = fs.readFileSync;
+      fs.readFileSync = function (f, ...a) { const b = R.call(this, f, ...a); if (b.length > 1 << 20) big++; return b; }; syncBuiltinESMExports();
+      const { verifySlot } = await import(${JSON.stringify(join(ST, 'src/package/install.mjs'))});
+      try { verifySlot(${JSON.stringify(slot)}, ${JSON.stringify(manifest)}); console.log('ACCEPTED', big); } catch (e) { console.log(e.code, big); }`;
+    const c = spawnSync(process.execPath, ['--input-type=module', '-e', code], { encoding: 'utf8' });
+    assert.equal(c.stdout.trim(), 'SLOT_DIGEST_MISMATCH 0', c.stderr); }
 });
 
 test('protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid', (t) => {

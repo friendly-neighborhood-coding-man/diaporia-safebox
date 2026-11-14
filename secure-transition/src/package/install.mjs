@@ -6,7 +6,7 @@ import { join, dirname } from 'node:path';
 import { sha256 } from '../common/crypto.mjs';
 import { fsyncDir } from '../common/fsutil.mjs';
 import { crashPoint, ioFault } from '../common/faults.mjs';
-import { PackageError } from './tar.mjs';
+import { PackageError, LIMITS } from './tar.mjs';
 const fail = (code, detail) => { throw new PackageError(code, detail); };
 
 export function assertAllowedSlot(slotDir, allowList) {
@@ -176,7 +176,8 @@ export function verifySlot(slotDir, manifest, { expectUid } = {}) {
       if (st.isDirectory()) { const c = openDir(p, r, st); entries.push({ dfd, n, r, st: c.st, dir: true }); walk(c.fd, c.st, r); }
       else if (st.isFile()) {
         const mf = listed.get(r); if (!mf) fail('SLOT_FILE_SET_MISMATCH', `unlisted ${r}`);
-        if (mf.size !== undefined && BigInt(mf.size) !== st.size) fail('SLOT_DIGEST_MISMATCH', r);
+        // Refuse before reading: wrong size against the manifest, or (manifest without sizes) larger than any packaged file.
+        if (mf.size !== undefined ? BigInt(mf.size) !== st.size : st.size > BigInt(LIMITS.maxFileBytes)) fail('SLOT_DIGEST_MISMATCH', r);
         const f = readAt(p, r, st); found.set(r, f); entries.push({ dfd, n, r, st: f.st, dir: false }); }
       else fail('SLOT_SPECIAL_FILE', r);
     }

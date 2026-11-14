@@ -18,13 +18,13 @@ one slot exists (`tests/os`).
 | Directory swap-and-swap-back during the walk (PR #31 S4; P1) | **FIXED** | P1 during the walk: PR #27 64, now 0 |
 | File/directory replaced while later entries are verified (PR #31 S3/S6; A1, A2, A5, A9) | **FIXED** | during the walk: PR #27 58, now 0 |
 | New entry created during the walk (A4); whole-slot swap (A6, P4); ancestor swap-and-swap-back (P5) | **FIXED during the walk** | during the walk: PR #27 29, now 0 |
-| Same, landing in the final two inspecting calls (four for an entry inside a subdirectory) | **RESIDUAL** (closing window) | P5 10 schedules, A4 4, all others 0 before the last inspecting call |
+| Same, landing in the final two inspecting calls (four for an entry inside a subdirectory) | **RESIDUAL** (closing window; this width holds only with fine-grained timestamps) | P5 10 schedules, A4 4, all others 0 before the last inspecting call. With timestamps masked (round-2 review R2-1) the window is everything after the entry's own final re-check (from call 33 of 41): 455 in-call, 365 before the last check |
 | In-place content rewrite, chmod, rewrite + `utimes` (A3, A7, A8) during the walk | **PARTIAL** | 0 during the walk, but detection relies on the file's ctime (fine-grained on this kernel/fs); 9 schedules each after that file's own re-check |
 | Write through an already-dirty `MAP_SHARED` mapping during the call | **NOT FIXED** (also open on PR #27) | `tests/research/review/mmap_bypass.mjs`: SUCCESS with EVIL bytes, ctime/mtime/inode unchanged; real race 1536/3000 SUCCESS, 749 with foreign bytes on immediate re-read |
 | Verify-then-use after `verifySlot` returns | **RESIDUAL** (no verifier can close it) | needs the slot unwritable by the attacker |
 | Second uid cannot rename/write/create/link/chmod a protected slot | **VERIFIED for this probe only** | `tests/os` 3/3: all EACCES/EPERM; 524k concurrent renames denied, 35k verifySlot calls succeed |
 | `assertProtectedPath` precondition (with `expectUid`) | **FIXED** (new check) | unit + OS negative control; PR #27 accepts a slot under a directory owned by another uid |
-| Unlisted or wrong-size files refused before they are read (memory exhaustion, review F5) | **FIXED** | `SLOT_FILE_SET_MISMATCH` / `SLOT_DIGEST_MISMATCH` before any read |
+| Unlisted or wrong-size files refused before they are read (memory exhaustion, review F5) | **FIXED** | `SLOT_FILE_SET_MISMATCH` / `SLOT_DIGEST_MISMATCH` before any read. A manifest without sizes (the parser always adds them) is capped at the package limit of 4 MiB per file (round-2 R2-2; unit test shows no large read) |
 | Separated SSTP deployment (controller/app/Authority uids, launcher) | **NOT_IMPLEMENTED / NOT_RUN** | Mission 3 branch |
 | Coarse-timestamp kernels/filesystems, tmpfs/overlay/NFS, ACLs, macOS/Windows | **NOT_RUN** | non-Linux fails closed (`VERIFIER_FD_RELATIVE_UNAVAILABLE`) |
 
@@ -50,10 +50,11 @@ or a swap/swap-back before calls i < j (every pair). "During the walk" = the las
 | P3 file swap-and-swap-back | 126 / 161 | 0 / 16 / 0 |
 | P4 whole-slot swap-and-swap-back | 8 / 16 | 0 / 10 / 0 |
 | P5 ancestor swap-and-swap-back | 8 / 16 | 0 / 20 / 10 |
-| **Total** | **341 / 502** | **0 / 111 / 50** |
+| **Total** | **341 / 502** | **0 / 111 / 41** |
 
 A6–A9, P4 and P5 were added from the independent review. mmap writes are not modelled by this probe (separate
-reproducer). Files: `evidence/exhaustive-d6172ec.json`, `evidence/exhaustive-new.json`, `evidence/review-reproducers.jsonl`.
+reproducer). Lines in `review-reproducers.jsonl` carry no tree label; one `before-final` line where the attack never
+fired comes from the d6172ec run (the reviewer confirmed it fires and bypasses on this branch). Files: `evidence/exhaustive-d6172ec.json`, `evidence/exhaustive-new.json`, `evidence/review-reproducers.jsonl`.
 
 ## The change (`secure-transition/src/package/install.mjs`)
 
@@ -114,6 +115,12 @@ spec fails on PR #27 (reviewer: 3 of 4 with export shims; the exhaustive asserti
 `INDEPENDENT-REVIEW.md` (round 1, on `48ccbcc`+): code PASS_WITH_ISSUES, within-call claim FAIL (F1 HIGH mmap, F2
 MEDIUM ancestor swap, F3 MEDIUM traversal not load-bearing, F4/F5 LOW). Addressed in `3d6c254`: F2 reordered, F4 test,
 F5 pre-read refusal, F1/F3 by withdrawing the claim and relabelling (F1 stays NOT FIXED).
+
+Round 2 (`INDEPENDENT-REVIEW-ROUND2.md`, on `0a2fd75`): **PASS_WITH_ISSUES**, no regressions; F2/F4/F5 confirmed fixed
+(36/36 as root and uid 65534, OS 3/3, exhaustive numbers reproduced, mmap still SUCCESS and correctly NOT FIXED).
+R2-1 (closing window assumes fine-grained timestamps) and R2-3 (total 41, not 50) fixed in this document; R2-2 (no
+size cap for a manifest without sizes) fixed in code with a test that fails without the fix; R2-4/R2-5 noted;
+R2-6 (`readCheckedFile` exported but unused by `verifySlot`) left as is.
 
 ## Follow-up security video (optional, only after operator review)
 
