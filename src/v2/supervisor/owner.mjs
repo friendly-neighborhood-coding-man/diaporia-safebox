@@ -3,7 +3,7 @@
 // (standing limits) and owner-signed single-use task capabilities (one per intended payment).
 // The owner's issuance log is the independent verifier's ground truth of "authorized".
 import { randomUUID } from 'node:crypto';
-import { appendFileSync, existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
+import { appendFileSync, closeSync, fstatSync, openSync, readSync, constants as C } from 'node:fs';
 import { V2_DOMAINS, newSigner, makeSigner } from '../common/crypto.mjs';
 import { POLICY_V, CAP_V, REVOKE_V, UNFREEZE_V } from '../sensitive/statements.mjs';
 
@@ -28,19 +28,36 @@ export class OwnerSimulator {
     const v = { issued: new Map(), revoked: new Map(), policies: new Map(), offset: 0,
       refresh() {
         // Incremental: read only bytes appended since the last refresh (the log is append-only).
-        if (!existsSync(logPath)) return v;
-        const size = statSync(logPath).size;
-        if (size === v.offset) return v;
-        const fd = openSync(logPath, 'r'); const buf = Buffer.alloc(size - v.offset);
-        readSync(fd, buf, 0, buf.length, v.offset); closeSync(fd);
-        const text = buf.toString('utf8'); const cut = text.lastIndexOf('\n') + 1;
-        v.offset += Buffer.byteLength(text.slice(0, cut));
+        // Open with O_NOFOLLOW and read that descriptor, so a symlink cannot be swapped in
+        // between the size check and the read.
+        let fd;
+        try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW); }
+        catch (e) {
+          if (e.code === 'ENOENT') return v;
+          if (e.code === 'ELOOP') { const err = new Error('OWNER_LOG_SYMLINK'); err.code = 'OWNER_LOG_SYMLINK'; throw err; }
+          throw e;
+        }
+        try {
+          const st = fstatSync(fd);
+          if (!st.isFile()) { const err = new Error('OWNER_LOG_NOT_A_FILE'); err.code = 'OWNER_LOG_NOT_A_FILE'; throw err; }
+          if (st.size < v.offset) { const err = new Error('OWNER_LOG_TRUNCATED'); err.code = 'OWNER_LOG_TRUNCATED'; throw err; }
+          if (st.size === v.offset) return v;
+          const buf = Buffer.alloc(st.size - v.offset);
+          let off = 0;
+          while (off < buf.length) {
+            const n = readSync(fd, buf, off, buf.length - off, v.offset + off);
+            if (n === 0) break;
+            off += n;
+          }
+          const text = buf.subarray(0, off).toString('utf8'); const cut = text.lastIndexOf('\n') + 1;
+          v.offset += Buffer.byteLength(text.slice(0, cut));
         const lines = text.slice(0, cut).split('\n');
         for (const l of lines) { if (!l) continue; const r = JSON.parse(l);
           if (r.type === 'CAP') v.issued.set(r.cap.capId, { cap: r.cap, issuedAtMs: r.issuedAtMs });
           else if (r.type === 'REVOKE') v.revoked.set(r.capId, r.at);
           else if (r.type === 'POLICY') v.policies.set(r.policy.policyId, r.policy); }
-        return v;
+          return v;
+        } finally { closeSync(fd); }
       } };
     return v.refresh();
   }
