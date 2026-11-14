@@ -8,6 +8,7 @@
 //
 //   node scripts/v6/real-device.mjs [--helper tools\winbio-gate\winbio-gate.exe] [--gmail-creds <file> --to <addr>] [--record] [--port 47610]
 //
+//   --only-workflow-a: Workflow A only (no alert, no freeze), used for the PIN-fallback check.
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -153,7 +154,10 @@ try {
 } catch (e) { results.workflowA = { error: e.code ?? e.message }; ev('FAIL', 'Workflow A: ' + (e.code ?? e.message)); }
 
 // ================================================================== Workflow B
-try {
+// --only-workflow-a: the PIN-fallback test (owner answers Windows Hello with a PIN and does NOT touch the sensor at the
+// gate); no incident, no email, no freeze
+if (flag('--only-workflow-a')) { results.workflowB = { skipped: 'ONLY_WORKFLOW_A' }; ev('INFO', 'Workflow B skipped (--only-workflow-a): no alert is sent'); }
+else try {
   ev('STEP', 'Workflow B: a burst from k1-phone (simulated stolen key) triggers a Risk Engine incident and a security alert');
   for (let i = 0; i < 4; i++) { await w.pay({ credId: 'k1-phone', amountYocto: (10n ** 22n).toString() }); await w.advance(60_000); }
   const row = w.notify.outbox().filter((o) => o.kind === 'INCIDENT' && o.locator).at(-1);
