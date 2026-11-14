@@ -61,7 +61,7 @@ button{font:inherit;padding:9px 16px;border-radius:7px;border:1px solid #8893a1;
 "use strict";
 const b64u=(b)=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
 const fromB64u=(s)=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4)),c=>c.charCodeAt(0));
-let cur=null; const TOKEN=new URLSearchParams(location.hash.slice(1)).get('t')||''; if(!TOKEN)document.body.insertAdjacentHTML('afterbegin','<p style="color:#b00"><b>Missing bridge secret: open the exact link the SafeBox runner printed.</b></p>');
+let cur=null; const TOKEN=new URLSearchParams(location.hash.slice(1)).get('t')||''; if(TOKEN)history.replaceState(null,'',location.pathname+location.search); if(!TOKEN)document.body.insertAdjacentHTML('afterbegin','<p style="color:#b00"><b>Missing bridge secret: open the exact link the SafeBox runner printed.</b></p>');
 async function send(r){await fetch('/bridge/result',{method:'POST',headers:{'content-type':'application/json','x-bridge-token':TOKEN},body:JSON.stringify(r)});}
 function txt(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 async function act(){

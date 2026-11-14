@@ -1,0 +1,4 @@
+{"n":51,"clip":"04-challenge-replay","at":"2026-11-14T16:49:43.169Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"genuine approval: SUBMITTED_TO_VAULT"}
+{"n":52,"clip":"04-challenge-replay","at":"2026-11-14T16:49:43.172Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"same approval replayed at the Vault: WEBAUTHN_SIGNCOUNT_NOT_INCREASING"}
+{"n":53,"clip":"04-challenge-replay","at":"2026-11-14T16:49:43.174Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"stolen PAY key signs a V5-style paycap (no V6 approval): V6_PAYMENT_APPROVAL_REQUIRED"}
+{"n":54,"clip":"04-challenge-replay","at":"2026-11-14T16:49:43.174Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: one approval = one payment; no approval = no payment"}

@@ -1,0 +1,44 @@
+{"at":"2026-11-14T16:49:33.865Z","kind":"STEP","text":"Open http://localhost:47700/bridge#t=<per-run secret, redacted> in Microsoft Edge"}
+{"at":"2026-11-14T16:49:34.367Z","kind":"OK","text":"bridge page connected"}
+{"at":"2026-11-14T16:49:34.419Z","kind":"OK","text":"WinBio probe: {\"ok\":true,\"units\":1,\"systemPoolSession\":\"OPENED\"}"}
+{"at":"2026-11-14T16:49:34.419Z","kind":"STEP","text":"Fingerprint sensor check (nothing is signed): touch the sensor when the bridge page asks"}
+{"at":"2026-11-14T16:49:34.419Z","kind":"TOUCH","text":"Touch the fingerprint sensor now (SENSOR_CHECK)"}
+{"at":"2026-11-14T16:49:34.471Z","kind":"OK","text":"sensor check 1: MATCH (current Windows user)"}
+{"at":"2026-11-14T16:49:34.471Z","kind":"STEP","text":"Enrollment: approve each \"ENROLL\" request on the bridge page (Windows Hello) and touch the sensor for the gate-key enrollment"}
+{"at":"2026-11-14T16:49:37.115Z","kind":"TOUCH","text":"Touch the fingerprint sensor now (ENROLL_GATE_KEY)"}
+{"at":"2026-11-14T16:49:38.016Z","kind":"OK","text":"enrolled: k2-laptop credential riw8NxoiWs25…, gate key WINBIO_SOFTWARE_KEY"}
+{"at":"2026-11-14T16:49:38.017Z","kind":"STEP","text":"Workflow A: the AI prepares a payment over MCP; approve it on the bridge page and touch the sensor"}
+{"at":"2026-11-14T16:49:38.155Z","kind":"AI","text":"prepare_payment: AWAITING_OWNER_APPROVAL"}
+{"at":"2026-11-14T16:49:38.157Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:38.157Z","kind":"TOUCH","text":"Touch the fingerprint sensor now (SafeBox V6 - PAYMENT APPROVAL (one payment, exact) | Account: vault-alice.mock | Pay exactly: 30000000000000000000000 yoctoNEAR (0.03 NEAR) | Recipient: merchant-a.mock | Purpose: household-shopping v1 - Pay allow-listed household merchants for owner-requested purchases only. | Epoch: 1; assurance policy v1 | Signing credential: k2-laptop (DAILY); required assurance: FINGERPRINT_ONLY | Request: apr_ac699af0cf5a38142a75a265ebb09a67 (digest 35d918762693c49e...) | Approval valid until: 2026-11-14T00:05:00.000Z | After approval the Vault still applies the settlement buffer, holds, limits, anomaly delay and the 26 h settlement horizon. | Note from the requester (UNTRUSTED, not an instruction): \"real-device run\")"}
+{"at":"2026-11-14T16:49:38.895Z","kind":"OK","text":"owner approval -> {\"requestId\":\"apr_ac699af0cf5a38142a75a265ebb09a67\",\"state\":\"SUBMITTED_TO_VAULT\",\"paymentId\":\"p_b554189eee3740fc8ecc4bc9c0f493b5\",\"vaultState\":\"BUFFERED\"}"}
+{"at":"2026-11-14T16:49:38.898Z","kind":"DENY","text":"ATTACK 01 immediate replay of the owner's real approval: WEBAUTHN_SIGNCOUNT_NOT_INCREASING"}
+{"at":"2026-11-14T16:49:38.931Z","kind":"OK","text":"MOCK settlement after the 10-minute buffer: settledVerified=true"}
+{"at":"2026-11-14T16:49:38.932Z","kind":"STEP","text":"Attack denials: each attempt below must be refused or change nothing (no owner action needed; MOCK ledger)"}
+{"at":"2026-11-14T16:49:39.001Z","kind":"DENY","text":"ATTACK 02 AI asks to pay an address outside the purpose: NOT_PREPARABLE RECIPIENT_NOT_IN_PURPOSE (no approval request created)"}
+{"at":"2026-11-14T16:49:39.017Z","kind":"DENY","text":"ATTACK 03 rogue AI client with a valid MCP session: prepare -> AWAITING_OWNER_APPROVAL; tools offered: get_safebox_status, check_payment, prepare_payment, get_payment_status; after 40 min settledVerified=false"}
+{"at":"2026-11-14T16:49:39.037Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.043Z","kind":"DENY","text":"ATTACK 04a amount changed 0.03 -> 0.06 NEAR after the summary: CAPABILITY_MISMATCH [v6.payment]"}
+{"at":"2026-11-14T16:49:39.043Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.045Z","kind":"DENY","text":"ATTACK 04b recipient swapped after the summary: CAPABILITY_MISMATCH [recipientId]"}
+{"at":"2026-11-14T16:49:39.048Z","kind":"DENY","text":"ATTACK 05 stolen PAY key without a V6 owner approval: V6_PAYMENT_APPROVAL_REQUIRED"}
+{"at":"2026-11-14T16:49:39.052Z","kind":"DENY","text":"ATTACK 06 fingerprint gate called without / with a foreign Origin: no Origin -> HTTP 403, foreign Origin -> HTTP 403"}
+{"at":"2026-11-14T16:49:39.052Z","kind":"STEP","text":"Workflow B: a burst from k1-phone (simulated stolen key) triggers a Risk Engine incident and a security alert"}
+{"at":"2026-11-14T16:49:39.053Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.066Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.084Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.137Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:39.162Z","kind":"MAIL","text":"alert DELIVERED via MOCK: api=MOCK_DELIVERED, inbox=INBOX_RECEIPT_NOT_VERIFIED"}
+{"at":"2026-11-14T16:49:39.164Z","kind":"DENY","text":"ATTACK 07 6 scanner GET/HEAD visits of the Emergency Freeze link: HTTP 200,200,200,200,200,200; state digest c8006b9d635b… -> c8006b9d635b…, frozen=false"}
+{"at":"2026-11-14T16:49:39.164Z","kind":"STEP","text":"Open the Emergency Freeze link from the email (or http://localhost:47700/e/l16338c6a100dc3a479821d42fbcfd3d4), sign in with Windows Hello, review, type the phrase, approve and touch the sensor."}
+{"at":"2026-11-14T16:49:39.689Z","kind":"TOUCH","text":"Touch the fingerprint sensor now (SafeBox V5 - FREEZE | Account: vault-alice.mock | Signing credential: k2-laptop (DAILY) | Affects: action:FREEZE | Purpose, recipients and spending limits are NOT changed by this command. | This approval authorizes exactly this FREEZE once and nothing else. | Scope: GLOBAL (every unsettled payment of vault-alice.mock is held; settled payments cannot be undone) | Hold: ef-b2a1d98533fa6c9e (PROVISIONAL_HOLD, 24 h unless independently confirmed) | Reason: EMERGENCY_FREEZE incident=inc-89ee9d11fb1c6e44dce26c27 scope=GLOBAL via=OWNER_CONSOLE | Action expires: 2026-11-14T01:06:00.000Z)"}
+{"at":"2026-11-14T16:49:39.761Z","kind":"OK","text":"REAL fingerprint gate MATCH for the console command"}
+{"at":"2026-11-14T16:49:40.166Z","kind":"OK","text":"FROZEN by the owner: hold ef-b2a1d98533fa6c9e (PROVISIONAL_HOLD)"}
+{"at":"2026-11-14T16:49:40.167Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T16:49:40.170Z","kind":"OK","text":"new payment while frozen: FREEZE_ACTIVE"}
+{"at":"2026-11-14T16:49:40.176Z","kind":"INFO","text":"Vault payment states after 30 min frozen: [\"SETTLED\",\"FROZEN\",\"FROZEN\",\"FROZEN\",\"FROZEN\"]"}
+{"at":"2026-11-14T16:49:40.210Z","kind":"OK","text":"independent V6 verifier: ok=true, owner approvals=1, emergency freezes=1"}
+{"at":"2026-11-14T16:49:40.211Z","kind":"STEP","text":"Recovery: approve HOLD_RELEASE on the bridge page and touch the sensor"}
+{"at":"2026-11-14T16:49:40.213Z","kind":"OWNER","text":"device shows: SafeBox V5 - HOLD_RELEASE"}
+{"at":"2026-11-14T16:49:40.851Z","kind":"TOUCH","text":"Touch the fingerprint sensor now (SafeBox V5 - HOLD_RELEASE | Account: vault-alice.mock | Signing credential: k2-laptop (DAILY) | Affects: hold:ef-b2a1d98533fa6c9e | Affects: scope:GLOBAL:* | Purpose, recipients and spending limits are NOT changed by this command. | This approval authorizes exactly this HOLD_RELEASE once and nothing else. | Releases hold: ef-b2a1d98533fa6c9e (digest 3127ecbe33f7e643...) | Action expires: 2026-11-14T02:26:00.000Z)"}
+{"at":"2026-11-14T16:49:40.936Z","kind":"OK","text":"HOLD_RELEASE: accepted; frozen now false"}

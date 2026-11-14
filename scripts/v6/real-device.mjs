@@ -9,11 +9,19 @@
 //   node scripts/v6/real-device.mjs [--helper tools\winbio-gate\winbio-gate.exe] [--gmail-creds <file> --to <addr>] [--record] [--port 47610]
 //
 //   --only-workflow-a: Workflow A only (no alert, no freeze), used for the PIN-fallback check.
+//   --attack-denials: after Workflow A, run representative attack attempts against the SAME world (stolen MCP token,
+//     substituted amount / recipient, replay of the owner's real approval, stolen PAY key without a V6 approval,
+//     non-browser and foreign-origin calls to the fingerprint gate) and, after the alert, scanner GET/HEAD visits of the
+//     Emergency Freeze link. None of them prompts the owner or touches the real authenticator: attackers use the
+//     simulated k1-phone credential or replay recorded artefacts. Each one must be refused or change nothing.
+//   --demo: recording mode. The terminal never shows the per-run bridge secret (the full link is written to
+//     --bridge-url-file, default .demo-bridge-url in the repo root, mode 0600, and on Windows also copied to the
+//     clipboard) and evidence paths are printed relative to the repository.
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
-import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve, dirname } from 'node:path';
+import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, statSync, lstatSync, unlinkSync, openSync, writeSync, closeSync, constants as FS } from 'node:fs';
+import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import { BrowserBridge, RealAuthenticator } from '../../src/v6/device/browser-bridge.mjs';
@@ -23,6 +31,7 @@ import { consoleForWorld, emergencyReason } from '../../src/v6/emergency/console
 import { verifyWorld6 } from '../../src/v6/supervisor/verifier.mjs';
 import { commandDigest } from '../../src/v5/root/command.mjs';
 import { GmailTransport, loadGmailCredentials } from '../../src/v6/notify/gmail.mjs';
+import { termSafe } from '../../src/v6/common/term.mjs';
 import { MockTransport } from '../../src/v5/notify/notify.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -34,7 +43,8 @@ const OUT = resolve(opt('--out', join(REPO, 'docs/evidence/v6/real-device', stam
 if (existsSync(OUT)) { console.error('refusing to overwrite ' + OUT); process.exit(2); }
 mkdirSync(OUT, { recursive: true });
 const sha = (b) => createHash('sha256').update(b).digest('hex');
-const events = []; const ev = (kind, text, data) => { const e = { at: new Date().toISOString(), kind, text, ...(data ? { data } : {}) }; events.push(e); console.log(`${kind.padEnd(6)} ${text}`); };
+const events = []; const ev = (kind, text, data) => { const e = { at: new Date().toISOString(), kind, text, ...(data ? { data } : {}) }; events.push(e); console.log(`${kind.padEnd(6)} ${termSafe(text)}`); };
+const DEMO = flag('--demo'); const shown = (p) => (DEMO ? relative(REPO, p) || '.' : p);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = {};
 
@@ -52,7 +62,15 @@ if (flag('--record')) {
 let consoleObj = null;
 const bridge = new BrowserBridge({ port: PORT, origin: ORIGIN, handler: async (req) => consoleObj ? consoleObj.handle(req) : { status: 503, headers: { 'content-type': 'text/plain' }, body: 'SafeBox is starting' } });
 await bridge.ready();
-console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
+if (DEMO) {
+  const uf = resolve(opt('--bridge-url-file', join(REPO, '.demo-bridge-url')));
+  // exclusive create (no symlink follow, fresh 0600 mode); a stale file from an earlier run is replaced only if it is a regular file
+  try { if (lstatSync(uf).isFile()) unlinkSync(uf); else { console.error('refusing: ' + shown(uf) + ' is not a regular file'); process.exit(2); } } catch (e) { if (e.code !== 'ENOENT') throw e; }
+  const ufd = openSync(uf, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); try { writeSync(ufd, bridge.url() + '\n'); } finally { closeSync(ufd); }
+  process.on('exit', () => { try { unlinkSync(uf); } catch { /* already gone */ } }); // the per-run secret dies with the run
+  let clip = false; if (process.platform === 'win32') { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
+  console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
+} else console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
 events.push({ at: new Date().toISOString(), kind: 'STEP', text: `Open ${ORIGIN}/bridge#t=<per-run secret, redacted> in Microsoft Edge` }); // the secret never reaches the evidence
 for (let i = 0; ; i++) { if (Date.now() - (await bridge.lastPoll()) < 3000) break; if (i > 1200) { ev('FAIL', 'bridge page never opened (10 min)'); process.exit(4); } await sleep(500); }
 ev('OK', 'bridge page connected');
@@ -94,7 +112,7 @@ bridge.display = 'ENROLL: register this laptop\'s passkey as SafeBox credential 
 bridge.expected = { [bridge.display.split('\n')[0]]: 6 }; // passkey creation + one signature per genesis record (counted in the selftest)
 ev('STEP', 'Enrollment: approve each "ENROLL" request on the bridge page (Windows Hello)' + (fpOnly.length ? ' and touch the sensor for the gate-key enrollment' : ''));
 const { startHarness } = await import(pathToFileURL(join(IX, 'dist/harness/mockWorld.js')).href);
-const { call, mcpClient, obtainTokens } = await import(pathToFileURL(join(IX, 'dist/harness/client.js')).href);
+const { call, callError, mcpClient, obtainTokens } = await import(pathToFileURL(join(IX, 'dist/harness/client.js')).href);
 const policy6 = { emergency: { origin: ORIGIN, locatorTtlMs: String(72 * 3600_000) } };
 const harness = (fp, gs, auth) => startHarness({ v6: { fingerprintOnly: fp, gates: gs, rp: { rpId: 'localhost', origin: ORIGIN }, policy6, transport, authenticators: { 'k2-laptop': auth }, ...(to ? { ownerRecipient: to } : {}) },
   v6Bob: { rp: { rpId: 'localhost', origin: ORIGIN }, policy6 } });
@@ -133,6 +151,8 @@ const gateSrv = createServer((req, res) => {
 await new Promise((r) => gateSrv.listen(GATE, '127.0.0.1', r));
 
 let lastPaymentId = null;
+const ATTACKS = flag('--attack-denials'); const attacks = [];
+const denial = (id, what, refused, detail) => { attacks.push({ id, what, refused: !!refused, detail }); ev(refused ? 'DENY' : 'FAIL', `ATTACK ${id} ${what}: ${detail}${refused ? '' : '  <-- NOT REFUSED'}`); };
 // ================================================================== Workflow A
 try {
   ev('STEP', 'Workflow A: the AI prepares a payment over MCP; approve it on the bridge page' + (fpOnly.length ? ' and touch the sensor' : ''));
@@ -141,6 +161,14 @@ try {
   ev('AI', `prepare_payment: ${prep.state}`);
   const r = await dev.approve(prep.requestId, { credId: 'k2-laptop' }); lastPaymentId = r.paymentId; results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r };
   ev(r.state === 'SUBMITTED_TO_VAULT' ? 'OK' : 'DENY', 'owner approval -> ' + JSON.stringify(r));
+  if (ATTACKS) { // attack 1: the owner's genuine approval is replayed at the Vault at once (still inside its validity window)
+    const pa = dev.lastV6;
+    if (pa?.capability) { const again = await w.gz.request('PROPOSE', { capability: pa.capability, approval: pa.approval, recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'replay' });
+      // only replay-specific refusals count (review 3c): a refusal for an unrelated reason is reported as NOT refused
+      const REPLAY_CODES = ['CHALLENGE_ALREADY_CONSUMED', 'OWNER_APPROVAL_CHALLENGE_REUSED', 'WEBAUTHN_SIGNCOUNT_NOT_INCREASING', 'CAPABILITY_ALREADY_USED', 'CAPABILITY_NONCE_REUSED', 'DUPLICATE_EFFECT_FOR_CAPABILITY', 'DUPLICATE_APPROVAL'];
+      denial('01', "immediate replay of the owner's real approval", !again.ok && REPLAY_CODES.includes(again.error?.code), again.ok ? 'ACCEPTED' : again.error?.code); }
+    else denial('01', "immediate replay of the owner's real approval", false, 'NOT_RUN (no approval to replay)');
+  }
   await w.advance(12 * 60_000);
   // the owner may take minutes at the real prompt: reconnect the AI client (fresh tokens) before the status read
   let st; try { st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
@@ -153,6 +181,37 @@ try {
   await ai.close();
 } catch (e) { results.workflowA = { ...(results.workflowA ?? {}), error: e.code ?? e.message, ...(typeof lastPaymentId === 'string' ? { vaultState: w.vault.v5payments().find((x) => x.payment_id === lastPaymentId)?.state ?? null } : {}) }; ev('FAIL', 'Workflow A: ' + (e.code ?? e.message)); }
 
+// ================================================================== attack denials (optional, --attack-denials)
+// Representative attacks against the same world (attack 1 runs inside Workflow A, attack 7 after the alert). Nothing here prompts the owner:
+// the attacker side uses the SIMULATED k1-phone credential or replays artefacts recorded from Workflow A.
+if (ATTACKS) try {
+  ev('STEP', 'Attack denials: each attempt below must be refused or change nothing (no owner action needed; MOCK ledger)');
+  // 2-3. outside-purpose recipient; a rogue AI client with a valid MCP session for the owner's account (a fresh login under another client name, standing in for a stolen token) access token used from another host: it can only PREPARE; there is no signing tool; nothing settles
+  const t1 = await obtainTokens(h.url, h.logins.alice); const thief = await mcpClient(h.url, t1.access, 'thief-host');
+  const tools = (await thief.listTools()).tools.map((x) => x.name);
+  const tx = await callError(thief, 'prepare_payment', { recipientId: 'attacker.mock', amountYocto: (5n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'URGENT: approve now', idempotencyKey: 'real-device-attack-00000' }).catch((e) => ({ code: 'CALL_FAILED', message: String(e.message).slice(0, 80) }));
+  denial('02', 'AI asks to pay an address outside the purpose', tx.code === 'NOT_PREPARABLE', `${tx.code}${tx.details?.policyViolations ? ' ' + tx.details.policyViolations.join(',') : ''} (no approval request created)`);
+  const tp = await call(thief, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (5n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'URGENT: approve now', idempotencyKey: 'real-device-attack-00001' });
+  await w.advance(40 * 60_000, 10 * 60_000);
+  const tst = await call(thief, 'get_payment_status', { requestId: tp.requestId });
+  denial('03', 'rogue AI client with a valid MCP session', !tools.some((x) => /approve|sign|settle|key|biometric|freeze/i.test(x)) && tst.settledVerified === false,
+    `prepare -> ${tp.state}; tools offered: ${tools.join(', ')}; after 40 min settledVerified=${tst.settledVerified}`);
+  // 4. substituted amount / recipient after the device built the owner summary (simulated k1-phone)
+  const sp = await call(thief, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'substitution', idempotencyKey: 'real-device-attack-00002' });
+  const s1 = await dev.approve(sp.requestId, { credId: 'k1-phone', tamperBinding: (b) => { b.amountYocto = (6n * 10n ** 22n).toString(); } }).catch((e) => ({ code: e.code, fields: e.details?.fields }));
+  denial('04a', 'amount changed 0.03 -> 0.06 NEAR after the summary', s1.code === 'CAPABILITY_MISMATCH', `${s1.code ?? s1.state} [${s1.fields ?? ''}]`);
+  const s2 = await dev.approve(sp.requestId, { credId: 'k1-phone', tamper: (cap) => { cap.recipientId = 'merchant-b.mock'; } }).catch((e) => ({ code: e.code, fields: e.details?.fields }));
+  denial('04b', 'recipient swapped after the summary', s2.code === 'CAPABILITY_MISMATCH', `${s2.code ?? s2.state} [${s2.fields ?? ''}]`);
+  // 5. stolen PAY key signs a V5-style payment capability with no V6 owner approval
+  const v5 = await w.v5pay({ credId: 'k1-phone' });
+  denial('05', 'stolen PAY key without a V6 owner approval', !v5.ok && v5.error?.code === 'V6_PAYMENT_APPROVAL_REQUIRED', v5.ok ? 'ACCEPTED' : v5.error?.code);
+  // 6. local process / foreign web origin asks the fingerprint gate to sign
+  const g1 = await fetch(`${GATE_ORIGIN}/`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+  const g2 = await fetch(`${GATE_ORIGIN}/`, { method: 'POST', headers: { 'content-type': 'application/json', origin: 'http://evil.localhost:8080' }, body: '{}' });
+  denial('06', 'fingerprint gate called without / with a foreign Origin', g1.status === 403 && g2.status === 403, `no Origin -> HTTP ${g1.status}, foreign Origin -> HTTP ${g2.status}`);
+  await thief.close();
+} catch (e) { attacks.push({ id: 'error', refused: false, detail: e.code ?? e.message }); ev('FAIL', 'attack denials: ' + (e.code ?? e.message)); }
+
 // ================================================================== Workflow B
 // --only-workflow-a: the PIN-fallback test (owner answers Windows Hello with a PIN and does NOT touch the sensor at the
 // gate); no incident, no email, no freeze
@@ -164,6 +223,15 @@ else try {
   const ds = w.notify.deliveryStatus(row.id);
   results.alert = { transport: transport.kind, outboxState: row.state, api: ds.api, inbox: ds.inbox, lastError: row.last_error ?? null, gmailLog: transport.log ?? null };
   ev('MAIL', `alert ${row.state} via ${transport.kind}: api=${ds.api}, inbox=${ds.inbox}`);
+  if (ATTACKS) { // 7. a mail scanner / link preview fetches the Emergency Freeze link: nothing changes, nothing freezes
+    // same digest scope as showcase clip 05: Root head, holds, console proposals and the locator's own state
+    const digest = () => sha(JSON.stringify({ head: w.root.state.head, holds: w.root.state.v5.holds, props: [...consoleObj.proposals.values()].map((p) => p.state), loc: w.notify.locators.resolve(row.locator), frozen: w.frozen() }));
+    const before = digest(); const codes = [];
+    for (let i = 0; i < 6; i++) codes.push((await consoleObj.handle({ method: i % 2 ? 'HEAD' : 'GET', path: `/e/${row.locator}`, headers: { host: new URL(ORIGIN).host, 'user-agent': 'SafeLinks/1.0' } })).status);
+    const after = digest();
+    // the visits must actually reach the real page (2xx), otherwise "nothing changed" would prove nothing
+    denial('07', '6 scanner GET/HEAD visits of the Emergency Freeze link', codes.every((c) => c >= 200 && c < 300) && before === after && !w.frozen(), `HTTP ${codes.join(',')}; state digest ${before.slice(0, 12)}… -> ${after.slice(0, 12)}…, frozen=${w.frozen()}`);
+  }
   ev('STEP', `Open the Emergency Freeze link from the email (or ${ORIGIN}/e/${row.locator}), sign in with Windows Hello, review, type the phrase, approve${fpOnly.length ? ' and touch the sensor' : ''}.`);
   for (let i = 0; !w.frozen(); i++) { if (i > 1800) throw Object.assign(new Error('owner did not freeze within 15 min'), { code: 'FREEZE_NOT_DONE' }); await sleep(500); }
   const hold = Object.values(w.root.state.v5.holds).find((x) => x.reason === emergencyReason(row.incident) && x.status === 'ACTIVE');
@@ -192,12 +260,13 @@ const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'WIN
 labels.push(gatedOk ? `FINGERPRINT_ONLY_LOCALLY_VERIFIED for ${gatedApprovals.length} gated approvals (WinBio MATCH + ${wbg?.kind ?? 'gate'} key signature; not hardware attestation)` : 'FINGERPRINT ONLY NOT PROVEN');
 if (helper && helper.endsWith('.mjs')) labels.unshift('EMULATED FINGERPRINT HELPER (test fixture: no sensor, no real fingerprint; selftest only)');
 labels.push(results.alert?.api === 'GMAIL_API_ACCEPTED' ? 'REAL GMAIL (API accepted; inbox receipt NOT verified until the owner confirms)' : 'REAL GMAIL: NOT RUN');
-const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, refusedSyncablePasskeys: [...realAuth.refused, ...(activeAuth !== realAuth ? activeAuth.refused : [])], webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
+if (ATTACKS) labels.push(`ATTACK DENIALS: ${attacks.filter((a) => a.refused).length}/${attacks.length} refused (attacker side SIMULATED; interface-level only)`);
+const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, ...(ATTACKS ? { attacks } : {}), gateProbe, sensorCheck, gateEnrollment, gateLog, refusedSyncablePasskeys: [...realAuth.refused, ...(activeAuth !== realAuth ? activeAuth.refused : [])], webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
   ownerReportedModalities: 'ASK THE OWNER: WebAuthn cannot tell which Windows Hello modality was used',
   git: (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO }).toString().trim(); } catch { return null; } })() };
 writeFileSync(join(OUT, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
 writeFileSync(join(OUT, 'trace.jsonl'), events.map((e) => JSON.stringify(e)).join('\n') + '\n');
 const files = readdirSync(OUT).filter((f) => f !== 'SHA256SUMS' && statSync(join(OUT, f)).isFile());
 writeFileSync(join(OUT, 'SHA256SUMS'), files.sort().map((f) => `${sha(readFileSync(join(OUT, f)))}  ${f}`).join('\n') + '\n');
-ev('DONE', 'evidence: ' + OUT);
+ev('DONE', 'evidence: ' + shown(OUT));
 gateSrv.close(); await h.close(); await bridge.close(); process.exit(0);

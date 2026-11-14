@@ -41,6 +41,7 @@ const { call, callError, mcpClient, obtainTokens } = await import(pathToFileURL(
 const { consoleForWorld, CONFIRM_PHRASE, emergencyReason } = await import('../../src/v6/emergency/console.mjs');
 const { verifyWorld6 } = await import('../../src/v6/supervisor/verifier.mjs');
 const { GmailTransport, loadGmailCredentials } = await import('../../src/v6/notify/gmail.mjs');
+const { termSafe } = await import('../../src/v6/common/term.mjs');
 const { MockTransport } = await import('../../src/v5/notify/notify.mjs');
 const { LABELS } = await import('../../src/v6/common/v6.mjs');
 let chromium = null;
@@ -70,7 +71,9 @@ const events = []; let clip = 'main';
 const labelsUsed = new Set([LABELS.MOCK_LEDGER, LABELS.SIMULATED_DEVICE, LABELS.FINGERPRINT_ONLY_NOT_PROVEN]);
 function ev(kind, text, data = undefined) {
   const e = { n: events.length, clip, at: new Date().toISOString(), mockTime: new Date(w.now()).toISOString(), kind, text, ...(data !== undefined ? { data } : {}) };
-  events.push(e); console.log(`[${clip}] ${kind.padEnd(7)} ${text}`); return e;
+  // CodeQL js/log-injection: event text can carry request-derived strings (memo, subject, hold reason). The terminal
+  // line is one line per event: CR/LF and other control characters are made visible, never interpreted.
+  events.push(e); console.log(`[${clip}] ${kind.padEnd(7)} ${termSafe(text)}`); return e;
 }
 const VIEWER = (id) => `<!DOCTYPE html><html><head><meta charset="utf-8"><title>SafeBox showcase</title><style>
 body{margin:0;font:15px/1.4 ui-monospace,Menlo,Consolas,monospace;background:#0f1419;color:#d6dde6}

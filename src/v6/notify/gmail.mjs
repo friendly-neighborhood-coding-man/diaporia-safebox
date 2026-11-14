@@ -9,7 +9,7 @@
 // * Secrets (client secret, refresh / access tokens) are held in memory only, never logged, never journaled. Request
 //   and response metadata are logged with recipient / subject reduced to hashes and the message id truncated.
 import { createHash, randomUUID } from 'node:crypto';
-import { readFileSync, statSync } from 'node:fs';
+import { openSync, fstatSync, readFileSync, closeSync, constants as FS } from 'node:fs';
 
 export const GMAIL_SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -27,8 +27,15 @@ export function buildRfc822({ from, to, subject, text, idempotencyKey, domain = 
 /** Loads operator OAuth credentials from a JSON file OUTSIDE the repository: {client_id, client_secret, refresh_token, sender}. */
 export function loadGmailCredentials(path) {
   if (!path) throw Object.assign(new Error('no credentials path'), { code: 'GMAIL_CREDENTIALS_MISSING' });
-  statSync(path);
-  const j = JSON.parse(readFileSync(path, 'utf8'));
+  // CodeQL js/file-system-race: open once and read through the same descriptor (no stat-then-read by path). O_NOFOLLOW
+  // where the platform has it (POSIX); a symlinked or non-regular credentials file is refused.
+  const fd = openSync(path, FS.O_RDONLY | (FS.O_NOFOLLOW ?? 0) | (FS.O_NONBLOCK ?? 0)); // O_NONBLOCK: a FIFO cannot hang the loader
+  let raw;
+  try {
+    if (!fstatSync(fd).isFile()) throw Object.assign(new Error('credentials path is not a regular file'), { code: 'GMAIL_CREDENTIALS_INVALID' });
+    raw = readFileSync(fd, 'utf8');
+  } finally { closeSync(fd); }
+  const j = JSON.parse(raw);
   for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) if (typeof j[k] !== 'string' || !j[k]) throw Object.assign(new Error('credentials field ' + k), { code: 'GMAIL_CREDENTIALS_INVALID' });
   return { clientId: j.client_id, clientSecret: j.client_secret, refreshToken: j.refresh_token, sender: j.sender };
 }

@@ -1,0 +1,4 @@
+{"n":75,"clip":"10-email-cannot-approve","at":"2026-11-14T16:49:43.292Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"MAIL","text":"the email contains 1 URL(s), all of the form http://localhost:47610/e/<opaque locator>"}
+{"n":76,"clip":"10-email-cannot-approve","at":"2026-11-14T16:49:43.293Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"forwarded-mail holder posts the locator as a confirmation: NOT_AUTHENTICATED"}
+{"n":77,"clip":"10-email-cannot-approve","at":"2026-11-14T16:49:43.293Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"locator used as a login: LOGIN_UNKNOWN"}
+{"n":78,"clip":"10-email-cannot-approve","at":"2026-11-14T16:49:43.293Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: email carries no authority and asks for nothing"}
