@@ -40,8 +40,10 @@ export class ExecutionVaultV6 extends ExecutionVaultV5 {
         // authenticate the owner's signature first (pure check on the replica; super.propose re-verifies and reserves)
         if (this.rootAlarm()) fail('ROOT_INTEGRITY_ALARM');
         const floor = (c) => this.store.db.prepare('SELECT n FROM sign_floor WHERE cred_id=?').get(c)?.n ?? 0;
-        const v = verifyPaycap(this.root, { capability: inner?.capability, approval: inner?.approval }, { now: this.now(), signCountFloor: floor });
-        if (strict || fpCreds.includes(v.credId)) {
+        let v;
+        try { v = verifyPaycap(this.root, { capability: inner?.capability, approval: inner?.approval }, { now: this.now(), signCountFloor: floor }); }
+        catch (e) { if (strict) throw e; v = null; } // LEGACY_V5: a bad paycap is refused and attributed by the V5 core, as before
+        if (v && (strict || fpCreds.includes(v.credId))) {
           pre = verifyPaymentApproval(this.root, { cap: v.cap, credId: v.credId, v6 }, this.now());
           if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');
         }

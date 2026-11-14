@@ -120,3 +120,32 @@ for (const fingerprintAssurance of ['LOCAL_GATE', 'HIGH_ASSURANCE']) {
     assert.equal(w.vault.v5payments().length, before + 1);
   });
 }
+
+test('P0.1-legacy: with fingerprint-only credentials configured, a UV credential\'s bad paycap under LEGACY_V5 is still refused and attributed by the V5 core', async () => {
+  const types = async (fp) => {
+    const w = buildV6({ fingerprintOnly: fp, policy6: { payment: { mode: 'LEGACY_V5', approvalTtlMs: String(5 * 60_000) } } });
+    const pa = w.owner.paycap(w.view(), { credId: 'k1-phone', recipientId: 'merchant-a.mock', amountYocto: Y(1), sku: '-', over: {} });
+    const r = await w.gz.request('PROPOSE', { capability: { ...pa.capability, amountYocto: Y(2) }, approval: pa.approval, recipientId: 'merchant-a.mock', amountYocto: Y(2), asset: 'NEAR', memo: 'tampered' });
+    assert.equal(r.ok, false); assert.equal(w.vault.v5payments().length, 0);
+    return w.journal.rows().map((x) => JSON.parse(x.body)).filter((e) => /REJECT|INVALID/.test(e.type)).map((e) => e.type);
+  };
+  assert.deepEqual(await types(['k2-laptop']), await types([]));
+});
+
+// each half of the LEGACY_V5 fix on its own (review round 2: the halves masked each other)
+const LEG5 = { payment: { mode: 'LEGACY_V5', approvalTtlMs: String(5 * 60_000) } };
+const rawV5 = (w, credId) => w.owner.paycap(w.view(), { credId, recipientId: 'merchant-a.mock', amountYocto: Y(1), sku: '-', over: {} });
+test('P0.1-legacy (pre-check): a fingerprint-only V5 paycap is refused BEFORE the payment transaction, as an owner-approval rejection', async () => {
+  const w = buildV6({ fingerprintOnly: ['k2-laptop'], policy6: LEG5 });
+  const pc = rawV5(w, 'k2-laptop');
+  assert.throws(() => w.vault.propose({ capability: pc.capability, approval: pc.approval, recipientId: 'merchant-a.mock', amountYocto: Y(1), asset: 'NEAR', memo: 'raw' }), (e) => e.code === 'V6_PAYMENT_APPROVAL_REQUIRED');
+  assert.ok(w.journal.rows().map((x) => JSON.parse(x.body)).some((e) => e.type === 'OWNER_APPROVAL_REJECTED' && e.outcome === 'V6_PAYMENT_APPROVAL_REQUIRED'), 'refused by the early pre-check');
+});
+test('P0.1-legacy (transaction guard): a fingerprint-only paycap that reaches the core without the V6 layer is refused inside the transaction', async () => {
+  const { ExecutionVaultV5 } = await import('../../src/v5/vault/vault.mjs');
+  const w = buildV6({ fingerprintOnly: ['k2-laptop'], policy6: LEG5 });
+  const pc = rawV5(w, 'k2-laptop');
+  assert.throws(() => ExecutionVaultV5.prototype.propose.call(w.vault, { capability: pc.capability, approval: pc.approval, recipientId: 'merchant-a.mock', amountYocto: Y(1), asset: 'NEAR', memo: 'raw' }),
+    (e) => e.code === 'V6_PAYMENT_APPROVAL_REQUIRED' && /fingerprint-only/.test(e.detail ?? e.message));
+  assert.equal(w.vault.store.db.prepare('SELECT COUNT(*) n FROM payments').get().n, 0);
+});

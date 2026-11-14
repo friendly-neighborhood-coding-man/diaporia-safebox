@@ -24,7 +24,7 @@ const M = [
   ['P0.1: device prompts the sensor for a payment that cannot be accepted', 'src/v6/kit.mjs', "if ((s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(s.v6.gateKeys[credId])) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE' }); return null; }", ''],
   ['P0.1: console gate prompts for a command that cannot be accepted', 'src/v6/device/gate-service.mjs', "if ((st.v6?.policy?.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(st.v6?.gateKeys?.[r0.credId])) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE');", ''],
   ['P0.1: assurance mode not validated', 'src/v6/common/v6.mjs', "if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');", ''],
-  ['P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5', VA, "if (strict || fpCreds.includes(v.credId)) {", "if (strict) {"],
+  ['P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5', VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"],
   ['P0.1 review: in-transaction fingerprint-only guard removed', VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", ''],
   // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
   ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
@@ -90,7 +90,7 @@ const M = [
 // Higher-order mutants: a first-order survivor whose higher-order mutant is caught is a verified redundant check.
 const HO = [
   ['HO: P0.3 challenge single use removed in the pre-check, the transaction AND the primary key', [[VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');", ''], [VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''], [VA, 'v6_challenges (nonce TEXT PRIMARY KEY,', 'v6_challenges (nonce TEXT,']]],
-  ['HO: P0.1 review: fingerprint-only LEGACY_V5 guard removed in the pre-check AND the transaction', [[VA, "if (strict || fpCreds.includes(v.credId)) {", "if (strict) {"], [VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", '']]],
+  ['HO: P0.1 review: fingerprint-only LEGACY_V5 guard removed in the pre-check AND the transaction', [[VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"], [VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", '']]],
   ['HO: RS256 modulus minimum removed in BOTH the COSE parser and the signature check', [[WA, "pk.asymmetricKeyDetails.modulusLength >= 2048 && ", ''], [WA, "n.length < 256 || ", '']]],
 ];
 const ONLY = process.env.MUTANTS ? new RegExp(process.env.MUTANTS) : null;
