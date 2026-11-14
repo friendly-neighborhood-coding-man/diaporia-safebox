@@ -1,0 +1,208 @@
+{
+ "generatedBy": "scripts/v5/mutations.mjs",
+ "caught": 16,
+ "total": 21,
+ "rows": [
+  {
+   "name": "Command: exact statement equality removed",
+   "file": "src/v5/root/command.mjs",
+   "caught": true,
+   "failingTests": 18,
+   "examples": [
+    "a signed statement with a modified accountId is rejected",
+    "a signed statement with a modified chainId is rejected",
+    "a signed statement with a modified credId is rejected",
+    "a signed statement with a modified role is rejected",
+    "a signed statement with a modified commandType is rejected",
+    "a signed statement with a modified actionDigest is rejected"
+   ]
+  },
+  {
+   "name": "Command: challenge single-use removed",
+   "file": "src/v5/root/command.mjs",
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "Command: TRUSTED level not enforced",
+   "file": "src/v5/root/command.mjs",
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "trusted-confirmation commands: DELEGATION_GRANT from a software-only key is refused, from protected confirmation accepted",
+    "personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged"
+   ]
+  },
+  {
+   "name": "Holds: confirmed-hold release without trusted confirmation",
+   "file": "src/v5/root/chain.mjs",
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "Holds: incident-freeze release without trusted confirmation",
+   "file": "src/v5/root/chain.mjs",
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "Holds: revoked-issuer holds keep restricting (anti-lockout removed)",
+   "file": "src/v5/root/holds.mjs",
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "MANDATORY: stolen K1 FREEZE, K2 independently holds, owner revokes K1 => K1 hold removable, K2 hold stays",
+    "reverse order: K2 holds first, stolen K1 freezes later; revoking K1 leaves K2 hold",
+    "owner-origin hold: the owner's own freeze survives revocation of an unrelated stolen key",
+    "crash recovery: hold registry and effective freeze survive Root and Vault restarts (replayed from the chain)",
+    "full V4 recovery of a stolen key lifts the thief's holds only (anti-lockout through recovery)"
+   ]
+  },
+  {
+   "name": "Holds: one surviving party no longer keeps a confirmed hold (any revoked party drops it)",
+   "file": "src/v5/root/holds.mjs",
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "MANDATORY variant: K2 CONFIRMS K1 hold instead; after revoking K1 the hold stays until K2 releases it",
+    "CONTEST_PROTECTIVE_HOLD: ORC + independent owner credential revokes the suspect and releases only its exclusive holds"
+   ]
+  },
+  {
+   "name": "Holds: issuer budget removed",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "repeated reinforcement by the same issuer is refused; issuer budget bounds re-freezing"
+   ]
+  },
+  {
+   "name": "Contest: ORC not required",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Contest: suspect may sign its own contest",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Contest: holds not attributable to the suspect can be dropped",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Incident review: LEGITIMATE verdict without trusted confirmation",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "owner incident review: FRAUD cancels the delayed payments; the affected credential cannot vouch for itself; LEGITIMATE needs trusted confirmation"
+   ]
+  },
+  {
+   "name": "Delegation: recipients outside the Purpose allowed",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "grant cannot exceed Purpose: recipients, asset, per-op, cumulative, TTL, mandatory revocation conditions"
+   ]
+  },
+  {
+   "name": "Rapid-Use: 24 h maximum removed",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "Rapid-Use can never enlarge Purpose: scope must restate exact limits and Purpose recipients"
+   ]
+  },
+  {
+   "name": "Rapid-Use: several keys of one human count as several votes",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "multi-owner: several keys of one human are one vote; non-owner roles and the ORC cannot vote",
+    "Scenario D: no unauthorized Rapid-Use activation, attempts audited and bounded, owner path intact"
+   ]
+  },
+  {
+   "name": "Rapid-Use: the bursting credential may vouch for itself",
+   "file": "src/v5/root/chain.mjs",
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged",
+    "Scenario A: stolen DAILY key burst is detected, delayed, notified; attacker cannot self-approve or expand; owner responds"
+   ]
+  },
+  {
+   "name": "Vault: engine decision signature not checked",
+   "file": "src/v5/vault/vault.mjs",
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "a decision not signed by the pinned engine key is refused by the vault"
+   ]
+  },
+  {
+   "name": "Vault: hard delay cap removed",
+   "file": "src/v5/vault/vault.mjs",
+   "caught": true,
+   "failingTests": 8,
+   "examples": [
+    "delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged",
+    "vault enforces its own 24 h cap whatever the engine asks",
+    "delegate pays inside scope; per-op, cumulative, max uses, recipient, replay and forged signature all refused",
+    "all layers record the lifecycle: Root holds, vault payments, risk detection, notification queue/attempts",
+    "vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive",
+    "Scenario B: genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes"
+   ]
+  },
+  {
+   "name": "Vault: delay does not move the capability window (F-V5-01 regression)",
+   "file": "src/v5/vault/vault.mjs",
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged",
+    "all layers record the lifecycle: Root holds, vault payments, risk detection, notification queue/attempts",
+    "vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive",
+    "Scenario B: genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes",
+    "Scenario B (multi-owner): genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes"
+   ]
+  },
+  {
+   "name": "Vault: Rapid-Use grant covers other flows",
+   "file": "src/v5/vault/vault.mjs",
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "Vault: Rapid-Use ignores restricted credentials",
+   "file": "src/v5/vault/vault.mjs",
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  }
+ ]
+}

@@ -1,0 +1,1771 @@
+{
+ "v": "safebox.v5.datasets",
+ "candidate": "d504b8aca28010fe2c94268665b63c65f8b6b998",
+ "note": "Synthetic personas written by the implementer. Seed 1 was used during development; seeds 2-5 were first run for this evidence file. Same generator and personas, so this is NOT an independent held-out evaluation.",
+ "dev": {
+  "summary": {
+   "benignTrajectories": 6,
+   "falsePositives": 0,
+   "falsePositiveRate": 0,
+   "falsePositiveDelayMsTotal": 0,
+   "falsePositiveMaxDelayMs": 0,
+   "maliciousTrajectories": 8,
+   "truePositives": 8,
+   "truePositiveRate": 1,
+   "falseNegativeRate": 0,
+   "settledBeforeDetection": 24,
+   "exposureBeforeDetectionYocto": "1264000000000000000000000",
+   "coldStart": {
+    "benign": [
+     {
+      "name": "new_account_first_day",
+      "detected": false
+     },
+     {
+      "name": "new_account_large_first",
+      "detected": false
+     }
+    ],
+    "malicious": [
+     {
+      "name": "cold_start_theft",
+      "detected": true,
+      "settledBefore": 0
+     }
+    ]
+   }
+  },
+  "rows": [
+   {
+    "seed": 1,
+    "name": "regular_shopper",
+    "label": "BENIGN",
+    "historyPayments": 77,
+    "windowPayments": 4,
+    "accepted": 4,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 4,
+    "exposureBeforeDetectionYocto": "98000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "weekly_bulk_buyer",
+    "label": "BENIGN",
+    "historyPayments": 39,
+    "windowPayments": 6,
+    "accepted": 6,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 6,
+    "exposureBeforeDetectionYocto": "113000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "new_account_first_day",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "107000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "new_account_large_first",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 1,
+    "accepted": 1,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 1,
+    "exposureBeforeDetectionYocto": "58000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "LARGE_FIRST_PAYMENT"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "busy_merchant_rotation",
+    "label": "BENIGN",
+    "historyPayments": 167,
+    "windowPayments": 8,
+    "accepted": 8,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "129000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "night_owl_shift_change",
+    "label": "BENIGN",
+    "historyPayments": 63,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "78000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 1,
+    "name": "fast_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 20,
+    "accepted": 16,
+    "denied": 4,
+    "detected": true,
+    "firstDetection": {
+     "index": 4,
+     "atMs": 80000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "RATE_ABOVE_BASELINE_1H",
+     "BURST_10M",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "medium_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 15,
+    "accepted": 15,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 900000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 864000000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "slow_drain_max_amount",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 27,
+    "denied": 3,
+    "detected": true,
+    "firstDetection": {
+     "index": 8,
+     "atMs": 14400000
+    },
+    "delayed": 19,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "464000000000000000000000",
+    "totalDelayMs": 1447200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "split_small",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 16,
+    "denied": 14,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 300000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "merchant_rotation_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 18,
+    "accepted": 18,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 6,
+     "atMs": 720000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "cold_start_theft",
+    "label": "MALICIOUS",
+    "historyPayments": 0,
+    "windowPayments": 12,
+    "accepted": 12,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 2,
+     "atMs": 240000
+    },
+    "delayed": 12,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 842400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "COLD_BURST_10M",
+     "REPEATED_SAME_MERCHANT"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "poisoned_baseline",
+    "label": "MALICIOUS",
+    "historyPayments": 120,
+    "windowPayments": 16,
+    "accepted": 16,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 4,
+     "atMs": 960000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "RATE_ABOVE_BASELINE_1H",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 1,
+    "name": "just_under_hourly",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 24,
+    "accepted": 24,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 10,
+     "atMs": 35400000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 10,
+    "exposureBeforeDetectionYocto": "500000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   }
+  ]
+ },
+ "laterSeeds": {
+  "summary": {
+   "benignTrajectories": 24,
+   "falsePositives": 0,
+   "falsePositiveRate": 0,
+   "falsePositiveDelayMsTotal": 0,
+   "falsePositiveMaxDelayMs": 0,
+   "maliciousTrajectories": 32,
+   "truePositives": 32,
+   "truePositiveRate": 1,
+   "falseNegativeRate": 0,
+   "settledBeforeDetection": 98,
+   "exposureBeforeDetectionYocto": "5156000000000000000000000",
+   "coldStart": {
+    "benign": [
+     {
+      "name": "new_account_first_day",
+      "detected": false
+     },
+     {
+      "name": "new_account_first_day",
+      "detected": false
+     },
+     {
+      "name": "new_account_first_day",
+      "detected": false
+     },
+     {
+      "name": "new_account_first_day",
+      "detected": false
+     },
+     {
+      "name": "new_account_large_first",
+      "detected": false
+     },
+     {
+      "name": "new_account_large_first",
+      "detected": false
+     },
+     {
+      "name": "new_account_large_first",
+      "detected": false
+     },
+     {
+      "name": "new_account_large_first",
+      "detected": false
+     }
+    ],
+    "malicious": [
+     {
+      "name": "cold_start_theft",
+      "detected": true,
+      "settledBefore": 0
+     },
+     {
+      "name": "cold_start_theft",
+      "detected": true,
+      "settledBefore": 0
+     },
+     {
+      "name": "cold_start_theft",
+      "detected": true,
+      "settledBefore": 0
+     },
+     {
+      "name": "cold_start_theft",
+      "detected": true,
+      "settledBefore": 0
+     }
+    ]
+   }
+  },
+  "rows": [
+   {
+    "seed": 2,
+    "name": "regular_shopper",
+    "label": "BENIGN",
+    "historyPayments": 68,
+    "windowPayments": 4,
+    "accepted": 4,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 4,
+    "exposureBeforeDetectionYocto": "117000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "regular_shopper",
+    "label": "BENIGN",
+    "historyPayments": 76,
+    "windowPayments": 4,
+    "accepted": 4,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 4,
+    "exposureBeforeDetectionYocto": "102000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "regular_shopper",
+    "label": "BENIGN",
+    "historyPayments": 71,
+    "windowPayments": 4,
+    "accepted": 4,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 4,
+    "exposureBeforeDetectionYocto": "138000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "regular_shopper",
+    "label": "BENIGN",
+    "historyPayments": 65,
+    "windowPayments": 4,
+    "accepted": 4,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 4,
+    "exposureBeforeDetectionYocto": "69000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "weekly_bulk_buyer",
+    "label": "BENIGN",
+    "historyPayments": 39,
+    "windowPayments": 6,
+    "accepted": 6,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 6,
+    "exposureBeforeDetectionYocto": "109000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "weekly_bulk_buyer",
+    "label": "BENIGN",
+    "historyPayments": 39,
+    "windowPayments": 6,
+    "accepted": 6,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 6,
+    "exposureBeforeDetectionYocto": "118000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "weekly_bulk_buyer",
+    "label": "BENIGN",
+    "historyPayments": 39,
+    "windowPayments": 6,
+    "accepted": 6,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 6,
+    "exposureBeforeDetectionYocto": "104000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "weekly_bulk_buyer",
+    "label": "BENIGN",
+    "historyPayments": 39,
+    "windowPayments": 6,
+    "accepted": 6,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 6,
+    "exposureBeforeDetectionYocto": "151000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "new_account_first_day",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "83000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "new_account_first_day",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "98000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "new_account_first_day",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "93000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "new_account_first_day",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "119000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "new_account_large_first",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 1,
+    "accepted": 1,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 1,
+    "exposureBeforeDetectionYocto": "58000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "LARGE_FIRST_PAYMENT"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "new_account_large_first",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 1,
+    "accepted": 1,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 1,
+    "exposureBeforeDetectionYocto": "58000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "LARGE_FIRST_PAYMENT"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "new_account_large_first",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 1,
+    "accepted": 1,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 1,
+    "exposureBeforeDetectionYocto": "58000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "LARGE_FIRST_PAYMENT"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "new_account_large_first",
+    "label": "BENIGN",
+    "historyPayments": 0,
+    "windowPayments": 1,
+    "accepted": 1,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 1,
+    "exposureBeforeDetectionYocto": "58000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "LARGE_FIRST_PAYMENT"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "busy_merchant_rotation",
+    "label": "BENIGN",
+    "historyPayments": 161,
+    "windowPayments": 8,
+    "accepted": 8,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "114000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "busy_merchant_rotation",
+    "label": "BENIGN",
+    "historyPayments": 150,
+    "windowPayments": 8,
+    "accepted": 8,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "149000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "busy_merchant_rotation",
+    "label": "BENIGN",
+    "historyPayments": 153,
+    "windowPayments": 8,
+    "accepted": 8,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "172000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "busy_merchant_rotation",
+    "label": "BENIGN",
+    "historyPayments": 146,
+    "windowPayments": 8,
+    "accepted": 8,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "153000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "night_owl_shift_change",
+    "label": "BENIGN",
+    "historyPayments": 63,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "70000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 3,
+    "name": "night_owl_shift_change",
+    "label": "BENIGN",
+    "historyPayments": 63,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "67000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 4,
+    "name": "night_owl_shift_change",
+    "label": "BENIGN",
+    "historyPayments": 63,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "81000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 5,
+    "name": "night_owl_shift_change",
+    "label": "BENIGN",
+    "historyPayments": 63,
+    "windowPayments": 3,
+    "accepted": 3,
+    "denied": 0,
+    "detected": false,
+    "firstDetection": null,
+    "delayed": 0,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "63000000000000000000000",
+    "totalDelayMs": 0,
+    "maxDelayMs": 0,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR"
+    ],
+    "emails": 0
+   },
+   {
+    "seed": 2,
+    "name": "fast_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 20,
+    "accepted": 16,
+    "denied": 4,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 100000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "fast_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 20,
+    "accepted": 16,
+    "denied": 4,
+    "detected": true,
+    "firstDetection": {
+     "index": 4,
+     "atMs": 80000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "RATE_ABOVE_BASELINE_1H",
+     "BURST_10M",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "fast_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 20,
+    "accepted": 16,
+    "denied": 4,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 100000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "fast_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 20,
+    "accepted": 16,
+    "denied": 4,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 100000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "medium_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 15,
+    "accepted": 15,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 900000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 864000000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "medium_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 15,
+    "accepted": 15,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 900000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 864000000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "medium_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 15,
+    "accepted": 15,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 900000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 864000000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "medium_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 15,
+    "accepted": 15,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 900000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 864000000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "slow_drain_max_amount",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 27,
+    "denied": 3,
+    "detected": true,
+    "firstDetection": {
+     "index": 8,
+     "atMs": 14400000
+    },
+    "delayed": 19,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "464000000000000000000000",
+    "totalDelayMs": 1447200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "slow_drain_max_amount",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 27,
+    "denied": 3,
+    "detected": true,
+    "firstDetection": {
+     "index": 8,
+     "atMs": 14400000
+    },
+    "delayed": 19,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "464000000000000000000000",
+    "totalDelayMs": 1447200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "slow_drain_max_amount",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 27,
+    "denied": 3,
+    "detected": true,
+    "firstDetection": {
+     "index": 8,
+     "atMs": 14400000
+    },
+    "delayed": 19,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "464000000000000000000000",
+    "totalDelayMs": 1447200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "slow_drain_max_amount",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 27,
+    "denied": 3,
+    "detected": true,
+    "firstDetection": {
+     "index": 8,
+     "atMs": 14400000
+    },
+    "delayed": 19,
+    "settledBeforeDetection": 8,
+    "exposureBeforeDetectionYocto": "464000000000000000000000",
+    "totalDelayMs": 1447200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "split_small",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 16,
+    "denied": 14,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 300000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "split_small",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 16,
+    "denied": 14,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 300000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "split_small",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 16,
+    "denied": 14,
+    "detected": true,
+    "firstDetection": {
+     "index": 4,
+     "atMs": 240000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "RATE_ABOVE_BASELINE_1H",
+     "BURST_10M",
+     "RATE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "split_small",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 30,
+    "accepted": 16,
+    "denied": 14,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 300000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 993600000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "BURST_10M",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "merchant_rotation_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 18,
+    "accepted": 16,
+    "denied": 2,
+    "detected": true,
+    "firstDetection": {
+     "index": 4,
+     "atMs": 480000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_1H",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "merchant_rotation_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 18,
+    "accepted": 18,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 6,
+     "atMs": 720000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "merchant_rotation_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 18,
+    "accepted": 18,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 6,
+     "atMs": 720000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "merchant_rotation_burst",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 18,
+    "accepted": 18,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 6,
+     "atMs": 720000
+    },
+    "delayed": 16,
+    "settledBeforeDetection": 2,
+    "exposureBeforeDetectionYocto": "100000000000000000000000",
+    "totalDelayMs": 1058400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "cold_start_theft",
+    "label": "MALICIOUS",
+    "historyPayments": 0,
+    "windowPayments": 12,
+    "accepted": 12,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 2,
+     "atMs": 240000
+    },
+    "delayed": 12,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 842400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "COLD_BURST_10M",
+     "REPEATED_SAME_MERCHANT"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "cold_start_theft",
+    "label": "MALICIOUS",
+    "historyPayments": 0,
+    "windowPayments": 12,
+    "accepted": 12,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 2,
+     "atMs": 240000
+    },
+    "delayed": 12,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 842400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "COLD_BURST_10M",
+     "REPEATED_SAME_MERCHANT"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "cold_start_theft",
+    "label": "MALICIOUS",
+    "historyPayments": 0,
+    "windowPayments": 12,
+    "accepted": 12,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 2,
+     "atMs": 240000
+    },
+    "delayed": 12,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 842400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "COLD_BURST_10M",
+     "REPEATED_SAME_MERCHANT"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "cold_start_theft",
+    "label": "MALICIOUS",
+    "historyPayments": 0,
+    "windowPayments": 12,
+    "accepted": 12,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 2,
+     "atMs": 240000
+    },
+    "delayed": 12,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "totalDelayMs": 842400000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "COLD_BURST_10M",
+     "REPEATED_SAME_MERCHANT"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "poisoned_baseline",
+    "label": "MALICIOUS",
+    "historyPayments": 120,
+    "windowPayments": 16,
+    "accepted": 16,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 1200000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "150000000000000000000000",
+    "totalDelayMs": 928800000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "poisoned_baseline",
+    "label": "MALICIOUS",
+    "historyPayments": 120,
+    "windowPayments": 16,
+    "accepted": 16,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 1200000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "150000000000000000000000",
+    "totalDelayMs": 928800000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "poisoned_baseline",
+    "label": "MALICIOUS",
+    "historyPayments": 120,
+    "windowPayments": 16,
+    "accepted": 16,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 1200000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "150000000000000000000000",
+    "totalDelayMs": 928800000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "poisoned_baseline",
+    "label": "MALICIOUS",
+    "historyPayments": 120,
+    "windowPayments": 16,
+    "accepted": 16,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 5,
+     "atMs": 1200000
+    },
+    "delayed": 13,
+    "settledBeforeDetection": 3,
+    "exposureBeforeDetectionYocto": "150000000000000000000000",
+    "totalDelayMs": 928800000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "REPEATED_SAME_MERCHANT",
+     "VALUE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_1H",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H",
+     "BURST_1H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 2,
+    "name": "just_under_hourly",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 24,
+    "accepted": 24,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 10,
+     "atMs": 35400000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 10,
+    "exposureBeforeDetectionYocto": "500000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 3,
+    "name": "just_under_hourly",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 24,
+    "accepted": 24,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 10,
+     "atMs": 35400000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 10,
+    "exposureBeforeDetectionYocto": "500000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 4,
+    "name": "just_under_hourly",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 24,
+    "accepted": 24,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 10,
+     "atMs": 35400000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 10,
+    "exposureBeforeDetectionYocto": "500000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   },
+   {
+    "seed": 5,
+    "name": "just_under_hourly",
+    "label": "MALICIOUS",
+    "historyPayments": 63,
+    "windowPayments": 24,
+    "accepted": 24,
+    "denied": 0,
+    "detected": true,
+    "firstDetection": {
+     "index": 10,
+     "atMs": 35400000
+    },
+    "delayed": 14,
+    "settledBeforeDetection": 10,
+    "exposureBeforeDetectionYocto": "500000000000000000000000",
+    "totalDelayMs": 1015200000,
+    "maxDelayMs": 86400000,
+    "reasons": [
+     "UNUSUAL_ACTIVE_HOUR",
+     "RATE_ABOVE_BASELINE_24H",
+     "VALUE_ABOVE_BASELINE_24H"
+    ],
+    "emails": 1
+   }
+  ]
+ }
+}

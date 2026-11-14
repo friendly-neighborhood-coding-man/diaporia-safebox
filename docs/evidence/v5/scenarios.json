@@ -1,0 +1,708 @@
+{
+ "v": "safebox.v5.scenarios",
+ "candidate": "d504b8aca28010fe2c94268665b63c65f8b6b998",
+ "generatedWallMs": 3969,
+ "scenarios": {
+  "A": {
+   "scenario": "A",
+   "desc": "stolen DAILY key (k1-phone), in-Purpose burst to merchant-a",
+   "params": {
+    "payments": 30,
+    "everyMs": 20000,
+    "amount": "50000000000000000000000",
+    "ownerResponseMs": 1800000
+   },
+   "attempts": {
+    "NONE": 2,
+    "ANOMALY_PAYMENT_DELAY": 14,
+    "POLICY_DENY": 14
+   },
+   "attackerActions": {
+    "rapidRequest": "OK",
+    "rapidSelfVote": "RAPID_FACTOR_IS_AFFECTED_CREDENTIAL:the bursting credential cannot vouch for itself",
+    "rapidActivate": "RAPID_QUORUM_NOT_MET:needs the ORC AND a separate owner credential (not the cover",
+    "payAttackerAccount": "POLICY_DENY:RECIPIENT_NOT_IN_PURPOSE,PENDING_COUNT_LIMIT",
+    "payOverLimit": "POLICY_DENY:OVER_PER_PAYMENT_LIMIT,PENDING_COUNT_LIMIT",
+    "amendPurpose": "QUORUM_NOT_SATISFIED:AMEND_PURPOSE",
+    "releaseOwnDelay": "INCIDENT_REVIEW_BY_AFFECTED_CREDENTIAL"
+   },
+   "owner": {
+    "quarantine": "OK",
+    "fraudReview": "OK",
+    "revoke": "OK"
+   },
+   "metrics": {
+    "timeToDetectionMs": 40000,
+    "timeToFirstEmailMs": 60000,
+    "proposed": 16,
+    "settled": 0,
+    "settledYocto": "0",
+    "cancelled": 16,
+    "expired": 0,
+    "buffered": 0,
+    "delayed": 16,
+    "acceleratedByRapid": 0,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "attackerBudgetLossYocto": "0",
+    "ownerPaymentAfter": "OK"
+   },
+   "notifications": {
+    "outbox": {
+     "byState": {
+      "DELIVERED": 2
+     },
+     "attempts": 2,
+     "suppressed": 0
+    },
+    "mockSent": 2,
+    "recipients": [
+     "alice@security.example.test"
+    ]
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 0,
+    "authorized": 0,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 123,
+     "checkpointsVerified": 4
+    },
+    "delays": {
+     "delayed": 0,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 123,
+    "suppressed": 0,
+    "bytes": 85085
+   }
+  },
+  "A_slowOwner": {
+   "scenario": "A",
+   "desc": "stolen DAILY key (k1-phone), in-Purpose burst to merchant-a",
+   "params": {
+    "payments": 30,
+    "everyMs": 20000,
+    "amount": "50000000000000000000000",
+    "ownerResponseMs": 21600000
+   },
+   "attempts": {
+    "NONE": 2,
+    "ANOMALY_PAYMENT_DELAY": 14,
+    "POLICY_DENY": 14
+   },
+   "attackerActions": {
+    "rapidRequest": "OK",
+    "rapidSelfVote": "RAPID_FACTOR_IS_AFFECTED_CREDENTIAL:the bursting credential cannot vouch for itself",
+    "rapidActivate": "RAPID_QUORUM_NOT_MET:needs the ORC AND a separate owner credential (not the cover",
+    "payAttackerAccount": "POLICY_DENY:RECIPIENT_NOT_IN_PURPOSE,PENDING_COUNT_LIMIT",
+    "payOverLimit": "POLICY_DENY:OVER_PER_PAYMENT_LIMIT,PENDING_COUNT_LIMIT",
+    "amendPurpose": "QUORUM_NOT_SATISFIED:AMEND_PURPOSE",
+    "releaseOwnDelay": "INCIDENT_REVIEW_BY_AFFECTED_CREDENTIAL"
+   },
+   "owner": {
+    "quarantine": "OK",
+    "fraudReview": "OK",
+    "revoke": "OK"
+   },
+   "metrics": {
+    "timeToDetectionMs": 40000,
+    "timeToFirstEmailMs": 60000,
+    "proposed": 16,
+    "settled": 0,
+    "settledYocto": "0",
+    "cancelled": 16,
+    "expired": 0,
+    "buffered": 0,
+    "delayed": 16,
+    "acceleratedByRapid": 0,
+    "settledBeforeDetection": 0,
+    "exposureBeforeDetectionYocto": "0",
+    "attackerBudgetLossYocto": "0",
+    "ownerPaymentAfter": "OK"
+   },
+   "notifications": {
+    "outbox": {
+     "byState": {
+      "DELIVERED": 2
+     },
+     "attempts": 2,
+     "suppressed": 0
+    },
+    "mockSent": 2,
+    "recipients": [
+     "alice@security.example.test"
+    ]
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 0,
+    "authorized": 0,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 123,
+     "checkpointsVerified": 4
+    },
+    "delays": {
+     "delayed": 0,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 123,
+    "suppressed": 0,
+    "bytes": 85085
+   }
+  },
+  "B": {
+   "scenario": "B",
+   "desc": "genuine urgent high-volume spending",
+   "params": {
+    "payments": 30,
+    "everyMs": 20000,
+    "amount": "50000000000000000000000",
+    "ownerResponseMs": 600000,
+    "multiOwner": false
+   },
+   "steps": {
+    "request": "OK",
+    "votes": [
+     "OK",
+     "OK"
+    ],
+    "activate": "OK",
+    "denied": {
+     "POLICY_DENY": 18
+    },
+    "end": "OK"
+   },
+   "metrics": {
+    "legitimateProposed": 34,
+    "legitimateSettled": 34,
+    "completionRate": 1,
+    "attemptsDeniedAtProposal": 18,
+    "completionRateOfAttempts": 0.6538461538461539,
+    "settledWithin15MinOfActivation": 30,
+    "acceleratedByRapid": 16,
+    "delayBeforeAuthorizationMs": 620000,
+    "timeToFirstDelayMs": 40000,
+    "afterEndAnomaly": [
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY"
+    ],
+    "purposeUnchanged": true,
+    "prompts": 4
+   },
+   "notifications": {
+    "outbox": {
+     "byState": {
+      "DELIVERED": 2
+     },
+     "attempts": 2,
+     "suppressed": 1
+    },
+    "mockSent": 2,
+    "recipients": [
+     "alice@security.example.test"
+    ]
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 34,
+    "authorized": 34,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [
+     {
+      "grantId": "rq-1",
+      "activatedAt": "1794615060000",
+      "expiresAt": "1794636660000",
+      "status": "REVOKED",
+      "endedBy": "k1-phone",
+      "approvers": [
+       "factor:orc",
+       "factor:owner-credential"
+      ]
+     }
+    ],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 267,
+     "checkpointsVerified": 10
+    },
+    "delays": {
+     "delayed": 20,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 267,
+    "suppressed": 0,
+    "bytes": 191316
+   }
+  },
+  "B_multiOwner": {
+   "scenario": "B-multi",
+   "desc": "genuine urgent high-volume spending",
+   "params": {
+    "payments": 30,
+    "everyMs": 20000,
+    "amount": "50000000000000000000000",
+    "ownerResponseMs": 600000,
+    "multiOwner": true
+   },
+   "steps": {
+    "request": "OK",
+    "votes": [
+     "OK",
+     "OK"
+    ],
+    "activate": "OK",
+    "denied": {
+     "POLICY_DENY": 18
+    },
+    "end": "OK"
+   },
+   "metrics": {
+    "legitimateProposed": 34,
+    "legitimateSettled": 34,
+    "completionRate": 1,
+    "attemptsDeniedAtProposal": 18,
+    "completionRateOfAttempts": 0.6538461538461539,
+    "settledWithin15MinOfActivation": 30,
+    "acceleratedByRapid": 16,
+    "delayBeforeAuthorizationMs": 620000,
+    "timeToFirstDelayMs": 40000,
+    "afterEndAnomaly": [
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY",
+     "ANOMALY_PAYMENT_DELAY"
+    ],
+    "purposeUnchanged": true,
+    "prompts": 4
+   },
+   "notifications": {
+    "outbox": {
+     "byState": {
+      "DELIVERED": 10
+     },
+     "attempts": 10,
+     "suppressed": 5
+    },
+    "mockSent": 10,
+    "recipients": [
+     "alice@security.example.test",
+     "bob@security.example.test",
+     "carol@security.example.test",
+     "dave@security.example.test",
+     "ops@security.example.test"
+    ]
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 34,
+    "authorized": 34,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [
+     {
+      "grantId": "rq-1",
+      "activatedAt": "1794615060000",
+      "expiresAt": "1794636660000",
+      "status": "REVOKED",
+      "endedBy": "alice-admin",
+      "approvers": [
+       "owner:alice",
+       "owner:bob"
+      ]
+     }
+    ],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 275,
+     "checkpointsVerified": 11
+    },
+    "delays": {
+     "delayed": 20,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 275,
+    "suppressed": 0,
+    "bytes": 195278
+   }
+  },
+  "C": {
+   "scenario": "C",
+   "desc": "mixed / evasive strategies",
+   "cases": {
+    "just_below_threshold_cold": {
+     "note": "one payment every 13 min stays under cold-start 10 min/1 h thresholds but hits 24 h volume",
+     "verifier": true,
+     "k1": {
+      "proposed": 12,
+      "settled": 4,
+      "settledYocto": "200000000000000000000000",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 8,
+      "delayed": 8,
+      "acceleratedByRapid": 0
+     }
+    },
+    "split_small_payments": {
+     "verifier": true,
+     "k1": {
+      "proposed": 16,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 16,
+      "delayed": 16,
+      "acceleratedByRapid": 0
+     }
+    },
+    "across_all_merchants": {
+     "verifier": true,
+     "k1": {
+      "proposed": 9,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 9,
+      "delayed": 9,
+      "acceleratedByRapid": 0
+     }
+    },
+    "slow_baseline_poisoning": {
+     "note": "ramped 2/day -> 13/day over 11 days; growth cap 1.5x the older level",
+     "verifier": true,
+     "k1": {
+      "proposed": 134,
+      "settled": 122,
+      "settledYocto": "4260000000000000000000000",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 12,
+      "delayed": 12,
+      "acceleratedByRapid": 0
+     }
+    },
+    "false_alarm_against_other_key": {
+     "otherKeyAnomaly": "NONE",
+     "verifier": true,
+     "k1": {
+      "proposed": 6,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 6,
+      "delayed": 6,
+      "acceleratedByRapid": 0
+     }
+    },
+    "notification_flood": {
+     "notify": {
+      "byState": {
+       "DELIVERED": 1
+      },
+      "attempts": 1,
+      "suppressed": 0
+     },
+     "incidents": 1,
+     "verifier": true,
+     "k1": {
+      "proposed": 40,
+      "settled": 39,
+      "settledYocto": "39000000000000000000000",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 1,
+      "delayed": 1,
+      "acceleratedByRapid": 0
+     }
+    },
+    "forged_votes": {
+     "forgedCredId": "CHALLENGE_NOT_FOR_THIS_CREDENTIAL",
+     "voteAsOrcWithK1Key": "CHALLENGE_NOT_FOR_THIS_CREDENTIAL",
+     "activate": "RAPID_QUORUM_NOT_MET:needs the ORC AND a separate owner credential (not the cover",
+     "verifier": true,
+     "k1": {
+      "proposed": 0,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 0,
+      "delayed": 0,
+      "acceleratedByRapid": 0
+     }
+    },
+    "replay_prior_authorization": {
+     "first": "OK",
+     "replaySame": "ACTION_REPLAY",
+     "replayRewrapped": "ACTION_REPLAY",
+     "activateRq2": "RAPID_QUORUM_NOT_MET:needs the ORC AND a separate owner credential (not the cover",
+     "verifier": true,
+     "k1": {
+      "proposed": 0,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 0,
+      "delayed": 0,
+      "acceleratedByRapid": 0
+     }
+    },
+    "rapid_after_revocation": {
+     "revoke": "OK",
+     "grant": "ENDED_EPOCH_CHANGE",
+     "payAfter": "PAYCAP_CREDENTIAL_NOT_ACTIVE:revoked",
+     "verifier": true,
+     "k1": {
+      "proposed": 0,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 0,
+      "delayed": 0,
+      "acceleratedByRapid": 0
+     }
+    },
+    "switch_epoch_or_purpose": {
+     "epochBump": "OK",
+     "grant": "ENDED_EPOCH_CHANGE",
+     "verifier": true,
+     "k1": {
+      "proposed": 0,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 0,
+      "delayed": 0,
+      "acceleratedByRapid": 0
+     }
+    },
+    "continue_after_expiry": {
+     "grant": "EXPIRED",
+     "after": [
+      "NONE",
+      "ANOMALY_PAYMENT_DELAY",
+      "ANOMALY_PAYMENT_DELAY",
+      "ANOMALY_PAYMENT_DELAY",
+      "ANOMALY_PAYMENT_DELAY"
+     ],
+     "verifier": true,
+     "k1": {
+      "proposed": 5,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 5,
+      "delayed": 5,
+      "acceleratedByRapid": 0
+     }
+    },
+    "exhaust_emergency_resources": {
+     "attackerRequests": [
+      "OK",
+      "OK",
+      "OK",
+      "RAPID_REQUEST_RATE_LIMIT",
+      "RAPID_REQUEST_RATE_LIMIT",
+      "RAPID_REQUEST_RATE_LIMIT"
+     ],
+     "ownerStillCanRequest": "OK",
+     "verifier": true,
+     "k1": {
+      "proposed": 0,
+      "settled": 0,
+      "settledYocto": "0",
+      "cancelled": 0,
+      "expired": 0,
+      "buffered": 0,
+      "delayed": 0,
+      "acceleratedByRapid": 0
+     }
+    }
+   }
+  },
+  "D": {
+   "scenario": "D",
+   "desc": "malicious emergency-approval requests",
+   "attempts": 30,
+   "resultCodes": {
+    "OK": 3,
+    "RAPID_FACTOR_IS_AFFECTED_CREDENTIAL": 3,
+    "TRUSTED_CONFIRMATION_REQUIRED": 3,
+    "RAPID_QUORUM_NOT_MET": 3,
+    "RAPID_REQUEST_ALREADY_PENDING": 4,
+    "RAPID_REQUEST_NOT_PENDING": 81,
+    "RAPID_REQUEST_RATE_LIMIT": 23
+   },
+   "unauthorizedActivations": 0,
+   "journalEntriesForAttempts": 124,
+   "journalSuppressed": 0,
+   "ownerPath": {
+    "request": "OK",
+    "orc": "OK",
+    "k3": "OK",
+    "activate": "OK"
+   },
+   "multi": {
+    "k1": "OK",
+    "k2SameHuman": "RAPID_DUPLICATE_PRINCIPAL_VOTE:several keys of one human are one vote",
+    "opsFreeze": "RAPID_VOTER_NOT_OWNER_PRINCIPAL:FREEZE",
+    "activate": "RAPID_QUORUM_NOT_MET:1/2 distinct owners (N=4)"
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 0,
+    "authorized": 0,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [
+     {
+      "grantId": "own",
+      "activatedAt": "1794650400000",
+      "expiresAt": "1794664800000",
+      "status": "ACTIVE",
+      "endedBy": null,
+      "approvers": [
+       "factor:orc",
+       "factor:owner-credential"
+      ]
+     }
+    ],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 132,
+     "checkpointsVerified": 5
+    },
+    "delays": {
+     "delayed": 0,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 132,
+    "suppressed": 0,
+    "bytes": 63935
+   }
+  },
+  "E": {
+   "scenario": "E",
+   "desc": "compromised notification infrastructure",
+   "cases": {
+    "outage": {
+     "outbox": [
+      [
+       "RETRY",
+       2
+      ]
+     ],
+     "delayedPaymentsStillDelayed": 5
+    },
+    "delayedAndDuplicateDelivery": {
+     "outbox": [
+      [
+       "DELIVERED",
+       3
+      ]
+     ],
+     "mockDeliveries": 2,
+     "distinctProviderIds": 1
+    },
+    "content": {
+     "links": false,
+     "memoLeaked": false,
+     "statesNoApproval": true
+    },
+    "stolenMailbox": {
+     "reviewWithEmailToken": "UNEXPECTED_EVIDENCE:attestation",
+     "activateWithEmail": "UNEXPECTED_EVIDENCE:approvals"
+    },
+    "forgedNotificationInOutbox": {
+     "note": "the outbox is write-only for the notification service; no component reads it as input",
+     "rootInputsFromNotify": 0
+    },
+    "injectedContent": {
+     "queued": 1,
+     "subjectClean": true,
+     "noLinks": true,
+     "noHtml": true
+    }
+   },
+   "metrics": {
+    "accelerationsWithoutAuthenticator": 0
+   },
+   "notifications": {
+    "outbox": {
+     "byState": {
+      "DELIVERED": 2
+     },
+     "attempts": 4,
+     "suppressed": 0
+    },
+    "mockSent": 4,
+    "recipients": [
+     "alice@security.example.test"
+    ]
+   },
+   "verifier": {
+    "ok": true,
+    "chainValid": true,
+    "effects": 5,
+    "authorized": 5,
+    "violations": [],
+    "unauthorizedAuthority": [],
+    "rapidGrants": [],
+    "rapidViolations": [],
+    "journal": {
+     "ok": true,
+     "events": 41,
+     "checkpointsVerified": 1
+    },
+    "delays": {
+     "delayed": 5,
+     "earlyRelease": []
+    }
+   },
+   "journal": {
+    "events": 41,
+    "suppressed": 0,
+    "bytes": 27881
+   }
+  }
+ }
+}

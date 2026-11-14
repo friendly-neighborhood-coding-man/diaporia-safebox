@@ -1,0 +1,86 @@
+{
+ "v": "safebox.v5.email-sandbox",
+ "candidate": "d504b8aca28010fe2c94268665b63c65f8b6b998",
+ "transport": "MockTransport (in-process; nothing leaves the container)",
+ "productionProvider": "NOT_CONNECTED",
+ "sent": [
+  {
+   "to": "alice@security.example.test",
+   "subject": "SafeBox security alert inc-7d6a9e322106: unusual spending was delayed",
+   "text": "SafeBox account: vault-alice.mock\nIncident: inc-7d6a9e322106\nReason: unusual spending pattern\nAffected credential / capability: AFFECTED k1-phone (DAILY, active)\nAffected credential / capability: enrolled k2-laptop (DAILY, active)\nAffected credential / capability: enrolled k3-root-hw (ROOT, active)\nAffected credential / capability: enrolled k4-freeze (FREEZE, active)\nAffected credential / capability: enrolled k5-recovery-hw (RECOVERY, active)\nObserved pattern: COLD_BURST_10M\nPayment delay status: unsettled payments of the affected flow are delayed up to 6 h; settled payments cannot be stopped\nYour Purpose, recipients and spending limits are unchanged. Nothing in this email can approve, release or speed up any payment.\nSafe next steps: open the SafeBox app you enrolled (do not use links in emails), review the incident there, and use your enrolled authenticator if you want to act.\nIf this spending is yours and urgent, you can request Rapid-Use Mode (max 24 h, same limits) from the SafeBox app; it needs your independent approvals.\nSafeBox never asks you to reply, click a link, or send a code by email.",
+   "idempotencyKey": "5605db7a89f7a3604d928b5d1f1ad350035d4c0f5af36e9a2238f4c8fdf8c316",
+   "providerId": "mock-ab2f8d08-76d0-4a9c-b10e-984685865afb",
+   "deliveredAfterMs": 0
+  },
+  {
+   "to": "alice@security.example.test",
+   "subject": "SafeBox DAILY security report",
+   "text": "SafeBox DAILY security report 2026-11-13T01:04:40.000Z .. 2026-11-14T01:04:40.000Z\nPayments: 14 proposed, 0 settled, 14 delayed, 0 cancelled, 0 rejected\nIncidents: 1 opened, 0 reviewed; detections 12\nProtective holds: 0 created, 0 confirmed, 0 released, 0 contested\nRapid-Use: 0 requested, 0 activated, 0 ended early\nNotifications: 1 delivered, 0 temporary failures, 0 not connected\nJournal head 7099b50582d901f8 at seq 69. Counts are computed from the journal; nothing in this report can approve anything.",
+   "idempotencyKey": "27584733acfe98bf85c7dedfebabea9493aeab7a3563f6cc3eda2f4ac8773f3d",
+   "providerId": "mock-2142ad71-cc68-4808-ae67-84e8d9409380",
+   "deliveredAfterMs": 0
+  }
+ ],
+ "outbox": {
+  "byState": {
+   "DELIVERED": 2
+  },
+  "attempts": 2,
+  "suppressed": 0
+ },
+ "report": {
+  "statement": {
+   "v": "safebox.v5.report",
+   "kind": "DAILY",
+   "accountId": "vault-alice.mock",
+   "from": "2026-11-13T01:04:40.000Z",
+   "to": "2026-11-14T01:04:40.000Z",
+   "incidentId": "-",
+   "counts": {
+    "paymentsProposed": "14",
+    "paymentsSettled": "0",
+    "paymentsDelayed": "14",
+    "paymentsCancelled": "0",
+    "paymentsExpired": "0",
+    "paymentsRejected": "0",
+    "invalidSignatures": "0",
+    "detections": "12",
+    "incidentsOpened": "1",
+    "incidentsReviewed": "0",
+    "holdsCreated": "0",
+    "holdsConfirmed": "0",
+    "holdsReleased": "0",
+    "holdsContested": "0",
+    "credentialsRevoked": "0",
+    "recoveriesOpened": "0",
+    "rapidRequested": "0",
+    "rapidActivated": "0",
+    "rapidRevoked": "0",
+    "rapidAccelerated": "0",
+    "delegationsGranted": "0",
+    "rootRejected": "0",
+    "attemptsSuppressed": "0",
+    "analystFindings": "0",
+    "notificationsQueued": "1",
+    "notify_DELIVERED": "1",
+    "notify_TEMPORARY_FAILURE": "0",
+    "notify_PERMANENT_FAILURE": "0",
+    "notify_NOT_CONNECTED": "0",
+    "settledYocto": "0",
+    "analyst_ACTIONED": "0",
+    "analyst_CORROBORATED": "0",
+    "analyst_INFERRED_ONLY": "0"
+   },
+   "events": "69",
+   "firstSeq": "1",
+   "lastSeq": "69",
+   "journalHead": "7099b50582d901f8f744e4cad2b28f1088c179c6aa30c8d8f734a35c5f21a63a",
+   "journalSeq": "69",
+   "countsDigest": "62491c3e4c7d6cdf32b8078259f9c6e37dd34afcc0b54353dfa3fd32e4ccab3c"
+  },
+  "verify": {
+   "ok": true,
+   "problems": []
+  }
+ }
+}
