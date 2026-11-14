@@ -26,6 +26,9 @@ const M = [
   ['P0.1: assurance mode not validated', 'src/v6/common/v6.mjs', "if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');", ''],
   ['P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5', VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"],
   ['P0.1 review: in-transaction fingerprint-only guard removed', VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", ''],
+  // hardening P1.8: DNS rebinding
+  ['P1.8: console Host check removed', 'src/v6/emergency/console.mjs', "if (!this.#hostOk(String(req.headers?.host ?? ''))) {", "if (false) {"],
+  ['P1.8: console Host check skipped for the real listener', 'src/v6/emergency/console.mjs', "}, { requireHost: true });", "});"],
   // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
   ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
   ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],

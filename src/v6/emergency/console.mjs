@@ -64,11 +64,17 @@ export class OwnerConsole {
 
   // ------------------------------------------------------------------ HTTP-shaped entry point (pure; used by tests and by listen())
   /** req: { method, path, headers (lower-case), body (string) } -> { status, headers, body } */
-  async handle(req) {
+  async handle(req, opts = {}) {
     const method = String(req.method ?? 'GET').toUpperCase(); const url = new URL(req.path ?? '/', 'http://x'); const p = url.pathname;
     const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'x-frame-options': 'DENY',
       'content-security-policy': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' ${this.gateOrigin}; frame-ancestors 'none'; form-action 'none'; base-uri 'none'` };
     try {
+      // P1.8 (issue #14): DNS rebinding. A rebound attacker page carries ITS hostname in Host; only the console's own
+      // host (and, for a localhost console, its loopback address on the same port) is served. requireHost is set by
+      // listen(); in-process callers (tests) may omit the header.
+      if (opts.requireHost || req.headers?.host !== undefined) {
+        if (!this.#hostOk(String(req.headers?.host ?? ''))) { this.#log('HTTP', 'MISDIRECTED_HOST', { method }); return { status: 421, headers: { ...headers, 'content-type': 'application/json' }, body: '{"ok":false,"error":{"code":"MISDIRECTED_HOST"}}' }; }
+      }
       if (method === 'GET' || method === 'HEAD') {
         let res;
         if (p === '/' || p === '/app') res = this.#page(null);
@@ -98,6 +104,15 @@ export class OwnerConsole {
       this.#log('HTTP', code, { method, path: p.startsWith('/e/') ? '/e/<locator>' : p });
       return { status, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify({ ok: false, error: { code, detail: String(e.detail ?? '').slice(0, 160) } }) };
     }
+  }
+  #hostOk(host) {
+    const o = new URL(this.origin); const port = o.port || (o.protocol === 'https:' ? '443' : '80');
+    const allowed = new Set([o.host]);
+    if (o.hostname === 'localhost') allowed.add('127.0.0.1:' + port);
+    if (o.hostname === '127.0.0.1') allowed.add('localhost:' + port);
+    // the literal loopback address this listener is bound to (a rebound page always sends the ATTACKER's hostname)
+    if (this.boundPort) for (const h of ['127.0.0.1', 'localhost', '[::1]']) allowed.add(h + ':' + this.boundPort);
+    return allowed.has(host.toLowerCase());
   }
   #reply(res, headers, head = false) {
     const h = { ...headers };
@@ -274,11 +289,11 @@ export class OwnerConsole {
       const chunks = []; let size = 0;
       req.on('data', (c) => { size += c.length; if (size > 64 * 1024) req.destroy(); else chunks.push(c); });
       req.on('end', async () => {
-        const out = await this.handle({ method: req.method, path: req.url, headers: req.headers, body: Buffer.concat(chunks).toString('utf8') });
+        const out = await this.handle({ method: req.method, path: req.url, headers: req.headers, body: Buffer.concat(chunks).toString('utf8') }, { requireHost: true });
         res.writeHead(out.status, out.headers); res.end(out.body);
       });
     });
-    return new Promise((ok) => srv.listen(port, host, () => ok(srv)));
+    return new Promise((ok) => srv.listen(port, host, () => { this.boundPort = String(srv.address().port); ok(srv); }));
   }
 }
 
