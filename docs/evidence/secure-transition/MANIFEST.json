@@ -1,0 +1,21 @@
+{
+ "milestone": "SSTP V0 PARTIAL EVIDENCE",
+ "status": "READY_FOR_OPERATOR_REVIEW",
+ "sourceCommit": "3e580286816ba30710317e4fd871abcfa476e9a2",
+ "baseFrozenV6": "bf7403d3d85abe43871e9a3b400d86abaeb0edae",
+ "command": "cd secure-transition && npm ci && node --test tests/unit/*.spec.mjs",
+ "exitCode": 0,
+ "tests": 30,
+ "pass": 30,
+ "fail": 0,
+ "ledger": "MOCK",
+ "keys": "MOCK",
+ "isolation": "NONE (single process, root)",
+ "files": {
+  "dependencies.txt": "4f4250d88a1098cd21af053b938a8b70887dec77e90e328cee79860e6a909ea1",
+  "environment.txt": "aeec68d8ca9af0c9ad361de61963a8366022eb017c07727806425a8aa32dc48a",
+  "source-sha256.txt": "c220494c36256329ef09333b3be6f26db16f9face6f64bae13b25247b5943d93",
+  "unit-tests.exit": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061",
+  "unit-tests.tap": "d6f4f1dc7efebea7ebf76f7686c57a135a645a3e2a4395d86dfa2de5af97f575"
+ }
+}

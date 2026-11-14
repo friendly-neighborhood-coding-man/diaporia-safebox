@@ -1,0 +1,190 @@
+TAP version 13
+# Subtest: payment within Purpose is signed once and is idempotent on requestId
+ok 1 - payment within Purpose is signed once and is idempotent on requestId
+  ---
+  duration_ms: 30.37915
+  type: 'test'
+  ...
+# Subtest: outside Purpose needs a bound, fresh, single-use owner approval
+ok 2 - outside Purpose needs a bound, fresh, single-use owner approval
+  ---
+  duration_ms: 17.706308
+  type: 'test'
+  ...
+# Subtest: budget is cumulative and never restored
+ok 3 - budget is cumulative and never restored
+  ---
+  duration_ms: 25.881645
+  type: 'test'
+  ...
+# Subtest: maintenance refuses payments but FREEZE and recovery rotation still work
+ok 4 - maintenance refuses payments but FREEZE and recovery rotation still work
+  ---
+  duration_ms: 35.400071
+  type: 'test'
+  ...
+# Subtest: policy governance: no app-callable policy setter; permissive migration needs owner+recovery; stale digest refused
+ok 5 - policy governance: no app-callable policy setter; permissive migration needs owner+recovery; stale digest refused
+  ---
+  duration_ms: 11.759818
+  type: 'test'
+  ...
+# Subtest: update authorization respects the version floor; completion needs a reconciled, witness-attested transition
+ok 6 - update authorization respects the version floor; completion needs a reconciled, witness-attested transition
+  ---
+  duration_ms: 11.507991
+  type: 'test'
+  ...
+# Subtest: reconcile: pending payments keep settling during maintenance; unknown txs are rebroadcast once
+ok 7 - reconcile: pending payments keep settling during maintenance; unknown txs are rebroadcast once
+  ---
+  duration_ms: 16.998848
+  type: 'test'
+  ...
+# Subtest: reconcile fails closed when the ledger shows activity the Authority never signed
+ok 8 - reconcile fails closed when the ledger shows activity the Authority never signed
+  ---
+  duration_ms: 5.375153
+  type: 'test'
+  ...
+# Subtest: property: random request sequences never decrease counters or exceed policy
+ok 9 - property: random request sequences never decrease counters or exceed policy
+  ---
+  duration_ms: 194.102437
+  type: 'test'
+  ...
+# Subtest: install into allow-listed slot, read back, verify
+ok 10 - install into allow-listed slot, read back, verify
+  ---
+  duration_ms: 13.295499
+  type: 'test'
+  ...
+# Subtest: destination allow-list, symlinked slot and planted files
+ok 11 - destination allow-list, symlinked slot and planted files
+  ---
+  duration_ms: 4.857058
+  type: 'test'
+  ...
+# Subtest: verifySlot detects tampering after install
+ok 12 - verifySlot detects tampering after install
+  ---
+  duration_ms: 32.853969
+  type: 'test'
+  ...
+# Subtest: journal: hash chain, torn tail dropped, mid-file tamper detected
+ok 13 - journal: hash chain, torn tail dropped, mid-file tamper detected
+  ---
+  duration_ms: 14.904369
+  type: 'test'
+  ...
+# Subtest: well-formed package round-trips
+ok 14 - well-formed package round-trips
+  ---
+  duration_ms: 5.165063
+  type: 'test'
+  ...
+# Subtest: tar reader rejects non-regular entries and unsafe paths
+ok 15 - tar reader rejects non-regular entries and unsafe paths
+  ---
+  duration_ms: 1.655968
+  type: 'test'
+  ...
+# Subtest: tar reader enforces bounds and structure
+ok 16 - tar reader enforces bounds and structure
+  ---
+  duration_ms: 26.535591
+  type: 'test'
+  ...
+# Subtest: manifest must be first, canonical, complete and closed
+ok 17 - manifest must be first, canonical, complete and closed
+  ---
+  duration_ms: 3.986679
+  type: 'test'
+  ...
+# Subtest: property: random single-byte corruption never yields an accepted package with different content
+ok 18 - property: random single-byte corruption never yields an accepted package with different content
+  ---
+  duration_ms: 93.852963
+  type: 'test'
+  ...
+# Subtest: valid release verifies (threshold 2-of-3 targets)
+ok 19 - valid release verifies (threshold 2-of-3 targets)
+  ---
+  duration_ms: 120.237206
+  type: 'test'
+  ...
+# Subtest: U01 unsigned / wrong-key metadata is rejected
+ok 20 - U01 unsigned / wrong-key metadata is rejected
+  ---
+  duration_ms: 25.870589
+  type: 'test'
+  ...
+# Subtest: U01 targets signed below threshold is rejected
+ok 21 - U01 targets signed below threshold is rejected
+  ---
+  duration_ms: 29.036005
+  type: 'test'
+  ...
+# Subtest: U02 signed metadata with tampered package bytes is rejected
+ok 22 - U02 signed metadata with tampered package bytes is rejected
+  ---
+  duration_ms: 52.934005
+  type: 'test'
+  ...
+# Subtest: U03/U05 replay of older signed metadata after a newer one was seen is rejected (rollback)
+ok 23 - U03/U05 replay of older signed metadata after a newer one was seen is rejected (rollback)
+  ---
+  duration_ms: 39.379185
+  type: 'test'
+  ...
+# Subtest: U04 expired timestamp is rejected even when the client is offline (no exemption)
+ok 24 - U04 expired timestamp is rejected even when the client is offline (no exemption)
+  ---
+  duration_ms: 15.619582
+  type: 'test'
+  ...
+# Subtest: U04 expired targets metadata is rejected
+ok 25 - U04 expired targets metadata is rejected
+  ---
+  duration_ms: 22.353268
+  type: 'test'
+  ...
+# Subtest: U04 mix-and-match: new timestamp+snapshot with targets from another release is rejected
+ok 26 - U04 mix-and-match: new timestamp+snapshot with targets from another release is rejected
+  ---
+  duration_ms: 21.424846
+  type: 'test'
+  ...
+# Subtest: U05 withheld metadata / target and freeze (server stops updating) are rejected
+ok 27 - U05 withheld metadata / target and freeze (server stops updating) are rejected
+  ---
+  duration_ms: 2189.217007
+  type: 'test'
+  ...
+# Subtest: target without sstp version is rejected
+ok 28 - target without sstp version is rejected
+  ---
+  duration_ms: 21.946412
+  type: 'test'
+  ...
+# Subtest: U15 root rotation: accepted by plain TUF, refused by SSTP unless the owner approved that exact root digest
+ok 29 - U15 root rotation: accepted by plain TUF, refused by SSTP unless the owner approved that exact root digest
+  ---
+  duration_ms: 106.256018
+  type: 'test'
+  ...
+# Subtest: rotation not cross-signed by the old root keys is rejected even by plain TUF
+ok 30 - rotation not cross-signed by the old root keys is rejected even by plain TUF
+  ---
+  duration_ms: 38.607364
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3009.816637

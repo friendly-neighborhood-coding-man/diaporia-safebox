@@ -1,0 +1,13 @@
+source_commit=3e580286816ba30710317e4fd871abcfa476e9a2
+branch=experiment/secure-transition-v0
+base_frozen_v6=bf7403d3d85abe43871e9a3b400d86abaeb0edae
+run_at_utc=2026-11-14T15:51:09Z
+node=v22.23.4
+npm=10.9.9
+kernel=Linux 6.18.44-fc-v470 x86_64
+os=Ubuntu 24.04.5 LTS
+uid=0 (tests ran as root in a disposable cloud container)
+openssl=3.5.9
+tpm=none
+package_lock_sha256=4a347c0a521671342e56598cf37cf649b2386a4e4c05312ec5942f23a8c45894
+command=cd secure-transition && npm ci && node --test tests/unit/*.spec.mjs
