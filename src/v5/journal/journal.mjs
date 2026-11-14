@@ -18,6 +18,17 @@ import { V5_DOMAINS, d5hex, newSigner5, verifyObj5, pseudonymizer, seal, unseal 
 
 export const LAYERS = Object.freeze(['ROOT', 'VAULT', 'CONTRACT', 'NOTIFY', 'RISK', 'ANALYSIS', 'REPORT']);
 export const EVENT_V = 'safebox.v5.journal-event';
+/**
+ * V6 hardening P1.7 (issue #14): security-critical events are checkpointed to the witnesses the moment they are written,
+ * so deleting one from the local file (tail truncation) is always detected. Only non-critical events written after the
+ * newest checkpoint (at most checkpointEvery - 1) can still vanish undetected. Rejected attempts and notification
+ * retries are deliberately NOT in this set: an attacker must not be able to force a witness write per request.
+ * PAYMENT_PROPOSED is not in it either (V5 baseline checkpoint counts are kept): an owner payment is covered by its
+ * OWNER_PAYMENT_APPROVAL_VERIFIED event; a delegated payment's PAYMENT_PROPOSED in the tail is the remaining gap.
+ */
+export const CHECKPOINT_NOW_TYPES = new Set(['OWNER_PAYMENT_APPROVAL_VERIFIED', 'PAYMENT_ACCELERATED_RAPID_USE', 'FROZEN', 'UNFROZEN',
+  'HOLD_CREATED', 'HOLD_CONFIRMED', 'HOLD_RELEASED', 'HOLD_ESCALATED', 'HOLD_EXPIRED', 'HOLDS_RELEASED_BY_UNSUSPEND', 'REVOKED', 'SUSPENDED', 'UNSUSPENDED',
+  'INCIDENT_OPENED', 'INCIDENT_ESCALATED', 'DELEGATION_GRANTED', 'DELEGATION_REVOKED', 'RAPID_USE_ACTIVATED', 'RAPID_USE_REVOKED', 'CONTEST_RESOLVED', 'ROOT_REJECTED']);
 const ZERO = '0'.repeat(64);
 const FORBIDDEN_KEY = /^(private_?key|privatekey|secret|recovery_?secret|seed|pin|passcode|password|biometric\w*|fingerprint|face_?data|webauthn|assertion|signature|sig|challenge_?response|mnemonic|api_?key|auth_?token|otp)$/i;
 const FORBIDDEN_VALUE = /(-----BEGIN|PRIVATE KEY|"authenticatorData"|clientDataJSON)/;
@@ -114,7 +125,7 @@ export class FootprintJournal {
     const bodyTxt = JSON.stringify(event);
     this.db.prepare('INSERT INTO events (seq, event_id, layer, type, at, body, sealed, period, prev_hash, hash) VALUES (?,?,?,?,?,?,?,?,?,?)').run(seq, event.eventId, layer, event.type, at, bodyTxt, sealedTxt, period, event.prevHash, hash);
     this.stats.appended++; this.stats.bytes += bodyTxt.length + (sealedTxt?.length ?? 0);
-    if (seq % this.checkpointEvery === 0) this.checkpoint();
+    if (seq % this.checkpointEvery === 0 || CHECKPOINT_NOW_TYPES.has(event.type)) this.checkpoint();
     return { ...event, hash };
   }
   checkpoint() {

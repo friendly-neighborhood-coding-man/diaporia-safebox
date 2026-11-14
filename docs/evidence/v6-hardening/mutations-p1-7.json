@@ -1,0 +1,20 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 1,
+ "total": 1,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P1.7: critical events not checkpointed immediately",
+   "file": "src/v5/journal/journal.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P1.7-truncate: deleting an owner payment approval (and everything after it) from the local journal is detected",
+    "P1.7-truncate: deleting an owner FREEZE (and everything after it) from the local journal is detected"
+   ]
+  }
+ ]
+}

@@ -29,6 +29,8 @@ const M = [
   // hardening P1.8: DNS rebinding
   ['P1.8: console Host check removed', 'src/v6/emergency/console.mjs', "if (!this.#hostOk(String(req.headers?.host ?? ''))) {", "if (false) {"],
   ['P1.8: console Host check skipped for the real listener', 'src/v6/emergency/console.mjs', "}, { requireHost: true });", "});"],
+  // hardening P1.7: immediate checkpoints for security-critical events
+  ['P1.7: critical events not checkpointed immediately', 'src/v5/journal/journal.mjs', "if (seq % this.checkpointEvery === 0 || CHECKPOINT_NOW_TYPES.has(event.type)) this.checkpoint();", "if (seq % this.checkpointEvery === 0) this.checkpoint();"],
   // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
   ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
   ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],
