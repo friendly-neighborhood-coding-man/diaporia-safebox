@@ -45,7 +45,12 @@ const M = [
   // ---- V5.1 P4 buffer + pending-slot repair
   ['Vault: signed tier ignored, every payment gets the 30 s floor (P4)', V, 'tierToBufferMs(this.bufferPolicy(), dec.statement.tier)', '0'],
   ['Vault: engine statement for another buffer policy accepted (P4)', V, "if (dec.statement.bufferPolicy !== this.bufferPolicy()) fail('ENGINE_BUFFER_POLICY_MISMATCH');", ''],
-  ['Vault: restart fail-safe for unevaluated payments removed (P4)', V, '    this.#failSafeUnevaluated();\n', '\n'],
+  ['Vault: fail-closed cancellation of unevaluated payments removed (F2/N2)', V, "    for (const r of rows) this.store.move(r.payment_id, 'BUFFERED', 'CANCELLED', 'vault', { reason }, { reason });", ''],
+  ['Vault: evaluation-complete marker ignored (N2)', V, "AND (v.payment_id IS NULL OR v.evaluated=0) AND", 'AND v.payment_id IS NULL AND'],
+  ['Verifier: cap evidence not bound to the tx paymentId (N1)', 'src/v5/supervisor/verifier.mjs', "if (ev.payment_id !== paymentId) v.push('EFFECT_CAP_NOT_BOUND_TO_PAYMENT');", ''],
+  ['Verifier: HIGH resolution accepts any LEGITIMATE review of the credential (N3)', 'src/v5/supervisor/verifier.mjs', "const rv = sE.v5.incidentReviews[inc];", "const rv = Object.values(sE.v5.incidentReviews).find(r => r.verdict === 'LEGITIMATE' && r.credId === fl.credId);"],
+  ['Verifier: hidden open incident not checked (R8)', 'src/v5/supervisor/verifier.mjs', "if (!grant) hidden.push(pid);", ''],
+  ['Verifier: flow from the vault row instead of signed evidence (F1)', 'src/v5/supervisor/verifier.mjs', "const fl = flowOf(paymentId);", "const fl = vp ? { flow: vp.flow, credId: vp.cred_id, delegationId: vp.delegation_id } : null;"],
   ['Buffer: sticky tier floor removed (P4 anti-reset)', 'src/v5/risk/buffer.mjs', "n = Math.max(n, N('stickyTier') || 0);", ''],
   ['Buffer: flow value uses this payment only (P4 anti-splitting)', 'src/v5/risk/buffer.mjs', 'flowValue1hBps: String(bps(v1h > amt ? v1h : amt, per)),', 'flowValue1hBps: String(bps(amt, per)),'],
   ['Buffer: open incident does not raise the tier (P4)', 'src/v5/risk/buffer.mjs', "if (i.openIncident === 'true') n += 3;", ''],
