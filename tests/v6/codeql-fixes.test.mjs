@@ -13,7 +13,7 @@ test('CQ-1 credentials: read through one descriptor; a symlink or a directory at
   const d = mkdtempSync(join(tmpdir(), 'cq-')); const real = join(d, 'real.json'); writeFileSync(real, CREDS); chmodSync(real, 0o600);
   assert.equal(loadGmailCredentials(real).sender, 'x@example.com');
   const link = join(d, 'link.json'); symlinkSync(real, link);
-  assert.throws(() => loadGmailCredentials(link), (e) => e.code === 'ELOOP');
+  assert.throws(() => loadGmailCredentials(link), (e) => e.code === 'GMAIL_CREDENTIALS_SYMLINK' && e.syscallCode === 'ELOOP'); // final reconcile: #22 error code, #26 descriptor
   const dir = join(d, 'dir.json'); mkdirSync(dir);
   assert.throws(() => loadGmailCredentials(dir), (e) => e.code === 'GMAIL_CREDENTIALS_INVALID' || e.code === 'EISDIR');
   assert.throws(() => loadGmailCredentials(join(d, 'missing.json')), (e) => e.code === 'ENOENT');

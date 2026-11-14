@@ -9,7 +9,7 @@
 // * Secrets (client secret, refresh / access tokens) are held in memory only, never logged, never journaled. Request
 //   and response metadata are logged with recipient / subject reduced to hashes and the message id truncated.
 import { createHash, randomUUID } from 'node:crypto';
-import { openSync, fstatSync, readFileSync, closeSync, constants as FS } from 'node:fs';
+import { openSync, fstatSync, readSync, writeSync, fsyncSync, fchmodSync, unlinkSync, closeSync, constants as FS } from 'node:fs';
 
 export const GMAIL_SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -24,20 +24,68 @@ export function buildRfc822({ from, to, subject, text, idempotencyKey, domain = 
     `X-SafeBox-Idempotency-Key: ${idempotencyKey.slice(0, 64)}`, 'MIME-Version: 1.0', 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: 8bit', '', body].join('\r\n');
 }
 
-/** Loads operator OAuth credentials from a JSON file OUTSIDE the repository: {client_id, client_secret, refresh_token, sender}. */
+const credError = (code, message) => Object.assign(new Error(message), { code });
+const MAX_CRED_BYTES = 1 << 20;
+const POSIX = process.platform !== 'win32';
+
+/** Loads operator OAuth credentials from a JSON file OUTSIDE the repository: {client_id, client_secret, refresh_token, sender}.
+ *  Reconciled final candidate (PR #26 CodeQL fix + PR #22): one descriptor opened O_NOFOLLOW (POSIX) | O_NONBLOCK (a FIFO
+ *  cannot hang the loader), fstat must be a regular file, on POSIX the file must not be group/other accessible (0600),
+ *  bounded read through the same descriptor. Windows: O_NOFOLLOW and POSIX modes do not exist; the file relies on the
+ *  user-profile ACL (documented residual). */
 export function loadGmailCredentials(path) {
-  if (!path) throw Object.assign(new Error('no credentials path'), { code: 'GMAIL_CREDENTIALS_MISSING' });
-  // CodeQL js/file-system-race: open once and read through the same descriptor (no stat-then-read by path). O_NOFOLLOW
-  // where the platform has it (POSIX); a symlinked or non-regular credentials file is refused.
-  const fd = openSync(path, FS.O_RDONLY | (FS.O_NOFOLLOW ?? 0) | (FS.O_NONBLOCK ?? 0)); // O_NONBLOCK: a FIFO cannot hang the loader
+  if (!path) throw credError('GMAIL_CREDENTIALS_MISSING', 'no credentials path');
+  let fd;
+  try { fd = openSync(path, FS.O_RDONLY | (FS.O_NOFOLLOW ?? 0) | (FS.O_NONBLOCK ?? 0)); }
+  catch (e) {
+    if (e.code === 'ELOOP' || e.code === 'EMLINK') throw Object.assign(credError('GMAIL_CREDENTIALS_SYMLINK', 'credentials path is a symlink'), { errno: e.errno, syscallCode: e.code });
+    throw e; // ENOENT etc. keep their system code
+  }
   let raw;
   try {
-    if (!fstatSync(fd).isFile()) throw Object.assign(new Error('credentials path is not a regular file'), { code: 'GMAIL_CREDENTIALS_INVALID' });
-    raw = readFileSync(fd, 'utf8');
+    const st = fstatSync(fd);
+    if (!st.isFile()) throw credError('GMAIL_CREDENTIALS_INVALID', 'credentials path is not a regular file');
+    if (POSIX && (st.mode & 0o077) !== 0) throw credError('GMAIL_CREDENTIALS_TOO_PERMISSIVE', 'credentials file must be mode 0600');
+    if (st.size > MAX_CRED_BYTES) throw credError('GMAIL_CREDENTIALS_TOO_LARGE', 'credentials file is too large');
+    const buf = Buffer.alloc(st.size); let off = 0;
+    while (off < buf.length) { const n = readSync(fd, buf, off, buf.length - off, off); if (n === 0) break; off += n; }
+    if (off !== buf.length) throw credError('GMAIL_CREDENTIALS_SHORT_READ', 'credentials file changed while it was read');
+    raw = buf.toString('utf8');
   } finally { closeSync(fd); }
   const j = JSON.parse(raw);
-  for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) if (typeof j[k] !== 'string' || !j[k]) throw Object.assign(new Error('credentials field ' + k), { code: 'GMAIL_CREDENTIALS_INVALID' });
+  for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) if (typeof j[k] !== 'string' || !j[k]) throw credError('GMAIL_CREDENTIALS_INVALID', 'credentials field ' + k);
   return { clientId: j.client_id, clientSecret: j.client_secret, refreshToken: j.refresh_token, sender: j.sender };
+}
+
+/** Creates a NEW credential file (from PR #22, hardened): exclusive create O_CREAT|O_EXCL (+O_NOFOLLOW on POSIX), 0600,
+ *  fsync, mode re-checked on the descriptor; a partially written file is removed. Field values are validated here, not
+ *  only in the setup script: non-empty strings, at most 4096 chars, no control characters. Refuses any existing path,
+ *  including a symlink or a dangling symlink. */
+export function writeGmailCredentialFile(path, creds) {
+  for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) {
+    const v = creds?.[k];
+    if (typeof v !== 'string' || !v || v.length > 4096 || /[\u0000-\u001f\u007f]/.test(v)) throw credError('GMAIL_CREDENTIALS_INVALID', 'credentials field ' + k + ' is empty, too long or contains control characters');
+  }
+  const text = JSON.stringify({ client_id: creds.client_id, client_secret: creds.client_secret, refresh_token: creds.refresh_token, sender: creds.sender }, null, 2);
+  let fd;
+  try { fd = openSync(path, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); }
+  catch (e) {
+    if (e.code === 'EEXIST' || e.code === 'ELOOP') throw credError('GMAIL_CREDENTIALS_EXISTS', 'refusing to replace an existing credentials path');
+    throw e;
+  }
+  let ok = false;
+  try {
+    const buf = Buffer.from(text); let off = 0;
+    while (off < buf.length) off += writeSync(fd, buf, off, buf.length - off, null);
+    fsyncSync(fd);
+    if (POSIX) { try { fchmodSync(fd, 0o600); } catch { /* checked below */ } }
+    const st = fstatSync(fd);
+    if (!st.isFile() || (POSIX && (st.mode & 0o077) !== 0)) throw credError('GMAIL_CREDENTIALS_TOO_PERMISSIVE', 'credential file mode');
+    ok = true;
+  } finally {
+    closeSync(fd);
+    if (!ok) { try { unlinkSync(path); } catch { /* the exclusive file is removed when creation cannot be finished */ } }
+  }
 }
 
 export class GmailTransport {
