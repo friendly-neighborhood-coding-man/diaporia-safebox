@@ -31,7 +31,11 @@
     "v4:matrix": "node --disable-warning=ExperimentalWarning scripts/v4/recovery-matrix.mjs",
     "v4:redteam": "node --disable-warning=ExperimentalWarning scripts/v4/run-redteam.mjs",
     "v4:os": "node scripts/v4/os-matrix.mjs",
-    "v4:mutations": "node scripts/v4/mutations.mjs"
+    "v4:mutations": "node scripts/v4/mutations.mjs",
+    "v5:test": "node --disable-warning=ExperimentalWarning --test tests/v5/*.test.mjs",
+    "v5:scenarios": "node --disable-warning=ExperimentalWarning scripts/v5/run-scenarios.mjs",
+    "v5:redteam": "node --disable-warning=ExperimentalWarning scripts/v5/run-redteam.mjs",
+    "v5:mutations": "node --disable-warning=ExperimentalWarning scripts/v5/mutations.mjs"
   },
   "dependencies": {
     "near-api-js": "7.5.3"

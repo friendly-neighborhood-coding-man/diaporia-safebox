@@ -20,7 +20,7 @@ export const SCENARIOS = {
 export class OwnerSimV5 {
   constructor(w, { responseMs = 60 * MIN, silent = false, payEveryTurn = true } = {}) {
     this.w = w; this.responseMs = responseMs; this.silent = silent; this.payEveryTurn = payEveryTurn;
-    this.firstAlertAt = null; this.handled = new Set(); this.actions = []; this.payments = []; this.prompts = [];
+    this.firstAlertAt = null; this.handled = new Set(); this.retries = {}; this.actions = []; this.payments = []; this.prompts = [];
   }
   askOwner(action, credIds, pitch) {
     const d = V5.actionDigest(action).toString('hex');
@@ -34,7 +34,8 @@ export class OwnerSimV5 {
     const w = this.w, out = new Set();
     const s = w.root.state;
     for (const h of Object.values(s.v5.holds)) if (h.status === 'ACTIVE' && !w.intents.has(h.authDigest) && !this.ownHolds?.has(h.holdId)) for (const i of h.issuers) if (i.kind === 'credential') out.add(i.ref);
-    for (const i of w.vault.incidents()) out.add(i.cred_id);
+    const own = new Set(this.payments.map(p => p.paymentId).filter(Boolean));
+    for (const i of w.vault.incidents()) if (w.vault.v5payments().some(p => p.incident_id === i.incident_id && !own.has(p.payment_id) && !/seeded/.test(p.decision ?? ''))) out.add(i.cred_id);
     for (const d of Object.values(s.v5.delegations)) if (!this.ownDelegations?.has(d.delegationId)) out.add(d.issuerCredId);
     for (const q of Object.values(s.v5.rapid.requests)) if (!this.ownRequests?.has(q.requestId)) out.add(q.requestedBy ?? '-');
     out.delete('-'); out.delete(undefined);
@@ -54,13 +55,20 @@ export class OwnerSimV5 {
     for (const sus of this.suspects()) {
       // the owner's own payment flow is never a suspect unless its incident contains payments the owner did not make
       const inc = w.vault.incidents().filter(i => i.cred_id === sus && i.state === 'OPEN');
-      const foreign = w.vault.v5payments().some(p => p.cred_id === sus && !ownPays.has(p.payment_id));
+      const foreign = w.vault.v5payments().some(p => p.cred_id === sus && !ownPays.has(p.payment_id) && !/seeded/.test(p.decision ?? ''));
       if (!foreign && !Object.values(w.root.state.v5.holds).some(h => h.issuers.some(i => i.ref === sus))) continue;
       if (this.handled.has(sus)) {
         for (const i of inc) if (!this.handled.has('inc:' + i.incident_id)) await this.#review(i, sus);
+        if (w.root.state.creds[sus]?.status !== 'revoked' && (this.retries[sus] = (this.retries[sus] ?? 0) + 1) <= 3) await this.#neutralize(sus, inc, true);
         continue;
       }
       this.handled.add(sus);
+      await this.#neutralize(sus, inc, false);
+    }
+  }
+  async #neutralize(sus, inc, retry) {
+    const w = this.w;
+    {
       const exclude = new Set([sus, ...this.suspects()]);
       const holds = Object.values(V5.projectState(w.root.state, w.now()).v5.holds).filter(h => h.status === 'ACTIVE' && h.issuers.some(i => i.ref === sus)).map(h => h.holdId);
       const helper = this.#activeCred(['k3-root-hw', 'k5-recovery-hw', 'k2-laptop'], exclude);
@@ -68,13 +76,13 @@ export class OwnerSimV5 {
       if (holds.length && helper) { r = await w.cmd('CONTEST_PROTECTIVE_HOLD', { contestId: w.newId('ct').slice(0, 30), holdIds: holds, suspectCredId: sus, reason: 'not me: stolen key' }, ['orc-1', helper]); this.actions.push({ at: iso(w.now()), kind: 'CONTEST', sus, holds, by: ['orc-1', helper], result: r.ok ? 'OK' : r.error.code }); }
       if (!r?.ok) {
         const revokers = ['k2-laptop', 'k3-root-hw', 'k5-recovery-hw'].filter(c => !exclude.has(c) && V5.projectState(w.root.state, w.now()).creds[c]?.status === 'active').slice(0, 2);
-        const qid = ('q-' + sus).slice(0, 40); this.ownHolds.add(qid);
-        const q = await w.cmd('SUSPEND', { credId: sus, holdId: qid }, [this.#activeCred(['k2-laptop', 'k3-root-hw', 'k4-freeze'], exclude) ?? 'k3-root-hw']);
+        const qid = ('q-' + sus + (retry ? '-r' + this.retries[sus] : '')).slice(0, 40); this.ownHolds.add(qid);
+        const q = w.root.state.creds[sus]?.status === 'suspended' ? { ok: true, result: 'already suspended' } : await w.cmd('SUSPEND', { credId: sus, holdId: qid }, [this.#activeCred(['k2-laptop', 'k3-root-hw', 'k4-freeze'], exclude) ?? 'k3-root-hw']);
         this.actions.push({ at: iso(w.now()), kind: 'QUARANTINE', sus, result: q.ok ? 'OK' : q.error.code });
         const v = await w.ownerAct('REVOKE', { credId: sus, reason: 'stolen' }, revokers);
         this.actions.push({ at: iso(w.now()), kind: 'REVOKE', sus, by: revokers, result: v.ok ? 'OK' : v.error.code });
       }
-      for (const i of inc) await this.#review(i, sus);
+      if (!retry) for (const i of inc) await this.#review(i, sus);
     }
   }
   async #review(i, sus) {
@@ -102,8 +110,9 @@ export async function evaluate(w, act, owner, stolen) {
     attacker: { proposed: atk.length, settled: atk.filter(p => p.state === 'SETTLED').length, settledYocto: sum(atk.filter(p => p.state === 'SETTLED')), toAttackerAccount: atk.filter(p => p.recipient === 'attacker.mock' && p.state === 'SETTLED').length,
       delayed: atk.filter(p => p.delay_ms > 0).length, delayedThenSettled: atk.filter(p => p.delay_ms > 0 && p.state === 'SETTLED').length, cancelled: atk.filter(p => p.state === 'CANCELLED').length,
       delegationsGranted: Object.values(s.v5.delegations).filter(d => !owner.ownDelegations?.has(d.delegationId)).length, rapidGrants: attackerRapid,
-      settledBeforeDetection: w.vault.incidents().reduce((t, i) => t + Number(i.settled_before), 0) },
-    owner: { actions: owner.actions, prompts: owner.prompts.length, paymentsAttempted: ownerPays.length, paymentsAccepted: ownerPays.filter(p => p.ok).length, paymentsSettled: ownerSettled, lastPayments: lastOwner,
+      settledBeforeFirstDelay: (() => { const t = Math.min(...atk.filter(p => p.delay_ms > 0).map(p => p.proposed_at)); return atk.filter(p => p.state === 'SETTLED' && p.proposed_at < t).length; })() },
+    owner: { actions: owner.actions, prompts: owner.prompts.length, paymentsAttempted: ownerPays.length, paymentsAccepted: ownerPays.filter(p => p.ok).length, paymentsSettled: ownerSettled, lastPayments: lastOwner, codes: ownerPays.reduce((m, p) => (m[p.code] = (m[p.code] ?? 0) + 1, m), {}),
+      delayedReasons: ps.filter(p => ownerPays.some(o => o.paymentId === p.payment_id) && p.delay_ms > 0).map(p => { try { return JSON.parse(p.decision).reasons; } catch { return []; } }),
       firstAlertAt: owner.firstAlertAt ? iso(owner.firstAlertAt) : null, creds: Object.fromEntries(Object.values(s.creds).map(c => [c.credId, c.status])) },
     endState: { effectiveHolds: effective, frozen: w.frozen(), epoch: String(s.epoch), },
     notifications: { mockSent: w.mock.sent.length, outbox: w.notify.stats() },

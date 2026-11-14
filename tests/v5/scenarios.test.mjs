@@ -63,7 +63,7 @@ test('Scenario E: compromised notification infrastructure never authorizes anyth
   assert.ok(r.cases.outage.delayedPaymentsStillDelayed >= 3, 'an outage grants no exception');
   assert.deepEqual(r.cases.content, { links: false, memoLeaked: false, statesNoApproval: true });
   assert.match(r.cases.stolenMailbox.reviewWithEmailToken, /UNEXPECTED_EVIDENCE/);
-  assert.match(r.cases.stolenMailbox.activateWithEmail, /UNEXPECTED_EVIDENCE/);
+  assert.match(r.cases.stolenMailbox.activateWithEmail, /UNEXPECTED_EVIDENCE|COMMAND_APPROVAL_FIELDS/);
   assert.deepEqual(Object.values(r.cases.injectedContent).slice(1), [true, true, true]);
   assert.equal(r.metrics.accelerationsWithoutAuthenticator, 0);
   assert.equal(r.verifier.ok, true);

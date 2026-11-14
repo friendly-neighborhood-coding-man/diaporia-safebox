@@ -565,6 +565,10 @@ export function applyTransition(state0, tr) {
   let out, fx;
   if (HANDLERS5[a?.type]) {
     checkActionHeader(s, a, at);
+    // F-V5-04: authenticate every approval BEFORE any command-specific validation, so an unauthenticated submitter
+    // learns nothing about policy (it gets the authentication error, never a business-rule error). Runs on a scratch
+    // copy (verification consumes challenges); the handler re-verifies and applies status rules on the real state.
+    if (Array.isArray(tr.approvals) && tr.approvals.length) { const probe = clone(s); for (const ap of tr.approvals.slice(0, 8)) verifyCommand(probe, a, ap, at, { allowSuspended: true }); }
     fx = [];
     s.v5tx = { levels: [] };
     HANDLERS5[a.type](s, a, tr, at, fx);
