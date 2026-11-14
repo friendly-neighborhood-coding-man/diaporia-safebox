@@ -13,8 +13,8 @@ const hashOf = (domain, obj) => createHash('sha256').update(Buffer.concat([Buffe
 const KNOWN = new Set(['BIOMETRIC_NO_MATCH', 'BIOMETRIC_TIMEOUT', 'BIOMETRIC_LOCKOUT', 'BIOMETRIC_CANCELLED', 'FINGERPRINT_ONLY_UNSUPPORTED']);
 
 export class WinBioGate {
-  constructor({ credId, exe, keyName = 'SafeBoxGate-' + credId, gateKeyId = 'winbio-' + credId, timeoutS = 30, onPrompt = null } = {}) {
-    Object.assign(this, { credId, exe, keyName, gateKeyId, timeoutS, onPrompt }); this.kind = null; this.log = [];
+  constructor({ credId, exe, keyName = 'SafeBoxGate-' + credId, gateKeyId = 'winbio-' + credId, timeoutS = 60, onPrompt = null, onDone = null } = {}) {
+    Object.assign(this, { credId, exe, keyName, gateKeyId, timeoutS, onPrompt, onDone }); this.kind = null; this.log = [];
   }
   #run(args, timeoutMs = 15_000) {
     let out;
@@ -25,6 +25,13 @@ export class WinBioGate {
     return j;
   }
   probe() { return this.#run(['probe']); }
+  /** Sensor check only (WinBioIdentify + current-user check); the helper signs NOTHING. Used as a preflight. */
+  identify(prompt = 'SafeBox sensor check (nothing is signed)') {
+    this.onPrompt?.('SENSOR_CHECK');
+    let j; try { j = this.#run(['identify', '--timeout', String(this.timeoutS), '--prompt', prompt.slice(0, 120)], (this.timeoutS + 15) * 1000); } finally { this.onDone?.(); }
+    this.log.push({ purpose: 'SENSOR_CHECK', ok: !!j.ok, code: j.code ?? null, hr: j.hr ?? null });
+    return j;
+  }
   publicKey() {
     const j = this.#run(['key', '--name', this.keyName]);
     if (!j.ok) fail('FINGERPRINT_ONLY_UNSUPPORTED', j.code);
@@ -33,7 +40,7 @@ export class WinBioGate {
   }
   #sign(hashHex, purpose) {
     this.onPrompt?.(purpose);
-    const j = this.#run(['verify-sign', '--name', this.keyName, '--hash', hashHex, '--timeout', String(this.timeoutS)], (this.timeoutS + 10) * 1000);
+    let j; try { j = this.#run(['verify-sign', '--name', this.keyName, '--hash', hashHex, '--timeout', String(this.timeoutS), '--prompt', ('SafeBox: ' + purpose).slice(0, 120)], (this.timeoutS + 15) * 1000); } finally { this.onDone?.(); }
     this.log.push({ purpose, ok: !!j.ok, code: j.code ?? null, hr: j.hr ?? null });
     if (!j.ok) fail(KNOWN.has(j.code) ? j.code : 'FINGERPRINT_ONLY_UNSUPPORTED', j.code + (j.hr ? ' ' + j.hr : ''));
     if (j.result !== 'MATCH' || !/^[0-9a-f]{128}$/.test(j.sig)) fail('FINGERPRINT_ONLY_UNSUPPORTED', 'helper result');

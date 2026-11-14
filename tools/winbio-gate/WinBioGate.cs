@@ -1,13 +1,15 @@
 // SafeBox V6 local fingerprint gate helper (Windows Biometric Framework + CNG key).
 //
 // Build (no Visual Studio needed, .NET Framework 4 csc):
-//   %WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:exe /out:winbio-gate.exe /r:System.Core.dll WinBioGate.cs
+//   %WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:exe /out:winbio-gate.exe /r:System.Core.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll WinBioGate.cs
 //
 // Commands (all output is ONE line of JSON on stdout; nothing else is printed):
 //   probe                                   enumerate fingerprint units / open a system-pool session (no capture)
 //   key   --name <keyName>                  create-or-open the gate key (TPM: Microsoft Platform Crypto Provider; else
 //                                           software KSP, reported as WINBIO_SOFTWARE_KEY) and return its public key
-//   verify-sign --name <keyName> --hash <64 hex> [--timeout <s>]
+//   identify [--timeout <s>] [--prompt <text>]
+//                                           sensor check only: WinBioIdentify + current-user check, NO signature
+//   verify-sign --name <keyName> --hash <64 hex> [--timeout <s>] [--prompt <text>]
 //                                           ask the physical sensor for a fingerprint (WinBioIdentify, system pool);
 //                                           ONLY if the identified Windows account is the current user, sign the
 //                                           given SHA-256 hash with the gate key (ECDSA P-256, IEEE-P1363 r||s).
@@ -17,12 +19,19 @@
 // exports biometric data (samples, templates, scores), and never signs without a MATCH. It is NOT hardware attestation:
 // a compromised OS or a modified helper could sign without a finger. There is deliberately no command that signs
 // without a fingerprint (the enrollment proof-of-possession also goes through verify-sign).
+//
+// Window focus: in the system pool, the Windows Biometric Service delivers a capture only to the process whose window
+// has the foreground. A windowless console helper therefore never receives the touch. While waiting, the helper shows
+// a small top-most window ("SafeBox fingerprint gate") and activates it; if Windows refuses to move the focus, the
+// window says so, and one click on it gives it the foreground.
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
+using System.Drawing;
 
 static class WinBioGate {
   const uint WINBIO_TYPE_FINGERPRINT = 0x00000008;
@@ -46,13 +55,15 @@ static class WinBioGate {
     return 1;
   }
 
+  [STAThread]
   static int Main(string[] args) {
     try {
       string cmd = args.Length > 0 ? args[0] : "";
       if (cmd == "probe") return Probe();
       if (cmd == "key") return Key(Arg(args, "--name"));
-      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "30"));
-      return Fail("USAGE", 0, "probe | key --name N | verify-sign --name N --hash HEX [--timeout S]");
+      if (cmd == "identify") return VerifySign(null, null, int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), false);
+      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), true);
+      return Fail("USAGE", 0, "probe | key --name N | identify [--timeout S] [--prompt T] | verify-sign --name N --hash HEX [--timeout S] [--prompt T]");
     } catch (Exception e) { return Fail("HELPER_EXCEPTION", 0, e.GetType().Name); }
   }
 
@@ -88,19 +99,41 @@ static class WinBioGate {
     return Out("{\"ok\":true,\"kind\":" + Q(kind) + ",\"x\":" + Q(Hex(x)) + ",\"y\":" + Q(Hex(y)) + ",\"provider\":" + Q(k.Provider.Provider) + "}");
   }
 
-  static int VerifySign(string name, string hashHex, int timeoutS) {
-    if (hashHex == null || hashHex.Length != 64) return Fail("BAD_HASH");
-    var hash = new byte[32]; for (int i = 0; i < 32; i++) hash[i] = Convert.ToByte(hashHex.Substring(i * 2, 2), 16);
+  [DllImport("user32.dll")] static extern bool SetForegroundWindow(IntPtr hWnd);
+
+  /** Runs WinBioIdentify on a worker thread while a top-most window of this process holds the foreground. */
+  static void IdentifyFocused(IntPtr s, IntPtr ident, int timeoutS, string prompt, out int idHr, out uint unit, out bool done) {
+    int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false;
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 520, Height = 210, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+      Text = "Touch the fingerprint sensor now (" + timeoutS + " s).\n" + (prompt ?? "") + "\n\nIf nothing happens when you touch it, click this window once, then touch again." };
+    form.Controls.Add(label);
+    var t = new Thread(() => { uint sub2 = 0; byte sub = 0; hr = WinBioIdentify(s, out u, ident, out sub, out sub2); fin = true; });
+    t.IsBackground = true;
+    var deadline = DateTime.UtcNow.AddSeconds(timeoutS);
+    var timer = new System.Windows.Forms.Timer { Interval = 150 };
+    timer.Tick += (o, e) => { if (fin || DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } else if (Form.ActiveForm != form) { label.ForeColor = Color.DarkRed; } else { label.ForeColor = Color.Black; } };
+    form.Shown += (o, e) => { form.Activate(); SetForegroundWindow(form.Handle); t.Start(); timer.Start(); };
+    Application.Run(form);
+    if (!fin) { WinBioCancel(s); t.Join(3000); }
+    idHr = hr; unit = u; done = fin;
+  }
+
+  static int VerifySign(string name, string hashHex, int timeoutS, string prompt, bool sign) {
+    var hash = new byte[32];
+    if (sign) {
+      if (hashHex == null || hashHex.Length != 64) return Fail("BAD_HASH");
+      for (int i = 0; i < 32; i++) hash[i] = Convert.ToByte(hashHex.Substring(i * 2, 2), 16);
+    }
+    if (timeoutS < 5 || timeoutS > 300) return Fail("BAD_TIMEOUT");
     IntPtr s; int hr = WinBioOpenSession(WINBIO_TYPE_FINGERPRINT, WINBIO_POOL_SYSTEM, WINBIO_FLAG_DEFAULT, IntPtr.Zero, UIntPtr.Zero, new IntPtr(1), out s);
     if (hr != 0) return Fail("FINGERPRINT_ONLY_UNSUPPORTED", hr, "WinBioOpenSession");
     IntPtr ident = Marshal.AllocHGlobal(128);
     try {
       for (int i = 0; i < 128; i++) Marshal.WriteByte(ident, i, 0);
-      uint unit = 0, reject = 0; byte sub = 0; int idHr = unchecked((int)0x80004004); bool done = false;
+      uint unit; int idHr; bool done;
       Console.Error.Write("Touch the fingerprint sensor now (" + timeoutS + " s)...\n");
-      var t = new Thread(() => { idHr = WinBioIdentify(s, out unit, ident, out sub, out reject); done = true; });
-      t.IsBackground = true; t.Start();
-      if (!t.Join(timeoutS * 1000)) { WinBioCancel(s); t.Join(3000); return Fail("BIOMETRIC_TIMEOUT"); }
+      IdentifyFocused(s, ident, timeoutS, prompt, out idHr, out unit, out done);
       if (!done) return Fail("BIOMETRIC_TIMEOUT");
       if (idHr != 0) {
         uint u = unchecked((uint)idHr);
@@ -118,6 +151,7 @@ static class WinBioGate {
       var sid = new byte[sidSize]; Marshal.Copy(IntPtr.Add(ident, 8), sid, 0, sidSize);
       var me = WindowsIdentity.GetCurrent().User; var mine = new byte[me.BinaryLength]; me.GetBinaryForm(mine, 0);
       if (Hex(sid) != Hex(mine)) return Fail("BIOMETRIC_NO_MATCH", 0, "different Windows account");
+      if (!sign) return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + "}");
       string kind; var k = OpenOrCreate(name, out kind);
       byte[] sig; using (var e = new ECDsaCng(k)) sig = e.SignHash(hash); // IEEE-P1363 r||s
       return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + ",\"kind\":" + Q(kind) + ",\"sig\":" + Q(Hex(sig)) + "}");

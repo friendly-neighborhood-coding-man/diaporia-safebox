@@ -22,6 +22,7 @@ function ecdsaSignDigest(priv, h) {
 const out = (o) => { process.stdout.write(JSON.stringify(o) + '\n'); process.exit(o.ok ? 0 : 1); };
 if (cmd === 'probe') out({ ok: true, units: 1, systemPoolSession: 'OPENED' });
 if (cmd === 'key') { const j = key().export({ format: 'jwk' }); out({ ok: true, kind: 'WINBIO_SOFTWARE_KEY', x: Buffer.from(j.x, 'base64url').toString('hex'), y: Buffer.from(j.y, 'base64url').toString('hex') }); }
+if (cmd === 'identify') { const o = process.env.FAKE_WINBIO_OUTCOME ?? 'MATCH'; out(o === 'MATCH' ? { ok: true, result: 'MATCH', unit: 1 } : { ok: false, code: o }); }
 if (cmd === 'verify-sign') {
   const o = process.env.FAKE_WINBIO_OUTCOME ?? 'MATCH';
   if (o !== 'MATCH') out({ ok: false, code: o });

@@ -32,7 +32,7 @@ await p2.goto(m[1]); await p2.fill('#cred', 'k2-laptop'); await p2.click('#signi
 await p2.waitForSelector('#freeze:not([hidden])', { timeout: 30000 }).catch(async (e) => { console.log('[selftest] page text: ' + (await p2.textContent('body')).slice(0, 1500)); throw e; });
 await p2.fill('#confirm', 'FREEZE EVERYTHING'); await p2.click('#go');
 await p2.waitForFunction(() => document.getElementById('freezeOut').textContent.length > 0, null, { timeout: 30000 });
-console.log('[selftest] console: ' + await p2.textContent('#freezeOut'));
+console.log('[selftest] bridge card: ' + await page.textContent('#log').catch(() => '')); console.log('[selftest] console: ' + await p2.textContent('#freezeOut'));
 // hand the (now higher) signature counter back to the bridge tab, as one real authenticator would have it
 await cdp.send('WebAuthn.clearCredentials', { authenticatorId });
 for (const c of (await cdp2.send('WebAuthn.getCredentials', { authenticatorId: a2 })).credentials) await cdp.send('WebAuthn.addCredential', { authenticatorId, credential: c });

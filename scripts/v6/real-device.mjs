@@ -55,12 +55,25 @@ ev('OK', 'bridge page connected');
 
 // ------------------------------------------------------------------ fingerprint gate
 const helper = opt('--helper');
-let gates = {}, fpOnly = [], gateProbe = null;
+let gates = {}, fpOnly = [], gateProbe = null, sensorCheck = [], wbg = null;
+const TOUCH = (p) => `TOUCH THE FINGERPRINT SENSOR NOW (${p}). A small "SafeBox fingerprint gate" window opens: if touching does nothing, click that window once and touch again.`;
 if (helper) {
-  const g = new WinBioGate({ credId: 'k2-laptop', exe: resolve(helper), onPrompt: (p) => ev('TOUCH', `Touch the fingerprint sensor now (${p})`) });
+  const g = wbg = new WinBioGate({ credId: 'k2-laptop', exe: resolve(helper), timeoutS: Number(opt('--touch-timeout', '60')),
+    onPrompt: (p) => { ev('TOUCH', `Touch the fingerprint sensor now (${p})`); bridge.notice(TOUCH(p)); }, onDone: () => bridge.notice(null) });
   try { gateProbe = g.probe(); } catch (e) { gateProbe = { ok: false, code: e.code }; }
   ev(gateProbe.ok ? 'OK' : 'INFO', 'WinBio probe: ' + JSON.stringify(gateProbe));
-  if (gateProbe.ok && gateProbe.systemPoolSession === 'OPENED') { gates = { 'k2-laptop': g }; fpOnly = ['k2-laptop']; }
+  if (gateProbe.ok && gateProbe.systemPoolSession === 'OPENED') {
+    // preflight: one sensor check (nothing is signed) BEFORE any enrollment, up to 3 attempts, so a sensor that never
+    // reaches the helper is found before the owner approves the genesis records
+    ev('STEP', 'Fingerprint sensor check (nothing is signed): touch the sensor when the bridge page asks');
+    for (let i = 1; i <= 3; i++) {
+      let j; try { j = g.identify(`SafeBox sensor check ${i} of 3 (nothing is signed)`); } catch (e) { j = { ok: false, code: e.code ?? 'HELPER_ERROR' }; }
+      sensorCheck.push({ attempt: i, ok: !!j.ok, code: j.code ?? null, hr: j.hr ?? null });
+      ev(j.ok ? 'OK' : 'INFO', `sensor check ${i}: ${j.ok ? 'MATCH (current Windows user)' : j.code + (j.hr ? ' ' + j.hr : '')}`);
+      if (j.ok || ['FINGERPRINT_ONLY_UNSUPPORTED', 'BIOMETRIC_LOCKOUT'].includes(j.code)) break;
+    }
+    if (sensorCheck.some((x) => x.ok)) { gates = { 'k2-laptop': g }; fpOnly = ['k2-laptop']; }
+  }
 }
 if (!fpOnly.length) ev('INFO', 'k2-laptop runs UV-only: FINGERPRINT ONLY NOT PROVEN, PIN FALLBACK POSSIBLE');
 
@@ -74,12 +87,25 @@ if (opt('--gmail-creds')) {
 // ------------------------------------------------------------------ world (interactor harness; bob's world stays fully simulated)
 const realAuth = new RealAuthenticator({ bridge, label: 'k2-laptop' });
 bridge.display = 'ENROLL: register this laptop\'s passkey as SafeBox credential k2-laptop and sign the account genesis records\n(account vault-alice.mock, MOCK ledger; one Windows Hello prompt per record)';
+bridge.expected = { [bridge.display.split('\n')[0]]: 6 }; // passkey creation + one signature per genesis record (counted in the selftest)
 ev('STEP', 'Enrollment: approve each "ENROLL" request on the bridge page (Windows Hello)' + (fpOnly.length ? ' and touch the sensor for the gate-key enrollment' : ''));
 const { startHarness } = await import(pathToFileURL(join(IX, 'dist/harness/mockWorld.js')).href);
 const { call, mcpClient, obtainTokens } = await import(pathToFileURL(join(IX, 'dist/harness/client.js')).href);
 const policy6 = { emergency: { origin: ORIGIN, locatorTtlMs: String(72 * 3600_000) } };
-const h = await startHarness({ v6: { fingerprintOnly: fpOnly, gates, rp: { rpId: 'localhost', origin: ORIGIN }, policy6, transport, authenticators: { 'k2-laptop': realAuth }, ...(to ? { ownerRecipient: to } : {}) },
+const harness = (fp, gs, auth) => startHarness({ v6: { fingerprintOnly: fp, gates: gs, rp: { rpId: 'localhost', origin: ORIGIN }, policy6, transport, authenticators: { 'k2-laptop': auth }, ...(to ? { ownerRecipient: to } : {}) },
   v6Bob: { rp: { rpId: 'localhost', origin: ORIGIN }, policy6 } });
+let h, gateEnrollment = fpOnly.length ? 'PENDING' : 'NOT_ATTEMPTED', activeAuth = realAuth;
+try { h = await harness(fpOnly, gates, realAuth); if (fpOnly.length) gateEnrollment = 'ENROLLED'; }
+catch (e) {
+  if (!fpOnly.length || !/^(BIOMETRIC_|FINGERPRINT_ONLY_UNSUPPORTED)/.test(String(e.code))) throw e;
+  // fail closed to a LABELLED UV-only run (no gate key is enrolled; nothing is presented as fingerprint-verified)
+  gateEnrollment = 'FAILED:' + e.code; fpOnly = []; gates = {};
+  ev('INFO', `gate-key enrollment failed (${e.code}): continuing UV-only, FINGERPRINT ONLY NOT PROVEN, PIN FALLBACK POSSIBLE`);
+  ev('STEP', 'Enrollment again without the gate key: approve the new ENROLL requests on the bridge page (Windows Hello)');
+  bridge.counts = new Map();
+  activeAuth = new RealAuthenticator({ bridge, label: 'k2-laptop' });
+  h = await harness([], {}, activeAuth);
+}
 const w = h.worlds['sbx-alice']; const dev = h.devices['sbx-alice'];
 w.owner.decide = (prompt, text) => { bridge.display = String(text); ev('OWNER', 'device shows: ' + String(text).split('\n')[0]); return true; }; // the real decision is the owner's Approve/Decline on the bridge page
 ev('OK', `enrolled: k2-laptop credential ${w.root.state.creds['k2-laptop'].webauthn.credentialId.slice(0, 12)}…, gate key ${w.root.state.v6.gateKeys['k2-laptop']?.kind ?? 'none'}`);
@@ -142,11 +168,13 @@ try {
 
 // ------------------------------------------------------------------ evidence
 if (rec) { rec.stdin.write('q'); await new Promise((r) => rec.on('close', r)); }
-const gateLog = w.gates['k2-laptop']?.log ?? [];
+const gateLog = wbg?.log ?? [];
+const gatedApprovals = gateLog.filter((x) => x.purpose !== 'SENSOR_CHECK' && x.purpose !== 'ENROLL_GATE_KEY');
 const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)'];
-if (fpOnly.length && gateLog.length && gateLog.every((x) => x.ok)) labels.push('FINGERPRINT_ONLY_LOCALLY_VERIFIED (WinBio gate MATCH; not hardware attestation)'); else labels.push('FINGERPRINT ONLY NOT PROVEN');
+if (fpOnly.length && gatedApprovals.length && gatedApprovals.every((x) => x.ok) && results.workflowA?.settledVerified && results.workflowB?.frozen) labels.push('FINGERPRINT_ONLY_LOCALLY_VERIFIED (WinBio gate MATCH; not hardware attestation)'); else labels.push('FINGERPRINT ONLY NOT PROVEN');
 labels.push(results.alert?.api === 'GMAIL_API_ACCEPTED' ? 'REAL GMAIL (API accepted; inbox receipt NOT verified until the owner confirms)' : 'REAL GMAIL: NOT RUN');
-const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, gateLog, webauthnCeremonies: realAuth.ceremonies, results,
+const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
+  ownerReportedModalities: 'ASK THE OWNER: WebAuthn cannot tell which Windows Hello modality was used',
   git: (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO }).toString().trim(); } catch { return null; } })() };
 writeFileSync(join(OUT, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
 writeFileSync(join(OUT, 'trace.jsonl'), events.map((e) => JSON.stringify(e)).join('\n') + '\n');

@@ -13,9 +13,10 @@ const WORKER = `
 const { workerData, parentPort } = require('node:worker_threads');
 const http = require('node:http');
 const { port, sab, reply, page } = workerData; const flag = new Int32Array(sab);
-let pending = null; let lastPoll = 0; const waiting = new Map(); let n = 0;
+let pending = null; let notice = null; let lastPoll = 0; const waiting = new Map(); let n = 0;
 parentPort.on('message', (m) => {
   if (m.type === 'webauthn') { pending = m; }
+  else if (m.type === 'notice') { notice = m.text; }
   else if (m.type === 'http-res') { const r = waiting.get(m.id); if (r) { waiting.delete(m.id); r.writeHead(m.res.status, m.res.headers); r.end(m.res.body); } }
   else if (m.type === 'status') parentPort.postMessage({ type: 'status', lastPoll });
 });
@@ -26,7 +27,7 @@ http.createServer((req, res) => {
   req.on('end', () => {
     const body = Buffer.concat(chunks).toString('utf8');
     if (u.pathname === '/bridge') { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); return res.end(page); }
-    if (u.pathname === '/bridge/next') { lastPoll = Date.now(); res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); return res.end(JSON.stringify(pending ? { id: pending.id, op: pending.op, options: pending.options, display: pending.display } : { none: true })); }
+    if (u.pathname === '/bridge/next') { lastPoll = Date.now(); res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); return res.end(JSON.stringify(pending ? { id: pending.id, op: pending.op, options: pending.options, display: pending.display, notice } : { none: true, notice })); }
     if (u.pathname === '/bridge/result' && req.method === 'POST') {
       if (req.headers.origin !== workerData.origin) { res.writeHead(403); return res.end('{"ok":false}'); }
       let m; try { m = JSON.parse(body); } catch { res.writeHead(400); return res.end('{}'); }
@@ -47,7 +48,7 @@ button{font:inherit;padding:9px 16px;border-radius:7px;border:1px solid #8893a1;
 <h1>SafeBox owner device bridge (${origin})</h1>
 <p>Keep this tab open. When SafeBox needs this laptop's enrolled passkey, the exact request appears below. Approving opens the
 <b>real Windows Hello prompt</b>; Windows Hello may accept a fingerprint, face or PIN (SafeBox cannot tell which: a separate fingerprint gate does).</p>
-<div class="card" id="c"><i>Waiting for a request...</i></div><div id="log"></div>
+<div class="card" id="n" hidden style="border-color:#d29922;background:#fff8e6;font-weight:600"></div><div class="card" id="c"><i>Waiting for a request...</i></div><div id="log"></div>
 <script>
 "use strict";
 const b64u=(b)=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
@@ -73,6 +74,7 @@ async function act(){
 async function decline(){const q=cur;cur=null;await send({id:q.id,ok:false,error:'DECLINED_BY_OWNER'});document.getElementById('c').innerHTML='<i>Declined. Waiting...</i>';}
 async function poll(){
   try{const r=await fetch('/bridge/next').then(r=>r.json());
+    const n=document.getElementById('n'); if(r.notice){n.hidden=false;n.textContent=r.notice;}else{n.hidden=true;}
     if(!r.none&&(!cur||cur.id!==r.id)){cur={...r,title:r.display.split('\\n')[0]};
       document.getElementById('c').innerHTML='<b>'+txt(cur.title)+'</b><pre>'+txt(r.display)+'</pre><button class="go" id="go">Approve with Windows Hello</button><button id="no">Decline</button>';
       document.getElementById('go').onclick=act;document.getElementById('no').onclick=decline;}}catch(e){}
@@ -95,6 +97,8 @@ export class BrowserBridge {
     });
   }
   ready() { return this.readyP; }
+  /** Show (or clear with null) a banner on the bridge page, e.g. "touch the fingerprint sensor now". */
+  notice(text) { this.worker.postMessage({ type: 'notice', text: text == null ? null : String(text) }); }
   lastPoll() { return new Promise((r) => { this.onStatus = (m) => r(m.lastPoll); this.worker.postMessage({ type: 'status' }); }); }
   /** Synchronous round trip to the owner's browser (blocks this thread; the worker keeps serving). */
   call(op, options, display) {
