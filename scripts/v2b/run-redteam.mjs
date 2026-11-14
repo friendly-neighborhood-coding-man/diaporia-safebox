@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import net from 'node:net';
 import http from 'node:http';
 import { layout, USERS, GROUPS, PRINCIPAL_GROUPS } from '../../src/v2/launch/layout.mjs';
+import { commandOnPath, shellSingleQuote, writableLines } from '../../src/v2/launch/argv-exec.mjs';
 import { GENESIS, GENESIS_TOTAL, EXECUTOR_ACCOUNT } from '../../src/v2/world.mjs';
 import { ClaudeBrain, ScriptedBrain } from '../../src/v2b/brain.mjs';
 import { systemPrompt } from '../../src/v2b/prompt.mjs';
@@ -34,7 +35,7 @@ const NODE = process.execPath;
 
 function need(c, m) { if (!c) { console.error('PRECONDITION FAILED: ' + m); process.exit(2); } }
 need(process.platform === 'linux' && process.getuid() === 0, 'Linux + root required');
-for (const b of ['setpriv', 'unshare', 'useradd', 'groupadd', 'mount']) need(spawnSync('sh', ['-c', `command -v ${b}`]).status === 0, b + ' missing');
+for (const b of ['setpriv', 'unshare', 'useradd', 'groupadd', 'mount']) need(commandOnPath(b), b + ' missing');
 const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
 for (const g of GROUPS) if (spawnSync('getent', ['group', g]).status !== 0) sh('groupadd', ['--system', g]);
 for (const u of Object.values(USERS)) if (spawnSync('id', [u]).status !== 0) sh('useradd', ['--system', '--no-create-home', '--shell', '/usr/sbin/nologin', '--user-group', u]);
@@ -49,7 +50,7 @@ const EVALUATOR_ONLY = ['src/v2b/classify.mjs', 'src/v2b/smoke.mjs', 'src/v2b/ha
 cpSync(join(REPO, 'src'), join(ROOT, 'src'), { recursive: true, filter: (p) => !EVALUATOR_ONLY.some(x => p === join(REPO, x)) }); copyFileSync(join(REPO, 'package.json'), join(ROOT, 'package.json'));
 cpSync(join(REPO, 'node_modules'), join(ROOT, 'node_modules'), { recursive: true, dereference: true });
 sh('chown', ['-R', 'root:root', ROOT]); sh('chmod', ['-R', 'go-w,a+rX', ROOT]); chmodSync('/var/lib/sbx2-code', 0o755);
-const codeCheck = sh('sh', ['-c', `find ${ROOT} ! -type l \\( -perm -o+w -o -perm -g+w \\) -print | head -5`]).trim();
+const codeCheck = writableLines([ROOT], { limit: 5 }).join('\n');
 
 const base = `/var/lib/sbx2/${runId}`;
 rmSync(base, { recursive: true, force: true }); mkdirSync('/var/lib/sbx2', { recursive: true, mode: 0o755 });
@@ -65,8 +66,8 @@ const MASK = ['/home', '/tmp', '/mnt', '/root', '/run', '/var/lib/sbx2-brain'];
 const cmdFor = (who, script, args) => {
   const inner = ['setpriv', ...privArgs(who), NODE, '--disable-warning=ExperimentalWarning', join(ROOT, script), ...args];
   if (who !== 'gen') return [inner[0], inner.slice(1)];
-  const q = (s) => `'${String(s).replace(/'/g, `'\\''`)}'`;
-  const mounts = ['mount -t proc -o hidepid=invisible proc /proc', ...MASK.filter(existsSync).map(m => `mount -t tmpfs -o size=1m,mode=0755 none ${m}`)].join(' && ');
+  const q = shellSingleQuote;
+  const mounts = ['mount -t proc -o hidepid=invisible proc /proc', ...MASK.filter(existsSync).map(m => `mount -t tmpfs -o size=1m,mode=0755 none ${q(m)}`)].join(' && ');
   return ['unshare', ['--net', '--mount', '--', 'sh', '-c', `${mounts} && exec ${inner.map(q).join(' ')}`]];
 };
 const runSync = (who, script, args) => { const [c, a] = cmdFor(who, script, args); const r = spawnSync(c, a, { env: env(who), cwd: '/' }); if (r.status !== 0) throw new Error(`${who} ${script} failed: ${r.stderr}`); return r.stdout.toString(); };

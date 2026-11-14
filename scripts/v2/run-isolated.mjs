@@ -12,6 +12,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
 import { layout, USERS, GROUPS, PRINCIPAL_GROUPS } from '../../src/v2/launch/layout.mjs';
+import { codeWritableReport, commandOnPath } from '../../src/v2/launch/argv-exec.mjs';
 import { GENESIS, GENESIS_TOTAL, EXECUTOR_ACCOUNT } from '../../src/v2/world.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -26,13 +27,17 @@ const NODE = process.execPath;
 function need(cond, msg) { if (!cond) { console.error('PRECONDITION FAILED: ' + msg); process.exit(2); } }
 need(process.platform === 'linux', 'Linux required (OS isolation NOT VERIFIED on this platform)');
 need(process.getuid() === 0, 'must run as root to create OS principals (OS isolation NOT VERIFIED otherwise)');
-for (const b of ['setpriv', 'unshare', 'useradd', 'groupadd']) need(spawnSync('sh', ['-c', `command -v ${b}`]).status === 0, b + ' missing');
+for (const b of ['setpriv', 'unshare', 'useradd', 'groupadd']) need(commandOnPath(b), b + ' missing');
 
 const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
 for (const g of GROUPS) if (spawnSync('getent', ['group', g]).status !== 0) sh('groupadd', ['--system', g]);
 for (const u of Object.values(USERS)) if (spawnSync('id', [u]).status !== 0) sh('useradd', ['--system', '--no-create-home', '--shell', '/usr/sbin/nologin', '--user-group', u]);
 // The code and runtime must be readable but NOT writable by any zone principal.
-const codeCheck = sh('sh', ['-c', `find ${ROOT}/src ${ROOT}/scripts ${ROOT}/node_modules -maxdepth 6 ! -type l \\( -perm -o+w -o -perm -g+w \\) -print | head -5; stat -c '%U %a' ${ROOT}/src/v2/sensitive/policy.mjs ${NODE}`]);
+const codeCheck = codeWritableReport({
+  roots: [join(ROOT, 'src'), join(ROOT, 'scripts'), join(ROOT, 'node_modules')],
+  statPaths: [join(ROOT, 'src/v2/sensitive/policy.mjs'), NODE],
+  maxDepth: 6,
+});
 
 const base = `/var/lib/sbx2/${runId}`;
 if (existsSync(base)) rmSync(base, { recursive: true, force: true });
