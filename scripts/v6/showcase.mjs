@@ -127,7 +127,7 @@ async function withClip(id, title, labels, fn) {
   let video = null;
   if (ctx) { const v = page.video(); await ctx.close(); const raw = await v.path(); video = raw; }
   const pass = checks.length > 0 && checks.every((x) => x.ok);
-  results.push({ id, title, labels, pass, checks, error, video });
+  results.push({ id, title, labels: [...clipLabels[id]], pass, checks, error, video });
   return pass;
 }
 if (VIDEO) browser = await chromium.launch({ args: ['--host-resolver-rules=MAP localhost 127.0.0.1'] });
@@ -368,7 +368,7 @@ for (const r of results) {
 rmSync(join(OUT, '.raw'), { recursive: true, force: true });
 const summary = { runner: 'scripts/v6/showcase.mjs', startedAt: stamp, mode: REAL_GMAIL ? 'REAL_GMAIL' : 'MOCK', video: VIDEO, ffmpeg: !!ffmpeg, ffmpegErrors: ffLog,
   git: (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO }).toString().trim(); } catch { return null; } })(),
-  labelsShown: [...labelsUsed], notRun: ['REAL DEVICE AUTH (Windows Hello)', 'FINGERPRINT_ONLY on a real sensor', ...(REAL_GMAIL ? [] : ['REAL GMAIL'])],
+  labelsShown: [...new Set([...labelsUsed, ...Object.values(clipLabels).flatMap((s) => [...s])])].filter((l) => !l.includes('pending provider result')), notRun: ['REAL DEVICE AUTH (Windows Hello)', 'FINGERPRINT_ONLY on a real sensor', ...(REAL_GMAIL ? [] : ['REAL GMAIL'])],
   honesty: 'All lines on screen are events emitted by this run. Devices are SIMULATED (Chromium virtual authenticator holding the Root-enrolled key; simulated fingerprint gate). Ledger is MOCK.',
   clips: results.map((r) => ({ id: r.id, title: r.title, pass: r.pass, checks: r.checks, labels: r.labels, mp4: r.mp4 ?? null, webm: r.webm ?? null, error: r.error })) };
 writeFileSync(join(OUT, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');

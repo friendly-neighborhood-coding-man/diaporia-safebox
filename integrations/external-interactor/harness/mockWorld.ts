@@ -107,9 +107,9 @@ export interface Harness {
   close(): Promise<void>;
 }
 
-export async function startHarness(opts: { v6?: false | Record<string, unknown>; mode?: DeploymentMode; baseUrl?: string; oauth?: { accessTokenTtlSec?: number; codeTtlSec?: number; refreshTokenTtlSec?: number }; limits?: { mcpPerMinute?: number; preparePerMinute?: number; webPerMinute?: number }; now?: () => number } = {}): Promise<Harness> {
+export async function startHarness(opts: { v6?: false | Record<string, unknown>; v6Bob?: false | Record<string, unknown>; mode?: DeploymentMode; baseUrl?: string; oauth?: { accessTokenTtlSec?: number; codeTtlSec?: number; refreshTokenTtlSec?: number }; limits?: { mcpPerMinute?: number; preparePerMinute?: number; webPerMinute?: number }; now?: () => number } = {}): Promise<Harness> {
   const dir = mkdtempSync(join(tmpdir(), "sbx-interactor-"));
-  const worlds: Record<string, World> = { "sbx-alice": await buildWorld(join(dir, "alice"), opts.v6 ?? false), "sbx-bob": await buildWorld(join(dir, "bob"), opts.v6 ?? false) };
+  const worlds: Record<string, World> = { "sbx-alice": await buildWorld(join(dir, "alice"), opts.v6 ?? false), "sbx-bob": await buildWorld(join(dir, "bob"), opts.v6Bob ?? opts.v6 ?? false) };
   const service = await SafeBoxService.open(join(dir, "interactor.db"));
   for (const [ref, w] of Object.entries(worlds)) service.addAccount(bindingFor(ref, w));
   const accounts = new AccountDirectory();

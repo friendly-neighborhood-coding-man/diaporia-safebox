@@ -59,7 +59,7 @@ export function defaultCapsule(t0, over = {}) {
  * key (RECOVERY); 3 guardians, 2 identity verifiers, 1 registrar, owner channels. profile 'multi-admin': 3 admins.
  */
 export class OwnerWorld {
-  constructor({ t0, profile = 'personal', config = {}, capsule = {}, guardians = 3, devices = null, rp = RP } = {}) {
+  constructor({ t0, profile = 'personal', config = {}, capsule = {}, guardians = 3, devices = null, rp = RP, authenticators = {} } = {}) {
     this.t0 = t0; this.profile = profile; this.rp = Object.freeze({ rpId: rp.rpId, origin: rp.origin });
     this.channels = {}; this.channelKeys = {};
     const ch = (cid, holderId) => { const k = newEdSigner('ch-' + cid); this.channels[cid] = { publicKey: k.publicKey, holderId }; this.channelKeys[cid] = k; return cid; };
@@ -83,7 +83,7 @@ export class OwnerWorld {
         new Device({ credId: 'ops-recovery', role: 'RECOVERY', holderId: 'ops', channelId: 'ch-ops', kind: 'ed25519' }),
       ];
     }
-    for (const d of this.devices) d.rp = this.rp;
+    for (const d of this.devices) { d.rp = this.rp; if (d.kind === 'passkey' && authenticators[d.credId]) d.auth = authenticators[d.credId]; } // V6: real-authenticator bridge per credential
     this.guardianKeys = {}; this.guardians = {};
     for (let i = 1; i <= guardians; i++) { const k = newEdSigner('g' + i); this.guardianKeys['g' + i] = k; this.guardians['g' + i] = { publicKey: k.publicKey, holderId: 'guardian-' + i }; }
     this.idvKeys = { 'idv-1': newEdSigner('idv-1'), 'idv-2': newEdSigner('idv-2') };
