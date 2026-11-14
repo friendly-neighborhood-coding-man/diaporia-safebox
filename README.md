@@ -360,6 +360,17 @@ The proposed architecture will be evaluated against these conditions:
 - **Signed-launcher scenario (Track D): `BLOCKED_BY_SAFETY_GATE / NOT_RUN`.** This experiment produced **no security validation result** and must not be described as a successful attack defense or as an observed exploit in SafeBox.
 - **Threat-model limits.** The intended design does not promise to prevent every compromise, protect a fully compromised OS/kernel or boot trust root, guarantee a trustworthy app UI, reverse completed payments, prevent all service denial, or cap losses through unrelated credentials and channels. Any actual damage bound must be measured within a stated threat model and specific spending path.
 
+### Parallel falsification sprint — research only (2026-11-15)
+
+**Status: `READY_FOR_OPERATOR_PARALLEL_VALIDATION_REVIEW`. Nothing from this sprint was merged into V6 or deployed.** Independent integration review corrected several prototype claims:
+
+- **Verified bytes, not verified paths.** R1 mmap, V-1 retained cross-uid writable mappings and R3 post-return rewrites defeated verify-then-open. A bounded read into a **memfd sealed first and then re-hashed**, followed by a consumer that verifies seals/digests and starts through a trusted absolute path, is the recommended **unimplemented** integration. The initial Worker A implementation was **PARTIAL**: a same-user pre-seal write delivered foreign bytes after SUCCESS. The reviewer's seal-first/re-hash correction refused that attack.
+- **Owner-log integrity requires independent authority.** Inode binding was falsified by inode reuse; held descriptors, prefix hashes and unsigned chains were insufficient. Owner-signed chained entries + a signed head + an **out-of-band anchor** rejected unauthorized POLICY across scoped T1/T2 tests. However, the current `sup/` placement exposes the anchor/owner keys to a directory writer; real deployment is **NOT_RUN**.
+- **Race/resource controls are helpful but not immutable execution.** Held FDs blocked N1 inode reuse, bounded reads addressed N3 growth, and returned bytes were genuine in **1,886/1,886 accepted schedules**. The path verifier remains vulnerable to writes after the final check, coarse timestamp dependence, deep-tree FD exhaustion and unnormalized `EMFILE`.
+- **Signed malicious update containment is not demonstrated.** Track D was **`BLOCKED_BY_SAFETY_GATE / NOT_RUN`**; B1–B6 OS isolation and an app-independent FREEZE path remain unimplemented. No properly signed hostile package has been shown contained.
+
+Full scoped summary: [Parallel falsification review](docs/security-research/PARALLEL-VALIDATION-2026-11-15.md). Prototype branches/evidence bundles remain with the operator, not in the submission.
+
 **Design principle:** *Flexible intelligence. Inflexible authority.* A compromised developer account should not automatically confer control over a user's sensitive authority. Whether a deployed SafeBox can enforce that distinction remains an open engineering and verification question.
 
 ---
