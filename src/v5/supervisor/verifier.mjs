@@ -36,19 +36,20 @@ export const AUTHORITY_TYPES_V5 = new Set(['ENROLL', 'REVOKE', 'ROTATE', 'ROTATE
 const TAKEOVER = ['RECOVERY_COMPLETE', 'RECONSTITUTE', 'GOV_CASE_EXECUTE'];
 const MAX_DELAY = Number(RISK_POLICY_V1.delay.maxDelayMs);
 
-export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], evidence = [], v5pay = [], ownerIntents = null, attackerCaseIds = new Set(), minBufferMs = 600_000, tickSlackMs = 15 * 60_000, journal = null }) {
+// `chain` (V6 closeout): the Root state machine module to replay with (default V5; V6 passes its wrapper).
+export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], evidence = [], v5pay = [], ownerIntents = null, attackerCaseIds = new Set(), minBufferMs = 600_000, tickSlackMs = 15 * 60_000, journal = null, chain = V5 }) {
   const out = { chainValid: true, chainError: null, financial: { effects: 0, authorized: 0, violations: [] }, authority: { changes: [], unauthorized: [] }, takeovers: [],
     rapid: { grants: [], violations: [] }, holds: {}, journal: null, delays: { delayed: 0, earlyRelease: [] } };
   let st;
-  try { st = V5.genesisState(genesis, { pinnedChainId }); } catch (e) { out.chainValid = false; out.chainError = 'GENESIS:' + (e.code ?? e.message); return out; }
+  try { st = chain.genesisState(genesis, { pinnedChainId }); } catch (e) { out.chainValid = false; out.chainError = 'GENESIS:' + (e.code ?? e.message); return out; }
   const snaps = [{ at: st.lastAt, state: st }];
   for (const tr of transitions) {
     let r;
-    try { r = V5.applyTransition(st, tr); } catch (e) { out.chainValid = false; out.chainError = `seq ${tr.seq} ${tr.action?.type}: ${e.code ?? e.message}`; break; }
+    try { r = chain.applyTransition(st, tr); } catch (e) { out.chainValid = false; out.chainError = `seq ${tr.seq} ${tr.action?.type}: ${e.code ?? e.message}`; break; }
     st = r.state; snaps.push({ at: st.lastAt, state: st });
     const type = tr.action.type;
     if (AUTHORITY_TYPES_V5.has(type)) {
-      const d = V5.actionDigest(tr.action).toString('hex'); const caseId = tr.action.body?.caseId ?? null;
+      const d = chain.actionDigest(tr.action).toString('hex'); const caseId = tr.action.body?.caseId ?? null;
       const ch = { seq: tr.seq, type, digest: d, caseId, epoch: st.epoch, effects: r.effects.map(e => e.type), levels: r.effects.find(e => e.type === 'CONFIRMATION_ASSURANCE')?.levels ?? [] };
       out.authority.changes.push(ch);
       if (TAKEOVER.includes(type) && caseId && attackerCaseIds.has(caseId)) { out.takeovers.push(ch); out.authority.unauthorized.push({ ...ch, code: 'RECOVERY_TAKEOVER' }); }
@@ -57,7 +58,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
   }
   out.finalState = st;
   const raw = (t) => { let s = snaps[0].state; for (const x of snaps) { if (x.at <= t) s = x.state; else break; } return s; };
-  const stateAt = (t) => V5.projectState(raw(t), Math.max(t, raw(t).lastAt));
+  const stateAt = (t) => chain.projectState(raw(t), Math.max(t, raw(t).lastAt));
   // Rapid-Use windows
   for (const g of Object.values(st.v5.rapid.grants)) {
     const len = Number(g.expiresAt) - Number(g.activatedAt);
