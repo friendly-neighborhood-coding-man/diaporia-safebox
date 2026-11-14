@@ -1,0 +1,259 @@
+
+> @diaporia-safebox/external-interactor@0.0.1 test
+> npm run build && node --disable-warning=ExperimentalWarning --test --test-concurrency=1 "dist/tests/**/*.spec.js"
+
+
+> @diaporia-safebox/external-interactor@0.0.1 build
+> node -e "require('fs').rmSync('dist',{recursive:true,force:true})" && tsc -p tsconfig.json
+
+TAP version 13
+# Subtest: E2E: official MCP client -> OAuth -> status/check/prepare -> separate owner device approval -> Vault -> buffer -> MOCK settlement -> verified status
+ok 1 - E2E: official MCP client -> OAuth -> status/check/prepare -> separate owner device approval -> Vault -> buffer -> MOCK settlement -> verified status
+  ---
+  duration_ms: 598.335641
+  type: 'test'
+  ...
+# Subtest: E2E idempotency: a retried prepare returns the same request; retry after approval does not create a second payment
+ok 2 - E2E idempotency: a retried prepare returns the same request; retry after approval does not create a second payment
+  ---
+  duration_ms: 266.556845
+  type: 'test'
+  ...
+# Subtest: E2E owner declines: nothing is proposed to the Vault, status reports OWNER_DECLINED
+ok 3 - E2E owner declines: nothing is proposed to the Vault, status reports OWNER_DECLINED
+  ---
+  duration_ms: 228.302519
+  type: 'test'
+  ...
+# Subtest: status output is redacted: no credential ids, device keys, contact addresses or chain internals
+ok 4 - status output is redacted: no credential ids, device keys, contact addresses or chain internals
+  ---
+  duration_ms: 195.11099
+  type: 'test'
+  ...
+# Subtest: official MCP SDK OAuthClientProvider completes discovery, dynamic registration, PKCE S256 and token exchange
+ok 5 - official MCP SDK OAuthClientProvider completes discovery, dynamic registration, PKCE S256 and token exchange
+  ---
+  duration_ms: 489.683129
+  type: 'test'
+  ...
+# Subtest: RFC 9728/8414 metadata; unauthenticated /mcp gets 401 with resource_metadata challenge
+ok 6 - RFC 9728/8414 metadata; unauthenticated /mcp gets 401 with resource_metadata challenge
+  ---
+  duration_ms: 251.64814
+  type: 'test'
+  ...
+# Subtest: registration refuses non-https / fragment / credential redirects, unsupported grants and unknown scopes
+ok 7 - registration refuses non-https / fragment / credential redirects, unsupported grants and unknown scopes
+  ---
+  duration_ms: 191.404378
+  type: 'test'
+  ...
+# Subtest: unregistered redirect is never redirected to; PKCE plain refused; wrong resource refused
+ok 8 - unregistered redirect is never redirected to; PKCE plain refused; wrong resource refused
+  ---
+  duration_ms: 217.227733
+  type: 'test'
+  ...
+# Subtest: CSRF: consent POST needs the per-request csrf token AND a same-origin Origin/Referer
+ok 9 - CSRF: consent POST needs the per-request csrf token AND a same-origin Origin/Referer
+  ---
+  duration_ms: 205.101081
+  type: 'test'
+  ...
+# Subtest: authorization code replay revokes the issued tokens; stolen code from another client is refused; PKCE verifier mismatch refused
+ok 10 - authorization code replay revokes the issued tokens; stolen code from another client is refused; PKCE verifier mismatch refused
+  ---
+  duration_ms: 223.581254
+  type: 'test'
+  ...
+# Subtest: refresh rotation: reuse revokes the family; a refresh cannot widen scope; revocation ends access
+ok 11 - refresh rotation: reuse revokes the family; a refresh cannot widen scope; revocation ends access
+  ---
+  duration_ms: 227.162427
+  type: 'test'
+  ...
+# Subtest: session expiry: an expired access token is refused (injected clock)
+ok 12 - session expiry: an expired access token is refused (injected clock)
+  ---
+  duration_ms: 153.888772
+  type: 'test'
+  ...
+# Subtest: wrong resource audience: a token minted for another resource is refused by this resource server
+ok 13 - wrong resource audience: a token minted for another resource is refused by this resource server
+  ---
+  duration_ms: 1.355754
+  type: 'test'
+  ...
+# Subtest: scope selection: the owner can grant less than asked; a no-scope request never gets payment preparation
+ok 14 - scope selection: the owner can grant less than asked; a no-scope request never gets payment preparation
+  ---
+  duration_ms: 204.163405
+  type: 'test'
+  ...
+# Subtest: rogue host: only four fixed tools exist; signing/settlement/owner tools cannot be called; scope filters registration
+ok 15 - rogue host: only four fixed tools exist; signing/settlement/owner tools cannot be called; scope filters registration
+  ---
+  duration_ms: 496.618491
+  type: 'test'
+  ...
+# Subtest: no signer or owner capability is reachable from the gateway: AiPort is 4 frozen closures; gateway sources never import the V5 world/kit/devices
+ok 16 - no signer or owner capability is reachable from the gateway: AiPort is 4 frozen closures; gateway sources never import the V5 world/kit/devices
+  ---
+  duration_ms: 239.665526
+  type: 'test'
+  ...
+# Subtest: strict runtime validation: extra fields (account override), bad amounts, bad recipients and path/SQL/shell strings are refused; nothing is created
+ok 17 - strict runtime validation: extra fields (account override), bad amounts, bad recipients and path/SQL/shell strings are refused; nothing is created
+  ---
+  duration_ms: 262.429164
+  type: 'test'
+  ...
+# Subtest: oversized and deeply nested JSON-RPC bodies are refused before the MCP layer
+ok 18 - oversized and deeply nested JSON-RPC bodies are refused before the MCP layer
+  ---
+  duration_ms: 172.976323
+  type: 'test'
+  ...
+# Subtest: prompt injection in merchant memo: sanitized, labelled untrusted on the device, never changes recipient/amount and never approves anything
+ok 19 - prompt injection in merchant memo: sanitized, labelled untrusted on the device, never changes recipient/amount and never approves anything
+  ---
+  duration_ms: 169.391269
+  type: 'test'
+  ...
+# Subtest: cross-account: bob's token cannot read alice's request; bob's device cannot approve it; account always comes from the token
+ok 20 - cross-account: bob's token cannot read alice's request; bob's device cannot approve it; account always comes from the token
+  ---
+  duration_ms: 233.495876
+  type: 'test'
+  ...
+# Subtest: owner/key substitution: unenrolled key, non-payment role, and a tampered capability are all refused by the Vault or the exactness check
+ok 21 - owner/key substitution: unenrolled key, non-payment role, and a tampered capability are all refused by the Vault or the exactness check
+  ---
+  duration_ms: 221.011563
+  type: 'test'
+  ...
+# \# forged-approval vault codes: PAYCAP_APPROVAL_KIND | PAYCAP_APPROVAL_KIND | WEBAUTHN_CHALLENGE_MISMATCH | WEBAUTHN_CHALLENGE_MISMATCH
+# Subtest: forged device approval: random signature / missing WebAuthn / foreign RP are refused; the AI host has no path to submit approvals at all
+ok 22 - forged device approval: random signature / missing WebAuthn / foreign RP are refused; the AI host has no path to submit approvals at all
+  ---
+  duration_ms: 262.526461
+  type: 'test'
+  ...
+# Subtest: stolen OAuth access token: the thief can only create approval requests; without the owner's device nothing settles
+ok 23 - stolen OAuth access token: the thief can only create approval requests; without the owner's device nothing settles
+  ---
+  duration_ms: 244.943036
+  type: 'test'
+  ...
+# Subtest: replay: a genuine approval cannot be reused for the same request, for another request, or directly at the Vault
+ok 24 - replay: a genuine approval cannot be reused for the same request, for another request, or directly at the Vault
+  ---
+  duration_ms: 261.675898
+  type: 'test'
+  ...
+# Subtest: concurrent preparation: parallel identical calls collapse to one request; a reused key with other details is a conflict; pending requests are capped
+ok 25 - concurrent preparation: parallel identical calls collapse to one request; a reused key with other details is a conflict; pending requests are capped
+  ---
+  duration_ms: 287.856108
+  type: 'test'
+  ...
+# Subtest: rate floods: MCP requests and payment preparations are rate limited per principal
+ok 26 - rate floods: MCP requests and payment preparations are rate limited per principal
+  ---
+  duration_ms: 430.28882
+  type: 'test'
+  ...
+# Subtest: stale Epoch: a credential change after preparation makes the device refuse; a forced submission is refused
+ok 27 - stale Epoch: a credential change after preparation makes the device refuse; a forced submission is refused
+  ---
+  duration_ms: 271.555641
+  type: 'test'
+  ...
+# Subtest: Purpose change after preparation: the device refuses and a forced submission is refused
+ok 28 - Purpose change after preparation: the device refuses and a forced submission is refused
+  ---
+  duration_ms: 241.348299
+  type: 'test'
+  ...
+# Subtest: outstanding hold and freeze: check reports blockers, prepare refuses, and a request prepared before the hold is refused by the Vault
+ok 29 - outstanding hold and freeze: check reports blockers, prepare refuses, and a request prepared before the hold is refused by the Vault
+  ---
+  duration_ms: 274.302699
+  type: 'test'
+  ...
+# Subtest: Purpose limits are enforced before a request exists: over-limit amount and non-Purpose recipient are NOT_PREPARABLE
+ok 30 - Purpose limits are enforced before a request exists: over-limit amount and non-Purpose recipient are NOT_PREPARABLE
+  ---
+  duration_ms: 244.439381
+  type: 'test'
+  ...
+# Subtest: session/request expiry: an expired request can no longer be approved, even with a valid device signature
+ok 31 - session/request expiry: an expired request can no longer be approved, even with a valid device signature
+  ---
+  duration_ms: 251.991667
+  type: 'test'
+  ...
+# Subtest: adapter crash recovery: crash after the Vault accepted resolves to the Vault payment; crash before it fails closed (never re-signed)
+ok 32 - adapter crash recovery: crash after the Vault accepted resolves to the Vault payment; crash before it fails closed (never re-signed)
+  ---
+  duration_ms: 285.26466
+  type: 'test'
+  ...
+# Subtest: deployment modes: public-readonly never offers or registers prepare_payment; no flag enables it; loopback mode refuses public binding
+ok 33 - deployment modes: public-readonly never offers or registers prepare_payment; no flag enables it; loopback mode refuses public binding
+  ---
+  duration_ms: 336.847867
+  type: 'test'
+  ...
+# Subtest: F1: recovery during an in-flight PROPOSE does not close the request; a cross-process 'not received' close is reconciled when the Vault accepted
+ok 34 - F1: recovery during an in-flight PROPOSE does not close the request; a cross-process 'not received' close is reconciled when the Vault accepted
+  ---
+  duration_ms: 272.573726
+  type: 'test'
+  ...
+# Subtest: F2: another AI client of the same account cannot read a request it did not prepare
+ok 35 - F2: another AI client of the same account cannot read a request it did not prepare
+  ---
+  duration_ms: 233.687689
+  type: 'test'
+  ...
+# Subtest: memo cannot break out of the device's UNTRUSTED label (quotes, pipes, backslashes replaced)
+ok 36 - memo cannot break out of the device's UNTRUSTED label (quotes, pipes, backslashes replaced)
+  ---
+  duration_ms: 213.922645
+  type: 'test'
+  ...
+# Subtest: V6-A E2E: MCP prepare -> fingerprint-only owner approval bound to the request -> Vault -> FIXED_600 -> MOCK settlement -> V6 verifier clean
+ok 37 - V6-A E2E: MCP prepare -> fingerprint-only owner approval bound to the request -> Vault -> FIXED_600 -> MOCK settlement -> V6 verifier clean
+  ---
+  duration_ms: 661.464732
+  type: 'test'
+  ...
+# Subtest: V6-A UV credential: phone approval (Windows-Hello-style UV, PIN fallback possible) is labelled UV, not fingerprint
+ok 38 - V6-A UV credential: phone approval (Windows-Hello-style UV, PIN fallback possible) is labelled UV, not fingerprint
+  ---
+  duration_ms: 323.654123
+  type: 'test'
+  ...
+# Subtest: V6-A refusals: legacy V5 paycap, missing gate, PIN-only, binding for another request, tampered amount -> nothing reaches settlement
+ok 39 - V6-A refusals: legacy V5 paycap, missing gate, PIN-only, binding for another request, tampered amount -> nothing reaches settlement
+  ---
+  duration_ms: 432.739588
+  type: 'test'
+  ...
+# Subtest: V6-A replay: a genuine V6 approval cannot be reused at the Vault (challenge nonce consumed durably)
+ok 40 - V6-A replay: a genuine V6 approval cannot be reused at the Vault (challenge nonce consumed durably)
+  ---
+  duration_ms: 237.241094
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13204.873495

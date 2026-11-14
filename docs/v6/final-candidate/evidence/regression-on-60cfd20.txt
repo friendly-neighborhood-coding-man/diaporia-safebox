@@ -1,0 +1,6 @@
+not ok 1 - V3 Root: inherited and planted action names are TRANSITION_TYPE_UNKNOWN and do not advance seq/head/nonce/epoch
+not ok 2 - V3 applyTransition directly: an inherited type throws TRANSITION_TYPE_UNKNOWN (no V4/V5 layer in front)
+not ok 3 - V4 Root: inherited and planted action names (incl. the V3 passthrough table) do not advance state
+not ok 4 - V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached
+# pass 0
+# fail 4

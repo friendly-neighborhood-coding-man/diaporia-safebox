@@ -1,0 +1,1025 @@
+{
+ "repo": "<repo>",
+ "summary": {
+  "V3": {
+   "committed": [
+    "toString",
+    "constructor",
+    "PLANTED_ON_PROTO"
+   ],
+   "advancedWithoutOk": [],
+   "epoch99": [
+    "PLANTED_ON_PROTO"
+   ]
+  },
+  "V4": {
+   "committed": [
+    "toString",
+    "constructor",
+    "PLANTED_ON_PROTO"
+   ],
+   "advancedWithoutOk": [],
+   "epoch99": [
+    "PLANTED_ON_PROTO"
+   ]
+  },
+  "V5": {
+   "committed": [
+    "toString",
+    "constructor",
+    "valueOf",
+    "hasOwnProperty",
+    "isPrototypeOf",
+    "propertyIsEnumerable",
+    "toLocaleString",
+    "__lookupGetter__",
+    "PLANTED_ON_PROTO"
+   ],
+   "advancedWithoutOk": [],
+   "epoch99": [
+    "PLANTED_ON_PROTO"
+   ]
+  },
+  "V6": {
+   "committed": [
+    "toString",
+    "constructor",
+    "valueOf",
+    "hasOwnProperty",
+    "isPrototypeOf",
+    "propertyIsEnumerable",
+    "toLocaleString",
+    "__lookupGetter__",
+    "PLANTED_ON_PROTO"
+   ],
+   "advancedWithoutOk": [],
+   "epoch99": [
+    "PLANTED_ON_PROTO"
+   ]
+  }
+ },
+ "controls": {
+  "V5": {
+   "ok": false,
+   "code": "HOLD_UNKNOWN"
+  },
+  "V6": {
+   "ok": false,
+   "code": "HOLD_UNKNOWN"
+  }
+ },
+ "detail": {
+  "V3": [
+   {
+    "type": "toString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 0,
+     "head": "86515932c26c39ce",
+     "nonces": 1,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 1,
+     "head": "3933ee71188a1fc3",
+     "nonces": 2,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 1,
+     "head": "3933ee71188a1fc3",
+     "nonces": 2,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "valueOf",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "hasOwnProperty",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "isPrototypeOf",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "propertyIsEnumerable",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "toLocaleString",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__proto__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__defineGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__lookupGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "tostring",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor.prototype",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "PLANTED_ON_PROTO",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 2,
+     "head": "783a75bb489a1ccf",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 3,
+     "head": "7c8785c33c39f125",
+     "nonces": 4,
+     "epoch": 99
+    }
+   }
+  ],
+  "V4": [
+   {
+    "type": "toString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 0,
+     "head": "1916921d593f3355",
+     "nonces": 2,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 1,
+     "head": "295e9093194cabf8",
+     "nonces": 3,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 1,
+     "head": "295e9093194cabf8",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "valueOf",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "hasOwnProperty",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "isPrototypeOf",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "propertyIsEnumerable",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "toLocaleString",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__proto__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__defineGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__lookupGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "tostring",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor.prototype",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "PLANTED_ON_PROTO",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 2,
+     "head": "c1fb2ddbd6b87aca",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 3,
+     "head": "06f875d26d6bf7ad",
+     "nonces": 5,
+     "epoch": 99
+    }
+   }
+  ],
+  "V5": [
+   {
+    "type": "toString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 0,
+     "head": "e836fdf35c2b3e8f",
+     "nonces": 3,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 1,
+     "head": "e257c7b9b86cdf7f",
+     "nonces": 4,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 1,
+     "head": "e257c7b9b86cdf7f",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "8e59536f100ec3ed",
+     "nonces": 5,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "valueOf",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 2,
+     "head": "8e59536f100ec3ed",
+     "nonces": 5,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 3,
+     "head": "9d96700da84d3445",
+     "nonces": 6,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "hasOwnProperty",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 3,
+     "head": "9d96700da84d3445",
+     "nonces": 6,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 4,
+     "head": "943696e71e5e00ed",
+     "nonces": 7,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "isPrototypeOf",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 4,
+     "head": "943696e71e5e00ed",
+     "nonces": 7,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 5,
+     "head": "3b9daf2466e924c6",
+     "nonces": 8,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "propertyIsEnumerable",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 5,
+     "head": "3b9daf2466e924c6",
+     "nonces": 8,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 6,
+     "head": "5e062d022d9a57d7",
+     "nonces": 9,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "toLocaleString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 6,
+     "head": "5e062d022d9a57d7",
+     "nonces": 9,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__proto__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__defineGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__lookupGetter__",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 7,
+     "head": "76364e3f584f89f3",
+     "nonces": 10,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "tostring",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor.prototype",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "PLANTED_ON_PROTO",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 8,
+     "head": "2576d9a9dbdacbd9",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 9,
+     "head": "200dbe15c985258e",
+     "nonces": 12,
+     "epoch": 99
+    }
+   }
+  ],
+  "V6": [
+   {
+    "type": "toString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 0,
+     "head": "bfe8e48a326edac8",
+     "nonces": 4,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 1,
+     "head": "001647cb14b9d1ed",
+     "nonces": 5,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 1,
+     "head": "001647cb14b9d1ed",
+     "nonces": 5,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 2,
+     "head": "f5c6f5ffe5471c4d",
+     "nonces": 6,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "valueOf",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 2,
+     "head": "f5c6f5ffe5471c4d",
+     "nonces": 6,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 3,
+     "head": "0910936760007cfe",
+     "nonces": 7,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "hasOwnProperty",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 3,
+     "head": "0910936760007cfe",
+     "nonces": 7,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 4,
+     "head": "38856eea2465d7ac",
+     "nonces": 8,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "isPrototypeOf",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 4,
+     "head": "38856eea2465d7ac",
+     "nonces": 8,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 5,
+     "head": "59381d9771b6cec2",
+     "nonces": 9,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "propertyIsEnumerable",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 5,
+     "head": "59381d9771b6cec2",
+     "nonces": 9,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 6,
+     "head": "fe1a2b9b216fe66c",
+     "nonces": 10,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "toLocaleString",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 6,
+     "head": "fe1a2b9b216fe66c",
+     "nonces": 10,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__proto__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__defineGetter__",
+    "ok": false,
+    "code": "INTERNAL_ERROR",
+    "advanced": false,
+    "before": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "__lookupGetter__",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 7,
+     "head": "c5160e26e4876b44",
+     "nonces": 11,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "tostring",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "constructor.prototype",
+    "ok": false,
+    "code": "TRANSITION_TYPE_UNKNOWN",
+    "advanced": false,
+    "before": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    }
+   },
+   {
+    "type": "PLANTED_ON_PROTO",
+    "ok": true,
+    "code": null,
+    "advanced": true,
+    "before": {
+     "seq": 8,
+     "head": "914a3c6962359e4d",
+     "nonces": 12,
+     "epoch": 1
+    },
+    "after": {
+     "seq": 9,
+     "head": "551245064824cccd",
+     "nonces": 13,
+     "epoch": 99
+    }
+   }
+  ],
+  "control_V5_HOLD_EXPIRE": {
+   "ok": false,
+   "code": "HOLD_UNKNOWN"
+  },
+  "control_V6_HOLD_EXPIRE": {
+   "ok": false,
+   "code": "HOLD_UNKNOWN"
+  }
+ }
+}
