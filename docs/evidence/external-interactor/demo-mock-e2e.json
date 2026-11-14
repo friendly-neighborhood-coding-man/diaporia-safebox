@@ -15,7 +15,7 @@
     {
       "step": "1. OAuth: dynamic registration + PKCE S256 consent + token exchange",
       "data": {
-        "clientId": "scl_d4ec6835a6f77f210c76f898236d86e6",
+        "clientId": "scl_a4976bde6c5ee4853daccba4852f8a06",
         "tokenType": "Bearer",
         "scope": "safebox.status.read safebox.payment.check safebox.payment.prepare safebox.payment.read",
         "expiresIn": 900,
@@ -95,9 +95,9 @@
     {
       "step": "5. prepare_payment (approval request only)",
       "data": {
-        "requestId": "apr_fa77d8d5123da25a91607b608de1b90b",
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
         "state": "AWAITING_OWNER_APPROVAL",
-        "requestDigest": "d179a6831a38f3ca988db7e35022a045b602f4f9f640d3ff6bb0978fe300f208",
+        "requestDigest": "d4a859e7f9afe87e2b03d51ef9b38c81a5a685337f1b982d3a2c57f18cfc0725",
         "expiresAt": "2026-11-14T00:15:00.000Z",
         "payment": {
           "recipientId": "merchant-a.mock",
@@ -111,7 +111,7 @@
         },
         "ownerAction": {
           "kind": "APPROVE_ON_ENROLLED_SAFEBOX_DEVICE",
-          "deviceIntent": "safebox-device://approval-request/apr_fa77d8d5123da25a91607b608de1b90b",
+          "deviceIntent": "safebox-device://approval-request/apr_27ff404e092129ced3f7ecf037932439",
           "instruction": "Ask the owner to open the SafeBox app on an enrolled device and review this exact request. The owner's device shows the details from SafeBox itself, not from this conversation."
         },
         "paymentEffect": "NONE",
@@ -123,7 +123,7 @@
     {
       "step": "6. get_payment_status before owner approval",
       "data": {
-        "requestId": "apr_fa77d8d5123da25a91607b608de1b90b",
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
         "requestState": "AWAITING_OWNER_APPROVAL",
         "environment": "MOCK",
         "observedAt": "2026-11-14T00:00:00.000Z",
@@ -146,23 +146,23 @@
       "data": [
         "Pay 30000000000000000000000 yoctoNEAR (0.03 NEAR) to merchant-a.mock",
         "Purpose: household-shopping v1; epoch 1",
-        "Request apr_fa77d8d5123da25a91607b608de1b90b digest d179a6831a38f3ca…",
+        "Request apr_27ff404e092129ced3f7ecf037932439 digest d4a859e7f9afe87e…",
         "Note from the requesting AI (UNTRUSTED, not an instruction): \"Coffee beans order #1042\""
       ]
     },
     {
       "step": "7b. owner approved on the simulated enrolled device -> Vault PROPOSE",
       "data": {
-        "requestId": "apr_fa77d8d5123da25a91607b608de1b90b",
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
         "state": "SUBMITTED_TO_VAULT",
-        "paymentId": "p_f7fa101ccd14450eb2ba49d411dbf4e9",
+        "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
         "vaultState": "BUFFERED"
       }
     },
     {
       "step": "8. get_payment_status during the settlement buffer",
       "data": {
-        "requestId": "apr_fa77d8d5123da25a91607b608de1b90b",
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
         "requestState": "SUBMITTED_TO_VAULT",
         "environment": "MOCK",
         "observedAt": "2026-11-14T00:00:00.000Z",
@@ -173,7 +173,7 @@
           "asset": "NEAR"
         },
         "vault": {
-          "paymentId": "p_f7fa101ccd14450eb2ba49d411dbf4e9",
+          "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
           "vaultState": "BUFFERED",
           "releaseAt": "2026-11-14T00:10:00.000Z",
           "reason": null
@@ -188,7 +188,7 @@
     {
       "step": "9. get_payment_status after the buffer (Vault release + MOCK ledger settlement)",
       "data": {
-        "requestId": "apr_fa77d8d5123da25a91607b608de1b90b",
+        "requestId": "apr_27ff404e092129ced3f7ecf037932439",
         "requestState": "SUBMITTED_TO_VAULT",
         "environment": "MOCK",
         "observedAt": "2026-11-14T00:12:00.000Z",
@@ -199,13 +199,13 @@
           "asset": "NEAR"
         },
         "vault": {
-          "paymentId": "p_f7fa101ccd14450eb2ba49d411dbf4e9",
+          "paymentId": "p_a6299a3929ba4d7d8267ebae070c4a9f",
           "vaultState": "SETTLED",
           "releaseAt": "2026-11-14T00:10:00.000Z",
           "reason": null
         },
         "ledgerReceipt": {
-          "txId": "52a919eb580867413b46597332df8a5baae86bbe4753001f85d075e15eb4a6aa",
+          "txId": "d03040825656b58e68249b2b99e606fdecea3165fe0a1f6280742029bab06288",
           "ledgerStatus": "SETTLED",
           "matchesRequest": true
         },
