@@ -1,0 +1,2 @@
+{"n":61,"clip":"07-csrf","at":"2026-11-14T16:49:43.177Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"SafeBox console refused: ORIGIN_REJECTED"}
+{"n":62,"clip":"07-csrf","at":"2026-11-14T16:49:43.177Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: no state change from a cross-site request"}
