@@ -42,8 +42,15 @@ async function api(path, body) {
     headers: { 'content-type': 'application/json', ...(CSRF ? { 'x-safebox-csrf': CSRF } : {}) }, body: JSON.stringify(body) });
   const j = await r.json(); if (!j.ok) throw new Error(j.error.code + (j.error.detail ? ' (' + j.error.detail + ')' : '')); return j;
 }
-async function assertWith(challengeHex, credentialId, rpId) {
-  const c = await navigator.credentials.get({ publicKey: { challenge: hex2buf(challengeHex), rpId, userVerification: 'required', timeout: 120000,
+async function loginChallenge(hex) {
+  // device-side derivation: the login assertion signs SHA-256('safebox.v6.console-login:' || digest), never a raw
+  // server-chosen value, so it cannot double as a command approval
+  const p = new TextEncoder().encode('safebox.v6.console-login:'); const d = new Uint8Array(hex2buf(hex));
+  const m = new Uint8Array(p.length + d.length); m.set(p); m.set(d, p.length);
+  return crypto.subtle.digest('SHA-256', m);
+}
+async function assertWith(challengeHex, credentialId, rpId, { login = false } = {}) {
+  const c = await navigator.credentials.get({ publicKey: { challenge: login ? await loginChallenge(challengeHex) : hex2buf(challengeHex), rpId, userVerification: 'required', timeout: 120000,
     allowCredentials: [{ type: 'public-key', id: fromB64u(credentialId) }] } });
   return { credentialId: b64u(c.rawId), authenticatorData: b64u(c.response.authenticatorData), clientDataJSON: b64u(c.response.clientDataJSON), signature: b64u(c.response.signature) };
 }
@@ -51,7 +58,7 @@ $('signin').onclick = async () => {
   try {
     const st = await api('/api/login/start', { credId: $('cred').value.trim() });
     if (st.kind !== 'passkey') throw new Error('this credential signs on its own hardware device, not in a browser');
-    const webauthn = await assertWith(st.challengeHex, st.credentialId, st.rpId);
+    const webauthn = await assertWith(st.challengeHex, st.credentialId, st.rpId, { login: true });
     const fin = await api('/api/login/finish', { loginId: st.loginId, webauthn });
     CSRF = fin.csrf; show($('loginOut'), 'Signed in as <b>' + txt(fin.credId) + '</b> (' + txt(fin.role) + ').', 'ok');
     const inc = await api('/api/incident' + (LOCATOR ? '?locator=' + encodeURIComponent(LOCATOR) : ''));

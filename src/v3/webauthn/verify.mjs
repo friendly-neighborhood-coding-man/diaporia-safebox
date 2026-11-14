@@ -50,6 +50,8 @@ export function coseToSpki(cose) {
   if (kty === 3 && alg === -257) {
     const n = cose.get(-1), e = cose.get(-2);
     if (!Buffer.isBuffer(n) || !Buffer.isBuffer(e) || n.length < 256 || n.length > 512 || e.length < 1 || e.length > 8) fail('WEBAUTHN_COSE');
+    // e must be odd and >= 3 (e = 1 makes every signature forgeable; review finding 6)
+    const ev = BigInt('0x' + e.toString('hex')); if (ev < 3n || ev % 2n === 0n) fail('WEBAUTHN_COSE');
     const k = createPublicKey({ key: { kty: 'RSA', n: b64u(n), e: b64u(e) }, format: 'jwk' });
     return { alg: 'RS256', spki: b64u(k.export({ format: 'der', type: 'spki' })) };
   }

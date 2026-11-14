@@ -83,7 +83,9 @@ export class OwnerDeviceSim {
       // V6 owner device ceremony: Root-pinned one-time challenge bound to THIS request, canonical Root-derived summary,
       // the human decision, the fingerprint gate (fingerprint-only credentials), then one signature over the exact capability.
       const pa = this.w.owner.paymentApproval(this.w.root.state, { credId, recipientId: r.recipientId, amountYocto: r.amountYocto, requestId: r.requestId, requestDigest: r.requestDigest,
-        memo: r.memo, at: this.w.now(), ttlMs: Math.min(ttlMs, 300_000), decide: () => true, ...(noGate ? { noGate } : {}), ...(tamperBinding ? { tamper: tamperBinding } : {}) });
+        memo: r.memo, at: this.w.now(), ttlMs: Math.min(ttlMs, 300_000),
+        // the owner world's own decide hook runs with the canonical Root-derived summary (a real device shows exactly this text)
+        decide: (prompt: unknown, text: string, ctx: unknown) => this.w.owner.decide(prompt, text, ctx), ...(noGate ? { noGate } : {}), ...(tamperBinding ? { tamper: tamperBinding } : {}) });
       if (!pa) return { refusedByDevice: [this.w.owner.gateErrors.at(-1)?.code ?? "OWNER_DECLINED"] };
       this.lastV6 = pa;
       if (tamper) tamper(pa.capability);

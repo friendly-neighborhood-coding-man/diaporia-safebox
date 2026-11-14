@@ -49,7 +49,7 @@ if (flag('--record')) {
 let consoleObj = null;
 const bridge = new BrowserBridge({ port: PORT, origin: ORIGIN, handler: async (req) => consoleObj ? consoleObj.handle(req) : { status: 503, headers: { 'content-type': 'text/plain' }, body: 'SafeBox is starting' } });
 await bridge.ready();
-ev('STEP', `Open ${ORIGIN}/bridge in Edge or Chrome on THIS laptop and keep that tab open.`);
+ev('STEP', `Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
 for (let i = 0; ; i++) { if (Date.now() - (await bridge.lastPoll()) < 3000) break; if (i > 1200) { ev('FAIL', 'bridge page never opened (10 min)'); process.exit(4); } await sleep(500); }
 ev('OK', 'bridge page connected');
 
@@ -114,7 +114,8 @@ consoleObj = consoleForWorld(w, { gateOrigin: GATE_ORIGIN });
 // gate server for the console page (same contract as the simulated one)
 const gateSrv = createServer((req, res) => {
   const cors = { 'access-control-allow-origin': ORIGIN, 'access-control-allow-methods': 'POST', 'access-control-allow-headers': 'content-type', 'content-type': 'application/json', vary: 'origin' };
-  if (req.headers.origin && req.headers.origin !== ORIGIN) { res.writeHead(403); return res.end('{"ok":false,"code":"GATE_ORIGIN_REJECTED"}'); }
+  // review: a request WITHOUT an Origin (a local non-browser process) is refused too
+  if (req.headers.origin !== ORIGIN) { res.writeHead(403); return res.end('{"ok":false,"code":"GATE_ORIGIN_REJECTED"}'); }
   if (req.method === 'OPTIONS') { res.writeHead(204, cors); return res.end(); }
   let b = ''; req.on('data', (d) => { b += d; }); req.on('end', () => {
     try { const q = JSON.parse(b); const g = w.gates[q.credId]; if (!g) throw Object.assign(new Error('no gate'), { code: 'FINGERPRINT_ONLY_UNSUPPORTED' });

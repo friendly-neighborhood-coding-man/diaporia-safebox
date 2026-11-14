@@ -1,7 +1,7 @@
 // V6 owner-side world: the V5 owner world (simulated devices, ORC, engine, contacts, delegates) plus the owner-signed
 // assurance policy, fingerprint-gate devices per credential, and the owner device's per-transaction PAYMENT APPROVAL
 // ceremony (Workflow A). Everything here is the OWNER side: the external AI never holds any of it.
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { iso, nonce as mkNonce } from '../v3/common/canon.mjs';
 import { PAYCAP_V, paycapDigest } from '../v3/vault/paycap.mjs';
 import { ChallengeService } from '../v4/intent/intent.mjs';
@@ -107,7 +107,8 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
   /** Owner device: answer a console LOGIN challenge (authorizes nothing; proves possession + UV for a session). */
   loginAssertion(credId, challengeHex, { origin = null, rpId = null, uv = true } = {}) {
     const d = this.dev(credId); const dig = Buffer.from(challengeHex, 'hex');
-    if (d.kind === 'passkey') return { webauthn: d.auth.assert({ rpId: rpId ?? this.rp.rpId, origin: origin ?? this.rp.origin, challenge: dig, uv }) };
+    // same derivation as the console page: the passkey never signs a raw server-chosen digest at login
+    if (d.kind === 'passkey') return { webauthn: d.auth.assert({ rpId: rpId ?? this.rp.rpId, origin: origin ?? this.rp.origin, challenge: createHash('sha256').update(Buffer.concat([Buffer.from('safebox.v6.console-login:'), dig])).digest(), uv }) };
     return { sig: d.signer.signDigest(V6_DOMAINS.SESSION, dig) };
   }
   /**

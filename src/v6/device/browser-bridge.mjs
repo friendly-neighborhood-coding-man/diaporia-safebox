@@ -26,6 +26,13 @@ http.createServer((req, res) => {
   req.on('data', (c) => chunks.push(c));
   req.on('end', () => {
     const body = Buffer.concat(chunks).toString('utf8');
+    // review finding 2: every bridge API call needs the per-run secret (given to the owner's tab in the URL fragment,
+    // never served by the server) and the exact Host, so another local process or a DNS-rebinding page cannot read
+    // pending requests or answer them. (A process that can read this runner's console/memory is out of scope.)
+    const hostOk = req.headers.host === 'localhost:' + port || req.headers.host === '127.0.0.1:' + port;
+    if (!hostOk) { res.writeHead(421); return res.end('misdirected'); }
+    const tok = String(req.headers['x-bridge-token'] ?? ''); const tokOk = tok.length === workerData.token.length && require('node:crypto').timingSafeEqual(Buffer.from(tok), Buffer.from(workerData.token));
+    if ((u.pathname === '/bridge/next' || u.pathname === '/bridge/result') && !tokOk) { res.writeHead(403); return res.end('{"ok":false,"code":"BRIDGE_TOKEN"}'); }
     if (u.pathname === '/bridge') { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); return res.end(page); }
     if (u.pathname === '/bridge/next') { lastPoll = Date.now(); res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' }); return res.end(JSON.stringify(pending ? { id: pending.id, op: pending.op, options: pending.options, display: pending.display, notice } : { none: true, notice })); }
     if (u.pathname === '/bridge/result' && req.method === 'POST') {
@@ -54,8 +61,8 @@ button{font:inherit;padding:9px 16px;border-radius:7px;border:1px solid #8893a1;
 "use strict";
 const b64u=(b)=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
 const fromB64u=(s)=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4)),c=>c.charCodeAt(0));
-let cur=null;
-async function send(r){await fetch('/bridge/result',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(r)});}
+let cur=null; const TOKEN=new URLSearchParams(location.hash.slice(1)).get('t')||''; if(!TOKEN)document.body.insertAdjacentHTML('afterbegin','<p style="color:#b00"><b>Missing bridge secret: open the exact link the SafeBox runner printed.</b></p>');
+async function send(r){await fetch('/bridge/result',{method:'POST',headers:{'content-type':'application/json','x-bridge-token':TOKEN},body:JSON.stringify(r)});}
 function txt(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 async function act(){
   const q=cur; const o=q.options; document.getElementById('c').innerHTML='<i>Windows Hello prompt open...</i>';
@@ -80,7 +87,7 @@ async function act(){
 }
 async function decline(){const q=cur;cur=null;await send({id:q.id,ok:false,error:'DECLINED_BY_OWNER'});document.getElementById('c').innerHTML='<i>Declined. Waiting...</i>';}
 async function poll(){
-  try{const r=await fetch('/bridge/next').then(r=>r.json());
+  try{const r=await fetch('/bridge/next',{headers:{'x-bridge-token':TOKEN}}).then(r=>r.json());
     const n=document.getElementById('n'); if(r.notice){n.hidden=false;n.textContent=r.notice;}else{n.hidden=true;}
     if(!r.none&&(!cur||cur.id!==r.id)){cur={...r,title:r.display.split('\\n')[0]};
       document.getElementById('c').innerHTML='<b>'+txt(cur.title)+'</b><pre>'+txt(r.display)+'</pre><button class="go" id="go">Approve with Windows Hello</button><button id="no">Decline</button>';
@@ -93,10 +100,11 @@ export class BrowserBridge {
   /** handler(req) -> Promise<{status, headers, body}> for every non-bridge path (the Owner Console). */
   constructor({ port, origin, handler = async () => ({ status: 503, headers: {}, body: 'not ready' }), timeoutMs = 300_000 }) {
     this.port = port; this.origin = origin; this.handler = handler; this.timeoutMs = timeoutMs; this.display = 'SafeBox request';
+    this.token = randomBytes(24).toString('hex'); // per-run bridge secret: only the owner's tab gets it (URL fragment)
     this.readyP = new Promise((r) => { this.onListening = r; });
     this.sab = new SharedArrayBuffer(4); this.flag = new Int32Array(this.sab);
     const { port1, port2 } = new MessageChannel(); this.reply = port1;
-    this.worker = new Worker(WORKER, { eval: true, workerData: { port, sab: this.sab, reply: port2, page: PAGE(origin), origin }, transferList: [port2] });
+    this.worker = new Worker(WORKER, { eval: true, workerData: { port, sab: this.sab, reply: port2, page: PAGE(origin), origin, token: this.token }, transferList: [port2] });
     this.worker.on('message', async (m) => {
       if (m.type === 'http') { let res; try { res = await this.handler(m.req); } catch (e) { res = { status: 500, headers: {}, body: String(e.message) }; } this.worker.postMessage({ type: 'http-res', id: m.id, res }); }
       if (m.type === 'listening') this.onListening?.();
@@ -104,6 +112,8 @@ export class BrowserBridge {
     });
   }
   ready() { return this.readyP; }
+  /** The URL the owner opens (the fragment never reaches any server log or Referer). */
+  url() { return `${this.origin}/bridge#t=${this.token}`; }
   /** Show (or clear with null) a banner on the bridge page, e.g. "touch the fingerprint sensor now". */
   notice(text) { this.worker.postMessage({ type: 'notice', text: text == null ? null : String(text) }); }
   lastPoll() { return new Promise((r) => { this.onStatus = (m) => r(m.lastPoll); this.worker.postMessage({ type: 'status' }); }); }

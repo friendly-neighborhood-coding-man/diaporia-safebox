@@ -15,7 +15,7 @@
 //   * Confirmation needs an explicit confirm phrase AND a fresh device approval of the exact statement (plus the
 //     fingerprint gate for fingerprint-only credentials, enforced by Root). The console then checks that Root AND the
 //     Vault replica report the hold (so "frozen" is never claimed from the HTTP response alone).
-import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { randomBytes, timingSafeEqual, createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { canon, fail, iso, edVerifyDigest } from '../../v3/common/canon.mjs';
 import { verifyAssertion } from '../../v3/webauthn/verify.mjs';
@@ -28,6 +28,10 @@ import { actionDetailLines } from '../kit.mjs';
 
 export const SESSION_V = 'safebox.v6.owner-session';
 export const CONFIRM_PHRASE = 'FREEZE EVERYTHING';
+/** WebAuthn login challenge = SHA-256(prefix || session-statement digest), derived by the device side (page / kit), so a
+ * compromised console API cannot pass a command digest off as a login challenge (review finding 3). */
+export const LOGIN_PREFIX = 'safebox.v6.console-login:';
+export const loginChallengeOf = (digest) => createHash('sha256').update(Buffer.concat([Buffer.from(LOGIN_PREFIX), Buffer.from(digest)])).digest();
 export const emergencyReason = (incidentId, via = 'OWNER_CONSOLE') => `EMERGENCY_FREEZE incident=${incidentId} scope=GLOBAL via=${via}`;
 const rid = (p, n = 12) => p + randomBytes(n).toString('hex');
 const INCIDENT_RE = /^inc-[0-9a-f]{8,64}$/;
@@ -145,7 +149,7 @@ export class OwnerConsole {
     if (c.kind === 'passkey') {
       if (!webauthn) deny(403, 'LOGIN_WEBAUTHN_REQUIRED');
       const floor = Math.max(Number(c.signCount ?? 0), this.counts.get(c.credId) ?? 0);
-      let r; try { r = verifyAssertion(webauthn, { rp: s.rp, expectedChallenge: L.digest, credential: { ...c.webauthn, signCount: floor }, requireUV: true }); }
+      let r; try { r = verifyAssertion(webauthn, { rp: s.rp, expectedChallenge: loginChallengeOf(L.digest), credential: { ...c.webauthn, signCount: floor }, requireUV: true }); }
       catch (e) { this.#log('LOGIN_FINISH', e.code ?? 'WEBAUTHN_INVALID', { credId: c.credId }); deny(403, e.code ?? 'WEBAUTHN_INVALID'); }
       this.counts.set(c.credId, r.signCount);
     } else {
