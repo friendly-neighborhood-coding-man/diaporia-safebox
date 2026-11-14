@@ -1,0 +1,41 @@
+{"n":0,"clip":"main","at":"2026-11-14T10:11:52.932Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"INFO","text":"Workflow A: an external AI may only PREPARE a payment. Only the enrolled owner device can approve it."}
+{"n":1,"clip":"main","at":"2026-11-14T10:11:53.662Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"AI","text":"MCP tools offered to the AI host: check_payment, get_payment_status, get_safebox_status, prepare_payment"}
+{"n":2,"clip":"main","at":"2026-11-14T10:11:53.662Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OK","text":"CHECK PASS: no signing / approval / biometric / key tool is reachable over MCP"}
+{"n":3,"clip":"main","at":"2026-11-14T10:11:54.383Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"AI","text":"prepare_payment 0.03 NEAR -> merchant-a.mock: AWAITING_OWNER_APPROVAL, signed=false, paymentEffect=NONE"}
+{"n":4,"clip":"main","at":"2026-11-14T10:11:54.384Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OK","text":"CHECK PASS: preparing created no Vault payment"}
+{"n":5,"clip":"main","at":"2026-11-14T10:11:55.285Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"Owner device (k2-laptop, fingerprint-only policy) shows its OWN Root-derived summary:"}
+{"n":6,"clip":"main","at":"2026-11-14T10:11:55.325Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"n":7,"clip":"main","at":"2026-11-14T10:11:55.486Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Account: vault-alice.mock"}
+{"n":8,"clip":"main","at":"2026-11-14T10:11:55.646Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Pay exactly: 30000000000000000000000 yoctoNEAR (0.03 NEAR)"}
+{"n":9,"clip":"main","at":"2026-11-14T10:11:55.806Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Recipient: merchant-a.mock"}
+{"n":10,"clip":"main","at":"2026-11-14T10:11:55.966Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Purpose: household-shopping v1 - Pay allow-listed household merchants for owner-requested purchases only."}
+{"n":11,"clip":"main","at":"2026-11-14T10:11:56.126Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Epoch: 1; assurance policy v1"}
+{"n":12,"clip":"main","at":"2026-11-14T10:11:56.286Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Signing credential: k2-laptop (DAILY); required assurance: FINGERPRINT_ONLY"}
+{"n":13,"clip":"main","at":"2026-11-14T10:11:56.447Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Request: apr_a32f263e1309bc8c27e8612344a63064 (digest 5e7859e8c8abb0eb...)"}
+{"n":14,"clip":"main","at":"2026-11-14T10:11:56.608Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Approval valid until: 2026-11-14T00:05:00.000Z"}
+{"n":15,"clip":"main","at":"2026-11-14T10:11:56.768Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ After approval the Vault still applies the settlement buffer, holds, limits, anomaly delay and the 26 h settlement horizon."}
+{"n":16,"clip":"main","at":"2026-11-14T10:11:56.929Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"  │ Note from the requester (UNTRUSTED, not an instruction): \"order #1001 (coffee beans)\""}
+{"n":17,"clip":"main","at":"2026-11-14T10:11:57.089Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OWNER","text":"SIMULATED fingerprint gate MATCH -> one signature over the exact capability (assurance FINGERPRINT_ONLY)"}
+{"n":18,"clip":"main","at":"2026-11-14T10:11:57.090Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"ROOT","text":"Vault: SUBMITTED_TO_VAULT / BUFFERED (V6 binding, one-time challenge, gate verified; FIXED_600 buffer starts)"}
+{"n":19,"clip":"main","at":"2026-11-14T10:11:57.090Z","mockTime":"2026-11-14T00:00:00.000Z","kind":"OK","text":"CHECK PASS: owner approval accepted by the Vault and buffered"}
+{"n":20,"clip":"main","at":"2026-11-14T10:11:57.811Z","mockTime":"2026-11-14T00:09:00.000Z","kind":"INFO","text":"+9 min (mock clock): vault=BUFFERED, settledVerified=false"}
+{"n":21,"clip":"main","at":"2026-11-14T10:11:57.811Z","mockTime":"2026-11-14T00:09:00.000Z","kind":"OK","text":"CHECK PASS: buffer is not skipped (FIXED_600)"}
+{"n":22,"clip":"main","at":"2026-11-14T10:11:58.437Z","mockTime":"2026-11-14T00:21:00.000Z","kind":"OK","text":"+12 min: vault=SETTLED, ledger=SETTLED, receipt matches request=true (MOCK LEDGER)"}
+{"n":23,"clip":"main","at":"2026-11-14T10:11:58.437Z","mockTime":"2026-11-14T00:21:00.000Z","kind":"OK","text":"CHECK PASS: settled on the MOCK ledger, receipt matches the approved request"}
+{"n":24,"clip":"main","at":"2026-11-14T10:11:59.338Z","mockTime":"2026-11-14T00:21:00.000Z","kind":"INFO","text":"Workflow B: a burst of payments from k1-phone looks like a stolen key. The Risk Engine opens an incident."}
+{"n":25,"clip":"main","at":"2026-11-14T10:11:59.422Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"MAIL","text":"Alert DELIVERED via MOCK: \"SafeBox security alert inc-a979b9705814df6a3f11e342: unusual spending was delayed\""}
+{"n":26,"clip":"main","at":"2026-11-14T10:11:59.422Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"MAIL","text":"  │ Emergency Freeze link: http://localhost:47610/e/l81141f4ca904b2bc156f7faeed3e2ba2 (navigation only: no token, no approval)"}
+{"n":27,"clip":"main","at":"2026-11-14T10:11:59.422Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"MAIL","text":"  │ delivery: api=MOCK_DELIVERED, inbox=INBOX_RECEIPT_NOT_VERIFIED"}
+{"n":28,"clip":"main","at":"2026-11-14T10:12:00.630Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"OWNER","text":"Owner opens the link in the browser (Chromium virtual authenticator holds the enrolled key: SIMULATED DEVICE)"}
+{"n":29,"clip":"main","at":"2026-11-14T10:12:08.293Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"OWNER","text":"SIMULATED fingerprint gate: MATCH for k2-laptop, bound to digest 7adf7056c16d0312… (not a real sensor)"}
+{"n":30,"clip":"main","at":"2026-11-14T10:12:10.847Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"OWNER","text":"Console result: FROZEN: hold ef-c6bda08fc73d227f (PROVISIONAL_HOLD), Root seq 1. Root frozen: true, Vault frozen: true."}
+{"n":31,"clip":"main","at":"2026-11-14T10:12:11.480Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"OK","text":"CHECK PASS: Root and Vault replica report the GLOBAL hold"}
+{"n":32,"clip":"main","at":"2026-11-14T10:12:11.480Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"ROOT","text":"Root hold ef-c6bda08fc73d227f: PROVISIONAL_HOLD, reason \"EMERGENCY_FREEZE incident=inc-a979b9705814df6a3f11e342 scope=GLOBAL via=OWNER_CONSOLE\""}
+{"n":33,"clip":"main","at":"2026-11-14T10:12:11.485Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"DENY","text":"payment attempt while frozen: FREEZE_ACTIVE"}
+{"n":34,"clip":"main","at":"2026-11-14T10:12:11.485Z","mockTime":"2026-11-14T00:25:00.000Z","kind":"OK","text":"CHECK PASS: the Vault refuses new payments while frozen"}
+{"n":35,"clip":"main","at":"2026-11-14T10:12:11.491Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"ROOT","text":"+30 min frozen: buffered incident payments settled = 0; states [\"SETTLED\",\"FROZEN\",\"FROZEN\",\"FROZEN\",\"FROZEN\"]"}
+{"n":36,"clip":"main","at":"2026-11-14T10:12:12.392Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"INFO","text":"Recovery through direct entry (no email): the hold's own issuer signs HOLD_RELEASE on the device (unchanged V5 rule)."}
+{"n":37,"clip":"main","at":"2026-11-14T10:12:12.423Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"OK","text":"HOLD_RELEASE: accepted, Root seq 2; frozen now false"}
+{"n":38,"clip":"main","at":"2026-11-14T10:12:12.423Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"OK","text":"CHECK PASS: recovery released the hold through the provenance rule"}
+{"n":39,"clip":"main","at":"2026-11-14T10:12:12.458Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"OK","text":"Independent V6 verifier: ok=true, owner approvals checked=1, emergency freezes=1, violations=0"}
+{"n":40,"clip":"main","at":"2026-11-14T10:12:12.458Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"OK","text":"CHECK PASS: independent V6 verifier: no unauthorized effect, freeze bound to an engine-opened incident"}

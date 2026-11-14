@@ -1,0 +1,6 @@
+{"n":73,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.630Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"owner k2-laptop freezes: true"}
+{"n":74,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.635Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"stolen k1 key tries to release it: RELEASE_NEEDS_EVERY_VALID_PARTY"}
+{"n":75,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.638Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"legacy UNFREEZE command: USE_HOLD_RELEASE"}
+{"n":76,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.641Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"release with a wrong hold digest: HOLD_DIGEST_MISMATCH"}
+{"n":77,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.641Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: only the hold's own valid parties can release it"}
+{"n":78,"clip":"09-forged-unfreeze","at":"2026-11-14T10:12:46.649Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"genuine release by its issuer: true"}
