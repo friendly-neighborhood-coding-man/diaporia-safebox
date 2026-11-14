@@ -75,7 +75,7 @@ test('P4: under EXP_30 a usual, low-value payment from verified history waits 30
 test('P4: splitting a maximum payment into 10 small ones does not lower the tier below the single large payment', async () => {
   const a = warm(); const big = await pay(a, { amountYocto: Y(6) });
   const b = warm(); const tiers = [];
-  for (let i = 0; i < 10; i++) { const p = await pay(b, { amountYocto: near(0.006) }); tiers.push(Number(p.tier)); await b.advance(12_000, 12_000); }
+  for (let i = 0; i < 10; i++) { const r = await b.pay({ amountYocto: near(0.006) }); if (!r.ok) { assert.match(r.error.detail ?? r.error.code, /INCIDENT_FLOW_PENDING_LIMIT/); break; } tiers.push(Number(b.vault.v5payments().find(p => p.payment_id === r.result.paymentId).tier)); await b.advance(12_000, 12_000); }
   assert.ok(tiers.every((t, i) => i === 0 || t >= tiers[i - 1]), 'tiers never decrease inside the hour: ' + tiers);
   assert.ok(Math.max(...tiers.slice(-3)) >= Number(big.tier), `split ${tiers} vs single ${big.tier}`);
   const v = await verifyWorld(b); assert.equal(v.buffer.tierResets, 0);

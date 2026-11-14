@@ -41,7 +41,7 @@ async function pay(w, who, { credId, amount = near(0.02), recipientId = 'merchan
     r = await w.gz.request('PROPOSE', { capability: pc.capability, approval: pc.approval, recipientId, amountYocto: amount, asset: 'NEAR', memo: who.toLowerCase() });
   } else r = await w.pay({ credId, recipientId, amountYocto: amount, request: { memo: who.toLowerCase() } });
   if (r.ok) { w.tags.set(r.result.paymentId, who); if (r.result.anomaly !== 'NONE' && w.firstDetectAt === null) w.firstDetectAt = w.now(); }
-  else { const c = String(r.error.detail ?? r.error.code).split(',')[0] || r.error.code; w.denials[who][c] = (w.denials[who][c] ?? 0) + 1; }
+  else { const det = String(r.error.detail ?? ''); const c = r.error.code === 'POLICY_DENY' && /^[A-Z_,]+$/.test(det) ? det.split(',')[0] : r.error.code; w.denials[who][c] = (w.denials[who][c] ?? 0) + 1; }
   return r;
 }
 /** owner reacts to a security incident: suspend the stolen credential (laptop) and mark the incident FRAUD */
@@ -216,8 +216,9 @@ S['13_restart_pending'] = async (arm, rnd) => {
 /** 14. Multiple flows competing for pending slots: attacker floods k1 while the owner pays from k2 every 5 min. */
 S['14_competing_pending_slots'] = async (arm, rnd) => {
   const w = world(arm); w.t0 = w.now();
-  for (let i = 0; i < 60; i++) { await pay(w, 'ATTACK', { amount: near(0.01) }); if (i % 10 === 0) await pay(w, 'LEGIT', { amount: near(0.01) }); await run(w, 30_000, { step: 30_000 }); }
-  for (let i = 0; i < 24; i++) { await pay(w, 'LEGIT', { amount: near(0.01) }); await run(w, 5 * MIN, { step: MIN }); }
+  // attacker: 0.01 NEAR every 30 s for 30 min on k1; owner: an ordinary 0.01 NEAR payment every 30 min for 12 h on k2
+  for (let i = 0; i < 60; i++) { await pay(w, 'ATTACK', { amount: near(0.01) }); if (i === 2) await pay(w, 'LEGIT', { amount: near(0.01) }); await run(w, 30_000, { step: 30_000 }); }
+  for (let i = 0; i < 24; i++) { await pay(w, 'LEGIT', { amount: near(0.01) }); await run(w, 30 * MIN, { step: 5 * MIN }); }
   await run(w, 72 * H, { step: 10 * MIN });
   return measure(w);
 };

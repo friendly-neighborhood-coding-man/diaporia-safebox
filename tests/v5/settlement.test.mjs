@@ -194,3 +194,12 @@ test('P1: riskClassOf is a deterministic function of the evaluation: each HIGH r
   assert.equal(riskClassOf(ev(), { triggers: 3, risk_class: 'LOW' }), 'HIGH', 'third prior delay decision escalates');
   assert.equal(riskClassOf(ev(), { triggers: 0, risk_class: 'HIGH' }), 'HIGH', 'an incident never de-escalates');
 });
+
+test('repair (A/B scenario 14): a flow under an open incident holds at most 8 pending slots; the owner\'s other flow keeps paying', async () => {
+  const w = buildV5();
+  const atk = []; for (let i = 0; i < 30; i++) { atk.push(await w.pay({ amountYocto: Y(1) })); await w.advance(30_000, 30_000); }
+  assert.equal(w.vault.v5payments().filter(p => p.cred_id === 'k1-phone' && p.state === 'BUFFERED').length, 8);
+  assert.ok(atk.filter(r => !r.ok).every(r => /INCIDENT_FLOW_PENDING_LIMIT/.test(r.error.detail)));
+  const own = []; for (let i = 0; i < 8; i++) { own.push(await w.pay({ credId: 'k2-laptop', amountYocto: Y(1) })); await w.advance(30 * MIN, 5 * MIN); }
+  assert.equal(own.filter(r => r.ok).length, 8, JSON.stringify(own.filter(r => !r.ok).map(r => r.error)));
+});

@@ -34,6 +34,9 @@ CREATE TRIGGER IF NOT EXISTS v5_pay_no_delete BEFORE DELETE ON v5_pay BEGIN SELE
 const SECURITY_EFFECTS = new Set(['SUSPENDED', 'HOLD_CREATED', 'RECOVERY_OPENED', 'REVOKED', 'FROZEN', 'CONTEST_RESOLVED', 'GOV_CASE_OPENED', 'RAPID_USE_REQUESTED']);
 const MAX_DELAY_MS = Number(RISK_POLICY_V1.delay.maxDelayMs); // vault-side hard cap, independent of the engine
 const DUE_STATES = ['BUFFERED'];
+// V5.1 repair (A/B scenario 14): a flow under an OPEN incident may hold at most half of the vault's 16 pending slots,
+// so one compromised credential cannot exhaust the slots every other flow (the owner's other devices, agents) needs.
+const INCIDENT_FLOW_PENDING_MAX = 8;
 
 export class ExecutionVaultV5 extends ExecutionVault {
   constructor(cfg, deps) {
@@ -118,6 +121,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const pv = purposeViolations(this.root.purpose, { operation: 'PAY', recipientId: op.recipientId, asset: op.asset, amountYocto: op.amountYocto, sku: null, now, capExpiresAt: Number(d.expiresAt), capIssuedAt: Number(d.grantedAt) }, this.spent())
       .filter(v => v !== 'CAPABILITY_TTL_TOO_LONG'); // a delegation's lifetime is bounded by the Root (delegationMaxTtlMs), not the per-payment cap TTL
     if (pv.length) deny('POLICY_DENY', pv.join(','));
+    if (this.extraProposeDenials({ flow: 'dg:' + d.delegationId }).length) deny('INCIDENT_FLOW_PENDING_LIMIT');
     const paymentId = 'p_' + randomUUID().replaceAll('-', ''); const capId = randomUUID();
     const row = this.store.tx(() => {
       if (this.store.byState(['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN']).length + 1 > 16) fail('PENDING_COUNT_LIMIT');
@@ -192,6 +196,13 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const inc = this.store.db.prepare('SELECT * FROM v5_incidents WHERE incident_id=?').get(id);
     this.onIncident({ incident: inc, ev, root: this.root });
     return inc;
+  }
+  /** V3 hook, evaluated inside the reservation transaction next to PENDING_COUNT_LIMIT (after authentication and Purpose). */
+  extraProposeDenials({ credId = null, flow = null }) {
+    flow ??= 'cred:' + credId;
+    if (!this.store.db.prepare("SELECT 1 FROM v5_incidents WHERE flow=? AND state='OPEN'").get(flow)) return [];
+    const n = this.store.db.prepare("SELECT COUNT(*) n FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state IN ('RESERVED','BUFFERED','RELEASED','UNKNOWN')").get(flow).n;
+    return n >= INCIDENT_FLOW_PENDING_MAX ? ['INCIDENT_FLOW_PENDING_LIMIT'] : [];
   }
   #authIssuedAt(paymentId, delegationId) {
     const ev = this.store.db.prepare('SELECT cap FROM cap_evidence WHERE payment_id=?').get(paymentId);
