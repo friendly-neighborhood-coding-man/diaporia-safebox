@@ -107,7 +107,8 @@ catch (e) {
   h = await harness([], {}, activeAuth);
 }
 const w = h.worlds['sbx-alice']; const dev = h.devices['sbx-alice'];
-w.owner.decide = (prompt, text) => { bridge.display = String(text); ev('OWNER', 'device shows: ' + String(text).split('\n')[0]); return true; }; // the real decision is the owner's Approve/Decline on the bridge page
+w.owner.decide = (prompt, text, ctx) => { if ((ctx?.credId ?? ctx?.binding?.credId ?? 'k2-laptop') === 'k2-laptop') bridge.display = String(text); // simulated credentials never change what the real bridge shows
+   ev('OWNER', 'device shows: ' + String(text).split('\n')[0]); return true; }; // the real decision is the owner's Approve/Decline on the bridge page
 ev('OK', `enrolled: k2-laptop credential ${w.root.state.creds['k2-laptop'].webauthn.credentialId.slice(0, 12)}…, gate key ${w.root.state.v6.gateKeys['k2-laptop']?.kind ?? 'none'}`);
 consoleObj = consoleForWorld(w, { gateOrigin: GATE_ORIGIN });
 
@@ -129,13 +130,16 @@ await new Promise((r) => gateSrv.listen(GATE, '127.0.0.1', r));
 // ================================================================== Workflow A
 try {
   ev('STEP', 'Workflow A: the AI prepares a payment over MCP; approve it on the bridge page' + (fpOnly.length ? ' and touch the sensor' : ''));
-  const t = await obtainTokens(h.url, h.logins.alice); const ai = await mcpClient(h.url, t.access);
+  const t = await obtainTokens(h.url, h.logins.alice); let ai = await mcpClient(h.url, t.access);
   const prep = await call(ai, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'real-device run', idempotencyKey: 'real-device-000000000001' });
   ev('AI', `prepare_payment: ${prep.state}`);
   const r = await dev.approve(prep.requestId, { credId: 'k2-laptop' });
   ev(r.state === 'SUBMITTED_TO_VAULT' ? 'OK' : 'DENY', 'owner approval -> ' + JSON.stringify(r));
   await w.advance(12 * 60_000);
-  const st = await call(ai, 'get_payment_status', { requestId: prep.requestId });
+  // the owner may take minutes at the real prompt: reconnect the AI client (fresh tokens) before the status read
+  let st; try { st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
+  catch (e) { ev('INFO', 'AI client reconnect after: ' + (e.code ?? e.message)); try { await ai.close(); } catch {}
+    const t2 = await obtainTokens(h.url, h.logins.alice); ai = await mcpClient(h.url, t2.access); st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
   results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r, assurance: dev.lastV6?.assurance ?? null, settledVerified: st.settledVerified };
   ev(st.settledVerified ? 'OK' : 'DENY', `MOCK settlement after the 10-minute buffer: settledVerified=${st.settledVerified}`);
   await ai.close();
