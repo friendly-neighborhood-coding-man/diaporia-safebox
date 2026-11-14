@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1416" />
+  <meta name="description" content="DIAPORIA SafeBox explores a deliberately sealed sensitive core designed to limit the damage of compromised AI agents and software updates. Experimental research, MOCK ledger only." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="DIAPORIA SafeBox — Compromise the app. Not the authority." />
+  <meta property="og:description" content="An experimental capability-security project. Current: bounded approvals and a MOCK ledger. Planned: an immutable, independently controlled sensitive core." />
+  <title>DIAPORIA SafeBox — Authority should outlast compromise</title>
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg: #0b1416; --bg2:#0f1c1e; --surface:#152326; --surface2:#192b2d;
+      --line:rgba(189,216,200,.16); --paper:#f0f4eb; --muted:#a5b5ad;
+      --accent:#d7efb8; --green:#9ee3bf; --amber:#f5ce9d;
+      --max:1160px;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-synthesis:none;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--paper);min-width:320px}
+    body::before{content:"";position:absolute;z-index:-1;top:0;left:0;right:0;height:780px;pointer-events:none;background:radial-gradient(ellipse 55% 50% at 78% 16%,rgba(57,118,105,.24),transparent 75%),linear-gradient(rgba(218,239,201,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(218,239,201,.03) 1px,transparent 1px);background-size:auto,70px 70px,70px 70px}
+    a{color:inherit} a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:4px} .skip{position:absolute;top:-60px;left:18px;padding:10px;background:var(--accent);color:var(--bg);z-index:30}.skip:focus{top:10px}
+    .wrap{width:min(var(--max),calc(100% - 64px));margin-inline:auto}
+    .navwrap{border-bottom:1px solid var(--line);background:rgba(11,20,22,.82);backdrop-filter:blur(20px);position:sticky;top:0;z-index:20}
+    nav{height:76px;display:flex;align-items:center;gap:32px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.04em;text-decoration:none;font-size:19px;white-space:nowrap}
+    .mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(215,239,184,.72);border-radius:9px;color:var(--accent);font:700 12px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-.06em;box-shadow:inset 0 0 20px rgba(215,239,184,.07)}
+    .brand .sub{color:var(--accent)}
+    .navlinks{display:flex;align-items:center;gap:26px}.navlinks a{font-size:13px;color:#c3d0c8;text-decoration:none}.navlinks a:hover{color:#fff}.navlinks .navcta{border:1px solid rgba(215,239,184,.45);border-radius:100px;padding:10px 17px;color:var(--accent)}
+    .hero{padding:92px 0 118px;display:grid;grid-template-columns:1.1fr .9fr;gap:52px;align-items:center}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:var(--accent);font:600 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.13em;text-transform:uppercase}
+    .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px rgba(215,239,184,.8)}
+    h1,h2,h3,p{margin-top:0} h1{font-size:clamp(47px,5.8vw,82px);line-height:1.055;letter-spacing:-.075em;margin:26px 0 26px;font-weight:720}
+    h1 em{font-style:normal;color:var(--accent)}
+    .intro{font-size:18px;line-height:1.76;color:#c1cec7;max-width:545px;margin-bottom:30px;letter-spacing:-.018em}
+    .heroactions{display:flex;flex-wrap:wrap;gap:12px;margin:33px 0 27px}
+    .btn{display:inline-flex;justify-content:center;align-items:center;gap:12px;font-size:14px;font-weight:700;padding:15px 22px;text-decoration:none;border-radius:9px;transition:transform .2s,background .2s}
+    .btn:hover{transform:translateY(-2px)}.btn.primary{background:var(--accent);color:#112019}.btn.secondary{border:1px solid #4d655f;color:var(--paper);background:rgba(255,255,255,.015)}
+    .herofoot{font:500 11px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.02em;color:#96a9a0}.herofoot strong{color:var(--amber);font-weight:600}
+    .machine{position:relative;background:linear-gradient(155deg,#1b3030,#111f22 56%,#142426);border:1px solid rgba(189,216,200,.22);border-radius:22px;padding:24px;box-shadow:0 28px 80px rgba(0,0,0,.33),inset 0 1px rgba(255,255,255,.035)}
+    .machine:after{content:"";position:absolute;z-index:-1;inset:18px -18px -18px 18px;border:1px solid rgba(189,216,200,.12);border-radius:22px}
+    .machinehead{display:flex;align-items:center;justify-content:space-between;gap:10px;font:600 10px ui-monospace,Consolas,monospace;color:#91a69d;letter-spacing:.13em;margin-bottom:22px}
+    .lights{display:flex;gap:6px}.lights i{width:7px;height:7px;border-radius:50%;background:#465956}.lights i:first-child{background:#b4dfb6}
+    .machine .node{border:1px solid rgba(188,215,199,.19);background:rgba(13,26,28,.8);border-radius:11px;padding:17px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+    .node .n-title{font-size:15px;font-weight:720;letter-spacing:-.02em}.node .n-detail{font-size:12px;line-height:1.6;color:#a5b7ad;margin-top:5px}.node .tag{font:600 10px ui-monospace,Consolas,monospace;white-space:nowrap;padding:5px 7px;border-radius:5px;background:rgba(215,239,184,.10);color:var(--accent)}
+    .node .tag.future{background:rgba(245,206,157,.11);color:var(--amber)}
+    .conduit{height:35px;display:flex;align-items:center;justify-content:center;gap:12px;font:600 10px ui-monospace,Consolas,monospace;letter-spacing:.06em;color:#a3c1af}.conduit::before,.conduit::after{content:"";width:42px;height:1px;background:rgba(158,227,191,.35)}
+    .target{border:1px solid rgba(215,239,184,.65)!important;box-shadow:0 0 0 6px rgba(215,239,184,.025),inset 0 0 34px rgba(215,239,184,.035)}
+    .isolation-hint{margin-top:19px;padding:12px 14px;background:rgba(245,206,157,.065);border:1px solid rgba(245,206,157,.2);color:#edcfab;border-radius:8px;font-size:11px;line-height:1.65}
+    .quote-bar{border-block:1px solid var(--line);background:#101d1e}.quote-content{display:flex;align-items:center;justify-content:space-between;gap:26px;padding:25px 0}.quote-content p{margin:0;font-size:17px;font-weight:620;letter-spacing:-.025em}.quote-content span{font:600 11px ui-monospace,Consolas,monospace;color:var(--muted);white-space:nowrap}
+    section{scroll-margin-top:90px}.section{padding:110px 0}.section-alt{background:#101c1e;border-block:1px solid var(--line)}
+    .section-header{max-width:780px;margin-bottom:44px}.kicker{font:700 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--green);text-transform:uppercase;margin-bottom:18px}.section h2{font-size:clamp(35px,4.5vw,58px);line-height:1.08;letter-spacing:-.06em;margin:0 0 22px;font-weight:700}.lede{font-size:16px;line-height:1.8;color:#afc0b8;max-width:760px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:22px}.card{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:32px}.card .cardtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:27px;color:var(--green);font:700 11px ui-monospace,Consolas,monospace;letter-spacing:.12em}.card h3{font-size:25px;letter-spacing:-.045em;line-height:1.2;margin:0 0 14px}.card p{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:0}.card p+p{margin-top:12px}.callout-link{display:inline-block;margin-top:19px;color:var(--accent);font-size:13px;text-underline-offset:4px}
+    .threatcard{grid-column:span 2;background:linear-gradient(115deg,rgba(52,92,86,.3),rgba(25,43,45,.5));display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center}.threatcard h3{max-width:630px;font-size:32px}.threatcard .aside{border-left:1px solid rgba(215,239,184,.25);padding-left:29px}.aside .aside-title{font:600 11px ui-monospace,Consolas,monospace;color:var(--accent);letter-spacing:.12em;margin-bottom:13px}.aside p{font-size:14px}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step{min-height:258px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.017);padding:25px 23px}.step .num{font:600 13px ui-monospace,Consolas,monospace;color:var(--accent);margin-bottom:40px}.step h3{font-size:19px;letter-spacing:-.03em;margin:0 0 13px}.step p{font-size:13px;line-height:1.75;color:var(--muted);margin:0}
+    .decision{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.decision .slim{border:1px solid var(--line);border-radius:12px;padding:24px;background:#152427}.slim .title{font-size:14px;font-weight:700;margin-bottom:9px}.slim p{font-size:13px;line-height:1.8;color:#b7c8be;margin:0}
+    /* Semantic roadmap: stage markers connected by a visible track, not a status table. */
+    .roadmap{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:0;margin:8px 0 0}
+    .milestone{min-width:0;position:relative;display:flex;flex-direction:column}
+    .milestone-station{height:66px;display:flex;align-items:flex-start;padding-top:8px;position:relative}
+    .station-node{width:44px;height:44px;border-radius:50%;border:1px solid rgba(187,217,199,.35);background:#17282a;display:grid;place-items:center;color:#c1d1c5;font:700 12px/1 ui-monospace,Consolas,monospace;z-index:2;position:relative;box-shadow:0 0 0 5px #101c1e}
+    .milestone:first-child .station-node{background:var(--accent);border-color:var(--accent);color:#12231b;box-shadow:0 0 0 6px rgba(215,239,184,.1)}
+    .milestone:not(:last-child) .milestone-station::after{content:"";position:absolute;top:29px;left:44px;right:-18px;height:2px;background:repeating-linear-gradient(90deg,rgba(160,196,174,.55) 0 12px,rgba(160,196,174,.15) 12px 20px)}
+    .milestone:not(:last-child) .milestone-station::before{content:"";position:absolute;z-index:3;right:-11px;top:25px;width:8px;height:8px;border-top:2px solid #91b8a0;border-right:2px solid #91b8a0;transform:rotate(45deg)}
+    .milestone-card{flex:1;min-height:315px;padding:25px 23px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,#1a2d2e,#142326);display:flex;flex-direction:column;gap:0}
+    .milestone.current .milestone-card{border-color:rgba(215,239,184,.54);background:linear-gradient(180deg,#233c35,#182a29)}
+    .milestone.goal .milestone-card{border-style:dashed;border-color:rgba(245,206,157,.52);background:linear-gradient(160deg,rgba(79,65,49,.28),#152325)}
+    .stage-status{width:fit-content;max-width:100%;font:700 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.055em;color:#a9c4b0;border:1px solid rgba(169,196,176,.28);border-radius:4px;padding:6px 8px;margin-bottom:27px}
+    .current .stage-status{color:var(--accent);border-color:rgba(215,239,184,.54)}
+    .goal .stage-status{color:var(--amber);border-color:rgba(245,206,157,.40)}
+    .milestone-overline{font:700 10px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:#7e9a8c;margin-bottom:10px}
+    .milestone h3{font-size:23px;line-height:1.14;letter-spacing:-.04em;margin:0 0 15px}
+    .milestone p{color:#b4c5ba;font-size:13px;line-height:1.7;margin:0 0 24px}
+    .milestone-foot{margin-top:auto;padding-top:17px;border-top:1px solid var(--line);font:600 10px/1.7 ui-monospace,Consolas,monospace;color:#8fa999}
+    .roadmap-note{margin-top:28px;border:1px solid rgba(245,206,157,.22);background:rgba(245,206,157,.045);border-radius:11px;padding:18px 21px;color:#d1bfa6;line-height:1.75;font-size:13px}
+    .roadmap-note strong{color:#f0d6b2}
+    .evidence-links{margin-top:20px;color:#94aa9e;font-size:12px;line-height:1.85}
+    .evidence-links a{text-underline-offset:3px;color:#cce5c0}
+    .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}.proof .metric{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:25px}.metric strong{display:block;font-size:34px;letter-spacing:-.055em;margin:0 0 4px}.metric span{display:block;font-size:12px;line-height:1.65;color:var(--muted)}
+    .research{background:linear-gradient(130deg,#21342f,#152427);border:1px solid rgba(215,239,184,.24);border-radius:17px;padding:38px;display:grid;grid-template-columns:1fr 1fr;gap:36px}.research h3{font-size:29px;letter-spacing:-.05em;margin:0 0 17px}.research p{color:#bacdbf;font-size:14px;line-height:1.8}.research ul{margin:0;padding-left:19px;color:#c4d4c9;font-size:13px;line-height:2}.research li+li{margin-top:4px}.research a{text-underline-offset:3px}
+    .ctaarea{padding:92px 0 100px;text-align:center}.ctaarea h2{font-size:clamp(42px,5vw,70px);letter-spacing:-.075em;line-height:1.03;margin:10px auto 23px;max-width:800px}.ctaarea p{max-width:620px;margin:0 auto 27px;color:var(--muted);line-height:1.7}.ctaarea .heroactions{justify-content:center}
+    footer{border-top:1px solid var(--line);padding:34px 0 55px;color:#90a59a;font-size:12px;line-height:1.8}.footerflex{display:flex;justify-content:space-between;gap:26px}.footerlinks{display:flex;gap:22px;flex-wrap:wrap}.footerlinks a{text-underline-offset:4px}
+    @media(max-width:1000px){.hero{grid-template-columns:1fr;gap:36px;padding:76px 0 94px}.machine{max-width:690px;width:100%}.steps{grid-template-columns:1fr 1fr}.step{min-height:220px}.two{grid-template-columns:1fr}.threatcard{grid-column:span 1}.research{grid-template-columns:1fr}.threatcard{display:block}.threatcard .aside{border-left:0;border-top:1px solid rgba(215,239,184,.25);margin-top:26px;padding:20px 0 0}.proof{grid-template-columns:1fr 1fr 1fr}
+      .roadmap{grid-template-columns:1fr;gap:0;margin-top:2px}.milestone{display:grid;grid-template-columns:60px minmax(0,1fr);gap:10px}.milestone-station{height:auto;justify-content:center;padding-top:4px}.milestone:not(:last-child) .milestone-station::after{top:50px;left:29px;right:auto;bottom:0;height:auto;width:2px;background:repeating-linear-gradient(180deg,rgba(160,196,174,.52) 0 12px,rgba(160,196,174,.16) 12px 20px)}.milestone:not(:last-child) .milestone-station::before{top:auto;bottom:8px;left:25px;right:auto;transform:rotate(135deg)}.milestone-card{min-height:0;margin-bottom:20px;padding:23px;flex:auto}.stage-status{margin-bottom:16px}.milestone p{margin-bottom:17px}.milestone-foot{padding-top:12px}}
+
+    @media(max-width:700px){.wrap{width:min(var(--max),calc(100% - 38px))}.navwrap nav{height:68px}.navlinks a:not(.navcta){display:none}.navlinks .navcta{font-size:12px;padding:8px 12px}.brand{font-size:16px}.mark{width:32px;height:32px}.hero{padding:61px 0 75px}.hero h1{font-size:clamp(42px,12vw,65px)}.intro{font-size:16px}.machine{padding:16px;border-radius:14px}.node .tag{font-size:9px}.section{padding:75px 0}.section h2{font-size:40px}.card{padding:23px}.threatcard h3{font-size:25px}.steps,.decision,.proof{grid-template-columns:1fr}.step{min-height:0}.step .num{margin-bottom:25px}.quote-content{display:block}.quote-content span{display:block;margin-top:12px}.research{padding:24px}.footerflex{display:block}.footerlinks{margin-top:15px}.ctaarea{padding:70px 0}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}.btn:hover{transform:none}}
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="navwrap"><nav class="wrap" aria-label="Primary navigation">
+  <a class="brand" href="#top" aria-label="DIAPORIA SafeBox home"><span class="mark">SB</span><span>DIAPORIA <span class="sub">SafeBox</span></span></a>
+  <div class="navlinks"><a href="#evidence">Roadmap</a><a href="#threat">Why</a><a href="#design">Design</a><a class="navcta" href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
+</nav></div>
+<main id="main">
+  <section class="wrap hero" id="top" aria-labelledby="hero-title">
+    <div>
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Experimental research · design roadmap</div>
+      <h1 id="hero-title">Compromise the app.<br><em>Not the authority.</em></h1>
+      <p class="intro">A software update can be compromised. A developer account can be stolen. The user's sensitive authority should not automatically follow either of them.</p>
+      <p class="intro" style="margin-top:-13px">SafeBox is researching a deliberately <strong style="color:#edf6e8">sealed, minimal, default-deny sensitive core</strong> to limit damage when the application itself becomes untrusted.</p>
+      <div class="heroactions"><a class="btn primary" href="#evidence">Explore the roadmap <span aria-hidden="true">↗</span></a><a class="btn secondary" href="#threat">Why this matters <span aria-hidden="true">↓</span></a></div>
+      <p class="herofoot"><strong>NOT PRODUCTION READY</strong> &nbsp;·&nbsp; V6 uses a MOCK ledger &nbsp;·&nbsp; Sealed core is a future target</p>
+    </div>
+    <aside class="machine" aria-label="Conceptual future trust-boundary architecture">
+      <div class="machinehead"><span>TRUST_BOUNDARY / PROPOSED</span><div class="lights" aria-hidden="true"><i></i><i></i><i></i></div></div>
+      <div class="node"><div><div class="n-title">AI &amp; Application</div><div class="n-detail">Planning, tools, updates. Assume compromised.</div></div><span class="tag">UNTRUSTED</span></div>
+      <div class="conduit">TYPED REQUEST ONLY ↓</div>
+      <div class="node target"><div><div class="n-title">Sealed Sensitive Core</div><div class="n-detail">Small policy engine · protected state · tightly scoped execution · no general hot-patching.</div></div><span class="tag future">PLANNED</span></div>
+      <div class="conduit">INDEPENDENT APPROVAL ↑</div>
+      <div class="node"><div><div class="n-title">Owner-Controlled Authority</div><div class="n-detail">Separate key, update consent, freeze and recovery.</div></div><span class="tag future">PLANNED</span></div>
+      <div class="isolation-hint"><strong>Architecture concept, not a deployed isolation boundary.</strong> V6 has scoped interface checks and a MOCK ledger. Separate OS protection, independently held update authority and sealed execution still require implementation and validation.</div>
+    </aside>
+  </section>
+  <div class="quote-bar"><div class="wrap quote-content"><p>Flexible intelligence. Inflexible authority.</p><span>THE SAFEBOX DESIGN PRINCIPLE</span></div></div>
+
+  <section class="section section-alt" id="evidence" aria-labelledby="roadmap-heading"><div class="wrap">
+    <div class="section-header">
+      <div class="kicker">01 / Roadmap at a glance</div>
+      <h2 id="roadmap-heading">From bounded approvals<br>to a sealed authority core.</h2>
+      <p class="lede">SafeBox is progressing from tested, mock-based authorization boundaries toward a deliberately closed sensitive zone. Each step below is a <strong>project milestone</strong>, not a claim that production isolation is already proven.</p>
+    </div>
+    <ol class="roadmap" aria-label="Four-stage SafeBox security research roadmap">
+      <li class="milestone current">
+        <div class="milestone-station" aria-hidden="true"><span class="station-node">01</span></div>
+        <article class="milestone-card">
+          <span class="stage-status">BUILT · MOCK TESTED</span>
+          <div class="milestone-overline">CURRENT / FROZEN V6</div>
+          <h3>Bounded approvals</h3>
+          <p>Scoped MCP prepares requests. The owner approves exact actions. Replay checks, limits, a 600-second buffer and Emergency Freeze run against a MOCK ledger.</p>
+          <div class="milestone-foot">Interface-level evidence · no real funds</div>
+        </article>
+      </li>
+      <li class="milestone upcoming">
+        <div class="milestone-station" aria-hidden="true"><span class="station-node">02</span></div>
+        <article class="milestone-card">
+          <span class="stage-status">RESEARCH · NOT DEPLOYED</span>
+          <div class="milestone-overline">NEXT / HARDENING</div>
+          <h3>Hard sensitive zone</h3>
+          <p>Separate OS identities, protect keys and policy state, and admit only a narrow set of typed requests. No general-purpose execution interface.</p>
+          <div class="milestone-foot">V2/V3 isolation research ≠ V6 isolation</div>
+        </article>
+      </li>
+      <li class="milestone future">
+        <div class="milestone-station" aria-hidden="true"><span class="station-node">03</span></div>
+        <article class="milestone-card">
+          <span class="stage-status">PLANNED · NOT VERIFIED</span>
+          <div class="milestone-overline">FUTURE / SEALED EPOCHS</div>
+          <h3>Immutable core</h3>
+          <p>Execute only verified bytes. Replace sealed versions through an independently approved update path, with protected state and anti-rollback checks.</p>
+          <div class="milestone-foot">No claim of tamper-proof execution today</div>
+        </article>
+      </li>
+      <li class="milestone goal">
+        <div class="milestone-station" aria-hidden="true"><span class="station-node">04</span></div>
+        <article class="milestone-card">
+          <span class="stage-status">RELEASE GOAL · UNPROVEN</span>
+          <div class="milestone-overline">TARGET / DAMAGE CONTROL</div>
+          <h3>Contain compromise</h3>
+          <p>Even after a hostile app update, constrain sensitive effects with independent spending limits, freeze and recovery. Measure the remaining damage.</p>
+          <div class="milestone-foot">Requires adversarial, independent validation</div>
+        </article>
+      </li>
+    </ol>
+    <div class="roadmap-note"><strong>What is not yet demonstrated:</strong> V6 OS isolation, sealed executable updates, hardware-independent signing or real-chain containment. The signed-launcher Track D experiment was <strong>BLOCKED_BY_SAFETY_GATE / NOT_RUN</strong>; it supplies no defense result. SSTP PR #34 remains PARTIAL and owner-log F9 in PR #32 failed its inode-reuse test.</div>
+    <div class="proof" aria-label="Current evidence, with scope">
+      <div class="metric"><strong>586 / 586</strong><span>Frozen V6 regression tests passed in the documented test environment.</span></div>
+      <div class="metric"><strong>40 / 40</strong><span>Scoped external MCP interactor tests passed in-process.</span></div>
+      <div class="metric"><strong>MOCK</strong><span>V6 settlement is simulated. No NEAR Testnet or Mainnet payment has been executed.</span></div>
+    </div>
+    <p class="evidence-links">Full scope and limitations: <a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/blob/0d04edf3517bb458707d325d7bdd8d10dcf04753/README.md" target="_blank" rel="noopener noreferrer">frozen submission README</a> · <a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/blob/0d04edf3517bb458707d325d7bdd8d10dcf04753/docs/v6/final-candidate/EVIDENCE-INDEX.md" target="_blank" rel="noopener noreferrer">Evidence Index</a>. Passing tests do not establish production security.</p>
+  </div></section>
+
+  <section class="section" id="threat"><div class="wrap">
+    <div class="section-header"><div class="kicker">02 / Why this matters</div><h2>What if the trusted update is the attack?</h2><p class="lede">We do not assume a malicious developer. We assume a well-intentioned developer can lose control of a repository, CI/CD, signing process or update channel. A valid signature can still accompany harmful code if the authority behind it was compromised.</p></div>
+    <div class="two">
+      <div class="card"><div class="cardtop"><span>ASSUMPTION A</span><span>✳</span></div><h3>Compromise is possible.</h3><p>Supply-chain exposure is not limited to malicious prompts. An attacker may gain the ability to ship legitimate-looking updates and run code inside a trusted application.</p></div>
+      <div class="card"><div class="cardtop"><span>ASSUMPTION B</span><span>✳</span></div><h3>Authority must be separate.</h3><p>The app may be allowed to propose a transaction without having the ability to rewrite spending policy, sign arbitrary transfers or replace the component enforcing those restrictions.</p></div>
+      <div class="card threatcard"><div><div class="cardtop"><span>A REAL-WORLD MOTIVATION</span><span>2026</span></div><h3>The NIKKE PC launcher security incident</h3><p>In November 2026, the publisher reported tampered launcher scripts and malware distribution. Independent analysis described malicious activity running through the legitimate launcher process. The example motivates a broader threat model: what happens when trusted software delivers untrusted behavior?</p><a class="callout-link" href="https://nikke-en.com/" target="_blank" rel="noopener noreferrer">Official NIKKE security notices ↗</a>&nbsp;&nbsp;<a class="callout-link" href="https://www.bitdefender.com/en-gb/blog/labs/nikke-game-launcher-malware" target="_blank" rel="noopener noreferrer">Bitdefender analysis ↗</a></div><div class="aside"><div class="aside-title">IMPORTANT DISTINCTION</div><p>This incident is <strong>not</strong> evidence of malicious intent by NIKKE's developers, and SafeBox does <strong>not</strong> claim to have reproduced or prevented the NIKKE attack. It is an example of why a compromised distribution path belongs in our threat model.</p></div></div>
+    </div>
+  </div></section>
+
+  <section class="section section-alt" id="design"><div class="wrap">
+    <div class="section-header"><div class="kicker">03 / Planned design</div><h2>Close the sensitive zone. Deliberately.</h2><p class="lede">Everyday agent behavior should be flexible. Changes to spending authority, policy or the security core itself should be rare, explicit and inconvenient by design.</p></div>
+    <div class="steps">
+      <article class="step"><div class="num">01 / MINIMIZE</div><h3>Deny by default</h3><p>Keep a small command vocabulary. No arbitrary shell, filesystem, policy editing or signing interface for the app or agent.</p></article>
+      <article class="step"><div class="num">02 / SEPARATE</div><h3>Protect authority</h3><p>Use OS-enforced principals and protected keys and state. Merely putting the same privileges in a second process is not isolation.</p></article>
+      <article class="step"><div class="num">03 / SEAL</div><h3>Replace, don't patch</h3><p>Verify the exact bytes the trusted component consumes. Plan separately staged, owner-authorized core epochs rather than ordinary hot-updates.</p></article>
+      <article class="step"><div class="num">04 / CONTAIN</div><h3>Bound the damage</h3><p>Preserve spending limits, single-use approvals, freeze capability and rollback-resistant state. Fail closed when trust cannot be established.</p></article>
+    </div>
+    <div class="decision"><div class="slim"><div class="title">What stays fixed?</div><p>The core's executable code, identity of its trust roots, and rules governing who is allowed to change authority—within a given sealed epoch.</p></div><div class="slim"><div class="title">What must still change?</div><p>Spent budgets, used nonces, freeze state, audit checkpoints and security version numbers. These require protected, monotonic updates—not an immutable database.</p></div></div>
+  </div></section>
+
+  <section class="section section-alt" id="research"><div class="wrap"><div class="research">
+    <div><div class="kicker">04 / Open research</div><h3>We publish the counterexamples, too.</h3><p>SSTP's deterministic race improvements are meaningful, but the independent follow-up found remaining writable-mapping, coarse-timestamp and inode-reuse bypasses. An owner-log identity claim also failed under inode reuse. We will not turn partial evidence into a full security claim.</p><p style="margin-bottom:0;color:#a6baa9">Planned next: use only verified bytes, independently protect update and execution authority, test legitimate updates and recovery, then independently measure the residual damage.</p></div>
+    <div><ul><li><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/34" target="_blank" rel="noopener noreferrer">SSTP verifier PR #34</a> — PARTIAL, not tamper-proof</li><li><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/32" target="_blank" rel="noopener noreferrer">Legacy hardening PR #32</a> — owner-log F9 claim failed</li><li><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/33" target="_blank" rel="noopener noreferrer">Isolation documentation PR #33</a> — design only</li><li>Track D signed-launcher exercise — BLOCKED_BY_SAFETY_GATE / NOT_RUN</li><li>Kernel compromise, hostile app UI, real-funds containment and hardware-isolated approval — not demonstrated</li></ul></div>
+  </div></div></section>
+
+  <section class="wrap ctaarea" aria-labelledby="close-title"><div class="kicker">THE INTENT</div><h2 id="close-title">Make compromise survivable.<br>Not impossible.</h2><p>SafeBox is an early research prototype, not a commercial wallet or completed isolation product. Its release objective is simple: a developer should not be able to confer a user's spending authority on an attacker merely by losing control of an application update.</p><div class="heroactions"><a class="btn primary" href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox" target="_blank" rel="noopener noreferrer">Read the repository ↗</a><a class="btn secondary" href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/blob/0d04edf3517bb458707d325d7bdd8d10dcf04753/docs/v6/final-candidate/EVIDENCE-INDEX.md" target="_blank" rel="noopener noreferrer">Inspect the evidence ↗</a></div></section>
+</main>
+<footer><div class="wrap footerflex"><div><strong style="color:var(--paper)">DIAPORIA SafeBox</strong><br>Research prototype · MIT licensed · Not for real funds<br>Frozen submission code: <code>a8ce018</code></div><div class="footerlinks"><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/blob/0d04edf3517bb458707d325d7bdd8d10dcf04753/README.md" target="_blank" rel="noopener noreferrer">README</a><a href="https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/blob/0d04edf3517bb458707d325d7bdd8d10dcf04753/LICENSE" target="_blank" rel="noopener noreferrer">License</a></div></div></footer>
+</body>
+</html>
