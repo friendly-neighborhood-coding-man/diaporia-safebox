@@ -17,6 +17,7 @@
 //   --demo: recording mode. The terminal never shows the per-run bridge secret (the full link is written to
 //     --bridge-url-file, default .demo-bridge-url in the repo root, mode 0600, and on Windows also copied to the
 //     clipboard unless --no-clipboard) and evidence paths are printed relative to the repository.
+//   --open-edge (with --demo, Windows only): the runner opens the bridge in an Edge --app window itself.
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -71,7 +72,15 @@ if (DEMO) {
   // --no-clipboard: Windows clipboard history (Win+V) and cloud clipboard sync can retain the per-run secret; the recording
   // runbook opens the bridge from the 0600 file instead (Start-Process msedge --app=...), so no address bar ever shows it.
   let clip = false; if (process.platform === 'win32' && !flag('--no-clipboard')) { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
-  console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
+  // --open-edge (Windows): the runner opens the bridge itself in an Edge app window (no address bar), so the secret is
+  // never typed, pasted or displayed on screen. It is passed on Edge's command line (visible to same-user processes,
+  // already inside the documented same-user residual). Not available elsewhere: falls back to the manual step.
+  let opened = false;
+  if (flag('--open-edge') && process.platform === 'win32') {
+    try { spawn('cmd', ['/d', '/c', 'start', '""', 'msedge', '--app=' + bridge.url()], { stdio: 'ignore', detached: true, windowsHide: true }).unref(); opened = true; } catch { /* manual step below */ }
+  }
+  if (opened) console.log(`STEP   The bridge opened in an Edge app window on THIS laptop (${ORIGIN}/bridge#t=<per-run secret, redacted>); keep that window open.`);
+  else console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
 } else console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
 events.push({ at: new Date().toISOString(), kind: 'STEP', text: `Open ${ORIGIN}/bridge#t=<per-run secret, redacted> in Microsoft Edge` }); // the secret never reaches the evidence
 for (let i = 0; ; i++) { if (Date.now() - (await bridge.lastPoll()) < 3000) break; if (i > 1200) { ev('FAIL', 'bridge page never opened (10 min)'); process.exit(4); } await sleep(500); }
