@@ -133,7 +133,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
           out.buffer.checked++;
           const s0 = decB.statement;
           const sigOk = verifyObj5(V5_DOMAINS.RISK_ENGINE, s0, decB.sig, st.v5.riskEngine.publicKey);
-          const tierOk = bufferPolicy === 'FIXED_600' ? s0.tier === '-' : String(tierFromInputs(s0.tierInputs)) === s0.tier;
+          const tierOk = bufferPolicy === 'FIXED_600' ? s0.tier === '-' : String(tierFromInputs(s0.tierInputs, bufferPolicy)) === s0.tier;
           const bufOk = String(tierToBufferMs(bufferPolicy, s0.tier)) === s0.bufferMs && s0.bufferPolicy === bufferPolicy;
           const jr = engineBuffer.get(paymentId); const jOk = !journal || (jr && jr.tier === s0.tier && jr.bufferMs === s0.bufferMs);
           if (!sigOk || !tierOk || !bufOk || !jOk) { v.push('BUFFER_DECISION_INVALID'); out.buffer.violations++; }
@@ -179,7 +179,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     else out.financial.authorized++;
   }
   // P4 anti-splitting: a flow's signed tier never drops below the highest signed tier the same flow got in the hour before
-  if (bufferPolicy === 'EXP_30') {
+  if (bufferPolicy !== 'FIXED_600') {
     const signed = [];
     for (const p of v5pay) { let d = null; try { d = JSON.parse(p.decision); } catch {} const s0 = d?.statement; if (!s0 || s0.tier === undefined || !verifyObj5(V5_DOMAINS.RISK_ENGINE, s0, d.sig, st.v5.riskEngine.publicKey)) continue; signed.push({ id: p.payment_id, flow: p.flow, at: p.proposed_at, tier: Number(s0.tier) }); }
     const resets = [];

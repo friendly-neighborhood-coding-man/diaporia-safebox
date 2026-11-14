@@ -43,7 +43,7 @@ export const V5_DEFAULT_CONFIG = Object.freeze({
   // EXP_30 = bufferSeconds(n) = min(600, 30 * 2^n) with a deterministic bounded risk tier n (Candidate B, experimental).
   bufferPolicy: 'FIXED_600',
 });
-export const BUFFER_POLICIES = Object.freeze(['FIXED_600', 'EXP_30']);
+export const BUFFER_POLICIES = Object.freeze(['FIXED_600', 'EXP_30', 'EXP_30_HV']); // EXP_30_HV: exploratory variant only
 const CFG5 = Object.keys(V5_DEFAULT_CONFIG);
 /** Predefined deterministic Risk-Policy-Engine rules that may END a Rapid-Use grant (they can never start or extend one). */
 export const ENGINE_RAPID_RULES = Object.freeze(['R1_SCOPE_EXPLOIT', 'R2_CREDENTIAL_RESTRICTED', 'R3_VELOCITY_CEILING']);

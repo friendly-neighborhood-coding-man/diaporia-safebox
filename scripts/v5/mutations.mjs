@@ -41,6 +41,17 @@ const M = [
   ['Verifier: settlement-horizon check removed (P2)', 'src/v5/supervisor/verifier.mjs', "{ v.push('EFFECT_AFTER_SETTLEMENT_HORIZON'); out.horizon.violations++; }", '{ out.horizon.violations += 0; }'],
   ['Verifier: HIGH-risk resolution check removed (P1)', 'src/v5/supervisor/verifier.mjs', "if (!review && !grant) v.push('HIGH_RISK_SETTLED_WITHOUT_RESOLUTION');", ''],
   ['Genesis: settlement-horizon bounds removed (P2)', C, "if (n.settlementHorizonMs < H || n.settlementHorizonMs > 72 * H) fail('V5_CONFIG_SETTLEMENT_HORIZON', 'between 1 h and 72 h');", ''],
+  // ---- V5.1 P4 buffer + pending-slot repair
+  ['Vault: signed tier ignored, every payment gets the 30 s floor (P4)', V, 'tierToBufferMs(this.bufferPolicy(), dec.statement.tier)', '0'],
+  ['Vault: engine statement for another buffer policy accepted (P4)', V, "if (dec.statement.bufferPolicy !== this.bufferPolicy()) fail('ENGINE_BUFFER_POLICY_MISMATCH');", ''],
+  ['Vault: restart fail-safe for unevaluated payments removed (P4)', V, '    this.#failSafeUnevaluated();\n', '\n'],
+  ['Buffer: sticky tier floor removed (P4 anti-reset)', 'src/v5/risk/buffer.mjs', "n = Math.max(n, N('stickyTier') || 0);", ''],
+  ['Buffer: flow value uses this payment only (P4 anti-splitting)', 'src/v5/risk/buffer.mjs', 'flowValue1hBps: String(bps(v1h > amt ? v1h : amt, per)),', 'flowValue1hBps: String(bps(amt, per)),'],
+  ['Buffer: open incident does not raise the tier (P4)', 'src/v5/risk/buffer.mjs', "if (i.openIncident === 'true') n += 3;", ''],
+  ['Verifier: early release before the signed buffer not flagged (P4)', 'src/v5/supervisor/verifier.mjs', "if (tx.submitted_at < proposedAt + payBuffer) { v.push('BUFFER_BYPASSED'); out.buffer.violations++; }", ''],
+  ['Verifier: tier not recomputed from the signed inputs (P4)', 'src/v5/supervisor/verifier.mjs', "String(tierFromInputs(s0.tierInputs, bufferPolicy)) === s0.tier", 'true'],
+  ['Verifier: tier-reset check removed (P4)', 'src/v5/supervisor/verifier.mjs', 'if (x.tier < exp) resets.push(x.id);', ''],
+  ['Vault: incident-flow pending cap removed (repair)', V, "return n >= INCIDENT_FLOW_PENDING_MAX ? ['INCIDENT_FLOW_PENDING_LIMIT'] : [];", 'return [];'],
 ];
 // Higher-order mutants (P3): remove a check AND the path that makes it redundant. A first-order survivor whose
 // higher-order mutant is caught is a verified redundant (defence-in-depth) check, not an untested one.

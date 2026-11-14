@@ -141,3 +141,11 @@ test('P4: restart safety: a payment reserved but never evaluated (crash between 
   w.restartVault();
   assert.equal(w.vault.store.get(r.paymentId).release_at - w.vault.store.get(r.paymentId).proposed_at, 600_000);
 });
+
+test('exploratory EXP_30_HV: a flow reaching half the per-payment maximum within an hour always waits 600 s', async () => {
+  assert.equal(tierFromInputs({ ...base, flowValue1hBps: '5000' }, 'EXP_30_HV'), 5);
+  assert.equal(tierFromInputs({ ...base, flowValue1hBps: '4999' }, 'EXP_30_HV'), 0);
+  const w = warm('EXP_30_HV');
+  assert.equal((await pay(w, { amountYocto: near(0.03) })).buffer_ms, 600_000);
+  assert.equal((await verifyWorld(w)).ok, true);
+});

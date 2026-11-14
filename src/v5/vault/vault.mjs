@@ -121,7 +121,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const pv = purposeViolations(this.root.purpose, { operation: 'PAY', recipientId: op.recipientId, asset: op.asset, amountYocto: op.amountYocto, sku: null, now, capExpiresAt: Number(d.expiresAt), capIssuedAt: Number(d.grantedAt) }, this.spent())
       .filter(v => v !== 'CAPABILITY_TTL_TOO_LONG'); // a delegation's lifetime is bounded by the Root (delegationMaxTtlMs), not the per-payment cap TTL
     if (pv.length) deny('POLICY_DENY', pv.join(','));
-    if (this.extraProposeDenials({ flow: 'dg:' + d.delegationId }).length) deny('INCIDENT_FLOW_PENDING_LIMIT');
+    if (this.extraProposeDenials({ flow: 'dg:' + d.delegationId, delegationId: d.delegationId, credId: d.issuerCredId, recipient: op.recipientId, amount: op.amountYocto, asset: op.asset }).length) deny('INCIDENT_FLOW_PENDING_LIMIT');
     const paymentId = 'p_' + randomUUID().replaceAll('-', ''); const capId = randomUUID();
     const row = this.store.tx(() => {
       if (this.store.byState(['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN']).length + 1 > 16) fail('PENDING_COUNT_LIMIT');
@@ -198,9 +198,12 @@ export class ExecutionVaultV5 extends ExecutionVault {
     return inc;
   }
   /** V3 hook, evaluated inside the reservation transaction next to PENDING_COUNT_LIMIT (after authentication and Purpose). */
-  extraProposeDenials({ credId = null, flow = null }) {
+  extraProposeDenials({ credId = null, flow = null, delegationId = null, recipient, amount, asset }) {
     flow ??= 'cred:' + credId;
     if (!this.store.db.prepare("SELECT 1 FROM v5_incidents WHERE flow=? AND state='OPEN'").get(flow)) return [];
+    // an ACTIVE Rapid-Use grant (ORC + an independent owner credential) covering exactly this payment lifts the per-flow
+    // cap; the global 16-slot limit, Purpose and budget still apply
+    if (this.rapidGrantFor({ credId, delegationId, recipient, amount, asset })) return [];
     const n = this.store.db.prepare("SELECT COUNT(*) n FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state IN ('RESERVED','BUFFERED','RELEASED','UNKNOWN')").get(flow).n;
     return n >= INCIDENT_FLOW_PENDING_MAX ? ['INCIDENT_FLOW_PENDING_LIMIT'] : [];
   }

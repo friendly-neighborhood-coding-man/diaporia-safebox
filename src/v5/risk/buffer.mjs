@@ -7,9 +7,12 @@
 const BPS = 10_000n;
 export const MAX_BUFFER_MS = 600_000;
 export const MAX_TIER = 5;
-export const bufferFloorMs = (policy) => policy === 'EXP_30' ? 30_000 : 600_000;
+// EXP_30_HV is an EXPLORATORY variant (not the prespecified candidate): EXP_30, except that a flow whose value over the
+// last hour reaches half the per-payment maximum always gets tier 5 (600 s). Only low-value activity is accelerated.
+export const EXP_POLICIES = new Set(['EXP_30', 'EXP_30_HV']);
+export const bufferFloorMs = (policy) => EXP_POLICIES.has(policy) ? 30_000 : 600_000;
 export function tierToBufferMs(policy, tier) {
-  if (policy !== 'EXP_30') return MAX_BUFFER_MS;
+  if (!EXP_POLICIES.has(policy)) return MAX_BUFFER_MS;
   const n = Number(tier);
   if (!Number.isInteger(n) || n < 0) return MAX_BUFFER_MS; // malformed tier: fail safe
   return Math.min(MAX_BUFFER_MS, 30_000 * 2 ** Math.min(n, 10));
@@ -28,9 +31,10 @@ const bps = (num, den) => den <= 0n ? Number(BPS) : Number(num * BPS / den);
  *  - stickiness: never below the highest tier this flow received in the last hour (no reset by waiting a few minutes
  *    or by splitting).
  */
-export function tierFromInputs(i) {
+export function tierFromInputs(i, policy = 'EXP_30') {
   if (!i || typeof i !== 'object') return MAX_TIER;
   const N = (k) => Number(i[k]);
+  if (policy === 'EXP_30_HV' && !(N('flowValue1hBps') < 5_000)) return MAX_TIER;
   let n = 0;
   const a = N('flowValue1hBps'); n += a >= 30_000 ? 3 : a >= 10_000 ? 2 : a >= 5_000 ? 1 : 0;
   const d = N('dailyUseBps'); n += d >= 5_000 ? 2 : d >= 2_500 ? 1 : 0;
@@ -63,7 +67,7 @@ export function bufferDecision(p, ctx, ev, { policy = 'FIXED_600', openIncident 
     securityCorrelated: ev.features.securityCorrelated, openIncident: String(!!openIncident),
     detectorLevel: ev.decision, stickyTier: String(sticky),
   };
-  if (policy !== 'EXP_30') return { policy: 'FIXED_600', tier: '-', bufferMs: String(MAX_BUFFER_MS), inputs };
-  const tier = tierFromInputs(inputs);
+  if (!EXP_POLICIES.has(policy)) return { policy: 'FIXED_600', tier: '-', bufferMs: String(MAX_BUFFER_MS), inputs };
+  const tier = tierFromInputs(inputs, policy);
   return { policy, tier: String(tier), bufferMs: String(tierToBufferMs(policy, tier)), inputs };
 }

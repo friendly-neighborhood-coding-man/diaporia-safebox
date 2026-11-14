@@ -9,7 +9,7 @@ import { verifyWorld } from '../supervisor/verifier.mjs';
 import { scopeOf } from './scenarios.mjs';
 
 const MIN = 60_000, H = 3600_000, D = 86_400_000;
-export const ARMS = Object.freeze({ A: { bufferPolicy: 'FIXED_600' }, B: { bufferPolicy: 'EXP_30' } });
+export const ARMS = Object.freeze({ A: { bufferPolicy: 'FIXED_600' }, B: { bufferPolicy: 'EXP_30' }, X_HV: { bufferPolicy: 'EXP_30_HV' } }); // X_*: exploratory, not part of the primary A/B
 export const ATTACK_CRED = 'k1-phone', OWNER_CRED = 'k2-laptop';
 
 /** mulberry32: small deterministic PRNG for controlled seeds (jitter only; no security decision uses it). */
