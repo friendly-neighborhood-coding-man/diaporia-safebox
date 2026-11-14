@@ -47,7 +47,7 @@ const run = (dir) => {
 };
 const orig = readFileSync(F, 'utf8'); const rows = [];
 const base = JSON.parse(spawnSync(process.execPath, [join(ST, 'tests/research/verifyslot-exhaustive.mjs'), ST], { encoding: 'utf8' }).stdout);
-const baseline = { inCallBypass: base.totalInCallBypass, duringWalk: base.totalBypassDuringWalk };
+const baseline = { inCallBypass: base.totalInCallBypass, duringWalk: base.totalBypassDuringWalk, renameBeforeLastCheck: Object.entries(base.summary).filter(([k]) => !['A3', 'A4', 'A7', 'A8'].some(c => k.startsWith(c))).reduce((x, [, v]) => x + v.bypassBeforeLastCheck, 0) };
 for (const [name, from, to] of M) {
   const froms = [from].flat(), tos = [to].flat();
   if (!froms.every(f => orig.includes(f))) { rows.push({ name, error: 'PATTERN_NOT_FOUND' }); console.log(JSON.stringify(rows.at(-1))); continue; }
@@ -57,12 +57,12 @@ for (const [name, from, to] of M) {
     // Exposure under the exhaustive interposition model, whether or not a test failed: does the mutant let more
     // attacker schedules through than the unmutated verifier (baseline below)?
     const ex = spawnSync(process.execPath, [join(ST, 'tests/research/verifyslot-exhaustive.mjs'), ST], { encoding: 'utf8', timeout: 300_000 });
-    let exposure = null; try { const j = JSON.parse(ex.stdout); exposure = { inCallBypass: j.totalInCallBypass, duringWalk: j.totalBypassDuringWalk, renameBeforeLastCheck: Object.entries(j.summary).filter(([k]) => !k.startsWith('A3') && !k.startsWith('A4')).reduce((x, [, v]) => x + v.bypassBeforeLastCheck, 0), symlinkSwapSuccess: j.summary['P2 sub/ swap-and-swap-back with a SYMLINK to the genuine twin'].success, control: j.control }; } catch { exposure = { error: (ex.stderr ?? '').slice(0, 200) }; }
+    let exposure = null; try { const j = JSON.parse(ex.stdout); exposure = { inCallBypass: j.totalInCallBypass, duringWalk: j.totalBypassDuringWalk, renameBeforeLastCheck: Object.entries(j.summary).filter(([k]) => !['A3', 'A4', 'A7', 'A8'].some(c => k.startsWith(c))).reduce((x, [, v]) => x + v.bypassBeforeLastCheck, 0), symlinkSwapSuccess: j.summary['P2 sub/ swap-and-swap-back with a SYMLINK to the genuine twin'].success, control: j.control }; } catch { exposure = { error: (ex.stderr ?? '').slice(0, 200) }; }
     rows.push({ name, unit, os, exposure, caught: (unit.fail ?? 0) > 0 || (os.fail ?? 0) > 0 });
   } finally { writeFileSync(F, orig); }
   console.log(JSON.stringify(rows.at(-1)));
 }
 const caught = rows.filter(r => r.caught).length;
-for (const r of rows) if (!r.caught && r.exposure && !r.exposure.error) r.survivorClass = (r.exposure.inCallBypass > baseline.inCallBypass || r.exposure.renameBeforeLastCheck > 0 || r.exposure.duringWalk > 0 || r.exposure.symlinkSwapSuccess > 0) ? 'GAP_MORE_EXPOSURE' : 'NO_EXTRA_EXPOSURE_IN_MODEL';
+for (const r of rows) if (!r.caught && r.exposure && !r.exposure.error) r.survivorClass = (r.exposure.duringWalk > baseline.duringWalk || r.exposure.symlinkSwapSuccess > 0) ? 'GAP_DURING_WALK' : (r.exposure.inCallBypass > baseline.inCallBypass || r.exposure.renameBeforeLastCheck > baseline.renameBeforeLastCheck) ? 'CLOSING_WINDOW_LARGER' : 'NO_EXTRA_EXPOSURE_IN_MODEL';
 writeFileSync(OUT, JSON.stringify({ tree: ST, baseline, caught, total: rows.length, patternErrors: rows.filter(r => r.error).length, rows }, null, 1) + '\n');
 console.log(`caught ${caught}/${rows.length}`);

@@ -186,6 +186,200 @@
     "36:lstatSync"
    ]
   },
+  "A6 slot dir itself replaced by an EVIL copy (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 0,
+   "inCallBypass": 0,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 0,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 1,
+    "SLOT_CHANGED_DURING_VERIFY": 35
+   }
+  },
+  "A7 a.mjs chmod 0664 (persistent, writable by others at return)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 27,
+   "inCallBypass": 27,
+   "bypassDuringWalk": 22,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 27,
+   "refusals": {
+    "SLOT_WRITABLE_BY_OTHERS": 9
+   },
+   "bypassAt": [
+    "10:readFileSync",
+    "11:closeSync",
+    "12:realpathSync",
+    "13:lstatSync",
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A8 a.mjs in-place rewrite then utimes(old atime/mtime) (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 26,
+   "inCallBypass": 26,
+   "bypassDuringWalk": 21,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 26,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 10
+   },
+   "bypassAt": [
+    "11:closeSync",
+    "12:realpathSync",
+    "13:lstatSync",
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A9 EVIL file hardlinked over a.mjs via link+rename (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 23,
+   "inCallBypass": 23,
+   "bypassDuringWalk": 18,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 23,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 7,
+    "SLOT_CHANGED_DURING_VERIFY": 6
+   },
+   "bypassAt": [
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "P4 whole slot swap-and-swap-back with a genuine twin slot (slot holds EVIL a.mjs)": {
+   "schedules": 666,
+   "fullyFired": 270,
+   "success": 17,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 8,
+   "bypassInClosingWindow": 8,
+   "bypassBeforeLastCheck": 16,
+   "refusals": {
+    "SLOT_CHANGED_DURING_VERIFY": 591,
+    "SLOT_DIGEST_MISMATCH": 58
+   },
+   "bypassAt": [
+    "4+14:fstatSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+14:closeSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+14:readdirSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+14:lstatSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync"
+   ]
+  },
+  "P5 ancestor dir swap-and-swap-back with a parent holding a genuine slot (slot holds EVIL a.mjs)": {
+   "schedules": 666,
+   "fullyFired": 270,
+   "success": 17,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 8,
+   "bypassInClosingWindow": 8,
+   "bypassBeforeLastCheck": 16,
+   "refusals": {
+    "SLOT_CHANGED_DURING_VERIFY": 591,
+    "SLOT_DIGEST_MISMATCH": 58
+   },
+   "bypassAt": [
+    "4+14:fstatSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+14:closeSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+14:readdirSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+14:lstatSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync"
+   ]
+  },
   "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)": {
    "schedules": 666,
    "fullyFired": 488,
@@ -526,8 +720,8 @@
    ]
   }
  },
- "totalInCallBypass": 394,
- "totalBypassDuringWalk": 264,
+ "totalInCallBypass": 502,
+ "totalBypassDuringWalk": 341,
  "sampleBypasses": [
   {
    "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
