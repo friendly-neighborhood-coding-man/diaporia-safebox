@@ -270,7 +270,8 @@ export function applyTransition(state0, tr) {
   const a = tr.action;
   checkActionHeader(s, a, at);
   const effects = [];
-  const H = HANDLERS[a.type];
+  // Own property only: HANDLERS['toString'] and HANDLERS['constructor'] are functions on the prototype.
+  const H = typeof a.type === 'string' && Object.hasOwn(HANDLERS, a.type) ? HANDLERS[a.type] : undefined;
   if (!H) fail('TRANSITION_TYPE_UNKNOWN', a.type);
   H(s, a, tr, at, effects);
   s.usedNonces[a.nonce] = s.seq + 1;

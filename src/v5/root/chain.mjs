@@ -574,7 +574,7 @@ export function applyTransition(state0, tr) {
   const pre = []; const s = clone(state0);
   normalizeHolds(s, at, pre); normalizeRapid(s, at, pre);
   let out, fx;
-  if (HANDLERS5[a?.type]) {
+  if (typeof a?.type === 'string' && Object.hasOwn(HANDLERS5, a.type)) {
     checkActionHeader(s, a, at);
     // F-V5-04: authenticate every approval BEFORE any command-specific validation, so an unauthenticated submitter
     // learns nothing about policy (it gets the authentication error, never a business-rule error). Runs on a scratch
