@@ -3,6 +3,7 @@
 // Object.prototype must be TRANSITION_TYPE_UNKNOWN and must never advance the sequence, head, used nonces or epoch.
 // This file drives V3, V4, V5 and V6 directly so that reverting the lookup in ANY one version fails a test here.
 import test from 'node:test';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { buildV3 } from '../../src/v3/world.mjs';
 import { applyTransition as applyV3, TR_V } from '../../src/v3/root/chain.mjs';
@@ -12,10 +13,13 @@ import { buildV6 } from '../../src/v6/world.mjs';
 
 const INHERITED = ['toString', 'constructor', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', '__proto__', '__lookupGetter__', '__defineGetter__'];
 const PLANTED = 'SBX_PLANTED_HANDLER';
-const snap = (s) => JSON.stringify({ seq: s.seq, head: String(s.head), nonces: Object.keys(s.usedNonces ?? {}).sort(), epoch: s.epoch });
+// seq, chain head, used nonces and epoch explicitly, plus a digest of the WHOLE Root state (state integrity).
+const full = (s) => createHash('sha256').update(JSON.stringify(s, (k, v) => typeof v === 'bigint' ? 'n' + v : v)).digest('hex');
+const snap = (s) => JSON.stringify({ seq: s.seq, head: String(s.head), nonces: Object.keys(s.usedNonces ?? {}).sort(), epoch: s.epoch, state: full(s) });
 
 async function assertNoAdvance(label, w, submit) {
   Object.defineProperty(Object.prototype, PLANTED, { value: function (s) { if (s && typeof s === 'object' && 'epoch' in s) s.epoch = 99; }, configurable: true, writable: true, enumerable: false });
+  const chainLen0 = typeof w.root.chain === 'function' ? w.root.chain(0).length : null;
   try {
     for (const type of [...INHERITED, PLANTED]) {
       const before = snap(w.root.state);
@@ -24,6 +28,8 @@ async function assertNoAdvance(label, w, submit) {
       assert.equal(r.error?.code, 'TRANSITION_TYPE_UNKNOWN', `${label} ${type}: ${r.error?.code} ${r.error?.detail ?? ''}`);
       assert.equal(snap(w.root.state), before, `${label} ${type} advanced Root state`);
     }
+    // the stored chain has not grown either
+    if (typeof w.root.chain === 'function') assert.equal(w.root.chain(0).length, chainLen0, `${label} chain grew`);
   } finally { delete Object.prototype[PLANTED]; }
 }
 
