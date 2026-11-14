@@ -100,7 +100,12 @@ export class BrowserBridge {
   call(op, options, display) {
     const id = randomBytes(8).toString('hex');
     Atomics.store(this.flag, 0, 0);
-    this.worker.postMessage({ type: 'webauthn', id, op, options, display: String(display ?? this.display) });
+    // a step that needs several signatures (enrollment signs one record per genesis layer) numbers each request, so a
+    // repeated title is visibly a NEW request, not a loop
+    const text = String(display ?? this.display); const [title, ...rest] = text.split('\n');
+    this.counts ??= new Map(); const k = (this.counts.get(title) ?? 0) + 1; this.counts.set(title, k);
+    const shown = [title + (k > 1 || this.expected?.[title] ? ` (request ${k}${this.expected?.[title] ? ' of ' + this.expected[title] : ''}, new challenge)` : ''), ...rest].join('\n');
+    this.worker.postMessage({ type: 'webauthn', id, op, options, display: shown });
     const w = Atomics.wait(this.flag, 0, 0, this.timeoutMs);
     if (w === 'timed-out') fail('REAL_AUTHENTICATOR_TIMEOUT');
     const m = receiveMessageOnPort(this.reply)?.message;
