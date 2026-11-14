@@ -137,9 +137,11 @@ static class WinBioGate {
       if (!done) return Fail("BIOMETRIC_TIMEOUT");
       if (idHr != 0) {
         uint u = unchecked((uint)idHr);
-        if (u == 0x80098005 || u == 0x80098006) return Fail("BIOMETRIC_NO_MATCH", idHr);   // WINBIO_E_UNKNOWN_ID / NO_MATCH
-        if (u == 0x80098008) return Fail("BIOMETRIC_NO_MATCH", idHr, "bad capture");      // WINBIO_E_BAD_CAPTURE
-        if (u == 0x80098004) return Fail("BIOMETRIC_CANCELLED", idHr);                    // WINBIO_E_CANCELED
+        // winerror.h: 0x80098003 WINBIO_E_UNKNOWN_ID, 0x80098004 WINBIO_E_CANCELED, 0x80098005 WINBIO_E_NO_MATCH,
+        // 0x80098006 WINBIO_E_CAPTURE_ABORTED, 0x80098008 WINBIO_E_BAD_CAPTURE
+        if (u == 0x80098003 || u == 0x80098005) return Fail("BIOMETRIC_NO_MATCH", idHr);
+        if (u == 0x80098008) return Fail("BIOMETRIC_NO_MATCH", idHr, "bad capture");
+        if (u == 0x80098004 || u == 0x80098006) return Fail("BIOMETRIC_CANCELLED", idHr);
         if (u == 0x8009802C || u == 0x8009801B) return Fail("BIOMETRIC_LOCKOUT", idHr);
         return Fail("FINGERPRINT_ONLY_UNSUPPORTED", idHr, "WinBioIdentify");
       }
