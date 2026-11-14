@@ -1,0 +1,95 @@
+{
+ "tree": "<d6172ec>/secure-transition",
+ "results": [
+  {
+   "name": "S0 control: untouched slot",
+   "verifySlot": "SUCCESS",
+   "fired": [],
+   "slotAtReturn": {
+    "a.mjs": "genuine",
+    "sub/x.mjs": "genuine",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": true
+  },
+  {
+   "name": "S1 file -> symlink(identical bytes) after open, before stillSame",
+   "verifySlot": "SLOT_CONTAINS_SYMLINK",
+   "fired": [
+    "swapped a.mjs->symlink"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "SYMLINK:genuine",
+    "sub/x.mjs": "genuine",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": true
+  },
+  {
+   "name": "S2 file -> other regular file (EVIL) after open, before stillSame",
+   "verifySlot": "SLOT_CHANGED_DURING_VERIFY",
+   "fired": [
+    "replaced a.mjs"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "EVIL",
+    "sub/x.mjs": "genuine",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": true
+  },
+  {
+   "name": "S3 a.mjs replaced (EVIL) after its checks, while z.mjs is verified",
+   "verifySlot": "SUCCESS",
+   "fired": [
+    "replaced a.mjs late"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "EVIL",
+    "sub/x.mjs": "genuine",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": false
+  },
+  {
+   "name": "S4 dir swap-and-swap-back with a REAL twin directory around the recursion into sub/",
+   "verifySlot": "SUCCESS",
+   "fired": [
+    "twin in (after pinDir, before readdir)",
+    "evil back (before stillSame(sub))"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "genuine",
+    "sub/x.mjs": "EVIL",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": false
+  },
+  {
+   "name": "S5 dir swap-and-swap-back with a SYMLINK to a twin around the recursion into sub/",
+   "verifySlot": "SLOT_CONTAINS_SYMLINK",
+   "fired": [
+    "symlink in"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "genuine",
+    "sub/x.mjs": "genuine",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": true
+  },
+  {
+   "name": "S6 sub/ replaced by an EVIL directory after its checks, while z.mjs is verified",
+   "verifySlot": "SUCCESS",
+   "fired": [
+    "sub replaced late"
+   ],
+   "slotAtReturn": {
+    "a.mjs": "genuine",
+    "sub/x.mjs": "EVIL",
+    "z.mjs": "genuine"
+   },
+   "invariantHeld": false
+  }
+ ]
+}
