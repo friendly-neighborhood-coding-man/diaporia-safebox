@@ -117,7 +117,7 @@ static class WinBioGate {
     var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 280, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
     var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
       Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint (" + timeoutS + " s)." };
-    var btn = new Button { Text = "Start fingerprint check", Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
+    var btn = new Button { Text = "Start fingerprint check", TabStop = false, Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
     form.Controls.Add(label); form.Controls.Add(btn);
     var t = new Thread(() => {
       Thread.Sleep(ArmDelayMs);
@@ -135,7 +135,8 @@ static class WinBioGate {
     });
     t.IsBackground = true;
     var deadline = DateTime.UtcNow.AddSeconds(timeoutS);
-    btn.Click += (o, e) => {
+    // mouse only: MouseClick never fires for Space/Enter, so a keystroke typed into the focused gate window cannot arm it
+    btn.MouseClick += (o, e) => {
       if (t.IsAlive || fin) return;
       ArmedAfterMs = shown.ElapsedMilliseconds; btn.Enabled = false; btn.Text = "Checking...";
       label.Text = (prompt ?? "") + "\n\nNow lift any finger, then TOUCH the fingerprint sensor.";
@@ -143,7 +144,7 @@ static class WinBioGate {
     };
     var timer = new System.Windows.Forms.Timer { Interval = 150 };
     timer.Tick += (o, e) => { if (fin || DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } else if (Form.ActiveForm != form) { label.ForeColor = Color.DarkRed; } else { label.ForeColor = Color.Black; } };
-    form.Shown += (o, e) => { shown.Start(); form.Activate(); SetForegroundWindow(form.Handle); timer.Start(); };
+    form.Shown += (o, e) => { shown.Start(); form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
     Application.Run(form);
     if (!fin) { stop = true; WinBioCancel(s); t.Join(3000); }
     idHr = hr; unit = u; done = fin;
