@@ -110,7 +110,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
         VALUES (?,?,?,?,?,?,?,?,?,?, 'PROPOSED', ?,?,?,?)`).run(paymentId, capId, d5hex(V5_DOMAINS.DELEGATED_OP, op), this.root.accountId, this.root.purpose.purposeId, this.root.purposeDigest,
         op.recipientId, op.asset, op.amountYocto, randomBytes(16).toString('hex'), now, Number(d.expiresAt), JSON.stringify(String(op.memo).replace(/[^\x20-\x7e]/g, '?').slice(0, 280)), now);
       this.store.db.prepare('INSERT INTO cap_evidence (cap_id, payment_id, cap, approval, cred_id, epoch, purpose_version, sku, nonce) VALUES (?,?,?,?,?,?,?,?,?)')
-        .run(capId, paymentId, JSON.stringify({ delegated: op }), JSON.stringify({ delegateSig: sig.slice(0, 16) + '…' }), d.issuerCredId, this.root.epoch, this.root.purpose.version, '-', randomBytes(16).toString('hex'));
+        .run(capId, paymentId, JSON.stringify({ delegated: op }), JSON.stringify({ delegateSig: sig }), d.issuerCredId, this.root.epoch, this.root.purpose.version, '-', randomBytes(16).toString('hex'));
       this.store.db.prepare('INSERT INTO v5_deleg_use (delegation_id, op_seq, payment_id, amount) VALUES (?,?,?,?)').run(d.delegationId, seq, paymentId, op.amountYocto);
       this.store.db.prepare('INSERT INTO caps_used (cap_id, payment_id) VALUES (?,?)').run(capId, paymentId);
       this.store.journal(paymentId, null, 'PROPOSED', 'delegate', { delegationId: d.delegationId, seq: String(seq), recipient: op.recipientId, amount: op.amountYocto });
@@ -132,7 +132,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const dec = this.engine.decide(p, ctx, { openIncident: grant ? null : open });
     if (!verifyObj5(V5_DOMAINS.RISK_ENGINE, dec.statement, dec.sig, this.enginePublicKey)) fail('ENGINE_DECISION_SIGNATURE'); // the vault trusts only the pinned engine key
     this.store.db.prepare('INSERT INTO v5_pay (payment_id, flow, cred_id, delegation_id, recipient, amount, proposed_at, anomaly, delay_ms, incident_id, rapid_grant, baseline_eligible, decision) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
-      .run(paymentId, flow, credId, delegationId, row.recipient, row.amount, now, 'NONE', 0, null, grant?.grantId ?? null, grant ? 0 : 1, JSON.stringify({ action: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code) }));
+      .run(paymentId, flow, credId, delegationId, row.recipient, row.amount, now, 'NONE', 0, null, grant?.grantId ?? null, grant ? 0 : 1, JSON.stringify({ action: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code), statement: dec.statement, sig: dec.sig }));
     if (grant) this.store.db.prepare('INSERT INTO v5_rapid_use (grant_id, payment_id, amount) VALUES (?,?,?)').run(grant.grantId, paymentId, row.amount);
     this.#j({ type: 'PAYMENT_PROPOSED', principal: this.ref(credId), relatedId: paymentId, outcome: 'BUFFERED', epoch: this.root.epoch, purposeVersion: this.root.purpose.version,
       operationDigest: row.cap_digest, data: { flow: this.ref(flow), recipient: row.recipient, amount: row.amount, rapidGrant: grant?.grantId ?? '-', decision: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code).join(','), score: dec.ev.score },

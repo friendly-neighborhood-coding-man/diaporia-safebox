@@ -31,7 +31,10 @@ export class RiskPolicyEngine {
     const statement = { kind: 'ANOMALY_DECISION', paymentId: p.paymentId, flow: p.flow, action, delayMs, policy: this.policy.version, policyDigest: this.digest,
       evaluationDigest: d5hex(V5_DOMAINS.RISK_ENGINE, { reasons: ev.reasons.map(r => r.code), features: ev.features }), incidentRef: openIncident?.incident_id ?? '-' };
     this.decisions++;
-    return { ev, statement, sig: this.signer.signObj(V5_DOMAINS.RISK_ENGINE, statement) };
+    const sig = this.signer.signObj(V5_DOMAINS.RISK_ENGINE, statement);
+    // the engine records its own decisions through its own (RISK-layer) writer, independent of the vault's records
+    if (action !== 'NONE' || ev.decision !== 'NONE') this.journal?.append({ type: 'ENGINE_DECISION', relatedId: p.paymentId, outcome: action, data: { delayMs, level: ev.decision, policy: this.policy.version, evaluationDigest: statement.evaluationDigest } });
+    return { ev, statement, sig };
   }
   rapidRevokeAttestation(action, ruleId, evidenceDigest) {
     return { engineSig: this.signer.signObj(V5_DOMAINS.RISK_ENGINE, { kind: 'RAPID_USE_REVOKE', actionDigest: action.digestHex, ruleId, evidenceDigest }), ruleId, evidenceDigest };
