@@ -1,0 +1,14 @@
+docs/evidence/legacy-hardening/legacy-mutations.json
+scripts/v2/legacy-hardening-mutations.mjs
+scripts/v2/run-isolated.mjs
+scripts/v2b/run-redteam.mjs
+src/v1/authz.mjs
+src/v1/near/executor.mjs
+src/v2/launch/argv-exec.mjs
+src/v2/launch/keygen.mjs
+src/v2/supervisor/owner.mjs
+tests/v1/keyfile-nofollow.test.mjs
+tests/v2/argv-exec.test.mjs
+tests/v2/keygen-exclusive.test.mjs
+tests/v2/legacy-review-followup.test.mjs
+tests/v2/owner-log-fd.test.mjs
