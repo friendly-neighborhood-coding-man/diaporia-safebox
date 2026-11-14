@@ -101,3 +101,24 @@ test('P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 ve
   assert.throws(() => ExecutionVaultV5.prototype.propose.call(w.vault, { ...args(pa), approval: plain }), (e) => e.code === 'V6_PAYMENT_APPROVAL_REQUIRED');
   assert.equal(w.vault.store.db.prepare('SELECT COUNT(*) n FROM payments').get().n, 0);
 });
+
+test('P0.3-settle: a crash after the ledger accepted the transfer, and two release workers, never settle twice', async () => {
+  const w = buildV6();
+  ok(await w.pay({ credId: 'k1-phone', amountYocto: Y(1) }));
+  await w.advance(9 * 60_000); // inside the FIXED_600 buffer
+  // crash: the ledger accepts and settles the transfer, the vault process dies before recording it
+  const real = w.vault.ledger; let crashed = false;
+  w.vault.ledger = { call: async (op, a) => { const r = await real.call(op, a); if (op === 'SUBMIT_TX' && !crashed) { crashed = true; throw Object.assign(new Error('CRASH after ledger accept'), { code: 'CRASH' }); } return r; } };
+  try { await w.advance(2 * 60_000); } catch {}
+  assert.ok(crashed, 'the release reached the ledger');
+  // a second worker starts ticking at the same time as the restarted one
+  w.restartVault(); const other = w.openVault();
+  await Promise.all([w.vault.tick(), other.tick()]);
+  other.store.close();
+  await w.advance(2 * 60_000);
+  const mine = w.ledger.transfers(0).filter((t) => t.sender === w.ACCOUNT || t.statement?.sender === w.ACCOUNT);
+  const pays = w.vault.v5payments();
+  assert.equal(pays.length, 1); assert.equal(pays[0].state, 'SETTLED', JSON.stringify(pays));
+  assert.equal(mine.length, 1, 'exactly one ledger transfer: ' + JSON.stringify(mine).slice(0, 200));
+  const v = await verifyWorld6(w); assert.equal(v.ok, true, JSON.stringify(v).slice(0, 300));
+});
