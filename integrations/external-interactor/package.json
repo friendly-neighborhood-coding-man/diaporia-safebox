@@ -1,0 +1,23 @@
+{
+  "name": "@diaporia-safebox/external-interactor",
+  "version": "0.0.1",
+  "private": true,
+  "description": "SafeBox External AI Interactor V0: OAuth-scoped MCP gateway that lets an external AI read SafeBox status, check payments and prepare owner-approval requests. It never signs, settles or executes a payment. Experimental, MOCK only.",
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "test": "npm run build && node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"dist/tests/**/*.spec.js\"",
+    "demo": "npm run build && node --disable-warning=ExperimentalWarning dist/scripts/demo-mock-e2e.js",
+    "serve:mock": "npm run build && node --disable-warning=ExperimentalWarning dist/scripts/serve-mock.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "typescript": "5.9.3"
+  }
+}
