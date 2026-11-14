@@ -18,6 +18,12 @@ const M = [
   // PR #24 owner log + PR #28 writer condition
   ['#24 owner log view follows symlinks', 'src/v2/supervisor/owner.mjs', "try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW); }", 'try { fd = openSync(logPath, C.O_RDONLY); }', ['tests/v2/owner-log-fd.test.mjs']],
   ['#24-cond owner log writer follows symlinks', 'src/v2/supervisor/owner.mjs', "C.O_WRONLY | C.O_APPEND | C.O_CREAT | (C.O_NOFOLLOW ?? 0), 0o600", 'C.O_WRONLY | C.O_APPEND | C.O_CREAT, 0o600', ['tests/v2/owner-log-fd.test.mjs']],
+  // Independent-review follow-ups (Mission 2): F1 FIFO, F9 replaced log, F13 link-not-rename, F14 torn line
+  ['F1 keygen private read blocks on a FIFO', 'src/v2/launch/keygen.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }', ['tests/v2/legacy-review-followup.test.mjs']],
+  ['F1 owner log view blocks on a FIFO', 'src/v2/supervisor/owner.mjs', "try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW); }', ['tests/v2/legacy-review-followup.test.mjs']],
+  ['F9 owner log view not bound to one file', 'src/v2/supervisor/owner.mjs', "else if (v.fileId !== id) {", 'else if (false) {', ['tests/v2/legacy-review-followup.test.mjs']],
+  ['F13 keygen loser renames over the winner', 'src/v2/launch/keygen.mjs', 'try { linkSync(tmp, path); }', 'try { renameSync(tmp, path); }', ['tests/v2/keygen-exclusive.test.mjs', 'tests/v2/legacy-review-followup.test.mjs']],
+  ['F14 owner log view consumes a torn last line', 'src/v2/supervisor/owner.mjs', 'const cut = got.lastIndexOf(0x0a) + 1;', 'const cut = got.length;', ['tests/v2/owner-log-fd.test.mjs', 'tests/v2/legacy-review-followup.test.mjs']],
 ];
 const rows = [];
 for (const [name, file, from, to, tests] of M) {
@@ -33,5 +39,5 @@ for (const [name, file, from, to, tests] of M) {
 }
 const out = process.argv[2] ?? 'docs/evidence/legacy-hardening/legacy-mutations.json';
 mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, JSON.stringify({ generatedBy: 'scripts/v6/reconcile-mutations.mjs', caught: rows.filter(r => r.caught).length, total: rows.length, patternErrors: rows.filter(r => r.error).length, rows }, null, 2));
+writeFileSync(out, JSON.stringify({ generatedBy: 'scripts/v2/legacy-hardening-mutations.mjs', caught: rows.filter(r => r.caught).length, total: rows.length, patternErrors: rows.filter(r => r.error).length, rows }, null, 2));
 console.log(`caught ${rows.filter(r => r.caught).length}/${rows.length}, pattern errors ${rows.filter(r => r.error).length}`);

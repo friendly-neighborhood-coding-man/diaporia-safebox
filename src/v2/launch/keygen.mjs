@@ -35,7 +35,7 @@ function writeNew(path, data, mode) {
 
 function readPrivate(path) {
   let fd;
-  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }
+  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }
   catch (e) {
     if (e.code === 'ENOENT') return null;
     if (e.code === 'ELOOP') fail('KEY_PATH_SYMLINK', path);
@@ -86,10 +86,11 @@ function publishPublic(path, text) {
 
 function ensureAppendFile(path) {
   try {
-    const fd = openSync(path, C.O_WRONLY | C.O_APPEND | C.O_CREAT | C.O_NOFOLLOW, 0o600);
-    closeSync(fd);
+    const fd = openSync(path, C.O_WRONLY | C.O_APPEND | C.O_CREAT | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0), 0o600);
+    try { if (!fstatSync(fd).isFile()) fail('KEY_PATH_NOT_A_FILE', path); } finally { closeSync(fd); }
   } catch (e) {
     if (e.code === 'ELOOP') fail('KEY_PATH_SYMLINK', path);
+    if (e.code === 'ENXIO') fail('KEY_PATH_NOT_A_FILE', path); // FIFO with no reader (O_NONBLOCK)
     throw e;
   }
 }

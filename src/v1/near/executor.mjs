@@ -17,7 +17,7 @@ export function contractArgsBytes(row) {
 /** Loads a near-cli style credential file. The key is captured in a closure and never serialised. */
 function readRestrictedFile(path, code) {
   let fd;
-  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }
+  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }
   catch (e) {
     if (e.code === 'ELOOP') fail(code + '_SYMLINK');
     throw e;
