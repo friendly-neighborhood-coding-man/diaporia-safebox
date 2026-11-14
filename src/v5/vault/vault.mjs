@@ -48,16 +48,19 @@ export class ExecutionVaultV5 extends ExecutionVault {
     this.metrics = { detectionLatencyMs: [], decisionsMs: [] };
     // the vault's own floor must match the owner-signed policy on its replica (never lower than the signed floor)
     if (this.cfg.minBufferMs !== bufferFloorMs(this.bufferPolicy())) fail('BUFFER_POLICY_FLOOR_MISMATCH', `${this.cfg.minBufferMs} vs ${this.bufferPolicy()}`);
-    this.#failSafeUnevaluated();
+    this.#cancelUnevaluated('ENGINE_EVALUATION_FAILED_BEFORE_RESTART');
   }
   bufferPolicy() { return this.root.v5.config.bufferPolicy ?? 'FIXED_600'; }
   /**
-   * Restart safety (P4): a payment the V3 core reserved but the V5 layer never evaluated (crash between the two steps)
-   * would otherwise keep the policy floor (30 s under EXP_30). It gets the maximum buffer instead.
+   * Fail closed (P4, verifier finding F2): a payment the V3 core reserved but the V5 layer never evaluated (engine error,
+   * bad engine signature, policy mismatch, or a crash between the two steps) would otherwise release at the policy floor
+   * (30 s under EXP_30) with no behavioural review. It is CANCELLED instead (ENGINE_EVALUATION_FAILED); the owner can
+   * re-authorize. Run on start-up and before every release pass.
    */
-  #failSafeUnevaluated() {
-    for (const r of this.store.db.prepare("SELECT p.payment_id, p.proposed_at, p.release_at FROM payments p LEFT JOIN v5_pay v ON v.payment_id=p.payment_id WHERE p.state='BUFFERED' AND v.payment_id IS NULL AND p.cap_id NOT LIKE 'hist-%'").all())
-      if (r.release_at < r.proposed_at + MAX_BUFFER_MS) { this.store.db.prepare("UPDATE payments SET release_at=? WHERE payment_id=? AND state='BUFFERED'").run(r.proposed_at + MAX_BUFFER_MS, r.payment_id); this.store.journal(r.payment_id, 'BUFFERED', 'BUFFERED', 'vault', { event: 'UNEVALUATED_AFTER_RESTART', releaseAt: r.proposed_at + MAX_BUFFER_MS }); }
+  #cancelUnevaluated(reason = 'ENGINE_EVALUATION_FAILED') {
+    const rows = this.store.db.prepare("SELECT p.payment_id FROM payments p LEFT JOIN v5_pay v ON v.payment_id=p.payment_id WHERE p.state='BUFFERED' AND v.payment_id IS NULL AND p.cap_id NOT LIKE 'hist-%'").all()
+    for (const r of rows) this.store.move(r.payment_id, 'BUFFERED', 'CANCELLED', 'vault', { reason }, { reason });
+    return rows.length;
   }
   ref(credId) { return this.journal ? this.journal.ref('cred', credId) : credId; }
   #j(ev) { try { this.jw?.append(ev); } catch (e) { if (e.code === 'JOURNAL_PRIVACY_VIOLATION') throw e; } }
@@ -141,7 +144,23 @@ export class ExecutionVaultV5 extends ExecutionVault {
   }
 
   /** Behavioural evaluation of a freshly BUFFERED payment; bounded targeted delay if the engine's predefined rule says so. */
-  #afterPropose(paymentId, { credId, delegationId, memo }) {
+  #afterPropose(paymentId, args) {
+    try { return this.#evaluate(paymentId, args); }
+    catch (e) {
+      // fail closed: no evaluated decision -> no release (F2). Cancel inside one transaction, then surface the error.
+      try {
+        this.store.tx(() => {
+          const r = this.store.get(paymentId);
+          if (r?.state === 'BUFFERED') {
+            this.store.move(paymentId, 'BUFFERED', 'CANCELLED', 'vault', { reason: 'ENGINE_EVALUATION_FAILED', code: String(e.code ?? 'ERROR') }, { reason: 'ENGINE_EVALUATION_FAILED' });
+            this.store.db.prepare("UPDATE v5_pay SET anomaly='CANCELLED_UNEVALUATED' WHERE payment_id=?").run(paymentId);
+          }
+        });
+      } catch {}
+      throw e;
+    }
+  }
+  #evaluate(paymentId, { credId, delegationId, memo }) {
     const now = this.now(); const row = this.store.get(paymentId);
     const flow = delegationId ? 'dg:' + delegationId : 'cred:' + credId;
     const grant = this.rapidGrantFor({ credId, delegationId, recipient: row.recipient, amount: row.amount, asset: row.asset });
@@ -352,6 +371,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
    *  3. due payments: Purpose recipient / asset / validity, credential holds and the delegation are re-checked.
    */
   #settlementGate(now) {
+    this.#cancelUnevaluated();
     const rows = this.store.db.prepare(`SELECT v.*, p.release_at, p.cap_expires_at, p.asset, p.state FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE p.state='BUFFERED'`).all();
     for (const r of rows) {
       let why = null;

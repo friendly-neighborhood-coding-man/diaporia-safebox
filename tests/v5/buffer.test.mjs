@@ -133,13 +133,30 @@ test('P4: Rapid-Use removes only the anomaly delay, never the signed buffer; HIG
   assert.equal(h.vault.v5payments().filter(p => p.risk_class === 'HIGH' && p.state === 'SETTLED').length, 0);
 });
 
-test('P4: restart safety: a payment reserved but never evaluated (crash between V3 and V5 steps) gets the maximum buffer', async () => {
+test('P4 / F2: a payment reserved but never evaluated is cancelled (fail closed), on restart and at runtime', async () => {
   const w = warm();
-  const pc = w.owner.paycap(w.view(), { credId: 'k2-laptop', recipientId: 'merchant-a.mock', amountYocto: Y(1) });
-  const r = ExecutionVault.prototype.propose.call(w.vault, { capability: pc.capability, approval: pc.approval, recipientId: 'merchant-a.mock', amountYocto: Y(1), asset: 'NEAR', memo: 'x' });
+  const unevaluated = () => { const pc = w.owner.paycap(w.view(), { credId: 'k2-laptop', recipientId: 'merchant-a.mock', amountYocto: Y(1) });
+    return ExecutionVault.prototype.propose.call(w.vault, { capability: pc.capability, approval: pc.approval, recipientId: 'merchant-a.mock', amountYocto: Y(1), asset: 'NEAR', memo: 'x' }); };
+  const r = unevaluated();
   assert.equal(w.vault.store.get(r.paymentId).release_at - w.now(), 30_000, 'V3 core alone would release at the 30 s floor');
   w.restartVault();
-  assert.equal(w.vault.store.get(r.paymentId).release_at - w.vault.store.get(r.paymentId).proposed_at, 600_000);
+  assert.equal(w.vault.store.get(r.paymentId).state, 'CANCELLED');
+  const r2 = unevaluated(); // no restart: the release pass cancels it before the V3 release
+  await w.advance(2 * MIN, 10_000);
+  assert.equal(w.vault.store.get(r2.paymentId).state, 'CANCELLED');
+});
+
+test('P4 / F2: an engine failure after the V3 reservation cancels the payment instead of releasing it unevaluated', async () => {
+  const w = warm();
+  const eng = w.vault.engine; const orig = eng.decide.bind(eng);
+  eng.decide = () => { throw Object.assign(new Error('engine down'), { code: 'ENGINE_DOWN' }); };
+  deny(await w.pay({ amountYocto: near(0.01) }), 'INTERNAL_ERROR'); // the world maps a non-SafeBox error to INTERNAL_ERROR
+  eng.decide = orig;
+  const rows = w.vault.store.db.prepare("SELECT state, reason FROM payments WHERE cap_id NOT LIKE 'hist-%' ORDER BY proposed_at DESC LIMIT 1").all();
+  assert.equal(rows[0].state, 'CANCELLED');
+  await w.advance(5 * MIN, 10_000);
+  assert.equal(w.vault.store.db.prepare("SELECT COUNT(*) n FROM payments WHERE state='SETTLED' AND cap_id NOT LIKE 'hist-%' AND proposed_at >= ?").get(w.now() - 6 * MIN).n, 0);
+  assert.equal((await verifyWorld(w)).ok, true);
 });
 
 test('exploratory EXP_30_HV: a flow reaching half the per-payment maximum within an hour always waits 600 s', async () => {

@@ -50,9 +50,9 @@ test('P3/challenge: a consumed challenge re-wrapped around a new action (new non
   deny(await w.submit({ action: a2, approvals: r.approvals }), 'CHALLENGE_NOT_FOR_THIS_ACTION|COMMAND_MISMATCH|ALREADY_CONSUMED');
 });
 
-test('P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay', async () => {
+test('P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)', async () => {
   const w = buildV5();
-  const r = req(w, 'HOLD_CREATE', holdBody('mh-6'), ['k2-laptop']);
+  const r = req(w, 'HOLD_CREATE', holdBody('mh-6'), ['k3-root-hw']); // Ed25519 hardware key: no WebAuthn sign counter, so only the challenge layer can refuse
   ok(await w.submit(r));
   const trs = w.root.chain(0); const tr = trs[trs.length - 1];
   const s = structuredClone(w.root.state);

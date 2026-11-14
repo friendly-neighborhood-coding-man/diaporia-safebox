@@ -8,6 +8,7 @@ const seeds = (process.env.SEEDS ?? '11,23,37,41,53').split(',').map(Number);
 const arms = (process.env.ARMS ?? 'A,B,X_HV').split(',');
 const t0 = Date.now();
 const raw = await runAll({ seeds, arms, log: (l) => process.stderr.write(l + '\n') });
+const sec = (ms) => ms === null ? null : ms / 1000;
 const pctl = (xs, p) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))]; };
 const ATTACK = (n) => /^0[1-5]|^02b|^08|^09|^11|^13|^14/.test(n);
 const agg = {};
@@ -22,7 +23,7 @@ for (const [name, byArm] of Object.entries(raw.results)) {
       attackerSettledBeforeDetectionNEAR_total: +sum(r => r.attacker.settledBeforeDetectionNEAR).toFixed(3),
       attackerPaymentsSettled: sum(r => r.attacker.settled),
       legitSettled: sum(r => r.legit.settled), legitAttempted: sum(r => r.legit.attemptedIncludingDenied),
-      legitLatencyS: { p50: pctl(lat, 0.5) / 1000, p95: pctl(lat, 0.95) / 1000, p99: pctl(lat, 0.99) / 1000, n: lat.length },
+      legitLatencyS: { p50: sec(pctl(lat, 0.5)), p95: sec(pctl(lat, 0.95)), p99: sec(pctl(lat, 0.99)), n: lat.length },
       falsePositiveDelays: sum(r => r.legit.falsePositiveDelays), falsePositiveCancellations: sum(r => r.legit.falsePositiveCancellations),
       legitDeniedAtProposal: sum(r => Object.values(r.legit.deniedAtProposal).reduce((a, b) => a + b, 0)), pendingSlotExhaustion: sum(r => r.legit.pendingSlotExhaustion),
       ownerPrompts: sum(r => r.owner.prompts), firstDetectAtS: runs.map(r => r.detection.firstDetectAtMs === null ? null : r.detection.firstDetectAtMs / 1000),
@@ -40,7 +41,7 @@ for (const arm of arms) {
   const lat = runs.flatMap(r => r.legit.latencyMs);
   const settled = runs.reduce((t, r) => t + r.legit.settled, 0), attempted = runs.reduce((t, r) => t + r.legit.attemptedIncludingDenied, 0);
   overall[arm] = { legitSuccessRate: attempted ? +(settled / attempted).toFixed(4) : null, legitSettled: settled, legitAttempted: attempted,
-    legitLatencyS: { p50: pctl(lat, 0.5) / 1000, p95: pctl(lat, 0.95) / 1000, p99: pctl(lat, 0.99) / 1000, n: lat.length },
+    legitLatencyS: { p50: sec(pctl(lat, 0.5)), p95: sec(pctl(lat, 0.95)), p99: sec(pctl(lat, 0.99)), n: lat.length },
     attackerSettledNEAR_total: +Object.entries(raw.results).filter(([n]) => ATTACK(n)).flatMap(([, x]) => x[arm] ?? []).reduce((t, r) => t + r.attacker.settledNEAR, 0).toFixed(3),
     attackerSettledBeforeDetectionNEAR_total: +Object.entries(raw.results).filter(([n]) => ATTACK(n)).flatMap(([, x]) => x[arm] ?? []).reduce((t, r) => t + r.attacker.settledBeforeDetectionNEAR, 0).toFixed(3),
     falsePositiveDelays: runs.reduce((t, r) => t + r.legit.falsePositiveDelays, 0), falsePositiveCancellations: runs.reduce((t, r) => t + r.legit.falsePositiveCancellations, 0),
@@ -54,7 +55,7 @@ function accept(c) {
   const S1 = overall[c].verifierOkAll && overall[c].horizonViolations === 0 && overall[c].unauthorizedAuthority === 0;
   const S2 = increases.length === 0;
   const L1 = overall[c].legitSuccessRate >= overall.A.legitSuccessRate;
-  const L2 = overall[c].legitLatencyS.p95 < overall.A.legitLatencyS.p95;
+  const L2 = overall[c].legitLatencyS.p95 !== null && overall.A.legitLatencyS.p95 !== null && overall[c].legitLatencyS.p95 < overall.A.legitLatencyS.p95; // null p95 never passes
   return { S1_invariants: S1, S2_noAttackerIncrease: S2, L1_successNotWorse: L1, L2_p95Improved: L2, accepted: S1 && S2 && L1 && L2, attackerIncreases: increases };
 }
 const decision = Object.fromEntries(arms.filter(a => a !== 'A').map(a => [a, accept(a)]));
