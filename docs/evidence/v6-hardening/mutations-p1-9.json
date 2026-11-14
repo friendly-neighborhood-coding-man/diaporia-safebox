@@ -1,0 +1,29 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 2,
+ "total": 2,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P1.9: key-material unwrapping removed (concatenated PEM literals missed)",
+   "file": "scripts/v6/supply-chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected"
+   ]
+  },
+  {
+   "name": "P1.9: JWK private key rule removed",
+   "file": "scripts/v6/supply-chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected"
+   ]
+  }
+ ]
+}

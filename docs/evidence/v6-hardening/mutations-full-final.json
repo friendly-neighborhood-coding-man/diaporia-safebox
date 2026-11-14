@@ -608,30 +608,6 @@
    ]
   },
   {
-   "name": "Device: signs a prepared command that differs from its own rebuild",
-   "file": "src/v6/device/command-review.mjs",
-   "order": 1,
-   "caught": true,
-   "failingTests": 2,
-   "examples": [
-    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt",
-    "B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)"
-   ],
-   "note": "re-anchored to src/v6/device/command-review.mjs (check moved there by the P0.2 review fix); re-run in mutations-reanchor-device.json"
-  },
-  {
-   "name": "Device: prepared grant not checked against Root-pinned issuer",
-   "file": "src/v6/device/command-review.mjs",
-   "order": 1,
-   "caught": true,
-   "failingTests": 2,
-   "examples": [
-    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt",
-    "device: a prepared challenge not signed by the Root-pinned issuer is not signed"
-   ],
-   "note": "re-anchored to src/v6/device/command-review.mjs (check moved there by the P0.2 review fix); re-run in mutations-reanchor-device.json"
-  },
-  {
    "name": "Verifier6: missing owner approval not flagged",
    "file": "src/v6/supervisor/verifier.mjs",
    "order": 1,
@@ -800,6 +776,29 @@
    "examples": [
     "RS256 keys below 2048 bits are refused"
    ]
+  },
+  {
+   "name": "P1.9: key-material unwrapping removed (concatenated PEM literals missed)",
+   "file": "scripts/v6/supply-chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected"
+   ],
+   "note": "added after the final delta review; run in mutations-p1-9.json"
+  },
+  {
+   "name": "P1.9: JWK private key rule removed",
+   "file": "scripts/v6/supply-chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected"
+   ],
+   "note": "added after the final delta review; run in mutations-p1-9.json"
   }
- ]
+ ],
+ "note": "Two device mutants whose kit.mjs anchors vanished in 7df30d7 were dropped: their checks moved to command-review.mjs and are already covered by the identical P0.2 mutants (final delta review). See mutations-reanchor-device.json."
 }

@@ -26,6 +26,9 @@ const M = [
   ['P0.1: assurance mode not validated', 'src/v6/common/v6.mjs', "if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');", ''],
   ['P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5', VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"],
   ['P0.1 review: in-transaction fingerprint-only guard removed', VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", ''],
+  // hardening P1.9 (final delta review): key material in source-literal / legacy-encrypted form
+  ['P1.9: key-material unwrapping removed (concatenated PEM literals missed)', 'scripts/v6/supply-chain.mjs', "for (const l of ls.slice(i + 1, i + 6).map(unwrap))", "for (const l of ls.slice(i + 1, i + 2).map((x) => x.trim()))"],
+  ['P1.9: JWK private key rule removed', 'scripts/v6/supply-chain.mjs', "  ['JWK_PRIVATE_KEY', /\"d\"\\s*:\\s*\"[A-Za-z0-9_-]{32,}\"/],\n", ''],
   // hardening P1.8: DNS rebinding
   ['P1.8: console Host check removed', 'src/v6/emergency/console.mjs', "if (!this.#hostOk(String(req.headers?.host ?? ''))) {", "if (false) {"],
   ['P1.8: console Host check skipped for the real listener', 'src/v6/emergency/console.mjs', "}, { requireHost: true });", "});"],
@@ -79,8 +82,6 @@ const M = [
   ['Console: approval not checked against prepared challenge', CON, "if (canon(ap.grant ?? null) !== canon(prop.grant)) deny(403, 'APPROVAL_NOT_FOR_PREPARED_CHALLENGE');", ''],
   ['Console: direct FREEZE may forge an emergency reason', CON, "if (String(b.reason ?? '').startsWith('EMERGENCY_FREEZE')) deny(400, 'USE_EMERGENCY_FREEZE_FLOW');", ''],
   // owner device
-  ['Device: signs a prepared command that differs from its own rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
-  ['Device: prepared grant not checked against Root-pinned issuer', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],
   // V6 verifier
   ['Verifier6: missing owner approval not flagged', VER6, "if (!x || x.payment_id !== paymentId) codes.push('OWNER_APPROVAL_MISSING');", ''],
   ['Verifier6: reused challenge not flagged', VER6, "if (nonces.has(r.nonce) && nonces.get(r.nonce) !== capId) codes.push('OWNER_APPROVAL_CHALLENGE_REUSED');", ''],
