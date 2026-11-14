@@ -1,0 +1,30 @@
+{
+ "generatedBy": "scripts/v6/supply-chain.mjs",
+ "commit": "fff3f8d095e2aca6877b53124d7be7edf13d5ba0",
+ "scope": "LOCAL run (not CI)",
+ "locks": [
+  {
+   "path": "package-lock.json",
+   "packages": 68,
+   "problems": []
+  },
+  {
+   "path": "integrations/external-interactor/package-lock.json",
+   "packages": 98,
+   "problems": []
+  }
+ ],
+ "secretScan": {
+  "files": 638,
+  "findings": []
+ },
+ "sbom": {
+  "file": "sbom.cdx.json",
+  "sha256": "6c4977d82a38c0fa7958d8287b205d94b5dcb327f1b6cdd4191ae9c77803c705",
+  "components": 68
+ },
+ "notRun": [
+  "npm audit / advisory database (needs network)",
+  "build provenance / reproducible build attestation (no CI runner)"
+ ]
+}
