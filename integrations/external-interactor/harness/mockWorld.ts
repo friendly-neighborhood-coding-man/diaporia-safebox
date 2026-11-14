@@ -18,9 +18,13 @@ import type { DeploymentMode } from "../src/mode.js";
 
 export type World = any;
 
-export async function buildWorld(dir: string): Promise<World> {
-  const mod = await import(pathToFileURL(join(safeboxRoot(), "src/v5/world.mjs")).href) as { buildV5: (o: Record<string, unknown>) => World };
+export async function buildWorld(dir: string, v6: false | Record<string, unknown> = false): Promise<World> {
   mkdirSync(dir, { recursive: true });
+  if (v6) {
+    const m6 = await import(pathToFileURL(join(safeboxRoot(), "src/v6/world.mjs")).href) as { buildV6: (o: Record<string, unknown>) => World };
+    return m6.buildV6({ dir, ...v6 });
+  }
+  const mod = await import(pathToFileURL(join(safeboxRoot(), "src/v5/world.mjs")).href) as { buildV5: (o: Record<string, unknown>) => World };
   return mod.buildV5({ dir });
 }
 
@@ -49,6 +53,7 @@ export function bindingFor(accountRef: string, w: World): AccountBinding {
  */
 export class OwnerDeviceSim {
   shown: string[] = [];
+  lastV6: any = null;
   constructor(readonly w: World, readonly owner: OwnerPort, readonly accountRef: string) {}
   async review(requestId: string): Promise<{ request: ApprovalRequest; text: string; problems: string[] }> {
     const r = this.owner.pending(this.accountRef, requestId);
@@ -69,11 +74,21 @@ export class OwnerDeviceSim {
     return { request: r, text, problems };
   }
   /** decide(text) models the human looking at the trusted display. Returns the OwnerPort result, or a refusal. */
-  async approve(requestId: string, { decide = (_t: string) => true, credId = "k1-phone", force = false, tamper }: { decide?: (t: string) => boolean; credId?: string; force?: boolean; tamper?: (cap: any) => void } = {}) {
+  async approve(requestId: string, { decide = (_t: string) => true, credId = "k1-phone", force = false, tamper, tamperBinding, noGate = false, legacyV5 = false }: { decide?: (t: string) => boolean; credId?: string; force?: boolean; tamper?: (cap: any) => void; tamperBinding?: (b: any) => void; noGate?: boolean; legacyV5?: boolean } = {}) {
     const { request: r, text, problems } = await this.review(requestId);
     if (problems.length && !force) return { refusedByDevice: problems };
     if (!decide(text)) { this.owner.decline(this.accountRef, requestId); return { declined: true as const }; }
     const ttlMs = Math.max(60_000, Math.min(30 * 60_000, r.expiresAt - this.w.now()));
+    if (this.w.root.state.v6 && this.w.root.state.v6.policy.payment.mode === "PER_TRANSACTION" && !legacyV5) {
+      // V6 owner device ceremony: Root-pinned one-time challenge bound to THIS request, canonical Root-derived summary,
+      // the human decision, the fingerprint gate (fingerprint-only credentials), then one signature over the exact capability.
+      const pa = this.w.owner.paymentApproval(this.w.root.state, { credId, recipientId: r.recipientId, amountYocto: r.amountYocto, requestId: r.requestId, requestDigest: r.requestDigest,
+        memo: r.memo, at: this.w.now(), ttlMs: Math.min(ttlMs, 300_000), decide: () => true, ...(noGate ? { noGate } : {}), ...(tamperBinding ? { tamper: tamperBinding } : {}) });
+      if (!pa) return { refusedByDevice: [this.w.owner.gateErrors.at(-1)?.code ?? "OWNER_DECLINED"] };
+      this.lastV6 = pa;
+      if (tamper) tamper(pa.capability);
+      return this.owner.submit(this.accountRef, requestId, { capability: pa.capability, approval: pa.approval });
+    }
     const pc = this.w.owner.paycap(this.w.view(), { credId, recipientId: r.recipientId, amountYocto: r.amountYocto, taskRef: SafeBoxService.taskRefFor(r.requestDigest), ttlMs });
     if (tamper) tamper(pc.capability);
     return this.owner.submit(this.accountRef, requestId, { capability: pc.capability, approval: pc.approval });
@@ -92,9 +107,9 @@ export interface Harness {
   close(): Promise<void>;
 }
 
-export async function startHarness(opts: { mode?: DeploymentMode; baseUrl?: string; oauth?: { accessTokenTtlSec?: number; codeTtlSec?: number; refreshTokenTtlSec?: number }; limits?: { mcpPerMinute?: number; preparePerMinute?: number; webPerMinute?: number }; now?: () => number } = {}): Promise<Harness> {
+export async function startHarness(opts: { v6?: false | Record<string, unknown>; mode?: DeploymentMode; baseUrl?: string; oauth?: { accessTokenTtlSec?: number; codeTtlSec?: number; refreshTokenTtlSec?: number }; limits?: { mcpPerMinute?: number; preparePerMinute?: number; webPerMinute?: number }; now?: () => number } = {}): Promise<Harness> {
   const dir = mkdtempSync(join(tmpdir(), "sbx-interactor-"));
-  const worlds: Record<string, World> = { "sbx-alice": await buildWorld(join(dir, "alice")), "sbx-bob": await buildWorld(join(dir, "bob")) };
+  const worlds: Record<string, World> = { "sbx-alice": await buildWorld(join(dir, "alice"), opts.v6 ?? false), "sbx-bob": await buildWorld(join(dir, "bob"), opts.v6 ?? false) };
   const service = await SafeBoxService.open(join(dir, "interactor.db"));
   for (const [ref, w] of Object.entries(worlds)) service.addAccount(bindingFor(ref, w));
   const accounts = new AccountDirectory();
