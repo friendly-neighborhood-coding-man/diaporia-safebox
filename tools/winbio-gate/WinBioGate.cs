@@ -46,6 +46,8 @@ static class WinBioGate {
   [DllImport("winbio.dll")] static extern int WinBioEnumBiometricUnits(uint factor, out IntPtr unitSchemaArray, out UIntPtr unitCount);
   [DllImport("winbio.dll")] static extern int WinBioFree(IntPtr address);
 
+  // the Node wrapper passes multi-line prompts (the owner-side command text, P0.2) as " | "-separated lines
+  static string Lines(string p) { return p == null ? null : (p.Length > 1400 ? p.Substring(0, 1400) : p).Replace(" | ", "\n"); }
   static string Arg(string[] a, string k) { for (int i = 0; i + 1 < a.Length; i++) if (a[i] == k) return a[i + 1]; return null; }
   static string Hex(byte[] b) { var s = new StringBuilder(b.Length * 2); foreach (var x in b) s.Append(x.ToString("x2")); return s.ToString(); }
   static string Q(string s) { return "\"" + s.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\""; }
@@ -61,8 +63,8 @@ static class WinBioGate {
       string cmd = args.Length > 0 ? args[0] : "";
       if (cmd == "probe") return Probe();
       if (cmd == "key") return Key(Arg(args, "--name"));
-      if (cmd == "identify") return VerifySign(null, null, int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), false);
-      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), true);
+      if (cmd == "identify") return VerifySign(null, null, int.Parse(Arg(args, "--timeout") ?? "60"), Lines(Arg(args, "--prompt")), false);
+      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "60"), Lines(Arg(args, "--prompt")), true);
       return Fail("USAGE", 0, "probe | key --name N | identify [--timeout S] [--prompt T] | verify-sign --name N --hash HEX [--timeout S] [--prompt T]");
     } catch (Exception e) { return Fail("HELPER_EXCEPTION", 0, e.GetType().Name); }
   }
@@ -115,8 +117,8 @@ static class WinBioGate {
   /** Phase 1: a window with a Start button (mouse only). Returns true if the owner clicked it before the deadline. */
   static bool ArmByClick(string prompt, DateTime deadline) {
     bool clicked = false; var shown = new System.Diagnostics.Stopwatch();
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 280, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 520, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint." };
     var btn = new Button { Text = "Start fingerprint check", TabStop = false, Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
     form.Controls.Add(label); form.Controls.Add(btn);
@@ -133,8 +135,8 @@ static class WinBioGate {
    *  when it is shown. Results faster than MinCaptureMs are discarded and a new touch is required. */
   static void IdentifyFocused(IntPtr s, IntPtr ident, DateTime deadline, string prompt, out int idHr, out uint unit, out bool done) {
     int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false; bool stop = false;
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 230, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 480, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nTOUCH the fingerprint sensor NOW.\n\nIf nothing happens when you touch it, click this window once, then touch again." };
     form.Controls.Add(label);
     Action<string> say = (txt) => { try { form.BeginInvoke((Action)(() => { label.Text = (prompt ?? "") + "\n\n" + txt; })); } catch { } };
@@ -188,8 +190,8 @@ static class WinBioGate {
    *  after a fresh MATCH for this prompt. */
   static int ConfirmTouch(string prompt, DateTime deadline) {
     int answer = 0; // 0 none, 1 yes, 2 no
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 600, Height = 300, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ControlBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 540, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ControlBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nYour fingerprint was read.\nDid YOU just touch the sensor to approve this?" };
     var panel = new TableLayoutPanel { Dock = DockStyle.Bottom, Height = 56, ColumnCount = 2 };
     panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50)); panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));

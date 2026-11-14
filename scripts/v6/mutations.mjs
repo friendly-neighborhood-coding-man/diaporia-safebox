@@ -15,6 +15,12 @@ const M = [
   ['P0.3: V3 in-transaction record hook not called', 'src/v3/vault/vault.mjs', "this.proposeTxRecord({ paymentId, cap, credId: v.credId });", ''],
   ['P0.3: core reached without V6 verification accepted', VA, "if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');", ''],
   ['P0.3: in-transaction challenge check removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''],
+  // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
+  ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
+  ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],
+  ['P0.2: future rootSeq accepted', 'src/v6/device/command-review.mjs', "|| Number(command.rootSeq) > Number(s.seq)", ''],
+  ['P0.2: gate shows the console digest instead of the rebuilt text', 'src/v6/device/gate-service.mjs', "challengeNonce: r0.grant.statement.challengeNonce, at, display: rv.text });", "challengeNonce: r0.grant.statement.challengeNonce, at, display: null });"],
+  ['P0.2: payment summaryDigest not recomputed', PA, "if (b.summaryDigest !== summaryDigestOf(paymentSummary(s, b, { memo: null }))) fail('V6_SUMMARY_NOT_CANONICAL');", ''],
   ['Vault: delegation policy check removed', VA, "if (this.policy6().delegation !== 'BOUNDED_DELEGATION_ALLOWED') fail('DELEGATION_DISABLED_BY_POLICY');", ''],
   // payment approval binding
   ['Payment: owner approval not required', PA, "if (!v6) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'per-transaction owner approval policy');", "if (!v6) return null;"],

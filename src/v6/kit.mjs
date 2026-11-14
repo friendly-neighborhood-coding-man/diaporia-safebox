@@ -11,6 +11,7 @@ import { projectState } from '../v5/root/chain.mjs';
 import { buildCommand, commandDigest } from '../v5/root/command.mjs';
 import { actionDigest } from '../v3/root/chain.mjs';
 import { canon } from '../v3/common/canon.mjs';
+import { actionDetailLines, reviewPrepared } from './device/command-review.mjs';
 import { V4_DOMAINS, verifyObj } from '../v4/common/v4.mjs';
 import { V5_DOMAINS, signDigest5With } from '../v5/common/v5.mjs';
 import { V6_DOMAINS, d6, d6hex, DEFAULT_ASSURANCE_POLICY } from './common/v6.mjs';
@@ -18,14 +19,7 @@ import { EXT6_V } from './root/chain.mjs';
 import { BINDING_V, PAY_ACTION_TYPE, taskRefFor, paymentSummary, summaryDigestOf, requiredAssurance } from './vault/payment-approval.mjs';
 
 export { ACCOUNT, Device };
-/** Device-derived detail lines for the human (the action is bound by actionDigest; nothing here comes from the page). */
-export function actionDetailLines(a) {
-  const out = [];
-  if (a.type === 'FREEZE') out.push(`Scope: GLOBAL (every unsettled payment of ${a.accountId} is held; settled payments cannot be undone)`, `Hold: ${a.body.freezeId} (${a.body.source === 'owner' ? 'PROVISIONAL_HOLD, 24 h unless independently confirmed' : a.body.source})`, `Reason: ${String(a.body.reason).slice(0, 160)}`);
-  if (a.type === 'HOLD_RELEASE') out.push(`Releases hold: ${a.body.holdId} (digest ${String(a.body.holdDigest).slice(0, 16)}...)`);
-  out.push(`Action expires: ${a.expiresAt}`);
-  return out;
-}
+export { actionDetailLines };
 const clonePolicy = (p) => JSON.parse(JSON.stringify(p));
 
 export class OwnerWorldV6 extends OwnerWorldV5 {
@@ -58,22 +52,27 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
   }
   fpOnly(credId) { return this.policy6.fingerprintOnlyCreds.includes(credId); }
   /** Attach the fingerprint gate to an approval (only on a MATCH; any other outcome discards the approval: fail closed). */
-  #gate(ap, { subject, digestHex, nonce, at }) {
+  #gate(ap, { subject, digestHex, nonce, at, display = null }) {
     const g = this.gates[ap.credId];
     if (!g) { this.gateErrors.push({ credId: ap.credId, code: 'FINGERPRINT_ONLY_UNSUPPORTED' }); return null; }
-    try { return { ...ap, gate: g.attest({ accountId: ACCOUNT, chainId: this.chainId6, subject, boundDigestHex: digestHex, challengeNonce: nonce, at }) }; }
+    try { return { ...ap, gate: g.attest({ accountId: ACCOUNT, chainId: this.chainId6, subject, boundDigestHex: digestHex, challengeNonce: nonce, at, display }) }; }
     catch (e) { this.gateErrors.push({ credId: ap.credId, code: e.code ?? 'BIOMETRIC_FAILED' }); return null; }
   }
   /** V5 command ceremony + fingerprint gate for fingerprint-only credentials. `noGate` models a client that skips it. */
+  /** Wrap `decide` so the gate window repeats exactly the text the device itself built and showed (P0.2 display). */
+  #shown(opts) { const shown = {}; const decide = opts.decide ?? this.decide; return { shown, opts: { ...opts, decide: (sum, text, ctx) => { shown[ctx?.credId] = String(text); return decide(sum, text, ctx); } } }; }
   approveCommand(state, action, credId, opts = {}) {
-    const ap = super.approveCommand(state, action, credId, opts);
+    const { shown, opts: o } = this.#shown(opts);
+    const ap = super.approveCommand(state, action, credId, o);
     if (!ap || this.orcs[credId] || opts.noGate || !(this.fpOnly(credId) || opts.withGate)) return ap;
-    return this.#gate(ap, { subject: 'COMMAND', digestHex: commandDigest(ap.command).toString('hex'), nonce: ap.grant.statement.challengeNonce, at: opts.at ?? state.lastAt });
+    const display = [shown[credId], ...actionDetailLines(action)].filter(Boolean).join('\n') || null;
+    return this.#gate(ap, { subject: 'COMMAND', digestHex: commandDigest(ap.command).toString('hex'), nonce: ap.grant.statement.challengeNonce, at: opts.at ?? state.lastAt, display });
   }
   authorize4(state, action, credIds, opts = {}) {
-    const aps = super.authorize4(state, action, credIds, opts);
+    const { shown, opts: o } = this.#shown(opts);
+    const aps = super.authorize4(state, action, credIds, o);
     return aps.map(ap => (!ap?.intent || this.orcs[ap.credId] || opts.noGate || !(this.fpOnly(ap.credId) || opts.withGate)) ? ap
-      : this.#gate(ap, { subject: 'COMMAND', digestHex: intentDigest(ap.intent).toString('hex'), nonce: ap.grant.statement.challengeNonce, at: opts.at ?? state.lastAt })).filter(Boolean);
+      : this.#gate(ap, { subject: 'COMMAND', digestHex: intentDigest(ap.intent).toString('hex'), nonce: ap.grant.statement.challengeNonce, at: opts.at ?? state.lastAt, display: shown[ap.credId] ?? null })).filter(Boolean);
   }
   /**
    * Owner device, console route: approve a command PREPARED by the SafeBox Owner Console. The device does not trust the
@@ -101,7 +100,7 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     let ap = { credId, command: st, grant };
     if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...this.rp, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(base, dig.toString('hex')) }; } // protected confirmation shows the Root summary verbatim
     else ap.sig = signDigest5With(d.signer, V5_DOMAINS.COMMAND, dig);
-    if (!noGate && this.fpOnly(credId)) ap = this.#gate(ap, { subject: 'COMMAND', digestHex: dig.toString('hex'), nonce: grant.statement.challengeNonce, at: at ?? state.lastAt });
+    if (!noGate && this.fpOnly(credId)) ap = this.#gate(ap, { subject: 'COMMAND', digestHex: dig.toString('hex'), nonce: grant.statement.challengeNonce, at: at ?? state.lastAt, display: text });
     return ap;
   }
   /** Owner device: answer a console LOGIN challenge (authorizes nothing; proves possession + UV for a session). */
@@ -127,7 +126,8 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     const binding = { v: BINDING_V, accountId: s.accountId, chainId: s.chainId, credId, recipientId, asset, amountYocto: String(amountYocto), purposeId: s.purpose.purposeId,
       purposeVersion: s.purpose.version, epoch: String(s.epoch), policyVersion: s.v6.policy.version, requestId, requestDigest, challengeNonce: grant.statement.challengeNonce,
       approvalExpiresAt: iso(at + ttl), summaryDigest: '', assurance: requiredAssurance(s, credId) };
-    const lines = paymentSummary(s, binding, { memo }); binding.summaryDigest = summaryDigestOf(lines);
+    // the device shows the requester note (UNTRUSTED), the digest covers the canonical Root-derived lines only (P0.2)
+    const lines = paymentSummary(s, binding, { memo }); binding.summaryDigest = summaryDigestOf(paymentSummary(s, binding, { memo: null }));
     const m = this.metrics; m.prompts++; m.byCred[credId] = (m.byCred[credId] ?? 0) + 1;
     if (!decide({ title: 'PAYMENT', text: lines.join('\n') }, lines.join('\n'), { credId, binding })) { m.declined++; return null; }
     if (tamper) tamper(binding);
@@ -139,7 +139,7 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     if (!noGate && (binding.assurance === 'FINGERPRINT_ONLY')) {
       const g = this.gates[credId];
       if (!g) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_UNSUPPORTED' }); return null; }
-      try { gate = g.attest({ accountId: s.accountId, chainId: s.chainId, subject: 'PAYMENT', boundDigestHex: dig.toString('hex'), challengeNonce: grant.statement.challengeNonce, at }); }
+      try { gate = g.attest({ accountId: s.accountId, chainId: s.chainId, subject: 'PAYMENT', boundDigestHex: dig.toString('hex'), challengeNonce: grant.statement.challengeNonce, at, display: lines.join('\n') }); }
       catch (e) { this.gateErrors.push({ credId, code: e.code ?? 'BIOMETRIC_FAILED' }); return null; }
     }
     m.gestures++; m.signatures++;

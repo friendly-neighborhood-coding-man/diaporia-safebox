@@ -79,6 +79,10 @@ export function verifyPaymentApproval(s, { cap, credId, v6 }, at, { skewMs = Num
   if (b.approvalExpiresAt !== cap.expiresAt) fail('V6_APPROVAL_EXPIRY_MISMATCH');
   if (ce - ci > Number(s.v6.policy.payment.approvalTtlMs)) fail('V6_APPROVAL_TTL_EXCEEDS_POLICY');
   if (ci < ia - skewMs || ci > ea + skewMs) fail('V6_CAPABILITY_OUTSIDE_CHALLENGE_WINDOW');
+  // P0.2 (issue #14): the displayed summary is no longer display-only. summaryDigest must be the digest of the
+  // canonical summary this Root state derives for this binding (the untrusted requester note is shown to the owner
+  // but excluded from the digest), so a display that showed other terms produces an approval that is refused here.
+  if (b.summaryDigest !== summaryDigestOf(paymentSummary(s, b, { memo: null }))) fail('V6_SUMMARY_NOT_CANONICAL');
   // 4. fingerprint-only credentials: the local gate attestation over the exact capability digest + this nonce
   let level = 'UV';
   if (b.assurance === 'FINGERPRINT_ONLY' || x.gate !== undefined) {

@@ -1,0 +1,17 @@
+pre-fix reproducer run (consoleGate = legacy bf7403d logic), 2026-11-14T12:53:56Z
+✖ P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix (192.666297ms)
+✖ P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE (161.69902ms)
+✖ P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt (124.574339ms)
+✖ P0.2-format: a digest-only gate request (no prepared object) is refused (123.452998ms)
+ℹ tests 4
+ℹ pass 0
+ℹ fail 4
+✖ failing tests:
+✖ P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix (192.666297ms)
+  AssertionError [ERR_ASSERTION]: gate window showed: null
+✖ P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE (161.69902ms)
+  AssertionError [ERR_ASSERTION]: gate window showed: null
+✖ P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt (124.574339ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: wrong epoch
+✖ P0.2-format: a digest-only gate request (no prepared object) is refused (123.452998ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.

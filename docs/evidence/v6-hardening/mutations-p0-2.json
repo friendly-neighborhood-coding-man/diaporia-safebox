@@ -1,0 +1,94 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 7,
+ "total": 8,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P0.3: V3 in-transaction record hook not called",
+   "file": "src/v3/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 11,
+   "examples": [
+    "P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence",
+    "P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence",
+    "P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record",
+    "P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)"
+   ]
+  },
+  {
+   "name": "P0.3: core reached without V6 verification accepted",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)"
+   ]
+  },
+  {
+   "name": "P0.3: in-transaction challenge check removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "P0.2: prepared command not compared to the Root rebuild",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: prepared grant not Root-pinned",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: future rootSeq accepted",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: gate shows the console digest instead of the rebuilt text",
+   "file": "src/v6/device/gate-service.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix",
+    "P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE"
+   ]
+  },
+  {
+   "name": "P0.2: payment summaryDigest not recomputed",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed a later approval expiry)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance)"
+   ]
+  }
+ ]
+}
