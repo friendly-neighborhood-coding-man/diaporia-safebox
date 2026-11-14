@@ -22,7 +22,9 @@ import { ExecutionVaultV5 } from './vault/vault.mjs';
 import { FootprintJournal } from './journal/journal.mjs';
 import { RiskPolicyEngine } from './risk/engine.mjs';
 import { NotificationService, MockTransport } from './notify/notify.mjs';
-import { V5_DOMAINS, d5hex } from './common/v5.mjs';
+import { V5_DOMAINS, d5hex, newSigner5 } from './common/v5.mjs';
+import { EvidenceAPI, metricRecomputer, corroborator, deterministicFindings } from './analyst/analyst.mjs';
+import { buildReport, renderReportText } from './report/report.mjs';
 
 export const T0 = Date.parse('2026-11-14T00:00:00.000Z');
 export const ATTACKER = 'attacker.mock';
@@ -89,7 +91,7 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
       const r = env.result;
       rootJ.append({ type: ROOT_EVENT(type), principal: signers.length ? signers.map(c => journal.ref('cred', c)).join('+') : (principal ?? (req.attestation ? 'service' : 'housekeeping')),
         operationDigest: d5hex(V5_DOMAINS.COMMAND, req.action), relatedId: 'seq-' + r.seq, outcome: 'ACCEPTED', epoch: w.root.state.epoch, purposeVersion: w.root.state.purpose.version,
-        data: { action: type, effects: r.effects.map(e => e.type).slice(0, 12).join(','), levels: (r.effects.find(e => e.type === 'CONFIRMATION_ASSURANCE')?.levels ?? []).join(',') } });
+        data: { action: type, effects: r.effects.map(e => e.type).slice(0, 12).join(','), levels: (r.effects.find(e => e.type === 'CONFIRMATION_ASSURANCE')?.levels ?? []).map(x => { const i = x.lastIndexOf(':'); return journal.ref('cred', x.slice(0, i)) + x.slice(i); }).join(',') } });
     } else {
       w.rejects.push({ type, code: env.error.code, detail: env.error.detail ?? '' });
       rootJ.attempt({ type: 'ROOT_REJECTED', principal: signers.length ? signers.map(c => journal.ref('cred', c)).join('+') : (principal ?? '-'), outcome: String(env.error.code), data: { action: type } });
@@ -170,6 +172,21 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   w.advance = async (ms, step = 60_000) => {
     let left = ms;
     while (left > 0) { const d = Math.min(step, left); clock.advance(d); wall.t += 1; left -= d; await w.vctl.call('HEARTBEAT', {}); await w.housekeep(); await w.pump(); await w.vctl.call('TICK', {}); await notify.drain(); }
+  };
+  // read-only Security Analyst wiring (evidence view, engine-side recomputation and corroboration)
+  w.analyst = { api: new EvidenceAPI(journal) };
+  w.analyst.recompute = metricRecomputer(w.analyst.api);
+  w.analyst.corroborate = (ref) => corroborator({ journal, vault: w.vault, engine })(ref);
+  w.analyst.deterministic = () => deterministicFindings(w.analyst.api).map(f => engine.intakeFinding(f, { eventIds: w.analyst.api.eventIds(), recompute: w.analyst.recompute, corroborate: w.analyst.corroborate }));
+  // signed periodic reports, delivered through the same MOCK outbox
+  w.reportSigner = newSigner5('report-service');
+  w.reports = [];
+  w.report = (kind, opts = {}) => {
+    const rep = buildReport({ kind, journal, signer: w.reportSigner, now: now(), ...opts });
+    w.reports.push(rep);
+    journal.writer('REPORT').append({ type: 'REPORT_ISSUED', relatedId: kind, outcome: 'SIGNED', data: { countsDigest: rep.statement.countsDigest, from: rep.statement.from, to: rep.statement.to } });
+    notify.enqueue(w.root.state, { incident: { incidentId: `report-${kind.toLowerCase()}-${rep.statement.to}` }, kind: 'REPORT', render: () => ({ subject: `SafeBox ${kind} security report`, text: renderReportText(rep) }) });
+    return rep;
   };
   w.newId = (p) => `${p}-${mkNonce().slice(0, 12)}`;
   w.iso = iso;

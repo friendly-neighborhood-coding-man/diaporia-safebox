@@ -65,7 +65,7 @@ export class NotificationService {
    * by several keys of one person are deduplicated; the key-specific context is kept in the body.
    * rootState: the verified Root replica (contacts are pinned there; an address not pinned is never used).
    */
-  enqueue(rootState, { incident, kind = 'INCIDENT', keyContextByHolder, delayStatus, rapidAvailable }) {
+  enqueue(rootState, { incident, kind = 'INCIDENT', keyContextByHolder = {}, delayStatus = '-', rapidAvailable = false, render = null }) {
     const out = { queued: 0, suppressed: 0, recipients: [], unresolved: [] };
     const byRef = new Map();
     for (const [holderId, contacts] of Object.entries(rootState.v5.contacts)) for (const c of contacts) {
@@ -79,7 +79,8 @@ export class NotificationService {
       if (this.db.prepare('SELECT 1 FROM outbox WHERE dedupe=?').get(dedupe)) { out.suppressed++; this.db.prepare('INSERT INTO suppressed (at, incident, contact_ref, why) VALUES (?,?,?,?)').run(this.now(), incident.incidentId, ref, 'DUPLICATE_ALERT'); continue; }
       const recent = this.db.prepare('SELECT COUNT(*) n FROM outbox WHERE contact_ref=? AND created_at>?').get(ref, this.now() - 3600_000).n;
       if (recent >= NOTIFY_POLICY.perRecipientPerHour) { out.suppressed++; this.db.prepare('INSERT INTO suppressed (at, incident, contact_ref, why) VALUES (?,?,?,?)').run(this.now(), incident.incidentId, ref, 'RECIPIENT_FLOOD_LIMIT'); continue; }
-      const m = renderIncidentEmail({ accountRef: this.accountId, incident, keyContext: [...new Set(e.keys)], delayStatus, rapidAvailable, kind });
+      const m = render ? (({ subject, text }) => ({ subject: clean(subject, 160), text: String(text).split('\n').map(l => clean(l, 400)).join('\n') }))(render({ holders: [...e.holders] }))
+        : renderIncidentEmail({ accountRef: this.accountId, incident, keyContext: [...new Set(e.keys)], delayStatus, rapidAvailable, kind });
       this.db.prepare('INSERT INTO outbox (id, dedupe, incident, kind, contact_ref, holders, subject, body, state, attempts, next_at, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
         .run('n-' + randomUUID(), dedupe, incident.incidentId, kind, ref, [...e.holders].join(','), m.subject, m.text, 'QUEUED', 0, this.now(), this.now());
       out.queued++; out.recipients.push({ contactRef: ref, holders: [...e.holders] });

@@ -138,7 +138,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
       operationDigest: row.cap_digest, data: { flow: this.ref(flow), recipient: row.recipient, amount: row.amount, rapidGrant: grant?.grantId ?? '-', decision: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code).join(','), score: dec.ev.score },
       sealed: { memo: String(memo ?? '').slice(0, 280) } });
     if (dec.ev.decision !== 'NONE' || dec.statement.action !== 'NONE') this.#j({ type: 'UNUSUAL_ACTIVITY_DETECTED', principal: this.ref(credId), relatedId: paymentId, outcome: dec.statement.action,
-      data: { flow: this.ref(flow), level: dec.ev.decision, reasons: dec.ev.reasons.map(r => `${r.cls}:${r.code}`).join(','), features: dec.ev.features, policy: dec.statement.policy, policyDigest: dec.statement.policyDigest } });
+      data: { flow: this.ref(flow), level: dec.ev.decision, reasons: dec.ev.reasons.map(r => `${r.cls}:${r.code}`).join(','), features: { ...dec.ev.features, flow: this.ref(flow) }, policy: dec.statement.policy, policyDigest: dec.statement.policyDigest } });
     if (dec.statement.action === 'DELAY' || dec.statement.action === 'DELAY_AND_END_RAPID') {
       const inc = open ?? this.#openIncident(flow, credId, dec.ev, now);
       if (open) this.store.db.prepare('UPDATE v5_incidents SET last_trigger_at=?, reasons=? WHERE incident_id=?').run(now, JSON.stringify([...new Set([...JSON.parse(open.reasons), ...dec.ev.reasons.map(r => r.code)])]), open.incident_id);
@@ -174,7 +174,8 @@ export class ExecutionVaultV5 extends ExecutionVault {
       this.store.db.prepare('UPDATE v5_incidents SET delayed_count=delayed_count+1 WHERE incident_id=?').run(incidentId);
       this.store.journal(paymentId, 'BUFFERED', 'BUFFERED', 'risk-engine', { event: 'ANOMALY_PAYMENT_DELAY', incidentId, releaseAt: release, delayMs: ms, unchanged: 'recipient,amount,asset,purpose,authorization' });
     });
-    this.#j({ type: 'PAYMENT_DELAYED', relatedId: paymentId, outcome: 'ANOMALY_PAYMENT_DELAY', evidenceRefs: [incidentId], data: { incidentId, delayMs: String(ms), releaseAt: iso(release), amount: r.amount, recipient: r.recipient } });
+    const fl = this.store.db.prepare('SELECT flow FROM v5_pay WHERE payment_id=?').get(paymentId)?.flow;
+    this.#j({ type: 'PAYMENT_DELAYED', relatedId: paymentId, outcome: 'ANOMALY_PAYMENT_DELAY', evidenceRefs: [incidentId], data: { flow: fl ? this.ref(fl) : '-', incidentId, delayMs: String(ms), releaseAt: iso(release), amount: r.amount, recipient: r.recipient } });
   }
   /** An ACTIVE Rapid-Use grant on the vault's own replica that covers exactly this payment (or null). */
   rapidGrantFor({ credId, delegationId, recipient, amount, asset }) {
