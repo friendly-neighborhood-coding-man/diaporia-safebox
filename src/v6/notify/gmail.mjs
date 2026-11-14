@@ -29,7 +29,7 @@ export function loadGmailCredentials(path) {
   if (!path) throw Object.assign(new Error('no credentials path'), { code: 'GMAIL_CREDENTIALS_MISSING' });
   // CodeQL js/file-system-race: open once and read through the same descriptor (no stat-then-read by path). O_NOFOLLOW
   // where the platform has it (POSIX); a symlinked or non-regular credentials file is refused.
-  const fd = openSync(path, FS.O_RDONLY | (FS.O_NOFOLLOW ?? 0));
+  const fd = openSync(path, FS.O_RDONLY | (FS.O_NOFOLLOW ?? 0) | (FS.O_NONBLOCK ?? 0)); // O_NONBLOCK: a FIFO cannot hang the loader
   let raw;
   try {
     if (!fstatSync(fd).isFile()) throw Object.assign(new Error('credentials path is not a regular file'), { code: 'GMAIL_CREDENTIALS_INVALID' });

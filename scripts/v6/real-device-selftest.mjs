@@ -25,7 +25,6 @@ if (process.argv.includes('--demo')) {
   await until(/Open the bridge link .*#t=<per-run secret, redacted>/);
   const i = process.argv.indexOf('--bridge-url-file');
   bridgeUrl = (await import('node:fs')).readFileSync(i > 0 ? resolve(process.argv[i + 1]) : join(REPO, '.demo-bridge-url'), 'utf8').trim();
-  if (/#t=[0-9a-f]+/.exec(log.replace(bridgeUrl, ''))?.[0] && log.includes(bridgeUrl.split('#')[1])) throw new Error('bridge secret leaked to the terminal');
 } else bridgeUrl = (await until(/Open (http:\/\/localhost:\d+\/bridge#t=[0-9a-f]+)/))[1];
 await page.goto(bridgeUrl);
 let clicks = 0; let stop = false;
@@ -45,6 +44,8 @@ console.log('[selftest] bridge card: ' + await page.textContent('#log').catch(()
 await cdp.send('WebAuthn.clearCredentials', { authenticatorId });
 for (const c of (await cdp2.send('WebAuthn.getCredentials', { authenticatorId: a2 })).credentials) await cdp.send('WebAuthn.addCredential', { authenticatorId, credential: c });
 await until(/DONE\s+evidence/, 300000);
+// --demo: the per-run bridge secret must never have reached the terminal (checked over the WHOLE run output)
+if (process.argv.includes('--demo')) { const tok = new URLSearchParams(bridgeUrl.split('#')[1]).get('t'); if (!tok || log.includes(tok)) { console.error('[selftest] FAIL: bridge secret leaked to the terminal'); process.exit(5); } console.log('[selftest] demo mode: bridge secret absent from the terminal output'); }
 stop = true; await new Promise((r) => setTimeout(r, 800)); console.log(`[selftest] bridge approvals clicked: ${clicks}`);
 await browser.close();
 process.exit(0);

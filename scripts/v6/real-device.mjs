@@ -20,7 +20,7 @@
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
-import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, statSync, lstatSync, unlinkSync, openSync, writeSync, closeSync, constants as FS } from 'node:fs';
 import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
@@ -64,7 +64,10 @@ const bridge = new BrowserBridge({ port: PORT, origin: ORIGIN, handler: async (r
 await bridge.ready();
 if (DEMO) {
   const uf = resolve(opt('--bridge-url-file', join(REPO, '.demo-bridge-url')));
-  writeFileSync(uf, bridge.url() + '\n', { mode: 0o600 });
+  // exclusive create (no symlink follow, fresh 0600 mode); a stale file from an earlier run is replaced only if it is a regular file
+  try { if (lstatSync(uf).isFile()) unlinkSync(uf); else { console.error('refusing: ' + shown(uf) + ' is not a regular file'); process.exit(2); } } catch (e) { if (e.code !== 'ENOENT') throw e; }
+  const ufd = openSync(uf, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); try { writeSync(ufd, bridge.url() + '\n'); } finally { closeSync(ufd); }
+  process.on('exit', () => { try { unlinkSync(uf); } catch { /* already gone */ } }); // the per-run secret dies with the run
   let clip = false; if (process.platform === 'win32') { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
   console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
 } else console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
@@ -161,7 +164,9 @@ try {
   if (ATTACKS) { // attack 1: the owner's genuine approval is replayed at the Vault at once (still inside its validity window)
     const pa = dev.lastV6;
     if (pa?.capability) { const again = await w.gz.request('PROPOSE', { capability: pa.capability, approval: pa.approval, recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'replay' });
-      denial('01', "immediate replay of the owner's real approval", !again.ok, again.ok ? 'ACCEPTED' : again.error?.code); }
+      // only replay-specific refusals count (review 3c): a refusal for an unrelated reason is reported as NOT refused
+      const REPLAY_CODES = ['CHALLENGE_ALREADY_CONSUMED', 'OWNER_APPROVAL_CHALLENGE_REUSED', 'WEBAUTHN_SIGNCOUNT_NOT_INCREASING', 'CAPABILITY_ALREADY_USED', 'CAPABILITY_NONCE_REUSED', 'DUPLICATE_EFFECT_FOR_CAPABILITY', 'DUPLICATE_APPROVAL'];
+      denial('01', "immediate replay of the owner's real approval", !again.ok && REPLAY_CODES.includes(again.error?.code), again.ok ? 'ACCEPTED' : again.error?.code); }
     else denial('01', "immediate replay of the owner's real approval", false, 'NOT_RUN (no approval to replay)');
   }
   await w.advance(12 * 60_000);
@@ -181,7 +186,7 @@ try {
 // the attacker side uses the SIMULATED k1-phone credential or replays artefacts recorded from Workflow A.
 if (ATTACKS) try {
   ev('STEP', 'Attack denials: each attempt below must be refused or change nothing (no owner action needed; MOCK ledger)');
-  // 2-3. outside-purpose recipient; stolen MCP access token used from another host: it can only PREPARE; there is no signing tool; nothing settles
+  // 2-3. outside-purpose recipient; a rogue AI client with a valid MCP session for the owner's account (a fresh login under another client name, standing in for a stolen token) access token used from another host: it can only PREPARE; there is no signing tool; nothing settles
   const t1 = await obtainTokens(h.url, h.logins.alice); const thief = await mcpClient(h.url, t1.access, 'thief-host');
   const tools = (await thief.listTools()).tools.map((x) => x.name);
   const tx = await callError(thief, 'prepare_payment', { recipientId: 'attacker.mock', amountYocto: (5n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'URGENT: approve now', idempotencyKey: 'real-device-attack-00000' }).catch((e) => ({ code: 'CALL_FAILED', message: String(e.message).slice(0, 80) }));
@@ -189,7 +194,7 @@ if (ATTACKS) try {
   const tp = await call(thief, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (5n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'URGENT: approve now', idempotencyKey: 'real-device-attack-00001' });
   await w.advance(40 * 60_000, 10 * 60_000);
   const tst = await call(thief, 'get_payment_status', { requestId: tp.requestId });
-  denial('03', 'stolen MCP token', !tools.some((x) => /approve|sign|settle|key|biometric|freeze/i.test(x)) && tst.settledVerified === false,
+  denial('03', 'rogue AI client with a valid MCP session', !tools.some((x) => /approve|sign|settle|key|biometric|freeze/i.test(x)) && tst.settledVerified === false,
     `prepare -> ${tp.state}; tools offered: ${tools.join(', ')}; after 40 min settledVerified=${tst.settledVerified}`);
   // 4. substituted amount / recipient after the device built the owner summary (simulated k1-phone)
   const sp = await call(thief, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'substitution', idempotencyKey: 'real-device-attack-00002' });
@@ -219,11 +224,13 @@ else try {
   results.alert = { transport: transport.kind, outboxState: row.state, api: ds.api, inbox: ds.inbox, lastError: row.last_error ?? null, gmailLog: transport.log ?? null };
   ev('MAIL', `alert ${row.state} via ${transport.kind}: api=${ds.api}, inbox=${ds.inbox}`);
   if (ATTACKS) { // 7. a mail scanner / link preview fetches the Emergency Freeze link: nothing changes, nothing freezes
-    const digest = () => sha(JSON.stringify({ head: w.root.state.head, holds: w.root.state.v5.holds, frozen: w.frozen() }));
-    const before = digest();
-    for (let i = 0; i < 6; i++) await consoleObj.handle({ method: i % 2 ? 'HEAD' : 'GET', path: `/e/${row.locator}`, headers: { 'user-agent': 'SafeLinks/1.0' } });
+    // same digest scope as showcase clip 05: Root head, holds, console proposals and the locator's own state
+    const digest = () => sha(JSON.stringify({ head: w.root.state.head, holds: w.root.state.v5.holds, props: [...consoleObj.proposals.values()].map((p) => p.state), loc: w.notify.locators.resolve(row.locator), frozen: w.frozen() }));
+    const before = digest(); const codes = [];
+    for (let i = 0; i < 6; i++) codes.push((await consoleObj.handle({ method: i % 2 ? 'HEAD' : 'GET', path: `/e/${row.locator}`, headers: { host: new URL(ORIGIN).host, 'user-agent': 'SafeLinks/1.0' } })).status);
     const after = digest();
-    denial('07', '6 scanner GET/HEAD visits of the Emergency Freeze link', before === after && !w.frozen(), `Root/hold digest ${before.slice(0, 12)}… -> ${after.slice(0, 12)}…, frozen=${w.frozen()}`);
+    // the visits must actually reach the real page (2xx), otherwise "nothing changed" would prove nothing
+    denial('07', '6 scanner GET/HEAD visits of the Emergency Freeze link', codes.every((c) => c >= 200 && c < 300) && before === after && !w.frozen(), `HTTP ${codes.join(',')}; state digest ${before.slice(0, 12)}… -> ${after.slice(0, 12)}…, frozen=${w.frozen()}`);
   }
   ev('STEP', `Open the Emergency Freeze link from the email (or ${ORIGIN}/e/${row.locator}), sign in with Windows Hello, review, type the phrase, approve${fpOnly.length ? ' and touch the sensor' : ''}.`);
   for (let i = 0; !w.frozen(); i++) { if (i > 1800) throw Object.assign(new Error('owner did not freeze within 15 min'), { code: 'FREEZE_NOT_DONE' }); await sleep(500); }

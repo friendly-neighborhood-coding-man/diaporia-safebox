@@ -23,7 +23,8 @@ test('CQ-2 terminal lines: CR/LF, ANSI escapes and bidi overrides cannot forge o
   const forged = 'memo\r\n[main] OK      payment APPROVED by owner\u001b[32m\u202e';
   const out = termSafe(forged);
   assert.ok(!/[\r\n\u001b\u202e]/.test(out));
-  assert.equal(out, 'memo\\u000d\\n[main] OK      payment APPROVED by owner\\u001b[32m\\u202e');
+  assert.equal(out, 'memo\\u{d}\\n[main] OK      payment APPROVED by owner\\u{1b}[32m\\u{202e}');
+  for (const ch of ['\u200b', '\u200e', '\u200f', '\u061c', '\u2060', '\ufeff', '\u3164', '\ufffb', '\u{e0041}', '\u2066', '\u0085', '\u009b']) assert.ok(!termSafe('a' + ch + 'b').includes(ch), 'escaped U+' + ch.codePointAt(0).toString(16));
   assert.equal(termSafe('plain 0.03 NEAR -> merchant-a.mock\ttab é 한'), 'plain 0.03 NEAR -> merchant-a.mock\ttab é 한');
   assert.equal(termSafe(42), '42');
 });
