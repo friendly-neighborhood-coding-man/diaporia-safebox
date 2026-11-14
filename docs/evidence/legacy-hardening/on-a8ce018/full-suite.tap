@@ -1,0 +1,3633 @@
+
+> diaporia-safebox@0.1.0 test
+> node --disable-warning=ExperimentalWarning --test
+
+TAP version 13
+# Subtest: normal mock transfer executes once after matching mock approval
+ok 1 - normal mock transfer executes once after matching mock approval
+  ---
+  duration_ms: 2.921768
+  type: 'test'
+  ...
+# Subtest: unapproved intent cannot execute
+ok 2 - unapproved intent cannot execute
+  ---
+  duration_ms: 0.318451
+  type: 'test'
+  ...
+# Subtest: recipient substitution fails after approval and does not execute
+ok 3 - recipient substitution fails after approval and does not execute
+  ---
+  duration_ms: 0.335426
+  type: 'test'
+  ...
+# Subtest: amount substitution fails after approval
+ok 4 - amount substitution fails after approval
+  ---
+  duration_ms: 0.307755
+  type: 'test'
+  ...
+# Subtest: approval is bound to prepared principal and digest
+ok 5 - approval is bound to prepared principal and digest
+  ---
+  duration_ms: 0.343953
+  type: 'test'
+  ...
+# Subtest: expired approval cannot execute
+ok 6 - expired approval cannot execute
+  ---
+  duration_ms: 0.330446
+  type: 'test'
+  ...
+# Subtest: strict contract rejects extra fields and malformed amounts
+ok 7 - strict contract rejects extra fields and malformed amounts
+  ---
+  duration_ms: 0.317042
+  type: 'test'
+  ...
+# SAFEBOX_METRICS {"suite":"SafeBox V1 adversarial suite (SEEN regression set, SIMULATED NEAR testnet)","scenarios":21,"attackAttempts":66,"attacksBlocked":66,"attackerToolCalls":9,"unauthorizedToolCallsAdvancingState":0,"unauthorizedSignedTransactionsBySafeBox":0,"unauthorizedExternalEffects":0,"legitimateAttempts":15,"legitimateCompleted":15,"falseBlocks":0,"duplicateEffects":0,"unknownUnreconciled":0,"knownLimitationScenarios":["known limitation: compromised FullAccess key in NATIVE mode is not chain-limited"]}
+# Subtest: S01 legitimate authorization and successful execution (contract + native modes)
+ok 8 - S01 legitimate authorization and successful execution (contract + native modes)
+  ---
+  duration_ms: 174.676723
+  type: 'test'
+  ...
+# Subtest: S02 recipient substitution
+ok 9 - S02 recipient substitution
+  ---
+  duration_ms: 21.851041
+  type: 'test'
+  ...
+# Subtest: S03 amount increase
+ok 10 - S03 amount increase
+  ---
+  duration_ms: 20.160848
+  type: 'test'
+  ...
+# Subtest: S04 asset substitution
+ok 11 - S04 asset substitution
+  ---
+  duration_ms: 14.604581
+  type: 'test'
+  ...
+# Subtest: S05 wrong contract or method
+ok 12 - S05 wrong contract or method
+  ---
+  duration_ms: 47.881401
+  type: 'test'
+  ...
+# Subtest: S06 wrong network
+ok 13 - S06 wrong network
+  ---
+  duration_ms: 28.419159
+  type: 'test'
+  ...
+# Subtest: S07 expired authorization / intent
+ok 14 - S07 expired authorization / intent
+  ---
+  duration_ms: 22.232088
+  type: 'test'
+  ...
+# Subtest: S08 revoked authorization
+ok 15 - S08 revoked authorization
+  ---
+  duration_ms: 22.186921
+  type: 'test'
+  ...
+# Subtest: S09 reused approval
+ok 16 - S09 reused approval
+  ---
+  duration_ms: 50.93031
+  type: 'test'
+  ...
+# Subtest: S10 concurrent duplicate execution (in-process)
+ok 17 - S10 concurrent duplicate execution (in-process)
+  ---
+  duration_ms: 37.340147
+  type: 'test'
+  ...
+# Subtest: S11 forged authorization
+ok 18 - S11 forged authorization
+  ---
+  duration_ms: 16.12672
+  type: 'test'
+  ...
+# Subtest: S12 cross-principal capability use
+ok 19 - S12 cross-principal capability use
+  ---
+  duration_ms: 42.269523
+  type: 'test'
+  ...
+# Subtest: S13 intent modified after authorization
+ok 20 - S13 intent modified after authorization
+  ---
+  duration_ms: 24.175125
+  type: 'test'
+  ...
+# Subtest: S14 direct executor invocation without authorization
+ok 21 - S14 direct executor invocation without authorization
+  ---
+  duration_ms: 37.082111
+  type: 'test'
+  ...
+# Subtest: S15 RPC timeout and UNKNOWN reconciliation
+ok 22 - S15 RPC timeout and UNKNOWN reconciliation
+  ---
+  duration_ms: 187.99694
+  type: 'test'
+  ...
+# Subtest: S16 restart after reservation, after signing and after broadcast
+ok 23 - S16 restart after reservation, after signing and after broadcast
+  ---
+  duration_ms: 109.004912
+  type: 'test'
+  ...
+# Subtest: S17 prompt injection posing as an administrator
+ok 24 - S17 prompt injection posing as an administrator
+  ---
+  duration_ms: 49.018871
+  type: 'test'
+  ...
+# Subtest: S18 untrusted tool output rewrites the payment recipient
+ok 25 - S18 untrusted tool output rewrites the payment recipient
+  ---
+  duration_ms: 39.425774
+  type: 'test'
+  ...
+# Subtest: S19 malformed and oversized inputs
+ok 26 - S19 malformed and oversized inputs
+  ---
+  duration_ms: 20.769782
+  type: 'test'
+  ...
+# Subtest: S20 legitimate transaction after malicious content is rejected
+ok 27 - S20 legitimate transaction after malicious content is rejected
+  ---
+  duration_ms: 86.943591
+  type: 'test'
+  ...
+# Subtest: S21 known limitation: compromised FullAccess key in NATIVE mode is not chain-limited
+ok 28 - S21 known limitation: compromised FullAccess key in NATIVE mode is not chain-limited
+  ---
+  duration_ms: 20.641331
+  type: 'test'
+  ...
+# Subtest: contract vector: valid -> OK
+ok 29 - contract vector: valid -> OK
+  ---
+  duration_ms: 5.363993
+  type: 'test'
+  ...
+# Subtest: contract vector: tampered_amount_after_signing -> ERR_DIGEST
+ok 30 - contract vector: tampered_amount_after_signing -> ERR_DIGEST
+  ---
+  duration_ms: 0.651407
+  type: 'test'
+  ...
+# Subtest: contract vector: tampered_recipient_after_signing -> ERR_DIGEST
+ok 31 - contract vector: tampered_recipient_after_signing -> ERR_DIGEST
+  ---
+  duration_ms: 0.570456
+  type: 'test'
+  ...
+# Subtest: contract vector: forged_signature -> ERR_BAD_SIGNATURE
+ok 32 - contract vector: forged_signature -> ERR_BAD_SIGNATURE
+  ---
+  duration_ms: 0.600556
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_contract -> ERR_WRONG_CONTRACT
+ok 33 - contract vector: wrong_contract -> ERR_WRONG_CONTRACT
+  ---
+  duration_ms: 0.654171
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_network -> ERR_NETWORK
+ok 34 - contract vector: wrong_network -> ERR_NETWORK
+  ---
+  duration_ms: 0.439136
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_method -> ERR_ACTION
+ok 35 - contract vector: wrong_method -> ERR_ACTION
+  ---
+  duration_ms: 0.546447
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_signer_field -> ERR_SIGNER
+ok 36 - contract vector: wrong_signer_field -> ERR_SIGNER
+  ---
+  duration_ms: 0.684875
+  type: 'test'
+  ...
+# Subtest: contract vector: not_executor_caller -> ERR_NOT_EXECUTOR
+ok 37 - contract vector: not_executor_caller -> ERR_NOT_EXECUTOR
+  ---
+  duration_ms: 0.495213
+  type: 'test'
+  ...
+# Subtest: contract vector: over_max -> ERR_OVER_MAX
+ok 38 - contract vector: over_max -> ERR_OVER_MAX
+  ---
+  duration_ms: 0.974368
+  type: 'test'
+  ...
+# Subtest: contract vector: expired_intent -> ERR_EXPIRED
+ok 39 - contract vector: expired_intent -> ERR_EXPIRED
+  ---
+  duration_ms: 0.696839
+  type: 'test'
+  ...
+# Subtest: contract vector: expired_authorization -> ERR_EXPIRED
+ok 40 - contract vector: expired_authorization -> ERR_EXPIRED
+  ---
+  duration_ms: 0.403112
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_principal -> ERR_PRINCIPAL
+ok 41 - contract vector: wrong_principal -> ERR_PRINCIPAL
+  ---
+  duration_ms: 0.443963
+  type: 'test'
+  ...
+# Subtest: contract vector: unknown_intent_field -> ERR_FIELDS
+ok 42 - contract vector: unknown_intent_field -> ERR_FIELDS
+  ---
+  duration_ms: 0.14242
+  type: 'test'
+  ...
+# Subtest: contract vector: wrong_asset -> ERR_ASSET
+ok 43 - contract vector: wrong_asset -> ERR_ASSET
+  ---
+  duration_ms: 0.369999
+  type: 'test'
+  ...
+# Subtest: vectors contain no private key material
+ok 44 - vectors contain no private key material
+  ---
+  duration_ms: 0.461066
+  type: 'test'
+  ...
+# Subtest: config is testnet-only with an exact RPC allowlist
+ok 45 - config is testnet-only with an exact RPC allowlist
+  ---
+  duration_ms: 2.375236
+  type: 'test'
+  ...
+# Subtest: pre-sign check rejects any transaction that differs from the sealed intent
+ok 46 - pre-sign check rejects any transaction that differs from the sealed intent
+  ---
+  duration_ms: 145.525845
+  type: 'test'
+  ...
+# Subtest: verifier: CONFIRMED only for the exact finalized effect (contract and native)
+ok 47 - verifier: CONFIRMED only for the exact finalized effect (contract and native)
+  ---
+  duration_ms: 72.063523
+  type: 'test'
+  ...
+# Subtest: RPC client maps node TIMEOUT_ERROR and unknown transactions correctly (stubbed fetch)
+ok 48 - RPC client maps node TIMEOUT_ERROR and unknown transactions correctly (stubbed fetch)
+  ---
+  duration_ms: 27.286338
+  type: 'test'
+  ...
+# Subtest: executor key file: permissions, account binding, and no secret in serialisation, DB or journal
+ok 49 - executor key file: permissions, account binding, and no secret in serialisation, DB or journal
+  ---
+  duration_ms: 57.123596
+  type: 'test'
+  ...
+# Subtest: canonical encoding is key-order independent and domain separated
+ok 50 - canonical encoding is key-order independent and domain separated
+  ---
+  duration_ms: 3.434219
+  type: 'test'
+  ...
+# Subtest: sealed intent binds every execution field and round-trips
+ok 51 - sealed intent binds every execution field and round-trips
+  ---
+  duration_ms: 3.031828
+  type: 'test'
+  ...
+# Subtest: intent rejects unknown, missing, defaulted and incompatible fields
+ok 52 - intent rejects unknown, missing, defaulted and incompatible fields
+  ---
+  duration_ms: 1.777727
+  type: 'test'
+  ...
+# Subtest: yocto formatting uses integer arithmetic only
+ok 53 - yocto formatting uses integer arithmetic only
+  ---
+  duration_ms: 0.451371
+  type: 'test'
+  ...
+# Subtest: owner authorization verifies only for the exact digest, key, principal, challenge and window
+ok 54 - owner authorization verifies only for the exact digest, key, principal, challenge and window
+  ---
+  duration_ms: 6.638132
+  type: 'test'
+  ...
+# Subtest: owner key never serialises its private part
+ok 55 - owner key never serialises its private part
+  ---
+  duration_ms: 0.919096
+  type: 'test'
+  ...
+# Subtest: mandate parser rejects inconsistent ceilings and non-testnet recipients
+ok 56 - mandate parser rejects inconsistent ceilings and non-testnet recipients
+  ---
+  duration_ms: 2.342062
+  type: 'test'
+  ...
+# Subtest: owner and executor key loads refuse a symlink and a permissive mode
+ok 57 - owner and executor key loads refuse a symlink and a permissive mode
+  ---
+  duration_ms: 36.890439
+  type: 'test'
+  ...
+# Subtest: 8 processes racing on one capability: exactly one reservation
+ok 58 - 8 processes racing on one capability: exactly one reservation
+  ---
+  duration_ms: 501.715048
+  type: 'test'
+  ...
+# Subtest: cumulative mandate ceiling holds under multi-process contention (5 x 1 NEAR, cap 3 NEAR)
+ok 59 - cumulative mandate ceiling holds under multi-process contention (5 x 1 NEAR, cap 3 NEAR)
+  ---
+  duration_ms: 498.043587
+  type: 'test'
+  ...
+# Subtest: journal is append-only and hash chained
+ok 60 - journal is append-only and hash chained
+  ---
+  duration_ms: 19.162916
+  type: 'test'
+  ...
+# Subtest: a directory name containing a shell separator is passed as one find argument
+ok 61 - a directory name containing a shell separator is passed as one find argument
+  ---
+  duration_ms: 9.943119
+  type: 'test'
+  ...
+# Subtest: shellSingleQuote keeps separators and quotes inside one shell word
+ok 62 - shellSingleQuote keeps separators and quotes inside one shell word
+  ---
+  duration_ms: 3.187039
+  type: 'test'
+  ...
+# Subtest: codeWritableReport stats the node binary without a shell
+ok 63 - codeWritableReport stats the node binary without a shell
+  ---
+  duration_ms: 10.420623
+  type: 'test'
+  ...
+# Subtest: find/stat path operands must be absolute: a dash-led or relative path is refused, not parsed as an expression (PR \#28 \#21 condition)
+ok 64 - find/stat path operands must be absolute: a dash-led or relative path is refused, not parsed as an expression (PR \#28 \#21 condition)
+  ---
+  duration_ms: 3.472929
+  type: 'test'
+  ...
+# Subtest: a find failure is recorded in the report instead of reading as "nothing writable"
+ok 65 - a find failure is recorded in the report instead of reading as "nothing writable"
+  ---
+  duration_ms: 4.623115
+  type: 'test'
+  ...
+# Subtest: SEEN prompt_injection: denied at the boundary, zero unauthorized ledger effect
+ok 66 - SEEN prompt_injection: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 237.276935
+  type: 'test'
+  ...
+# Subtest: SEEN admin_impersonation: denied at the boundary, zero unauthorized ledger effect
+ok 67 - SEEN admin_impersonation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 138.289402
+  type: 'test'
+  ...
+# Subtest: SEEN malicious_tool_output: denied at the boundary, zero unauthorized ledger effect
+ok 68 - SEEN malicious_tool_output: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 120.360795
+  type: 'test'
+  ...
+# Subtest: SEEN ssrf_internal: denied at the boundary, zero unauthorized ledger effect
+ok 69 - SEEN ssrf_internal: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 119.608482
+  type: 'test'
+  ...
+# Subtest: SEEN credential_exfiltration: denied at the boundary, zero unauthorized ledger effect
+ok 70 - SEEN credential_exfiltration: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 77.130378
+  type: 'test'
+  ...
+# Subtest: SEEN unauthorized_executor_invocation: denied at the boundary, zero unauthorized ledger effect
+ok 71 - SEEN unauthorized_executor_invocation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 71.071222
+  type: 'test'
+  ...
+# Subtest: SEEN forged_owner_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 72 - SEEN forged_owner_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 68.319535
+  type: 'test'
+  ...
+# Subtest: SEEN recipient_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 73 - SEEN recipient_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 89.589544
+  type: 'test'
+  ...
+# Subtest: SEEN amount_manipulation: denied at the boundary, zero unauthorized ledger effect
+ok 74 - SEEN amount_manipulation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 101.622761
+  type: 'test'
+  ...
+# Subtest: SEEN asset_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 75 - SEEN asset_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 81.158099
+  type: 'test'
+  ...
+# Subtest: SEEN contract_method_substitution: denied at the boundary, zero unauthorized ledger effect
+ok 76 - SEEN contract_method_substitution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 59.835312
+  type: 'test'
+  ...
+# Subtest: SEEN cross_principal_confusion: denied at the boundary, zero unauthorized ledger effect
+ok 77 - SEEN cross_principal_confusion: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 61.063047
+  type: 'test'
+  ...
+# Subtest: SEEN expired_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 78 - SEEN expired_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 74.285195
+  type: 'test'
+  ...
+# Subtest: SEEN revoked_authorization: denied at the boundary, zero unauthorized ledger effect
+ok 79 - SEEN revoked_authorization: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 63.586641
+  type: 'test'
+  ...
+# Subtest: SEEN replay: denied at the boundary, zero unauthorized ledger effect
+ok 80 - SEEN replay: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 89.112968
+  type: 'test'
+  ...
+# Subtest: SEEN duplicate_execution: denied at the boundary, zero unauthorized ledger effect
+ok 81 - SEEN duplicate_execution: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 166.19439
+  type: 'test'
+  ...
+# Subtest: SEEN concurrent_race: denied at the boundary, zero unauthorized ledger effect
+ok 82 - SEEN concurrent_race: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 232.645588
+  type: 'test'
+  ...
+# Subtest: SEEN malformed_oversized: denied at the boundary, zero unauthorized ledger effect
+ok 83 - SEEN malformed_oversized: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 64.308
+  type: 'test'
+  ...
+# Subtest: SEEN policy_modification: denied at the boundary, zero unauthorized ledger effect
+ok 84 - SEEN policy_modification: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 67.034076
+  type: 'test'
+  ...
+# Subtest: SEEN watchdog_manipulation: denied at the boundary, zero unauthorized ledger effect
+ok 85 - SEEN watchdog_manipulation: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 71.67259
+  type: 'test'
+  ...
+# Subtest: SEEN freeze_bypass: denied at the boundary, zero unauthorized ledger effect
+ok 86 - SEEN freeze_bypass: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 59.827542
+  type: 'test'
+  ...
+# Subtest: SEEN restart_crash_recovery: denied at the boundary, zero unauthorized ledger effect
+ok 87 - SEEN restart_crash_recovery: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 85.248042
+  type: 'test'
+  ...
+# Subtest: SEEN audit_log_tamper: denied at the boundary, zero unauthorized ledger effect
+ok 88 - SEEN audit_log_tamper: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 59.194706
+  type: 'test'
+  ...
+# Subtest: SEEN buffer_bypass: denied at the boundary, zero unauthorized ledger effect
+ok 89 - SEEN buffer_bypass: denied at the boundary, zero unauthorized ledger effect
+  ---
+  duration_ms: 56.580928
+  type: 'test'
+  ...
+# Subtest: BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+ok 90 - BR-001: a malicious transfer PENDING on the ledger at freeze time must not settle after recovery/unfreeze
+  ---
+  duration_ms: 94.828693
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+ok 91 - BR-001 mutation: legit + unauthorized (allow-listed, unbound recipient) both pending at freeze -> legit settles, unauthorized voided
+  ---
+  duration_ms: 201.0322
+  type: 'test'
+  ...
+# Subtest: BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+ok 92 - BR-001 mutation: VOID_PENDING is refused when not frozen and for SETTLED transfers (settled is final)
+  ---
+  duration_ms: 50.237079
+  type: 'test'
+  ...
+# Subtest: crash before ledger submit: restart reconciles by re-submitting the SAME signed bytes; exactly one effect
+ok 93 - crash before ledger submit: restart reconciles by re-submitting the SAME signed bytes; exactly one effect
+  ---
+  duration_ms: 61.806941
+  type: 'test'
+  ...
+# Subtest: crash after ledger applied the transfer (lost response): recovery finds it, no double settlement
+ok 94 - crash after ledger applied the transfer (lost response): recovery finds it, no double settlement
+  ---
+  duration_ms: 53.872799
+  type: 'test'
+  ...
+# Subtest: superseded key nonce: a never-accepted transfer is re-signed (same payment, same one-use nonce) and settles once
+ok 95 - superseded key nonce: a never-accepted transfer is re-signed (same payment, same one-use nonce) and settles once
+  ---
+  duration_ms: 55.286544
+  type: 'test'
+  ...
+# Subtest: re-signed transfer and ledger dedup: same intent nonce can never be accepted twice
+ok 96 - re-signed transfer and ledger dedup: same intent nonce can never be accepted twice
+  ---
+  duration_ms: 46.728948
+  type: 'test'
+  ...
+# Subtest: audit log failure fails closed: no proposal accepted, no release, no ledger effect; recovers when audit returns
+ok 97 - audit log failure fails closed: no proposal accepted, no release, no ledger effect; recovers when audit returns
+  ---
+  duration_ms: 51.534518
+  type: 'test'
+  ...
+# Subtest: budget limits are enforced by the Sensitive Zone (pending count, pending exposure, cumulative, executions, duration)
+ok 98 - budget limits are enforced by the Sensitive Zone (pending count, pending exposure, cumulative, executions, duration)
+  ---
+  duration_ms: 152.261751
+  type: 'test'
+  ...
+# Subtest: durable single-use capability across OS processes: 6 processes race the same capability, exactly one reservation
+ok 99 - durable single-use capability across OS processes: 6 processes race the same capability, exactly one reservation
+  ---
+  duration_ms: 368.071775
+  type: 'test'
+  ...
+# Subtest: freeze integrity: forged / unbound / stale unfreeze statements are refused; proposals denied while frozen
+ok 100 - freeze integrity: forged / unbound / stale unfreeze statements are refused; proposals denied while frozen
+  ---
+  duration_ms: 33.442739
+  type: 'test'
+  ...
+# Subtest: anomaly (payments stuck UNKNOWN) => HOLD (no releases) => cleared after review
+ok 101 - anomaly (payments stuck UNKNOWN) => HOLD (no releases) => cleared after review
+  ---
+  duration_ms: 97.321929
+  type: 'test'
+  ...
+# Subtest: policy integrity: attacker-signed or below-floor policies are refused even on the control channel
+ok 102 - policy integrity: attacker-signed or below-floor policies are refused even on the control channel
+  ---
+  duration_ms: 28.206641
+  type: 'test'
+  ...
+# Subtest: virtual clock readers refuse a clock that moves backwards or is missing (fail closed)
+ok 103 - virtual clock readers refuse a clock that moves backwards or is missing (fail closed)
+  ---
+  duration_ms: 29.649105
+  type: 'test'
+  ...
+# Subtest: in-process repair loop: injected flaw -> breach -> freeze -> patch -> replay/mutations denied -> regression -> recover -> resume
+ok 104 - in-process repair loop: injected flaw -> breach -> freeze -> patch -> replay/mutations denied -> regression -> recover -> resume
+  ---
+  duration_ms: 3088.06595
+  type: 'test'
+  ...
+# Subtest: pre-release audit (buffer use) catches the same injected flaw with ZERO ledger effect
+ok 105 - pre-release audit (buffer use) catches the same injected flaw with ZERO ledger effect
+  ---
+  duration_ms: 348.557617
+  type: 'test'
+  ...
+# Subtest: public-key symlink is replaced, not followed
+ok 106 - public-key symlink is replaced, not followed
+  ---
+  duration_ms: 15.905037
+  type: 'test'
+  ...
+# Subtest: a private-key symlink is refused and its target is not read as the key
+ok 107 - a private-key symlink is refused and its target is not read as the key
+  ---
+  duration_ms: 3.946739
+  type: 'test'
+  ...
+# Subtest: an existing private key with no public key is republished, not skipped
+ok 108 - an existing private key with no public key is republished, not skipped
+  ---
+  duration_ms: 5.333477
+  type: 'test'
+  ...
+# Subtest: a group-readable private key is refused
+ok 109 - a group-readable private key is refused
+  ---
+  duration_ms: 2.14721
+  type: 'test'
+  ...
+# Subtest: concurrent sens keygen calls leave one private key and a matching public key
+ok 110 - concurrent sens keygen calls leave one private key and a matching public key
+  ---
+  duration_ms: 1201.040203
+  type: 'test'
+  ...
+# Subtest: a FIFO at the executor key path or the owner log path is refused, never blocks (review F1)
+ok 111 - a FIFO at the executor key path or the owner log path is refused, never blocks (review F1)
+  ---
+  duration_ms: 232.912662
+  type: 'test'
+  ...
+# Subtest: the incremental owner-log view refuses a log replaced by another file between refreshes (review F9)
+ok 112 - the incremental owner-log view refuses a log replaced by another file between refreshes (review F9)
+  ---
+  duration_ms: 6.849635
+  type: 'test'
+  ...
+# Subtest: a torn last line is left for the next refresh and then applied once (review F14)
+ok 113 - a torn last line is left for the next refresh and then applied once (review F14)
+  ---
+  duration_ms: 5.691967
+  type: 'test'
+  ...
+# Subtest: keygen keeps a concurrent winner's private key: the loser links, it never renames over it (review F13)
+ok 114 - keygen keeps a concurrent winner's private key: the loser links, it never renames over it (review F13)
+  ---
+  duration_ms: 142.083056
+  type: 'test'
+  ...
+# Subtest: legitimate payment: PROPOSED->AUTHORIZED->RESERVED->BUFFERED->RELEASED->SETTLED, verified independently
+ok 115 - legitimate payment: PROPOSED->AUTHORIZED->RESERVED->BUFFERED->RELEASED->SETTLED, verified independently
+  ---
+  duration_ms: 65.424687
+  type: 'test'
+  ...
+# Subtest: buffer: release re-checks freeze; frozen payment is never released and is cancelled on unfreeze
+ok 116 - buffer: release re-checks freeze; frozen payment is never released and is cancelled on unfreeze
+  ---
+  duration_ms: 121.836236
+  type: 'test'
+  ...
+# Subtest: freeze persists across Sensitive Zone restart
+ok 117 - freeze persists across Sensitive Zone restart
+  ---
+  duration_ms: 65.126211
+  type: 'test'
+  ...
+# Subtest: stale watchdog lease blocks release (fail closed) until heartbeat resumes
+ok 118 - stale watchdog lease blocks release (fail closed) until heartbeat resumes
+  ---
+  duration_ms: 34.228912
+  type: 'test'
+  ...
+# Subtest: owner revocation during the buffer cancels the payment
+ok 119 - owner revocation during the buffer cancels the payment
+  ---
+  duration_ms: 50.822511
+  type: 'test'
+  ...
+# Subtest: delayed ledger settlement: RELEASED waits, then SETTLED exactly once
+ok 120 - delayed ledger settlement: RELEASED waits, then SETTLED exactly once
+  ---
+  duration_ms: 56.272731
+  type: 'test'
+  ...
+# Subtest: FP-001: a legitimate payment with a Unicode memo is not blocked (memo is never a decision input); control chars still refused
+ok 121 - FP-001: a legitimate payment with a Unicode memo is not blocked (memo is never a decision input); control chars still refused
+  ---
+  duration_ms: 39.388952
+  type: 'test'
+  ...
+# Subtest: OS: access matrix + all 24 techniques through real sockets/files/signals/network
+ok 122 - OS: access matrix + all 24 techniques through real sockets/files/signals/network
+  ---
+  duration_ms: 4082.910007
+  type: 'test'
+  ...
+# Subtest: OS: containment + automated repair drill (injected flaw, post-effect detection) resumes only after all gates pass
+ok 123 - OS: containment + automated repair drill (injected flaw, post-effect detection) resumes only after all gates pass
+  ---
+  duration_ms: 6318.000245
+  type: 'test'
+  ...
+# Subtest: owner log view reads an append-only file and refuses a symlink
+ok 124 - owner log view reads an append-only file and refuses a symlink
+  ---
+  duration_ms: 7.364473
+  type: 'test'
+  ...
+# Subtest: owner log WRITER refuses a symlink at logPath and leaves the target untouched (PR \#28 \#24 condition)
+ok 125 - owner log WRITER refuses a symlink at logPath and leaves the target untouched (PR \#28 \#24 condition)
+  ---
+  duration_ms: 2.801397
+  type: 'test'
+  ...
+# Subtest: attack technique names are own properties, not Object.prototype methods
+ok 126 - attack technique names are own properties, not Object.prototype methods
+  ---
+  duration_ms: 1.337036
+  type: 'test'
+  ...
+# Subtest: F-B01: exact-amount capability denies below-intent and above-cap amounts, accepts the exact price
+ok 127 - F-B01: exact-amount capability denies below-intent and above-cap amounts, accepts the exact price
+  ---
+  duration_ms: 110.794028
+  type: 'test'
+  ...
+# Subtest: F-B01: legacy max-amount capabilities keep V2-A semantics (backward compatible)
+ok 128 - F-B01: legacy max-amount capabilities keep V2-A semantics (backward compatible)
+  ---
+  duration_ms: 81.565118
+  type: 'test'
+  ...
+# Subtest: F-B01: verifier flags an exact capability spent at another amount even if the Sensitive Zone were bypassed
+ok 129 - F-B01: verifier flags an exact capability spent at another amount even if the Sensitive Zone were bypassed
+  ---
+  duration_ms: 17.161687
+  type: 'test'
+  ...
+# Subtest: F-B01: scripted replay of the H1 underpay tactic yields no LEGIT_BUT_UNINTENDED with exact capabilities
+ok 130 - F-B01: scripted replay of the H1 underpay tactic yields no LEGIT_BUT_UNINTENDED with exact capabilities
+  ---
+  duration_ms: 848.624229
+  type: 'test'
+  ...
+# Subtest: v2b: reply parsing tolerates fences/prose; action validation bounds the turn
+ok 131 - v2b: reply parsing tolerates fences/prose; action validation bounds the turn
+  ---
+  duration_ms: 1.022884
+  type: 'test'
+  ...
+# Subtest: v2b: canary scan detects partial secret exposure
+ok 132 - v2b: canary scan detects partial secret exposure
+  ---
+  duration_ms: 0.861521
+  type: 'test'
+  ...
+# Subtest: v2b: scripted attacker (no LLM) — redirect, overspend, interception and poisoning are classified by the verifier
+ok 133 - v2b: scripted attacker (no LLM) — redirect, overspend, interception and poisoning are classified by the verifier
+  ---
+  duration_ms: 720.59609
+  type: 'test'
+  ...
+# Subtest: F-B02: with the V2-A (untrusted) replay, a forged General Zone report makes an UNPATCHED system resume
+ok 134 - F-B02: with the V2-A (untrusted) replay, a forged General Zone report makes an UNPATCHED system resume
+  ---
+  duration_ms: 1588.1333
+  type: 'test'
+  ...
+# Subtest: F-B02/F-B03: trusted supervisor replay refuses to resume an unpatched system, ignores forged reports, resumes a patched one
+ok 135 - F-B02/F-B03: trusted supervisor replay refuses to resume an unpatched system, ignores forged reports, resumes a patched one
+  ---
+  duration_ms: 1795.436509
+  type: 'test'
+  ...
+# Subtest: forged / replayed WebAuthn responses are rejected at the injection port
+ok 136 - forged / replayed WebAuthn responses are rejected at the injection port
+  ---
+  duration_ms: 59.435322
+  type: 'test'
+  ...
+# Subtest: external-key signature replay: same action twice -> ACTION_REPLAY; signature moved to another action -> bad signature
+ok 137 - external-key signature replay: same action twice -> ACTION_REPLAY; signature moved to another action -> bad signature
+  ---
+  duration_ms: 41.252559
+  type: 'test'
+  ...
+# Subtest: credential independence: duplicated key, shared seed, shared device, same sync provider are refused at genesis
+ok 138 - credential independence: duplicated key, shared seed, shared device, same sync provider are refused at genesis
+  ---
+  duration_ms: 29.144554
+  type: 'test'
+  ...
+# Subtest: genesis cannot be swapped: a genesis that is not the pinned digest is refused by every domain
+ok 139 - genesis cannot be swapped: a genesis that is not the pinned digest is refused by every domain
+  ---
+  duration_ms: 4.793501
+  type: 'test'
+  ...
+# Subtest: authority matrix: weakening below hard floors is impossible, even with the full governance quorum; strengthening works
+ok 140 - authority matrix: weakening below hard floors is impossible, even with the full governance quorum; strengthening works
+  ---
+  duration_ms: 45.903833
+  type: 'test'
+  ...
+# Subtest: multi-administrator profile: five keys of ONE person never equal several administrators
+ok 141 - multi-administrator profile: five keys of ONE person never equal several administrators
+  ---
+  duration_ms: 34.510917
+  type: 'test'
+  ...
+# Subtest: evidence review (multi-admin, deceased administrator): police report alone grants nothing; registrar-signed certificate + identity + guardians + survivors works
+ok 142 - evidence review (multi-admin, deceased administrator): police report alone grants nothing; registrar-signed certificate + identity + guardians + survivors works
+  ---
+  duration_ms: 131.11992
+  type: 'test'
+  ...
+# Subtest: concurrent rotation of the same epoch: exactly one wins, the other is STALE_EPOCH
+ok 143 - concurrent rotation of the same epoch: exactly one wins, the other is STALE_EPOCH
+  ---
+  duration_ms: 28.659829
+  type: 'test'
+  ...
+# Subtest: restart during rotation / recovery: Root and Vault rebuild from durable state; duplicate requests are idempotent-denied
+ok 144 - restart during rotation / recovery: Root and Vault rebuild from durable state; duplicate requests are idempotent-denied
+  ---
+  duration_ms: 63.458747
+  type: 'test'
+  ...
+# Subtest: crash after persist (before effects propagate): no lost transition, no double effect
+ok 145 - crash after persist (before effects propagate): no lost transition, no double effect
+  ---
+  duration_ms: 42.717243
+  type: 'test'
+  ...
+# Subtest: rollback / fork of the Root store is detected by the vault replica; tampered rows stop the Root (crash poisoning fails closed)
+ok 146 - rollback / fork of the Root store is detected by the vault replica; tampered rows stop the Root (crash poisoning fails closed)
+  ---
+  duration_ms: 59.673411
+  type: 'test'
+  ...
+# Subtest: General Zone has no Root operation; a forged "recovery complete" and a false recovery notice carry no authority
+ok 147 - General Zone has no Root operation; a forged "recovery complete" and a false recovery notice carry no authority
+  ---
+  duration_ms: 29.141305
+  type: 'test'
+  ...
+# Subtest: resource exhaustion: oversized and deeply nested requests are refused; repeated fake cases are rate limited
+ok 148 - resource exhaustion: oversized and deeply nested requests are refused; repeated fake cases are rate limited
+  ---
+  duration_ms: 65.98571
+  type: 'test'
+  ...
+# Subtest: executor key is not a credential: a compromised vault cannot amend Purpose or rotate keys
+ok 149 - executor key is not a credential: a compromised vault cannot amend Purpose or rotate keys
+  ---
+  duration_ms: 35.648664
+  type: 'test'
+  ...
+# Subtest: deployment: reviewed hash + FunctionCall-only keys passes
+ok 150 - deployment: reviewed hash + FunctionCall-only keys passes
+  ---
+  duration_ms: 2.119767
+  type: 'test'
+  ...
+# Subtest: deployment: FullAccess, all-methods, re-init, foreign receiver and code-hash drift are all reported
+ok 151 - deployment: FullAccess, all-methods, re-init, foreign receiver and code-hash drift are all reported
+  ---
+  duration_ms: 0.534057
+  type: 'test'
+  ...
+# Subtest: deployment: missing expected hash and implicit accounts fail closed
+ok 152 - deployment: missing expected hash and implicit accounts fail closed
+  ---
+  duration_ms: 0.263069
+  type: 'test'
+  ...
+# Subtest: OS: V3 principal privilege matrix (root / recovery / vault / ledger / general zone)
+ok 153 - OS: V3 principal privilege matrix (root / recovery / vault / ledger / general zone)
+  ---
+  duration_ms: 701.698038
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 154 - F-V3-02 exact replay: stolen channel objects (campaign A replay) -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 152.768671
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 155 - F-V3-02 exact replay: one compromised guardian objects -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 117.669626
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 156 - F-V3-02 exact replay: stolen ROOT key objects as claimed-lost subject + stolen channel -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 105.843526
+  type: 'test'
+  ...
+# Subtest: F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+ok 157 - F-V3-02 exact replay: lost RECOVERY key: compromised guardian + channel object -> owner overrides with all-survivor consent + normal guardian quorum and recovers
+  ---
+  duration_ms: 107.450887
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: missing ONE survivor consent -> override denied
+ok 158 - F-V3-02 mutation: missing ONE survivor consent -> override denied
+  ---
+  duration_ms: 100.095991
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: below the normal guardian quorum -> override denied
+ok 159 - F-V3-02 mutation: below the normal guardian quorum -> override denied
+  ---
+  duration_ms: 63.536835
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+ok 160 - F-V3-02 mutation: guardian objections not outnumbered by approvals -> override denied
+  ---
+  duration_ms: 73.653292
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: a SURVIVING credential objection is never overridable
+ok 161 - F-V3-02 mutation: a SURVIVING credential objection is never overridable
+  ---
+  duration_ms: 75.536341
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+ok 162 - F-V3-02 mutation: reconstitution path keeps the strict rules (guardian objection not overridable)
+  ---
+  duration_ms: 85.842222
+  type: 'test'
+  ...
+# Subtest: F-V3-02 mutation: a guardian that approves and then objects is not counted on both sides
+ok 163 - F-V3-02 mutation: a guardian that approves and then objects is not counted on both sides
+  ---
+  duration_ms: 79.859929
+  type: 'test'
+  ...
+# Subtest: owner governance route: stolen K1+K4 with all guardians/IDVs colluding -> owner revokes and refills via K2+K3
+ok 164 - owner governance route: stolen K1+K4 with all guardians/IDVs colluding -> owner revokes and refills via K2+K3
+  ---
+  duration_ms: 123.071306
+  type: 'test'
+  ...
+# Subtest: V3 Root: inherited and planted action names are TRANSITION_TYPE_UNKNOWN and do not advance seq/head/nonce/epoch
+ok 165 - V3 Root: inherited and planted action names are TRANSITION_TYPE_UNKNOWN and do not advance seq/head/nonce/epoch
+  ---
+  duration_ms: 115.417637
+  type: 'test'
+  ...
+# Subtest: V3 applyTransition directly: an inherited type throws TRANSITION_TYPE_UNKNOWN (no V4/V5 layer in front)
+ok 166 - V3 applyTransition directly: an inherited type throws TRANSITION_TYPE_UNKNOWN (no V4/V5 layer in front)
+  ---
+  duration_ms: 68.243134
+  type: 'test'
+  ...
+# Subtest: V4 Root: inherited and planted action names (incl. the V3 passthrough table) do not advance state
+ok 167 - V4 Root: inherited and planted action names (incl. the V3 passthrough table) do not advance state
+  ---
+  duration_ms: 67.378433
+  type: 'test'
+  ...
+# Subtest: V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached
+ok 168 - V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached
+  ---
+  duration_ms: 233.269593
+  type: 'test'
+  ...
+# Subtest: fake loss report: claim alone changes no authority; every channel notified; timer alone never completes
+ok 169 - fake loss report: claim alone changes no authority; every channel notified; timer alone never completes
+  ---
+  duration_ms: 99.153658
+  type: 'test'
+  ...
+# Subtest: fake loss report: owner objects from a surviving key (HOLD) then cancels; the attacker cannot override a survivor objection
+ok 170 - fake loss report: owner objects from a surviving key (HOLD) then cancels; the attacker cannot override a survivor objection
+  ---
+  duration_ms: 67.53833
+  type: 'test'
+  ...
+# Subtest: conflicting / repeated loss reports: one case at a time and a cool-down between cases
+ok 171 - conflicting / repeated loss reports: one case at a time and a cool-down between cases
+  ---
+  duration_ms: 93.85429
+  type: 'test'
+  ...
+# Subtest: lost-claim set must be live credentials of the subject holder; plan keys must be independent
+ok 172 - lost-claim set must be live credentials of the subject holder; plan keys must be independent
+  ---
+  duration_ms: 44.417501
+  type: 'test'
+  ...
+# Subtest: compromised notification channel: its forged OBJECTION is overridable by full evidence; its forged ACK cannot enable early completion
+ok 173 - compromised notification channel: its forged OBJECTION is overridable by full evidence; its forged ACK cannot enable early completion
+  ---
+  duration_ms: 121.424071
+  type: 'test'
+  ...
+# Subtest: thief holding the lost key objects to block recovery: overridable (no permanent lockout) — positive control
+ok 174 - thief holding the lost key objects to block recovery: overridable (no permanent lockout) — positive control
+  ---
+  duration_ms: 97.622688
+  type: 'test'
+  ...
+# Subtest: GUARDIAN COLLUSION + one stolen key: claim the other four keys lost, forge nothing, then override the real owner's objections
+ok 175 - GUARDIAN COLLUSION + one stolen key: claim the other four keys lost, forge nothing, then override the real owner's objections
+  ---
+  duration_ms: 93.791727
+  type: 'test'
+  ...
+# Subtest: guardian impersonation and identity forgery: unpinned keys are rejected
+ok 176 - guardian impersonation and identity forgery: unpinned keys are rejected
+  ---
+  duration_ms: 37.064337
+  type: 'test'
+  ...
+# Subtest: 72-hour boundary: complete at openedAt+72h-1ms fails, at +72h succeeds (all evidence present, not all channels acked)
+ok 177 - 72-hour boundary: complete at openedAt+72h-1ms fails, at +72h succeeds (all evidence present, not all channels acked)
+  ---
+  duration_ms: 74.298652
+  type: 'test'
+  ...
+# Subtest: early completion needs EVERY channel acked and the 1 h floor; missing guardian blocks even after the window
+ok 178 - early completion needs EVERY channel acked and the 1 h floor; missing guardian blocks even after the window
+  ---
+  duration_ms: 100.898761
+  type: 'test'
+  ...
+# Subtest: Purpose amendment, rotation and matrix change are refused while a recovery case is open
+ok 179 - Purpose amendment, rotation and matrix change are refused while a recovery case is open
+  ---
+  duration_ms: 43.350906
+  type: 'test'
+  ...
+# Subtest: old-epoch authorization reuse: a consent prepared in epoch 1 is dead after the recovery bumps the epoch
+ok 180 - old-epoch authorization reuse: a consent prepared in epoch 1 is dead after the recovery bumps the epoch
+  ---
+  duration_ms: 96.389575
+  type: 'test'
+  ...
+# Subtest: laundering: sequential partial recoveries cannot reset the loss denominator; recovered keys cannot consent while provisional
+ok 181 - laundering: sequential partial recoveries cannot reset the loss denominator; recovered keys cannot consent while provisional
+  ---
+  duration_ms: 99.736314
+  type: 'test'
+  ...
+# Subtest: Recovery Guardians, K4 and K5 never pay or amend purpose, even inside a recovery
+ok 182 - Recovery Guardians, K4 and K5 never pay or amend purpose, even inside a recovery
+  ---
+  duration_ms: 42.451743
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone,k5-recovery-hw} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze}; owner objects only with {k2-laptop}
+ok 183 - F-V3-01 mutation: stolen {k1-phone,k5-recovery-hw} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze}; owner objects only with {k2-laptop}
+  ---
+  duration_ms: 97.57507
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k4-freeze}
+ok 184 - F-V3-01 mutation: stolen {k1-phone} + colluding guardians/IDVs/channels claim {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k4-freeze}
+  ---
+  duration_ms: 113.849248
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k3-root-hw} + colluding guardians/IDVs/channels claim {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}; owner objects only with {k1-phone}
+ok 185 - F-V3-01 mutation: stolen {k3-root-hw} + colluding guardians/IDVs/channels claim {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}; owner objects only with {k1-phone}
+  ---
+  duration_ms: 96.417174
+  type: 'test'
+  ...
+# Subtest: F-V3-01 mutation: stolen {k1-phone,k2-laptop} + colluding guardians/IDVs/channels claim {k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k5-recovery-hw}
+ok 186 - F-V3-01 mutation: stolen {k1-phone,k2-laptop} + colluding guardians/IDVs/channels claim {k3-root-hw,k4-freeze,k5-recovery-hw}; owner objects only with {k5-recovery-hw}
+  ---
+  duration_ms: 96.562511
+  type: 'test'
+  ...
+# Subtest: RESIDUAL R-1 (documented, not fixed): owner silent for 72 h + one stolen key + ALL guardians + BOTH identity verifiers + a majority of the owner's channels => takeover
+ok 187 - RESIDUAL R-1 (documented, not fixed): owner silent for 72 h + one stolen key + ALL guardians + BOTH identity verifiers + a majority of the owner's channels => takeover
+  ---
+  duration_ms: 102.407961
+  type: 'test'
+  ...
+# Subtest: lost {none}
+ok 188 - lost {none}
+  ---
+  duration_ms: 45.136788
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone}
+ok 189 - lost {k1-phone}
+  ---
+  duration_ms: 121.917132
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop}
+ok 190 - lost {k2-laptop}
+  ---
+  duration_ms: 129.509255
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop}
+ok 191 - lost {k1-phone,k2-laptop}
+  ---
+  duration_ms: 107.641634
+  type: 'test'
+  ...
+# Subtest: lost {k3-root-hw}
+ok 192 - lost {k3-root-hw}
+  ---
+  duration_ms: 133.160432
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k3-root-hw}
+ok 193 - lost {k1-phone,k3-root-hw}
+  ---
+  duration_ms: 103.053569
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k3-root-hw}
+ok 194 - lost {k2-laptop,k3-root-hw}
+  ---
+  duration_ms: 95.840515
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k3-root-hw}
+ok 195 - lost {k1-phone,k2-laptop,k3-root-hw}
+  ---
+  duration_ms: 123.734899
+  type: 'test'
+  ...
+# Subtest: lost {k4-freeze}
+ok 196 - lost {k4-freeze}
+  ---
+  duration_ms: 106.073252
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k4-freeze}
+ok 197 - lost {k1-phone,k4-freeze}
+  ---
+  duration_ms: 101.957777
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k4-freeze}
+ok 198 - lost {k2-laptop,k4-freeze}
+  ---
+  duration_ms: 100.452264
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k4-freeze}
+ok 199 - lost {k1-phone,k2-laptop,k4-freeze}
+  ---
+  duration_ms: 123.50208
+  type: 'test'
+  ...
+# Subtest: lost {k3-root-hw,k4-freeze}
+ok 200 - lost {k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 101.970035
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k3-root-hw,k4-freeze}
+ok 201 - lost {k1-phone,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 130.279566
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k3-root-hw,k4-freeze}
+ok 202 - lost {k2-laptop,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 118.094967
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze}
+ok 203 - lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 139.055569
+  type: 'test'
+  ...
+# Subtest: lost {k5-recovery-hw}
+ok 204 - lost {k5-recovery-hw}
+  ---
+  duration_ms: 106.890933
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k5-recovery-hw}
+ok 205 - lost {k1-phone,k5-recovery-hw}
+  ---
+  duration_ms: 97.165763
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k5-recovery-hw}
+ok 206 - lost {k2-laptop,k5-recovery-hw}
+  ---
+  duration_ms: 107.527001
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k5-recovery-hw}
+ok 207 - lost {k1-phone,k2-laptop,k5-recovery-hw}
+  ---
+  duration_ms: 121.587236
+  type: 'test'
+  ...
+# Subtest: lost {k3-root-hw,k5-recovery-hw}
+ok 208 - lost {k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 240.197888
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k3-root-hw,k5-recovery-hw}
+ok 209 - lost {k1-phone,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 143.938036
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k3-root-hw,k5-recovery-hw}
+ok 210 - lost {k2-laptop,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 138.404704
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k3-root-hw,k5-recovery-hw}
+ok 211 - lost {k1-phone,k2-laptop,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 117.920523
+  type: 'test'
+  ...
+# Subtest: lost {k4-freeze,k5-recovery-hw}
+ok 212 - lost {k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 109.216552
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k4-freeze,k5-recovery-hw}
+ok 213 - lost {k1-phone,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 115.153505
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k4-freeze,k5-recovery-hw}
+ok 214 - lost {k2-laptop,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 120.049043
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}
+ok 215 - lost {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 134.518991
+  type: 'test'
+  ...
+# Subtest: lost {k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 216 - lost {k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 133.891836
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 217 - lost {k1-phone,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 106.313722
+  type: 'test'
+  ...
+# Subtest: lost {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 218 - lost {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 127.960049
+  type: 'test'
+  ...
+# Subtest: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 219 - lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 59.904057
+  type: 'test'
+  ...
+# Subtest: actuator: build RECOVERY_OPEN with planOwnCredIds and submit by digest -> case opens, authority unchanged
+ok 220 - actuator: build RECOVERY_OPEN with planOwnCredIds and submit by digest -> case opens, authority unchanged
+  ---
+  duration_ms: 63.672435
+  type: 'test'
+  ...
+# Subtest: legitimate payment: K1 passkey (UV) -> buffered -> settled; verifier authorizes the effect
+ok 221 - legitimate payment: K1 passkey (UV) -> buffered -> settled; verifier authorizes the effect
+  ---
+  duration_ms: 88.538892
+  type: 'test'
+  ...
+# Subtest: PAY: K2 works, K3/K4/K5 can never pay, UV=false refused, exact amount and recipient bound
+ok 222 - PAY: K2 works, K3/K4/K5 can never pay, UV=false refused, exact amount and recipient bound
+  ---
+  duration_ms: 57.634832
+  type: 'test'
+  ...
+# Subtest: Purpose amendment needs K1+K2+K3 with UV; immutable fields can never change; any 2 keys fail
+ok 223 - Purpose amendment needs K1+K2+K3 with UV; immutable fields can never change; any 2 keys fail
+  ---
+  duration_ms: 79.857669
+  type: 'test'
+  ...
+# Subtest: rotation is role-preserving, bumps the epoch and invalidates outstanding capabilities and buffered payments
+ok 224 - rotation is role-preserving, bumps the epoch and invalidates outstanding capabilities and buffered payments
+  ---
+  duration_ms: 66.62022
+  type: 'test'
+  ...
+# Subtest: K4 freezes alone but cannot unfreeze; unfreeze needs K3 + a daily key; frozen payments are cancelled not released
+ok 225 - K4 freezes alone but cannot unfreeze; unfreeze needs K3 + a daily key; frozen payments are cancelled not released
+  ---
+  duration_ms: 79.968628
+  type: 'test'
+  ...
+# Subtest: supervisor breach freeze needs a repair certificate for THIS freeze in addition to the owner quorum
+ok 226 - supervisor breach freeze needs a repair certificate for THIS freeze in addition to the owner quorum
+  ---
+  duration_ms: 56.886197
+  type: 'test'
+  ...
+# Subtest: revoking a compromised key needs two OTHER keys, bumps the epoch, and the vacancy is refilled by K3 + daily
+ok 227 - revoking a compromised key needs two OTHER keys, bumps the epoch, and the vacancy is refilled by K3 + daily
+  ---
+  duration_ms: 56.126844
+  type: 'test'
+  ...
+# Subtest: registration: none and packed self-attestation verify; UV, origin, rpId and challenge are enforced
+ok 228 - registration: none and packed self-attestation verify; UV, origin, rpId and challenge are enforced
+  ---
+  duration_ms: 10.018978
+  type: 'test'
+  ...
+# Subtest: assertion: signature, counter, type and flags; UV is reported, never a biometric claim
+ok 229 - assertion: signature, counter, type and flags; UV is reported, never a biometric claim
+  ---
+  duration_ms: 4.2989
+  type: 'test'
+  ...
+# Subtest: CBOR: strict decoding (trailing bytes, indefinite length, duplicate keys, depth)
+ok 230 - CBOR: strict decoding (trailing bytes, indefinite length, duplicate keys, depth)
+  ---
+  duration_ms: 1.602376
+  type: 'test'
+  ...
+# Subtest: BALLOT: sealed to the tally key only; a different X25519 key cannot open it; commitments bind case + voter + choice
+ok 231 - BALLOT: sealed to the tally key only; a different X25519 key cannot open it; commitments bind case + voter + choice
+  ---
+  duration_ms: 91.726795
+  type: 'test'
+  ...
+# Subtest: BALLOT: bound to the case — a ballot from an earlier case is refused in a later case; malformed sealed payloads refused
+ok 232 - BALLOT: bound to the case — a ballot from an earlier case is refused in a later case; malformed sealed payloads refused
+  ---
+  duration_ms: 111.635806
+  type: 'test'
+  ...
+# Subtest: BALLOT RESULT: APPROVED is verifiable from public openings; REJECTED reveals no individual choice; votes after the window refused
+ok 233 - BALLOT RESULT: APPROVED is verifiable from public openings; REJECTED reveals no individual choice; votes after the window refused
+  ---
+  duration_ms: 140.066641
+  type: 'test'
+  ...
+# Subtest: BALLOT: single-voter inference is real and documented (an electorate of one reveals that voter's choice)
+ok 234 - BALLOT: single-voter inference is real and documented (an electorate of one reveals that voter's choice)
+  ---
+  duration_ms: 90.002555
+  type: 'test'
+  ...
+# Subtest: INTEGRATION: Vault replays the V4 chain; a governance execution bumps the epoch and cancels pending payments; verifier independent
+ok 235 - INTEGRATION: Vault replays the V4 chain; a governance execution bumps the epoch and cancels pending payments; verifier independent
+  ---
+  duration_ms: 154.662126
+  type: 'test'
+  ...
+# Subtest: INTEGRATION: payments keep working through an R-1 attack (bounded lockdown) and after a legitimate majority recovery
+ok 236 - INTEGRATION: payments keep working through an R-1 attack (bounded lockdown) and after a legitimate majority recovery
+  ---
+  duration_ms: 175.998412
+  type: 'test'
+  ...
+# Subtest: F-V4-01 BASELINE: on V3 one stolen key suspends the others and the owner can no longer recover
+ok 237 - F-V4-01 BASELINE: on V3 one stolen key suspends the others and the owner can no longer recover
+  ---
+  duration_ms: 103.802268
+  type: 'test'
+  ...
+# Subtest: F-V4-01 REPLAY (campaign B shape): two stolen DAILY keys freeze + suspend k3/k4/k5 => owner recovers, suspensions and freeze lifted
+ok 238 - F-V4-01 REPLAY (campaign B shape): two stolen DAILY keys freeze + suspend k3/k4/k5 => owner recovers, suspensions and freeze lifted
+  ---
+  duration_ms: 163.970361
+  type: 'test'
+  ...
+# Subtest: F-V4-01 single stolen key (k1-phone; campaign E shape for k4) suspends ALL four others => owner still recovers
+ok 239 - F-V4-01 single stolen key (k1-phone; campaign E shape for k4) suspends ALL four others => owner still recovers
+  ---
+  duration_ms: 123.798875
+  type: 'test'
+  ...
+# Subtest: F-V4-01 single stolen key (k4-freeze; campaign E shape for k4) suspends ALL four others => owner still recovers
+ok 240 - F-V4-01 single stolen key (k4-freeze; campaign E shape for k4) suspends ALL four others => owner still recovers
+  ---
+  duration_ms: 125.919806
+  type: 'test'
+  ...
+# Subtest: F-V4-01 narrowness: owner-imposed suspensions survive; a suspended key consent is intent-bound; an attacker case still cannot complete
+ok 241 - F-V4-01 narrowness: owner-imposed suspensions survive; a suspended key consent is intent-bound; an attacker case still cannot complete
+  ---
+  duration_ms: 283.920934
+  type: 'test'
+  ...
+# Subtest: F-V4-01b REINFORCEMENT: stolen K1 freezes, the owner deliberately reinforces with K2, recovery revokes K1 => vault stays frozen
+ok 242 - F-V4-01b REINFORCEMENT: stolen K1 freezes, the owner deliberately reinforces with K2, recovery revokes K1 => vault stays frozen
+  ---
+  duration_ms: 113.820116
+  type: 'test'
+  ...
+# Subtest: F-V4-01b SUPERVISOR: a breach freeze reinforced by the stolen key is never lifted by recovery
+ok 243 - F-V4-01b SUPERVISOR: a breach freeze reinforced by the stolen key is never lifted by recovery
+  ---
+  duration_ms: 307.297274
+  type: 'test'
+  ...
+# Subtest: F-V4-01b HONEST OWNER FREEZE: a freeze placed with a key that is later rotated stays; one placed with a key later lost is shown before it is dropped
+ok 244 - F-V4-01b HONEST OWNER FREEZE: a freeze placed with a key that is later rotated stays; one placed with a key later lost is shown before it is dropped
+  ---
+  duration_ms: 210.836306
+  type: 'test'
+  ...
+# Subtest: F-V4-03 DEADLOCK: suspended owner keys + colluding guardian majority => ORC + suspended K3 open R-3, replace g1/g2, owner recovers
+ok 245 - F-V4-03 DEADLOCK: suspended owner keys + colluding guardian majority => ORC + suspended K3 open R-3, replace g1/g2, owner recovers
+  ---
+  duration_ms: 206.452707
+  type: 'test'
+  ...
+# Subtest: F-V4-03 narrowness: a thief holding a suspended key and one active role still cannot form the emergency quorum without the ORC
+ok 246 - F-V4-03 narrowness: a thief holding a suspended key and one active role still cannot form the emergency quorum without the ORC
+  ---
+  duration_ms: 47.863824
+  type: 'test'
+  ...
+# Subtest: INTENT: canonical fields, SHA-256 digest, 256-bit nonce, 120 s lifetime, every field bound
+ok 247 - INTENT: canonical fields, SHA-256 digest, 256-bit nonce, 120 s lifetime, every field bound
+  ---
+  duration_ms: 140.098668
+  type: 'test'
+  ...
+# Subtest: APPROVE A, EXECUTE B: an approval for one action cannot be attached to another (params, subject, type)
+ok 248 - APPROVE A, EXECUTE B: an approval for one action cannot be attached to another (params, subject, type)
+  ---
+  duration_ms: 84.638016
+  type: 'test'
+  ...
+# Subtest: STALE APPROVAL: authority state changed after approval (epoch / credential set) => refused
+ok 249 - STALE APPROVAL: authority state changed after approval (epoch / credential set) => refused
+  ---
+  duration_ms: 43.922562
+  type: 'test'
+  ...
+# Subtest: CHALLENGES: expired, not yet valid, from the future, too long, forged issuer, other account, other credential, replayed, rate-limited
+ok 250 - CHALLENGES: expired, not yet valid, from the future, too long, forged issuer, other account, other credential, replayed, rate-limited
+  ---
+  duration_ms: 87.56751
+  type: 'test'
+  ...
+# Subtest: CONCURRENCY + CRASH: two racing submissions consume one nonce once; a Root restart never resurrects a consumed nonce
+ok 251 - CONCURRENCY + CRASH: two racing submissions consume one nonce once; a Root restart never resurrects a consumed nonce
+  ---
+  duration_ms: 102.988575
+  type: 'test'
+  ...
+# Subtest: LEGACY V3 approvals are refused for high-risk actions; protective FREEZE still works with one tap
+ok 252 - LEGACY V3 approvals are refused for high-risk actions; protective FREEZE still works with one tap
+  ---
+  duration_ms: 45.603505
+  type: 'test'
+  ...
+# Subtest: TRUSTED CONFIRMATION: CRITICAL action with software-only confirmations is refused (lower assurance); APC / hardware display accepted
+ok 253 - TRUSTED CONFIRMATION: CRITICAL action with software-only confirmations is refused (lower assurance); APC / hardware display accepted
+  ---
+  duration_ms: 143.69543
+  type: 'test'
+  ...
+# Subtest: APC: prompt text must be exactly the deterministic summary; a different prompt, no enrolled key, or a foreign key is refused
+ok 254 - APC: prompt text must be exactly the deterministic summary; a different prompt, no enrolled key, or a foreign key is refused
+  ---
+  duration_ms: 56.617536
+  type: 'test'
+  ...
+# Subtest: SCREEN EVIDENCE: optional, exact, bound to the challenge, never raises assurance, never replayable
+ok 255 - SCREEN EVIDENCE: optional, exact, bound to the challenge, never raises assurance, never replayable
+  ---
+  duration_ms: 95.062553
+  type: 'test'
+  ...
+# Subtest: HUMAN DECISION: the device shows the Root-derived plan key digests; an attacker-opened plan is visibly not the owner's and is declined
+ok 256 - HUMAN DECISION: the device shows the Root-derived plan key digests; an attacker-opened plan is visibly not the owner's and is declined
+  ---
+  duration_ms: 134.801536
+  type: 'test'
+  ...
+# Subtest: SUMMARY: deterministic, ASCII-only, covers removals / resulting authority / epoch side effect / expiry; requester free text is labelled unverified and truncated
+ok 257 - SUMMARY: deterministic, ASCII-only, covers removals / resulting authority / epoch side effect / expiry; requester free text is labelled unverified and truncated
+  ---
+  duration_ms: 43.771714
+  type: 'test'
+  ...
+# Subtest: WEBAUTHN: wrong origin / rpId / challenge, UV missing, cross-origin are refused; zero signature counters are tolerated
+ok 258 - WEBAUTHN: wrong origin / rpId / challenge, UV missing, cross-origin are refused; zero signature counters are tolerated
+  ---
+  duration_ms: 63.634218
+  type: 'test'
+  ...
+# Subtest: INTENT EQUALITY: a validly signed approval for a different intent (fresh grant, full quorum) => INTENT_MISMATCH
+ok 259 - INTENT EQUALITY: a validly signed approval for a different intent (fresh grant, full quorum) => INTENT_MISMATCH
+  ---
+  duration_ms: 184.892301
+  type: 'test'
+  ...
+# Subtest: CHALLENGE SINGLE USE: the same grant cannot be verified twice against one state (independent of the action nonce)
+ok 260 - CHALLENGE SINGLE USE: the same grant cannot be verified twice against one state (independent of the action nonce)
+  ---
+  duration_ms: 50.225087
+  type: 'test'
+  ...
+# Subtest: ORC DIGEST BINDING: an ORC authorization recorded for another case digest never reconstitutes
+ok 261 - ORC DIGEST BINDING: an ORC authorization recorded for another case digest never reconstitutes
+  ---
+  duration_ms: 125.262959
+  type: 'test'
+  ...
+# Subtest: GOV SECURITY DELAY: a direct GOV_CASE_EXECUTE before executeAfter is refused by the Root itself
+ok 262 - GOV SECURITY DELAY: a direct GOV_CASE_EXECUTE before executeAfter is refused by the Root itself
+  ---
+  duration_ms: 84.668361
+  type: 'test'
+  ...
+# Subtest: BASELINE: V3 R-1 reproduces (takeover) on the unchanged V3 code
+ok 263 - BASELINE: V3 R-1 reproduces (takeover) on the unchanged V3 code
+  ---
+  duration_ms: 132.323443
+  type: 'test'
+  ...
+# Subtest: R-1 CLOSED: same collusion on V4 => RECONSTITUTE denied (OWNER_AUTHORIZATION_REQUIRED), case expires, no authority transfer
+ok 264 - R-1 CLOSED: same collusion on V4 => RECONSTITUTE denied (OWNER_AUTHORIZATION_REQUIRED), case expires, no authority transfer
+  ---
+  duration_ms: 132.960292
+  type: 'test'
+  ...
+# Subtest: R-1 variant: acknowledgements from EVERY channel + arbitrarily long silence still never authorize
+ok 265 - R-1 variant: acknowledgements from EVERY channel + arbitrarily long silence still never authorize
+  ---
+  duration_ms: 132.095664
+  type: 'test'
+  ...
+# Subtest: R-1 variant: attacker tries to supply owner authorization with stolen K1, a guardian key, a forged ORC id, or a self-made ORC
+ok 266 - R-1 variant: attacker tries to supply owner authorization with stolen K1, a guardian key, a forged ORC id, or a self-made ORC
+  ---
+  duration_ms: 105.822436
+  type: 'test'
+  ...
+# Subtest: R-1 variant: an ORC authorization is bound to the exact case digest (replan / other case / replay all invalidate it)
+ok 267 - R-1 variant: an ORC authorization is bound to the exact case digest (replan / other case / replay all invalidate it)
+  ---
+  duration_ms: 90.213879
+  type: 'test'
+  ...
+# Subtest: R-1: an ORC alone is not a master key (no guardians / identity evidence => no reconstitution)
+ok 268 - R-1: an ORC alone is not a master key (no guardians / identity evidence => no reconstitution)
+  ---
+  duration_ms: 104.029641
+  type: 'test'
+  ...
+# Subtest: R-1: ORC is never a payment, Purpose or budget authority
+ok 269 - R-1: ORC is never a payment, Purpose or budget authority
+  ---
+  duration_ms: 77.386126
+  type: 'test'
+  ...
+# Subtest: GENUINE OWNER: majority loss (K2..K5) succeeds with the ORC; minority loss succeeds without it
+ok 270 - GENUINE OWNER: majority loss (K2..K5) succeeds with the ORC; minority loss succeeds without it
+  ---
+  duration_ms: 279.950218
+  type: 'test'
+  ...
+# Subtest: GENUINE OWNER without ORC (lost too): majority loss is not recoverable by the recovery path and expires safely
+ok 271 - GENUINE OWNER without ORC (lost too): majority loss is not recoverable by the recovery path and expires safely
+  ---
+  duration_ms: 132.993045
+  type: 'test'
+  ...
+# Subtest: REATTEMPT COOLDOWN: 12 h per subject holder, not per case id; fresh nonce + fresh plan keys required
+ok 272 - REATTEMPT COOLDOWN: 12 h per subject holder, not per case id; fresh nonce + fresh plan keys required
+  ---
+  duration_ms: 143.367734
+  type: 'test'
+  ...
+# Subtest: CLAIM BUDGET + LOCKDOWN BUDGET: repeated false claims cannot lock the owner out indefinitely
+ok 273 - CLAIM BUDGET + LOCKDOWN BUDGET: repeated false claims cannot lock the owner out indefinitely
+  ---
+  duration_ms: 266.228864
+  type: 'test'
+  ...
+# Subtest: CANCELLATION: the ORC cancels a fraudulent case at once and releases the lockdown
+ok 274 - CANCELLATION: the ORC cancels a fraudulent case at once and releases the lockdown
+  ---
+  duration_ms: 52.261121
+  type: 'test'
+  ...
+# Subtest: EXPIRY: takes no evidence, is refused before the deadline, and a HOLD (objection) is bounded by the same deadline
+ok 275 - EXPIRY: takes no evidence, is refused before the deadline, and a HOLD (objection) is bounded by the same deadline
+  ---
+  duration_ms: 62.336549
+  type: 'test'
+  ...
+# Subtest: GUARDIAN 2/3 compromised, owner k2-laptop+k3-root-hw: replaced atomically, epoch bumps, nothing else changes
+ok 276 - GUARDIAN 2/3 compromised, owner k2-laptop+k3-root-hw: replaced atomically, epoch bumps, nothing else changes
+  ---
+  duration_ms: 221.869544
+  type: 'test'
+  ...
+# Subtest: GUARDIAN 2/3 compromised, owner k2-laptop+k3-root-hw+k5-recovery-hw: replaced atomically, epoch bumps, nothing else changes
+ok 277 - GUARDIAN 2/3 compromised, owner k2-laptop+k3-root-hw+k5-recovery-hw: replaced atomically, epoch bumps, nothing else changes
+  ---
+  duration_ms: 172.790753
+  type: 'test'
+  ...
+# Subtest: GUARDIAN 3/3 compromised: electorate = both identity verifiers (unanimous); quorum floor kept
+ok 278 - GUARDIAN 3/3 compromised: electorate = both identity verifiers (unanimous); quorum floor kept
+  ---
+  duration_ms: 91.513394
+  type: 'test'
+  ...
+# Subtest: IDV 1/2 and 2/2 compromised (owner K2+K3+K5), and combined guardians-then-IDVs
+ok 279 - IDV 1/2 and 2/2 compromised (owner K2+K3+K5), and combined guardians-then-IDVs
+  ---
+  duration_ms: 403.781093
+  type: 'test'
+  ...
+# Subtest: IMPOSSIBLE: every guardian AND every identity verifier compromised => empty electorate is never valid (reported, authority unchanged)
+ok 280 - IMPOSSIBLE: every guardian AND every identity verifier compromised => empty electorate is never valid (reported, authority unchanged)
+  ---
+  duration_ms: 161.894663
+  type: 'test'
+  ...
+# Subtest: FORGED / INSUFFICIENT ACCUSATIONS: one verdict, duplicated adjudicator, forged signature, wrong subject key, wrong finding, expired verdict, unknown adjudicator, bare accusation
+ok 281 - FORGED / INSUFFICIENT ACCUSATIONS: one verdict, duplicated adjudicator, forged signature, wrong subject key, wrong finding, expired verdict, unknown adjudicator, bare accusation
+  ---
+  duration_ms: 72.953417
+  type: 'test'
+  ...
+# Subtest: GUARDIAN EQUIVOCATION: two contradictory signatures by the guardian key are a self-contained compromise proof
+ok 282 - GUARDIAN EQUIVOCATION: two contradictory signatures by the guardian key are a self-contained compromise proof
+  ---
+  duration_ms: 71.079202
+  type: 'test'
+  ...
+# Subtest: OWNER QUORUM: duplicates, same role twice, FREEZE key, single key, attacker with stolen K1 => all refused; K1+ORC accepted
+ok 283 - OWNER QUORUM: duplicates, same role twice, FREEZE key, single key, attacker with stolen K1 => all refused; K1+ORC accepted
+  ---
+  duration_ms: 104.010568
+  type: 'test'
+  ...
+# Subtest: LOST ROOT (K3) or LOST RECOVERY (K5): the remaining owner roles (+ ORC) still form the quorum; lost K3+K5 needs the ORC
+ok 284 - LOST ROOT (K3) or LOST RECOVERY (K5): the remaining owner roles (+ ORC) still form the quorum; lost K3+K5 needs the ORC
+  ---
+  duration_ms: 262.494264
+  type: 'test'
+  ...
+# Subtest: QUORUM MANIPULATION: accused / outsider / duplicate voters, forged eligibility, lying tally, incomplete approval
+ok 285 - QUORUM MANIPULATION: accused / outsider / duplicate voters, forged eligibility, lying tally, incomplete approval
+  ---
+  duration_ms: 89.830881
+  type: 'test'
+  ...
+# Subtest: REMOVAL WITHOUT REPLACEMENT and MALICIOUS REPLACEMENTS are refused
+ok 286 - REMOVAL WITHOUT REPLACEMENT and MALICIOUS REPLACEMENTS are refused
+  ---
+  duration_ms: 78.404108
+  type: 'test'
+  ...
+# Subtest: UNAVAILABLE is not malice: needs an unanswered liveness ping for 30 days; a reply resets it; the member is retired, not disqualified
+ok 287 - UNAVAILABLE is not malice: needs an unanswered liveness ping for 30 days; a reply resets it; the member is retired, not disqualified
+  ---
+  duration_ms: 105.544864
+  type: 'test'
+  ...
+# Subtest: WITHDRAWAL needs the member's own signature; ordinary rotation needs the owner governance quorum + the outgoing guardian
+ok 288 - WITHDRAWAL needs the member's own signature; ordinary rotation needs the owner governance quorum + the outgoing guardian
+  ---
+  duration_ms: 185.60666
+  type: 'test'
+  ...
+# Subtest: SECURITY DELAY + CANCELLATION: no execution before 24 h; the owner (ORC or quorum) can cancel during the delay; notifications required
+ok 289 - SECURITY DELAY + CANCELLATION: no execution before 24 h; the owner (ORC or quorum) can cancel during the delay; notifications required
+  ---
+  duration_ms: 92.134668
+  type: 'test'
+  ...
+# Subtest: MUTUAL EXCLUSION: no governance case during a recovery case and vice versa; vote window expiry closes the case
+ok 290 - MUTUAL EXCLUSION: no governance case during a recovery case and vice versa; vote window expiry closes the case
+  ---
+  duration_ms: 100.94063
+  type: 'test'
+  ...
+# Subtest: ATTACKER (stolen K1, compromised g1+g2, one bribed adjudicator) cannot replace the honest guardian g3
+ok 291 - ATTACKER (stolen K1, compromised g1+g2, one bribed adjudicator) cannot replace the honest guardian g3
+  ---
+  duration_ms: 65.183389
+  type: 'test'
+  ...
+# Subtest: matrix: lost {none}
+ok 292 - matrix: lost {none}
+  ---
+  duration_ms: 83.08275
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone}
+ok 293 - matrix: lost {k1-phone}
+  ---
+  duration_ms: 367.967396
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop}
+ok 294 - matrix: lost {k2-laptop}
+  ---
+  duration_ms: 368.91021
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop}
+ok 295 - matrix: lost {k1-phone,k2-laptop}
+  ---
+  duration_ms: 288.110109
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k3-root-hw}
+ok 296 - matrix: lost {k3-root-hw}
+  ---
+  duration_ms: 308.817403
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k3-root-hw}
+ok 297 - matrix: lost {k1-phone,k3-root-hw}
+  ---
+  duration_ms: 266.497358
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k3-root-hw}
+ok 298 - matrix: lost {k2-laptop,k3-root-hw}
+  ---
+  duration_ms: 315.266357
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k3-root-hw}
+ok 299 - matrix: lost {k1-phone,k2-laptop,k3-root-hw}
+  ---
+  duration_ms: 428.805012
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k4-freeze}
+ok 300 - matrix: lost {k4-freeze}
+  ---
+  duration_ms: 293.321585
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k4-freeze}
+ok 301 - matrix: lost {k1-phone,k4-freeze}
+  ---
+  duration_ms: 275.461802
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k4-freeze}
+ok 302 - matrix: lost {k2-laptop,k4-freeze}
+  ---
+  duration_ms: 284.324889
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k4-freeze}
+ok 303 - matrix: lost {k1-phone,k2-laptop,k4-freeze}
+  ---
+  duration_ms: 255.951709
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k3-root-hw,k4-freeze}
+ok 304 - matrix: lost {k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 336.149443
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k3-root-hw,k4-freeze}
+ok 305 - matrix: lost {k1-phone,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 311.366439
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k3-root-hw,k4-freeze}
+ok 306 - matrix: lost {k2-laptop,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 327.033001
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze}
+ok 307 - matrix: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze}
+  ---
+  duration_ms: 261.887406
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k5-recovery-hw}
+ok 308 - matrix: lost {k5-recovery-hw}
+  ---
+  duration_ms: 285.663365
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k5-recovery-hw}
+ok 309 - matrix: lost {k1-phone,k5-recovery-hw}
+  ---
+  duration_ms: 259.876597
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k5-recovery-hw}
+ok 310 - matrix: lost {k2-laptop,k5-recovery-hw}
+  ---
+  duration_ms: 236.699665
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k5-recovery-hw}
+ok 311 - matrix: lost {k1-phone,k2-laptop,k5-recovery-hw}
+  ---
+  duration_ms: 304.408063
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k3-root-hw,k5-recovery-hw}
+ok 312 - matrix: lost {k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 263.694073
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k3-root-hw,k5-recovery-hw}
+ok 313 - matrix: lost {k1-phone,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 255.630618
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k3-root-hw,k5-recovery-hw}
+ok 314 - matrix: lost {k2-laptop,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 317.334073
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k3-root-hw,k5-recovery-hw}
+ok 315 - matrix: lost {k1-phone,k2-laptop,k3-root-hw,k5-recovery-hw}
+  ---
+  duration_ms: 330.84115
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k4-freeze,k5-recovery-hw}
+ok 316 - matrix: lost {k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 369.119626
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k4-freeze,k5-recovery-hw}
+ok 317 - matrix: lost {k1-phone,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 340.557252
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k4-freeze,k5-recovery-hw}
+ok 318 - matrix: lost {k2-laptop,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 305.904027
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}
+ok 319 - matrix: lost {k1-phone,k2-laptop,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 255.0168
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 320 - matrix: lost {k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 354.10658
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 321 - matrix: lost {k1-phone,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 322.769656
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 322 - matrix: lost {k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 274.451766
+  type: 'test'
+  ...
+# Subtest: matrix: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+ok 323 - matrix: lost {k1-phone,k2-laptop,k3-root-hw,k4-freeze,k5-recovery-hw}
+  ---
+  duration_ms: 222.121565
+  type: 'test'
+  ...
+# Subtest: matrix scenarios
+ok 324 - matrix scenarios
+  ---
+  duration_ms: 1474.413489
+  type: 'test'
+  ...
+# Subtest: C_ui: the owner approves the exact requested revocation on device; a swapped action is declined
+ok 325 - C_ui: the owner approves the exact requested revocation on device; a swapped action is declined
+  ---
+  duration_ms: 118.470358
+  type: 'test'
+  ...
+# Subtest: A_r1: stolen K1 intent approvals work for consent; a self-made key labelled orc-1 is refused
+ok 326 - A_r1: stolen K1 intent approvals work for consent; a self-made key labelled orc-1 is refused
+  ---
+  duration_ms: 68.765115
+  type: 'test'
+  ...
+# Subtest: the analyst module exposes no action capability (only evidence, intake, prompts)
+ok 327 - the analyst module exposes no action capability (only evidence, intake, prompts)
+  ---
+  duration_ms: 90.225638
+  type: 'test'
+  ...
+# Subtest: untrusted strings are framed as evidence data; the system prompt forbids following them; pseudonyms only
+ok 328 - untrusted strings are framed as evidence data; the system prompt forbids following them; pseudonyms only
+  ---
+  duration_ms: 182.389417
+  type: 'test'
+  ...
+# Subtest: injected / out-of-schema model output can never act: unknown kinds, fields, classes, fake events and wrong metrics are rejected or downgraded
+ok 329 - injected / out-of-schema model output can never act: unknown kinds, fields, classes, fake events and wrong metrics are rejected or downgraded
+  ---
+  duration_ms: 171.562806
+  type: 'test'
+  ...
+# Subtest: a corroboration request on a quiet flow is not corroborated (analyst opinion alone never escalates)
+ok 330 - a corroboration request on a quiet flow is not corroborated (analyst opinion alone never escalates)
+  ---
+  duration_ms: 105.360512
+  type: 'test'
+  ...
+# Subtest: garbage output is recorded as UNPARSEABLE_OUTPUT, nothing else
+ok 331 - garbage output is recorded as UNPARSEABLE_OUTPUT, nothing else
+  ---
+  duration_ms: 49.919913
+  type: 'test'
+  ...
+# Subtest: deterministic analyst produces OBSERVED findings that the engine verifies and corroborates
+ok 332 - deterministic analyst produces OBSERVED findings that the engine verifies and corroborates
+  ---
+  duration_ms: 106.738585
+  type: 'test'
+  ...
+# Subtest: signed reports: counts come from the journal and re-verify; tampering detected; delivered via MOCK outbox
+ok 333 - signed reports: counts come from the journal and re-verify; tampering detected; delivered via MOCK outbox
+  ---
+  duration_ms: 351.740274
+  type: 'test'
+  ...
+# Subtest: established baseline: normal day not delayed; a 3x burst is delayed
+ok 334 - established baseline: normal day not delayed; a 3x burst is delayed
+  ---
+  duration_ms: 4.214625
+  type: 'test'
+  ...
+# Subtest: cold start uses conservative absolute thresholds
+ok 335 - cold start uses conservative absolute thresholds
+  ---
+  duration_ms: 0.398282
+  type: 'test'
+  ...
+# Subtest: baseline poisoning: slow escalation is capped at 1.5x the older level; delayed / rapid / security-window payments never train
+ok 336 - baseline poisoning: slow escalation is capped at 1.5x the older level; delayed / rapid / security-window payments never train
+  ---
+  duration_ms: 0.836119
+  type: 'test'
+  ...
+# Subtest: hard ceilings cannot be poisoned: even a huge baseline cannot allow 6 payments in 10 min
+ok 337 - hard ceilings cannot be poisoned: even a huge baseline cannot allow 6 payments in 10 min
+  ---
+  duration_ms: 9.147565
+  type: 'test'
+  ...
+# Subtest: security-event correlation lowers thresholds (burst near a suspension / hold)
+ok 338 - security-event correlation lowers thresholds (burst near a suspension / hold)
+  ---
+  duration_ms: 1.995093
+  type: 'test'
+  ...
+# Subtest: delay is TARGETED: the bursting credential waits, the other credential's payments are untouched
+ok 339 - delay is TARGETED: the bursting credential waits, the other credential's payments are untouched
+  ---
+  duration_ms: 200.414167
+  type: 'test'
+  ...
+# Subtest: delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged
+ok 340 - delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged
+  ---
+  duration_ms: 249.656244
+  type: 'test'
+  ...
+# Subtest: vault enforces its own 24 h cap whatever the engine asks
+ok 341 - vault enforces its own 24 h cap whatever the engine asks
+  ---
+  duration_ms: 111.909818
+  type: 'test'
+  ...
+# Subtest: a decision not signed by the pinned engine key is refused by the vault
+ok 342 - a decision not signed by the pinned engine key is refused by the vault
+  ---
+  duration_ms: 66.970041
+  type: 'test'
+  ...
+# Subtest: settled payments cannot be stopped: incident records prior settled exposure honestly
+ok 343 - settled payments cannot be stopped: incident records prior settled exposure honestly
+  ---
+  duration_ms: 126.774514
+  type: 'test'
+  ...
+# Subtest: owner incident review: FRAUD cancels the delayed payments; the affected credential cannot vouch for itself; LEGITIMATE needs trusted confirmation
+ok 344 - owner incident review: FRAUD cancels the delayed payments; the affected credential cannot vouch for itself; LEGITIMATE needs trusted confirmation
+  ---
+  duration_ms: 147.68413
+  type: 'test'
+  ...
+# Subtest: owner incident review LEGITIMATE (trusted key) releases the delayed payments at the normal buffer
+ok 345 - owner incident review LEGITIMATE (trusted key) releases the delayed payments at the normal buffer
+  ---
+  duration_ms: 231.732187
+  type: 'test'
+  ...
+# Subtest: delay never changes Purpose or limits and never touches another merchant hold or freeze
+ok 346 - delay never changes Purpose or limits and never touches another merchant hold or freeze
+  ---
+  duration_ms: 178.03082
+  type: 'test'
+  ...
+# Subtest: MANDATORY: stolen K1 FREEZE, K2 independently holds, owner revokes K1 => K1 hold removable, K2 hold stays
+ok 347 - MANDATORY: stolen K1 FREEZE, K2 independently holds, owner revokes K1 => K1 hold removable, K2 hold stays
+  ---
+  duration_ms: 121.905613
+  type: 'test'
+  ...
+# Subtest: MANDATORY variant: K2 CONFIRMS K1 hold instead; after revoking K1 the hold stays until K2 releases it
+ok 348 - MANDATORY variant: K2 CONFIRMS K1 hold instead; after revoking K1 the hold stays until K2 releases it
+  ---
+  duration_ms: 99.151559
+  type: 'test'
+  ...
+# Subtest: reverse order: K2 holds first, stolen K1 freezes later; revoking K1 leaves K2 hold
+ok 349 - reverse order: K2 holds first, stolen K1 freezes later; revoking K1 leaves K2 hold
+  ---
+  duration_ms: 84.672764
+  type: 'test'
+  ...
+# Subtest: release of a multi-party hold needs every valid party; one party cannot lift another party's hold
+ok 350 - release of a multi-party hold needs every valid party; one party cannot lift another party's hold
+  ---
+  duration_ms: 121.925465
+  type: 'test'
+  ...
+# Subtest: concurrent freezes from three credentials; each released independently; union semantics
+ok 351 - concurrent freezes from three credentials; each released independently; union semantics
+  ---
+  duration_ms: 105.11636
+  type: 'test'
+  ...
+# Subtest: repeated reinforcement by the same issuer is refused; issuer budget bounds re-freezing
+ok 352 - repeated reinforcement by the same issuer is refused; issuer budget bounds re-freezing
+  ---
+  duration_ms: 199.586206
+  type: 'test'
+  ...
+# Subtest: provisional hold expires after 24 h unless escalated; escalation needs distinct role + trusted confirmation
+ok 353 - provisional hold expires after 24 h unless escalated; escalation needs distinct role + trusted confirmation
+  ---
+  duration_ms: 125.012022
+  type: 'test'
+  ...
+# Subtest: unconfirmed provisional hold lapses at 24 h; housekeeping records it
+ok 354 - unconfirmed provisional hold lapses at 24 h; housekeeping records it
+  ---
+  duration_ms: 95.779024
+  type: 'test'
+  ...
+# Subtest: verified incident freeze: never on a timer, never by contest or issuer revocation; needs quorum + repair certificate for THIS hold
+ok 355 - verified incident freeze: never on a timer, never by contest or issuer revocation; needs quorum + repair certificate for THIS hold
+  ---
+  duration_ms: 234.117781
+  type: 'test'
+  ...
+# Subtest: supervisor breach hold + owner hold: releasing the incident freeze leaves the owner hold
+ok 356 - supervisor breach hold + owner hold: releasing the incident freeze leaves the owner hold
+  ---
+  duration_ms: 94.682221
+  type: 'test'
+  ...
+# Subtest: CONTEST_PROTECTIVE_HOLD: ORC + independent owner credential revokes the suspect and releases only its exclusive holds
+ok 357 - CONTEST_PROTECTIVE_HOLD: ORC + independent owner credential revokes the suspect and releases only its exclusive holds
+  ---
+  duration_ms: 139.573353
+  type: 'test'
+  ...
+# Subtest: CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect
+ok 358 - CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect
+  ---
+  duration_ms: 125.554896
+  type: 'test'
+  ...
+# Subtest: owner-origin hold: the owner's own freeze survives revocation of an unrelated stolen key
+ok 359 - owner-origin hold: the owner's own freeze survives revocation of an unrelated stolen key
+  ---
+  duration_ms: 81.361576
+  type: 'test'
+  ...
+# Subtest: crash recovery: hold registry and effective freeze survive Root and Vault restarts (replayed from the chain)
+ok 360 - crash recovery: hold registry and effective freeze survive Root and Vault restarts (replayed from the chain)
+  ---
+  duration_ms: 94.391291
+  type: 'test'
+  ...
+# Subtest: full V4 recovery of a stolen key lifts the thief's holds only (anti-lockout through recovery)
+ok 361 - full V4 recovery of a stolen key lifts the thief's holds only (anti-lockout through recovery)
+  ---
+  duration_ms: 155.837622
+  type: 'test'
+  ...
+# Subtest: P4: bufferSeconds(n) = min(600, 30 * 2^n): 30, 60, 120, 240, 480, 600, 600; FIXED_600 is always 600 s
+ok 362 - P4: bufferSeconds(n) = min(600, 30 * 2^n): 30, 60, 120, 240, 480, 600, 600; FIXED_600 is always 600 s
+  ---
+  duration_ms: 1.594911
+  type: 'test'
+  ...
+# Subtest: P4: the tier is a deterministic bounded function of the signed inputs; each input moves it; sticky floor; cap 5
+ok 363 - P4: the tier is a deterministic bounded function of the signed inputs; each input moves it; sticky floor; cap 5
+  ---
+  duration_ms: 0.39343
+  type: 'test'
+  ...
+# Subtest: P4: bufferPolicy is owner-signed in the genesis extension; unknown policy refused; vault floor must match it
+ok 364 - P4: bufferPolicy is owner-signed in the genesis extension; unknown policy refused; vault floor must match it
+  ---
+  duration_ms: 155.575366
+  type: 'test'
+  ...
+# Subtest: P4: under EXP_30 a usual, low-value payment from verified history waits 30 s and settles; FIXED_600 waits 600 s
+ok 365 - P4: under EXP_30 a usual, low-value payment from verified history waits 30 s and settles; FIXED_600 waits 600 s
+  ---
+  duration_ms: 588.829418
+  type: 'test'
+  ...
+# Subtest: P4: splitting a maximum payment into 10 small ones does not lower the tier below the single large payment
+ok 366 - P4: splitting a maximum payment into 10 small ones does not lower the tier below the single large payment
+  ---
+  duration_ms: 325.346041
+  type: 'test'
+  ...
+# Subtest: P4: verifier recomputes the tier, checks the signature and flags a payment released before its signed buffer
+ok 367 - P4: verifier recomputes the tier, checks the signature and flags a payment released before its signed buffer
+  ---
+  duration_ms: 209.563861
+  type: 'test'
+  ...
+# Subtest: P4: a compromised vault that lowers stored tiers to reset the next decision is exposed (BUFFER_TIER_RESET)
+ok 368 - P4: a compromised vault that lowers stored tiers to reset the next decision is exposed (BUFFER_TIER_RESET)
+  ---
+  duration_ms: 276.375966
+  type: 'test'
+  ...
+# Subtest: P4: Rapid-Use removes only the anomaly delay, never the signed buffer; HIGH unresolved never auto-releases at max buffer
+ok 369 - P4: Rapid-Use removes only the anomaly delay, never the signed buffer; HIGH unresolved never auto-releases at max buffer
+  ---
+  duration_ms: 594.852211
+  type: 'test'
+  ...
+# Subtest: P4 / F2: a payment reserved but never evaluated is cancelled (fail closed), on restart and at runtime
+ok 370 - P4 / F2: a payment reserved but never evaluated is cancelled (fail closed), on restart and at runtime
+  ---
+  duration_ms: 89.849183
+  type: 'test'
+  ...
+# Subtest: P4 / F2: an engine failure after the V3 reservation cancels the payment instead of releasing it unevaluated
+ok 371 - P4 / F2: an engine failure after the V3 reservation cancels the payment instead of releasing it unevaluated
+  ---
+  duration_ms: 77.917921
+  type: 'test'
+  ...
+# Subtest: exploratory EXP_30_HV: a flow reaching half the per-payment maximum within an hour always waits 600 s
+ok 372 - exploratory EXP_30_HV: a flow reaching half the per-payment maximum within an hour always waits 600 s
+  ---
+  duration_ms: 99.734367
+  type: 'test'
+  ...
+# Subtest: P4: the vault refuses an engine statement made for another buffer policy (ENGINE_BUFFER_POLICY_MISMATCH)
+ok 373 - P4: the vault refuses an engine statement made for another buffer policy (ENGINE_BUFFER_POLICY_MISMATCH)
+  ---
+  duration_ms: 63.952966
+  type: 'test'
+  ...
+# Subtest: P4 anti-splitting: the tier input counts the flow's whole last-hour value, not the single payment
+ok 374 - P4 anti-splitting: the tier input counts the flow's whole last-hour value, not the single payment
+  ---
+  duration_ms: 175.500946
+  type: 'test'
+  ...
+# Subtest: P4: a compromised engine that signs (and journals) a tier inconsistent with its own signed inputs is flagged
+ok 375 - P4: a compromised engine that signs (and journals) a tier inconsistent with its own signed inputs is flagged
+  ---
+  duration_ms: 96.685422
+  type: 'test'
+  ...
+# Subtest: statement binds every required field (protocol, account, chain, credential, role, command, params, Purpose, matrix, epoch, root state, resources, limits, nonce, expiry, usage, level)
+ok 376 - statement binds every required field (protocol, account, chain, credential, role, command, params, Purpose, matrix, epoch, root state, resources, limits, nonce, expiry, usage, level)
+  ---
+  duration_ms: 97.870984
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified accountId is rejected
+ok 377 - a signed statement with a modified accountId is rejected
+  ---
+  duration_ms: 59.635148
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified chainId is rejected
+ok 378 - a signed statement with a modified chainId is rejected
+  ---
+  duration_ms: 58.745081
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified credId is rejected
+ok 379 - a signed statement with a modified credId is rejected
+  ---
+  duration_ms: 79.074973
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified role is rejected
+ok 380 - a signed statement with a modified role is rejected
+  ---
+  duration_ms: 53.7463
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified commandType is rejected
+ok 381 - a signed statement with a modified commandType is rejected
+  ---
+  duration_ms: 63.394044
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified actionDigest is rejected
+ok 382 - a signed statement with a modified actionDigest is rejected
+  ---
+  duration_ms: 58.538723
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified paramsDigest is rejected
+ok 383 - a signed statement with a modified paramsDigest is rejected
+  ---
+  duration_ms: 51.188734
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified purposeVersion is rejected
+ok 384 - a signed statement with a modified purposeVersion is rejected
+  ---
+  duration_ms: 69.08416
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified matrixVersion is rejected
+ok 385 - a signed statement with a modified matrixVersion is rejected
+  ---
+  duration_ms: 57.832619
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified epoch is rejected
+ok 386 - a signed statement with a modified epoch is rejected
+  ---
+  duration_ms: 56.395186
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified authorityDigest is rejected
+ok 387 - a signed statement with a modified authorityDigest is rejected
+  ---
+  duration_ms: 62.909634
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified affectedResources is rejected
+ok 388 - a signed statement with a modified affectedResources is rejected
+  ---
+  duration_ms: 44.929645
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified financialScope is rejected
+ok 389 - a signed statement with a modified financialScope is rejected
+  ---
+  duration_ms: 56.137209
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified requiredLevel is rejected
+ok 390 - a signed statement with a modified requiredLevel is rejected
+  ---
+  duration_ms: 57.5448
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified expiresAt is rejected
+ok 391 - a signed statement with a modified expiresAt is rejected
+  ---
+  duration_ms: 49.647031
+  type: 'test'
+  ...
+# Subtest: a signed statement with a modified usageLimit is rejected
+ok 392 - a signed statement with a modified usageLimit is rejected
+  ---
+  duration_ms: 66.585223
+  type: 'test'
+  ...
+# Subtest: cross-command substitution: an approval for FREEZE cannot authorize HOLD_RELEASE / CONTEST / RAPID approve
+ok 393 - cross-command substitution: an approval for FREEZE cannot authorize HOLD_RELEASE / CONTEST / RAPID approve
+  ---
+  duration_ms: 85.123778
+  type: 'test'
+  ...
+# Subtest: replay: the same approved request cannot be applied twice (nonce + one-time challenge)
+ok 394 - replay: the same approved request cannot be applied twice (nonce + one-time challenge)
+  ---
+  duration_ms: 77.232096
+  type: 'test'
+  ...
+# Subtest: stale authority: an approval built before another transition fails (authority digest / root state binding)
+ok 395 - stale authority: an approval built before another transition fails (authority digest / root state binding)
+  ---
+  duration_ms: 66.16275
+  type: 'test'
+  ...
+# Subtest: expired grant / statement is rejected
+ok 396 - expired grant / statement is rejected
+  ---
+  duration_ms: 53.825005
+  type: 'test'
+  ...
+# Subtest: V5 commands refuse V4 intents and bare action-digest approvals; V4 operations refuse bare approvals
+ok 397 - V5 commands refuse V4 intents and bare action-digest approvals; V4 operations refuse bare approvals
+  ---
+  duration_ms: 62.532487
+  type: 'test'
+  ...
+# Subtest: approval signed by one credential presented as another credential is rejected
+ok 398 - approval signed by one credential presented as another credential is rejected
+  ---
+  duration_ms: 51.762269
+  type: 'test'
+  ...
+# Subtest: trusted-confirmation commands: DELEGATION_GRANT from a software-only key is refused, from protected confirmation accepted
+ok 399 - trusted-confirmation commands: DELEGATION_GRANT from a software-only key is refused, from protected confirmation accepted
+  ---
+  duration_ms: 66.209424
+  type: 'test'
+  ...
+# Subtest: the deterministic device summary names the command, resources and limits
+ok 400 - the deterministic device summary names the command, resources and limits
+  ---
+  duration_ms: 56.664987
+  type: 'test'
+  ...
+# Subtest: grant cannot exceed Purpose: recipients, asset, per-op, cumulative, TTL, mandatory revocation conditions
+ok 401 - grant cannot exceed Purpose: recipients, asset, per-op, cumulative, TTL, mandatory revocation conditions
+  ---
+  duration_ms: 133.524746
+  type: 'test'
+  ...
+# Subtest: delegate pays inside scope; per-op, cumulative, max uses, recipient, replay and forged signature all refused
+ok 402 - delegate pays inside scope; per-op, cumulative, max uses, recipient, replay and forged signature all refused
+  ---
+  duration_ms: 289.249805
+  type: 'test'
+  ...
+# Subtest: max uses exhausted
+ok 403 - max uses exhausted
+  ---
+  duration_ms: 100.63559
+  type: 'test'
+  ...
+# Subtest: ends on: expiry, issuer restricted, explicit revoke, freeze, delegation hold
+ok 404 - ends on: expiry, issuer restricted, explicit revoke, freeze, delegation hold
+  ---
+  duration_ms: 462.510871
+  type: 'test'
+  ...
+# Subtest: epoch change (credential revoked) ends every delegation
+ok 405 - epoch change (credential revoked) ends every delegation
+  ---
+  duration_ms: 84.127311
+  type: 'test'
+  ...
+# Subtest: a delegate burst is its own anomaly flow: delayed without touching the owner's own key flow
+ok 406 - a delegate burst is its own anomaly flow: delayed without touching the owner's own key flow
+  ---
+  duration_ms: 134.168065
+  type: 'test'
+  ...
+# Subtest: intact journal verifies; checkpoints are signed and held by two witnesses
+ok 407 - intact journal verifies; checkpoints are signed and held by two witnesses
+  ---
+  duration_ms: 14.240518
+  type: 'test'
+  ...
+# Subtest: the store itself refuses UPDATE / DELETE (append-only triggers)
+ok 408 - the store itself refuses UPDATE / DELETE (append-only triggers)
+  ---
+  duration_ms: 1.800626
+  type: 'test'
+  ...
+# Subtest: an administrator who bypasses the triggers is still DETECTED: modification, deletion, truncation, reordering, insertion
+ok 409 - an administrator who bypasses the triggers is still DETECTED: modification, deletion, truncation, reordering, insertion
+  ---
+  duration_ms: 8.053446
+  type: 'test'
+  ...
+# Subtest: privacy: secrets, keys, biometrics, PINs and raw challenge responses are refused at the writer
+ok 410 - privacy: secrets, keys, biometrics, PINs and raw challenge responses are refused at the writer
+  ---
+  duration_ms: 1.641578
+  type: 'test'
+  ...
+# Subtest: flood: rejected attempts are rate-limited per principal (one ATTEMPTS_SUPPRESSED marker), other principals unaffected
+ok 411 - flood: rejected attempts are rate-limited per principal (one ATTEMPTS_SUPPRESSED marker), other principals unaffected
+  ---
+  duration_ms: 7.507573
+  type: 'test'
+  ...
+# Subtest: roles: the analyst sees pseudonyms and no sealed metadata; the owner sees names; the verifier sees only hashes
+ok 412 - roles: the analyst sees pseudonyms and no sealed metadata; the owner sees names; the verifier sees only hashes
+  ---
+  duration_ms: 92.815499
+  type: 'test'
+  ...
+# Subtest: retention: shredding a period key makes its sealed metadata unreadable while the chain still verifies
+ok 413 - retention: shredding a period key makes its sealed metadata unreadable while the chain still verifies
+  ---
+  duration_ms: 83.679513
+  type: 'test'
+  ...
+# Subtest: all layers record the lifecycle: Root holds, vault payments, risk detection, notification queue/attempts
+ok 414 - all layers record the lifecycle: Root holds, vault payments, risk detection, notification queue/attempts
+  ---
+  duration_ms: 283.638553
+  type: 'test'
+  ...
+# Subtest: CONFIRMED_OWNER_HOLD release needs a trusted confirmation; UV-only signers are refused
+ok 415 - CONFIRMED_OWNER_HOLD release needs a trusted confirmation; UV-only signers are refused
+  ---
+  duration_ms: 120.823679
+  type: 'test'
+  ...
+# Subtest: VERIFIED_INCIDENT_FREEZE release with quorum + repair certificate still needs a trusted confirmation (multi-admin: all passkeys)
+ok 416 - VERIFIED_INCIDENT_FREEZE release with quorum + repair certificate still needs a trusted confirmation (multi-admin: all passkeys)
+  ---
+  duration_ms: 103.730634
+  type: 'test'
+  ...
+# Subtest: a consumed challenge grant cannot be reused, even inside a fresh action carrying the same approval
+ok 417 - a consumed challenge grant cannot be reused, even inside a fresh action carrying the same approval
+  ---
+  duration_ms: 89.515381
+  type: 'test'
+  ...
+# Subtest: a Rapid-Use grant for k1 never removes anomaly delays of another flow (k2)
+ok 418 - a Rapid-Use grant for k1 never removes anomaly delays of another flow (k2)
+  ---
+  duration_ms: 327.940635
+  type: 'test'
+  ...
+# Subtest: F-V5-04: a forged approval with an otherwise invalid body gets the AUTHENTICATION error, never a business-rule error
+ok 419 - F-V5-04: a forged approval with an otherwise invalid body gets the AUTHENTICATION error, never a business-rule error
+  ---
+  duration_ms: 64.730166
+  type: 'test'
+  ...
+# Subtest: incident -> one email per distinct verified address of every key holder; keys of one person deduplicated; context lists keys
+ok 420 - incident -> one email per distinct verified address of every key holder; keys of one person deduplicated; context lists keys
+  ---
+  duration_ms: 88.972447
+  type: 'test'
+  ...
+# Subtest: end-to-end: a delayed burst emails every holder through the MOCK transport only
+ok 421 - end-to-end: a delayed burst emails every holder through the MOCK transport only
+  ---
+  duration_ms: 178.408405
+  type: 'test'
+  ...
+# Subtest: email content: no links, no reply/code requests, states limits unchanged and that email cannot approve
+ok 422 - email content: no links, no reply/code requests, states limits unchanged and that email cannot approve
+  ---
+  duration_ms: 0.425045
+  type: 'test'
+  ...
+# Subtest: idempotent enqueue: the same incident twice -> DUPLICATE_ALERT suppressed, nothing sent twice
+ok 423 - idempotent enqueue: the same incident twice -> DUPLICATE_ALERT suppressed, nothing sent twice
+  ---
+  duration_ms: 54.256225
+  type: 'test'
+  ...
+# Subtest: provider outage -> bounded retries with backoff -> delivered after recovery; REJECT -> FAILED; attempts bounded
+ok 424 - provider outage -> bounded retries with backoff -> delivered after recovery; REJECT -> FAILED; attempts bounded
+  ---
+  duration_ms: 86.013601
+  type: 'test'
+  ...
+# Subtest: real provider adapter without explicit configuration reports NOT_CONNECTED and never counts as delivered
+ok 425 - real provider adapter without explicit configuration reports NOT_CONNECTED and never counts as delivered
+  ---
+  duration_ms: 96.103671
+  type: 'test'
+  ...
+# Subtest: flood control: at most 6 messages per recipient per hour
+ok 426 - flood control: at most 6 messages per recipient per hour
+  ---
+  duration_ms: 98.002458
+  type: 'test'
+  ...
+# Subtest: unverified addresses are never used: an address-book entry not pinned in the Root genesis is ignored
+ok 427 - unverified addresses are never used: an address-book entry not pinned in the Root genesis is ignored
+  ---
+  duration_ms: 69.197015
+  type: 'test'
+  ...
+# Subtest: email is never authorization: no Root operation accepts an email/notification artifact as approval
+ok 428 - email is never authorization: no Root operation accepts an email/notification artifact as approval
+  ---
+  duration_ms: 131.932805
+  type: 'test'
+  ...
+# Subtest: P3/challenge: an accepted command replayed verbatim is refused (ACTION_REPLAY), also after a Root restart
+ok 429 - P3/challenge: an accepted command replayed verbatim is refused (ACTION_REPLAY), also after a Root restart
+  ---
+  duration_ms: 168.633172
+  type: 'test'
+  ...
+# Subtest: P3/challenge: concurrent duplicate submissions -> exactly one accepted
+ok 430 - P3/challenge: concurrent duplicate submissions -> exactly one accepted
+  ---
+  duration_ms: 115.968289
+  type: 'test'
+  ...
+# Subtest: P3/challenge: one approval (one challenge) duplicated inside a request is refused (challenge probe or DUPLICATE_APPROVAL)
+ok 431 - P3/challenge: one approval (one challenge) duplicated inside a request is refused (challenge probe or DUPLICATE_APPROVAL)
+  ---
+  duration_ms: 84.881878
+  type: 'test'
+  ...
+# Subtest: P3/challenge: a consumed challenge re-wrapped around a new action (new nonce) is refused
+ok 432 - P3/challenge: a consumed challenge re-wrapped around a new action (new nonce) is refused
+  ---
+  duration_ms: 78.452403
+  type: 'test'
+  ...
+# Subtest: P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)
+ok 433 - P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)
+  ---
+  duration_ms: 72.079968
+  type: 'test'
+  ...
+# Subtest: P3/rapid: suspending a scope credential ends the grant on the Root; its delayed payments are not accelerated and do not settle
+ok 434 - P3/rapid: suspending a scope credential ends the grant on the Root; its delayed payments are not accelerated and do not settle
+  ---
+  duration_ms: 257.529497
+  type: 'test'
+  ...
+# Subtest: P3/rapid: an active grant whose scope credential is then suspended ends at that transition (no window for acceleration)
+ok 435 - P3/rapid: an active grant whose scope credential is then suspended ends at that transition (no window for acceleration)
+  ---
+  duration_ms: 210.296148
+  type: 'test'
+  ...
+# Subtest: P3/rapid flow scope: a grant for k1 never accelerates k2 or a delegation; restart keeps the scope
+ok 436 - P3/rapid flow scope: a grant for k1 never accelerates k2 or a delegation; restart keeps the scope
+  ---
+  duration_ms: 200.691913
+  type: 'test'
+  ...
+# Subtest: P3/rapid layer isolation: with the Root-side grant termination removed from the replica, the vault check alone refuses the grant
+ok 437 - P3/rapid layer isolation: with the Root-side grant termination removed from the replica, the vault check alone refuses the grant
+  ---
+  duration_ms: 90.120366
+  type: 'test'
+  ...
+# Subtest: prototype method names do not commit a V5 transition
+ok 438 - prototype method names do not commit a V5 transition
+  ---
+  duration_ms: 84.726239
+  type: 'test'
+  ...
+# Subtest: V5: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing
+ok 439 - V5: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing
+  ---
+  duration_ms: 101.757885
+  type: 'test'
+  ...
+# Subtest: V6: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing
+ok 440 - V6: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing
+  ---
+  duration_ms: 95.995316
+  type: 'test'
+  ...
+# Subtest: personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged
+ok 441 - personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged
+  ---
+  duration_ms: 319.36939
+  type: 'test'
+  ...
+# Subtest: Rapid-Use can never enlarge Purpose: scope must restate exact limits and Purpose recipients
+ok 442 - Rapid-Use can never enlarge Purpose: scope must restate exact limits and Purpose recipients
+  ---
+  duration_ms: 72.845181
+  type: 'test'
+  ...
+# Subtest: window starts at activation, ends at <= 24 h, never auto-renews; a new window needs a fresh request
+ok 443 - window starts at activation, ends at <= 24 h, never auto-renews; a new window needs a fresh request
+  ---
+  duration_ms: 165.144824
+  type: 'test'
+  ...
+# Subtest: approval window: votes expire after 1 h; stale request cannot be activated
+ok 444 - approval window: votes expire after 1 h; stale request cannot be activated
+  ---
+  duration_ms: 134.397844
+  type: 'test'
+  ...
+# Subtest: "End Rapid-Use Mode": the ORC, an approver or the covered credential ends it immediately; unrelated cred cannot
+ok 445 - "End Rapid-Use Mode": the ORC, an approver or the covered credential ends it immediately; unrelated cred cannot
+  ---
+  duration_ms: 323.116915
+  type: 'test'
+  ...
+# Subtest: deterministic termination: hold on the covered credential / epoch change ends the grant; monitoring continues; velocity ceiling ends it via engine attestation
+ok 446 - deterministic termination: hold on the covered credential / epoch change ends the grant; monitoring continues; velocity ceiling ends it via engine attestation
+  ---
+  duration_ms: 1857.56831
+  type: 'test'
+  ...
+# Subtest: request abuse: per-credential rate limit and one pending request per credential
+ok 447 - request abuse: per-credential rate limit and one pending request per credential
+  ---
+  duration_ms: 149.505912
+  type: 'test'
+  ...
+# Subtest: a frozen vault stays frozen during Rapid-Use (no hold is bypassed)
+ok 448 - a frozen vault stays frozen during Rapid-Use (no hold is bypassed)
+  ---
+  duration_ms: 207.676476
+  type: 'test'
+  ...
+# Subtest: multi-owner N=3: quorum = max(2, ceil(N/2)) = 2 distinct humans
+ok 449 - multi-owner N=3: quorum = max(2, ceil(N/2)) = 2 distinct humans
+  ---
+  duration_ms: 93.12883
+  type: 'test'
+  ...
+# Subtest: multi-owner N=4: quorum = max(2, ceil(N/2)) = 2 distinct humans
+ok 450 - multi-owner N=4: quorum = max(2, ceil(N/2)) = 2 distinct humans
+  ---
+  duration_ms: 101.401426
+  type: 'test'
+  ...
+# Subtest: multi-owner N=5: quorum = max(2, ceil(N/2)) = 3 distinct humans
+ok 451 - multi-owner N=5: quorum = max(2, ceil(N/2)) = 3 distinct humans
+  ---
+  duration_ms: 122.483982
+  type: 'test'
+  ...
+# Subtest: multi-owner N=6: quorum = max(2, ceil(N/2)) = 3 distinct humans
+ok 452 - multi-owner N=6: quorum = max(2, ceil(N/2)) = 3 distinct humans
+  ---
+  duration_ms: 161.25108
+  type: 'test'
+  ...
+# Subtest: multi-owner: several keys of one human are one vote; non-owner roles and the ORC cannot vote
+ok 453 - multi-owner: several keys of one human are one vote; non-owner roles and the ORC cannot vote
+  ---
+  duration_ms: 110.35194
+  type: 'test'
+  ...
+# Subtest: multi-owner: a suspended owner cannot vote and a vote of an owner suspended before activation no longer counts; suspension never shrinks N
+ok 454 - multi-owner: a suspended owner cannot vote and a vote of an owner suspended before activation no longer counts; suspension never shrinks N
+  ---
+  duration_ms: 145.426491
+  type: 'test'
+  ...
+# Subtest: vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive
+ok 455 - vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive
+  ---
+  duration_ms: 340.136009
+  type: 'test'
+  ...
+# Subtest: vault restart during Rapid-Use: the grant is re-derived from the Root replica, not from vault memory
+ok 456 - vault restart during Rapid-Use: the grant is re-derived from the Root replica, not from vault memory
+  ---
+  duration_ms: 235.99444
+  type: 'test'
+  ...
+# Subtest: Root crash after persisting a transition but before effects: replay restores the exact state, holds included
+ok 457 - Root crash after persisting a transition but before effects: replay restores the exact state, holds included
+  ---
+  duration_ms: 114.064525
+  type: 'test'
+  ...
+# Subtest: two Root writers on one store: the second append is a fork and is refused (compare-and-append)
+ok 458 - two Root writers on one store: the second append is a fork and is refused (compare-and-append)
+  ---
+  duration_ms: 68.795897
+  type: 'test'
+  ...
+# Subtest: concurrent payment proposals: the pending limit and Purpose limits hold under Promise.all
+ok 459 - concurrent payment proposals: the pending limit and Purpose limits hold under Promise.all
+  ---
+  duration_ms: 586.592955
+  type: 'test'
+  ...
+# Subtest: concurrent delegated operations with the same sequence number: exactly one is accepted
+ok 460 - concurrent delegated operations with the same sequence number: exactly one is accepted
+  ---
+  duration_ms: 91.025457
+  type: 'test'
+  ...
+# Subtest: a stale approval prepared against an older Root state cannot land after a concurrent hold (authority digest)
+ok 461 - a stale approval prepared against an older Root state cannot land after a concurrent hold (authority digest)
+  ---
+  duration_ms: 97.090695
+  type: 'test'
+  ...
+# Subtest: Scenario A: stolen DAILY key burst is detected, delayed, notified; attacker cannot self-approve or expand; owner responds
+ok 462 - Scenario A: stolen DAILY key burst is detected, delayed, notified; attacker cannot self-approve or expand; owner responds
+  ---
+  duration_ms: 605.135842
+  type: 'test'
+  ...
+# Subtest: Scenario B: genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes
+ok 463 - Scenario B: genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes
+  ---
+  duration_ms: 1166.88566
+  type: 'test'
+  ...
+# Subtest: Scenario B (multi-owner): genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes
+ok 464 - Scenario B (multi-owner): genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes
+  ---
+  duration_ms: 1191.264601
+  type: 'test'
+  ...
+# Subtest: Scenario C: evasive strategies
+ok 465 - Scenario C: evasive strategies
+  ---
+  duration_ms: 2899.969148
+  type: 'test'
+  ...
+# Subtest: Scenario D: no unauthorized Rapid-Use activation, attempts audited and bounded, owner path intact
+ok 466 - Scenario D: no unauthorized Rapid-Use activation, attempts audited and bounded, owner path intact
+  ---
+  duration_ms: 843.714666
+  type: 'test'
+  ...
+# Subtest: Scenario E: compromised notification infrastructure never authorizes anything
+ok 467 - Scenario E: compromised notification infrastructure never authorizes anything
+  ---
+  duration_ms: 284.11231
+  type: 'test'
+  ...
+# Subtest: labelled trajectories (dev set, seed 1): no benign delay, every malicious trajectory detected
+ok 468 - labelled trajectories (dev set, seed 1): no benign delay, every malicious trajectory detected
+  ---
+  duration_ms: 4884.663848
+  type: 'test'
+  ...
+# Subtest: P2: settlementHorizonMs (26 h) is part of the genesis extension every owner device and the ORC sign; out-of-range values are refused
+ok 469 - P2: settlementHorizonMs (26 h) is part of the genesis extension every owner device and the ORC sign; out-of-range values are refused
+  ---
+  duration_ms: 135.074263
+  type: 'test'
+  ...
+# Subtest: P2: the four times stay separate; a delay moves only the earliest release, never the latest settlement
+ok 470 - P2: the four times stay separate; a delay moves only the earliest release, never the latest settlement
+  ---
+  duration_ms: 202.089341
+  type: 'test'
+  ...
+# Subtest: P2: the vault enforces the horizon independently of the risk engine (2 h horizon < 6 h delay -> expired, not settled)
+ok 471 - P2: the vault enforces the horizon independently of the risk engine (2 h horizon < 6 h delay -> expired, not settled)
+  ---
+  duration_ms: 164.743879
+  type: 'test'
+  ...
+# Subtest: P2: an authorization issued near the end of its 2 h validity expires at its horizon when the delay would cross it
+ok 472 - P2: an authorization issued near the end of its 2 h validity expires at its horizon when the delay would cross it
+  ---
+  duration_ms: 244.370583
+  type: 'test'
+  ...
+# Subtest: P2: verifier flags a settlement after the horizon even when the vault records are rewritten
+ok 473 - P2: verifier flags a settlement after the horizon even when the vault records are rewritten
+  ---
+  duration_ms: 150.398896
+  type: 'test'
+  ...
+# Subtest: P1: LOW risk (short burst) -> bounded delay, then conditional settlement with the owner offline
+ok 474 - P1: LOW risk (short burst) -> bounded delay, then conditional settlement with the owner offline
+  ---
+  duration_ms: 310.164372
+  type: 'test'
+  ...
+# Subtest: P1: HIGH risk (hard ceiling) with the owner offline 72 h -> every delayed payment expires, none settles; no global freeze
+ok 475 - P1: HIGH risk (hard ceiling) with the owner offline 72 h -> every delayed payment expires, none settles; no global freeze
+  ---
+  duration_ms: 429.709456
+  type: 'test'
+  ...
+# Subtest: P1: HIGH risk resolved by the owner (trusted LEGITIMATE review) settles; FRAUD cancels
+ok 476 - P1: HIGH risk resolved by the owner (trusted LEGITIMATE review) settles; FRAUD cancels
+  ---
+  duration_ms: 676.825059
+  type: 'test'
+  ...
+# Subtest: P1: a LOW incident that escalates to HIGH marks its pending payments HIGH (deadlines unchanged)
+ok 477 - P1: a LOW incident that escalates to HIGH marks its pending payments HIGH (deadlines unchanged)
+  ---
+  duration_ms: 163.358733
+  type: 'test'
+  ...
+# Subtest: P1: verifier flags a HIGH-risk payment settled without owner resolution (vault record downgraded to LOW)
+ok 478 - P1: verifier flags a HIGH-risk payment settled without owner resolution (vault record downgraded to LOW)
+  ---
+  duration_ms: 299.984973
+  type: 'test'
+  ...
+# Subtest: P1: release-time re-check: a delegation revoked while its payment waits cancels it
+ok 479 - P1: release-time re-check: a delegation revoked while its payment waits cancels it
+  ---
+  duration_ms: 83.878404
+  type: 'test'
+  ...
+# Subtest: P1: vault restart during a pending HIGH-risk payment: class, deadline and expiry survive
+ok 480 - P1: vault restart during a pending HIGH-risk payment: class, deadline and expiry survive
+  ---
+  duration_ms: 212.042669
+  type: 'test'
+  ...
+# Subtest: P2: an ordinary reserved payment settles inside its window with no second signature
+ok 481 - P2: an ordinary reserved payment settles inside its window with no second signature
+  ---
+  duration_ms: 76.337506
+  type: 'test'
+  ...
+# Subtest: P1: riskClassOf is a deterministic function of the evaluation: each HIGH rule on its own
+ok 482 - P1: riskClassOf is a deterministic function of the evaluation: each HIGH rule on its own
+  ---
+  duration_ms: 0.687269
+  type: 'test'
+  ...
+# Subtest: repair (A/B scenario 14): a flow under an open incident holds at most 8 pending slots; the owner's other flow keeps paying
+ok 483 - repair (A/B scenario 14): a flow under an open incident holds at most 8 pending slots; the owner's other flow keeps paying
+  ---
+  duration_ms: 455.941056
+  type: 'test'
+  ...
+# Subtest: F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution
+ok 484 - F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution
+  ---
+  duration_ms: 392.150649
+  type: 'test'
+  ...
+# Subtest: F1 control: an honest HIGH incident resolved LEGITIMATE by a trusted key verifies clean
+ok 485 - F1 control: an honest HIGH incident resolved LEGITIMATE by a trusted key verifies clean
+  ---
+  duration_ms: 308.104879
+  type: 'test'
+  ...
+# Subtest: F3: an effect whose V5 record was deleted, or whose proposal time was rewritten, is flagged
+ok 486 - F3: an effect whose V5 record was deleted, or whose proposal time was rewritten, is flagged
+  ---
+  duration_ms: 187.744744
+  type: 'test'
+  ...
+# Subtest: F4: rewriting the vault's flow column does not hide a tier reset (flows come from signed evidence)
+ok 487 - F4: rewriting the vault's flow column does not hide a tier reset (flows come from signed evidence)
+  ---
+  duration_ms: 147.092876
+  type: 'test'
+  ...
+# Subtest: F6: a delegated op accepted long after its signed issuedAt is flagged (DELEGATED_OP_STALE_AT_PROPOSAL)
+ok 488 - F6: a delegated op accepted long after its signed issuedAt is flagged (DELEGATED_OP_STALE_AT_PROPOSAL)
+  ---
+  duration_ms: 256.900794
+  type: 'test'
+  ...
+# Subtest: N1: a ledger effect spending capability X under an older payment id Y is flagged (cap not bound to payment)
+ok 489 - N1: a ledger effect spending capability X under an older payment id Y is flagged (cap not bound to payment)
+  ---
+  duration_ms: 96.344708
+  type: 'test'
+  ...
+# Subtest: N2: a crash after the v5_pay insert but before the evaluation completes leaves the payment cancelled on restart
+ok 490 - N2: a crash after the v5_pay insert but before the evaluation completes leaves the payment cancelled on restart
+  ---
+  duration_ms: 191.38992
+  type: 'test'
+  ...
+# Subtest: N3: an owner LEGITIMATE review of a different incident id does not resolve the HIGH incident
+ok 491 - N3: an owner LEGITIMATE review of a different incident id does not resolve the HIGH incident
+  ---
+  duration_ms: 284.376224
+  type: 'test'
+  ...
+# Subtest: N4 (honest, no false positive): a reviewed LOW incident's payments settle cleanly although a later HIGH incident opens meanwhile
+ok 492 - N4 (honest, no false positive): a reviewed LOW incident's payments settle cleanly although a later HIGH incident opens meanwhile
+  ---
+  duration_ms: 318.775525
+  type: 'test'
+  ...
+# Subtest: N5: without the engine journal the verifier never reports ok for a ledger with effects
+ok 493 - N5: without the engine journal the verifier never reports ok for a ledger with effects
+  ---
+  duration_ms: 111.924453
+  type: 'test'
+  ...
+# Subtest: N3b: a compromised vault that hands the engine an already-reviewed incident (to borrow its review) is flagged
+ok 494 - N3b: a compromised vault that hands the engine an already-reviewed incident (to borrow its review) is flagged
+  ---
+  duration_ms: 295.58214
+  type: 'test'
+  ...
+# Subtest: R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not
+ok 495 - R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not
+  ---
+  duration_ms: 765.28194
+  type: 'test'
+  ...
+# Subtest: F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1's grant
+ok 496 - F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1's grant
+  ---
+  duration_ms: 393.632235
+  type: 'test'
+  ...
+# Subtest: legitimate flows verify: normal, delayed, Rapid-Use accelerated, reviewed, delegated
+ok 497 - legitimate flows verify: normal, delayed, Rapid-Use accelerated, reviewed, delegated
+  ---
+  duration_ms: 407.825513
+  type: 'test'
+  ...
+# Subtest: compromised vault releases a delayed payment early -> DELAYED_PAYMENT_RELEASED_EARLY
+ok 498 - compromised vault releases a delayed payment early -> DELAYED_PAYMENT_RELEASED_EARLY
+  ---
+  duration_ms: 143.97837
+  type: 'test'
+  ...
+# Subtest: compromised vault erases its own delay record -> engine journal exposes DELAY_RECORD_MISMATCH
+ok 499 - compromised vault erases its own delay record -> engine journal exposes DELAY_RECORD_MISMATCH
+  ---
+  duration_ms: 157.289405
+  type: 'test'
+  ...
+# Subtest: compromised vault settles during a global hold -> EFFECT_DURING_GLOBAL_HOLD
+ok 500 - compromised vault settles during a global hold -> EFFECT_DURING_GLOBAL_HOLD
+  ---
+  duration_ms: 101.602865
+  type: 'test'
+  ...
+# Subtest: tampered journal is reported by the verifier
+ok 501 - tampered journal is reported by the verifier
+  ---
+  duration_ms: 138.745734
+  type: 'test'
+  ...
+# Subtest: CQ-1 credentials: read through one descriptor; a symlink or a directory at the path is refused (POSIX)
+ok 502 - CQ-1 credentials: read through one descriptor; a symlink or a directory at the path is refused (POSIX)
+  ---
+  duration_ms: 1.645559
+  type: 'test'
+  ...
+# Subtest: CQ-2 terminal lines: CR/LF, ANSI escapes and bidi overrides cannot forge or recolour a demo terminal line
+ok 503 - CQ-2 terminal lines: CR/LF, ANSI escapes and bidi overrides cannot forge or recolour a demo terminal line
+  ---
+  duration_ms: 0.408845
+  type: 'test'
+  ...
+# Subtest: credential load requires a regular 0600 file and refuses a symlink (POSIX)
+ok 504 - credential load requires a regular 0600 file and refuses a symlink (POSIX)
+  ---
+  duration_ms: 3.246221
+  type: 'test'
+  ...
+# Subtest: credential load: a FIFO at the path neither hangs nor loads (PR \#26 O_NONBLOCK kept)
+ok 505 - credential load: a FIFO at the path neither hangs nor loads (PR \#26 O_NONBLOCK kept)
+  ---
+  duration_ms: 7.370019
+  type: 'test'
+  ...
+# Subtest: credential write: exclusive create, mode 0600, refuses a symlink or dangling symlink, validates fields
+ok 506 - credential write: exclusive create, mode 0600, refuses a symlink or dangling symlink, validates fields
+  ---
+  duration_ms: 3.015562
+  type: 'test'
+  ...
+# Subtest: G-off-by-default: without SAFEBOX_ALLOW_REAL_EMAIL=1, credentials and an allowlist nothing leaves the process
+ok 507 - G-off-by-default: without SAFEBOX_ALLOW_REAL_EMAIL=1, credentials and an allowlist nothing leaves the process
+  ---
+  duration_ms: 2.531046
+  type: 'test'
+  ...
+# Subtest: G-send: refresh -> messages.send with Bearer + base64url RFC 822; 200 means GMAIL_API_ACCEPTED (not delivered)
+ok 508 - G-send: refresh -> messages.send with Bearer + base64url RFC 822; 200 means GMAIL_API_ACCEPTED (not delivered)
+  ---
+  duration_ms: 3.765747
+  type: 'test'
+  ...
+# Subtest: G-scope: a token whose scope is not exactly gmail.send is refused and nothing is sent (least privilege)
+ok 509 - G-scope: a token whose scope is not exactly gmail.send is refused and nothing is sent (least privilege)
+  ---
+  duration_ms: 1.591673
+  type: 'test'
+  ...
+# Subtest: G-errors: revoked grant -> AUTH_FAILED; 401 -> one refresh retry; 429/5xx/rateLimit -> TEMPORARY; 400 -> PERMANENT; network -> TEMPORARY
+ok 510 - G-errors: revoked grant -> AUTH_FAILED; 401 -> one refresh retry; 429/5xx/rateLimit -> TEMPORARY; 400 -> PERMANENT; network -> TEMPORARY
+  ---
+  duration_ms: 3.818967
+  type: 'test'
+  ...
+# Subtest: G-headers: CR/LF header injection in recipient/sender is refused; subject is flattened to one ASCII line
+ok 511 - G-headers: CR/LF header injection in recipient/sender is refused; subject is flattened to one ASCII line
+  ---
+  duration_ms: 0.892489
+  type: 'test'
+  ...
+# Subtest: G-credentials: loaded from a file outside the repo; missing / incomplete files are refused
+ok 512 - G-credentials: loaded from a file outside the repo; missing / incomplete files are refused
+  ---
+  duration_ms: 1.133118
+  type: 'test'
+  ...
+# Subtest: G-outbox: incident alert through Gmail -> API_ACCEPTED (inbox NOT verified) -> manual receipt attestation; revoked grant -> REAUTH_REQUIRED, no retry storm
+ok 513 - G-outbox: incident alert through Gmail -> API_ACCEPTED (inbox NOT verified) -> manual receipt attestation; revoked grant -> REAUTH_REQUIRED, no retry storm
+  ---
+  duration_ms: 234.136183
+  type: 'test'
+  ...
+# Subtest: G-no-links fallback: linkMode NO_LINKS keeps the V5 "do not use links" text and no URL at all
+ok 514 - G-no-links fallback: linkMode NO_LINKS keeps the V5 "do not use links" text and no URL at all
+  ---
+  duration_ms: 134.522688
+  type: 'test'
+  ...
+# Subtest: P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix
+ok 515 - P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix
+  ---
+  duration_ms: 270.425944
+  type: 'test'
+  ...
+# Subtest: P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE
+ok 516 - P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE
+  ---
+  duration_ms: 204.827705
+  type: 'test'
+  ...
+# Subtest: P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt
+ok 517 - P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt
+  ---
+  duration_ms: 202.897755
+  type: 'test'
+  ...
+# Subtest: P0.2-format: a digest-only gate request (no prepared object) is refused
+ok 518 - P0.2-format: a digest-only gate request (no prepared object) is refused
+  ---
+  duration_ms: 178.836081
+  type: 'test'
+  ...
+# Subtest: P0.2-display (device route): a HOLD_RELEASE approved on the device shows the rebuilt command on the gate window, not a digest prefix
+ok 519 - P0.2-display (device route): a HOLD_RELEASE approved on the device shows the rebuilt command on the gate window, not a digest prefix
+  ---
+  duration_ms: 184.303287
+  type: 'test'
+  ...
+# Subtest: P0.2-display: free text never adds, removes or shifts a line in the gate window
+ok 520 - P0.2-display: free text never adds, removes or shifts a line in the gate window
+  ---
+  duration_ms: 106.4556
+  type: 'test'
+  ...
+# Subtest: P0.1-helper: a helper build that does not report the post-MATCH owner confirmation is refused (no gate, no payment)
+ok 521 - P0.1-helper: a helper build that does not report the post-MATCH owner confirmation is refused (no gate, no payment)
+  ---
+  duration_ms: 315.053249
+  type: 'test'
+  ...
+# Subtest: P0.2-display: a raw newline in command free text never reaches the gate window (refused before any grant / prompt) and is neutralised in the display text anyway
+ok 522 - P0.2-display: a raw newline in command free text never reaches the gate window (refused before any grant / prompt) and is neutralised in the display text anyway
+  ---
+  duration_ms: 82.279567
+  type: 'test'
+  ...
+# Subtest: P0.1-bound: a forged gate without the owner's own UV assertion authorizes no payment
+ok 523 - P0.1-bound: a forged gate without the owner's own UV assertion authorizes no payment
+  ---
+  duration_ms: 122.373608
+  type: 'test'
+  ...
+# Subtest: P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV
+ok 524 - P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV
+  ---
+  duration_ms: 99.000016
+  type: 'test'
+  ...
+# Subtest: P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor
+ok 525 - P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor
+  ---
+  duration_ms: 85.704278
+  type: 'test'
+  ...
+# Subtest: P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root
+ok 526 - P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root
+  ---
+  duration_ms: 110.497071
+  type: 'test'
+  ...
+# Subtest: P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated
+ok 527 - P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated
+  ---
+  duration_ms: 0.832993
+  type: 'test'
+  ...
+# Subtest: P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt
+ok 528 - P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt
+  ---
+  duration_ms: 75.998314
+  type: 'test'
+  ...
+# Subtest: P0.1-legacy (LOCAL_GATE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+ok 529 - P0.1-legacy (LOCAL_GATE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+  ---
+  duration_ms: 84.024501
+  type: 'test'
+  ...
+# Subtest: P0.1-legacy (HIGH_ASSURANCE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+ok 530 - P0.1-legacy (HIGH_ASSURANCE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+  ---
+  duration_ms: 68.335133
+  type: 'test'
+  ...
+# Subtest: P0.1-legacy: with fingerprint-only credentials configured, a UV credential's bad paycap under LEGACY_V5 is still refused and attributed by the V5 core
+ok 531 - P0.1-legacy: with fingerprint-only credentials configured, a UV credential's bad paycap under LEGACY_V5 is still refused and attributed by the V5 core
+  ---
+  duration_ms: 152.834183
+  type: 'test'
+  ...
+# Subtest: P0.1-legacy (pre-check): a fingerprint-only V5 paycap is refused BEFORE the payment transaction, as an owner-approval rejection
+ok 532 - P0.1-legacy (pre-check): a fingerprint-only V5 paycap is refused BEFORE the payment transaction, as an owner-approval rejection
+  ---
+  duration_ms: 56.018395
+  type: 'test'
+  ...
+# Subtest: P0.1-legacy (transaction guard): a fingerprint-only paycap that reaches the core without the V6 layer is refused inside the transaction
+ok 533 - P0.1-legacy (transaction guard): a fingerprint-only paycap that reaches the core without the V6 layer is refused inside the transaction
+  ---
+  duration_ms: 55.899168
+  type: 'test'
+  ...
+# Subtest: P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence
+ok 534 - P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence
+  ---
+  duration_ms: 139.264287
+  type: 'test'
+  ...
+# Subtest: P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence
+ok 535 - P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence
+  ---
+  duration_ms: 126.441141
+  type: 'test'
+  ...
+# Subtest: P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record
+ok 536 - P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record
+  ---
+  duration_ms: 2037.495544
+  type: 'test'
+  ...
+# Subtest: P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)
+ok 537 - P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)
+  ---
+  duration_ms: 72.26683
+  type: 'test'
+  ...
+# Subtest: P0.3-settle: a crash after the ledger accepted the transfer, and two release workers, never settle twice
+ok 538 - P0.3-settle: a crash after the ledger accepted the transfer, and two release workers, never settle twice
+  ---
+  duration_ms: 115.912574
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3)
+ok 539 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3)
+  ---
+  duration_ms: 96.552235
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient)
+ok 540 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient)
+  ---
+  duration_ms: 78.980001
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed a later approval expiry)
+ok 541 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed a later approval expiry)
+  ---
+  duration_ms: 84.342067
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance)
+ok 542 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance)
+  ---
+  duration_ms: 86.364869
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (arbitrary digest)
+ok 543 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (arbitrary digest)
+  ---
+  duration_ms: 61.45173
+  type: 'test'
+  ...
+# Subtest: P0.2-summary: the honest summary (with the untrusted requester note shown) still verifies at the Vault and the verifier
+ok 544 - P0.2-summary: the honest summary (with the untrusted requester note shown) still verifies at the Vault and the verifier
+  ---
+  duration_ms: 119.593573
+  type: 'test'
+  ...
+# Subtest: P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in
+ok 545 - P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in
+  ---
+  duration_ms: 8583.411574
+  type: 'test'
+  ...
+# Subtest: P1.6-login-race: a flood running BETWEEN the owner's login start and finish cannot evict the owner's pending login below the cap
+ok 546 - P1.6-login-race: a flood running BETWEEN the owner's login start and finish cannot evict the owner's pending login below the cap
+  ---
+  duration_ms: 440.51227
+  type: 'test'
+  ...
+# Subtest: P1.6-residual: more than PENDING_LOGINS_MAX starts between the owner's start and finish evict the owner's pending login (fails closed; the owner retries)
+ok 547 - P1.6-residual: more than PENDING_LOGINS_MAX starts between the owner's start and finish evict the owner's pending login (fails closed; the owner retries)
+  ---
+  duration_ms: 403.932485
+  type: 'test'
+  ...
+# Subtest: P1.7-truncate: deleting an owner payment approval (and everything after it) from the local journal is detected
+ok 548 - P1.7-truncate: deleting an owner payment approval (and everything after it) from the local journal is detected
+  ---
+  duration_ms: 119.999167
+  type: 'test'
+  ...
+# Subtest: P1.7-truncate: deleting an owner FREEZE (and everything after it) from the local journal is detected
+ok 549 - P1.7-truncate: deleting an owner FREEZE (and everything after it) from the local journal is detected
+  ---
+  duration_ms: 127.913928
+  type: 'test'
+  ...
+# Subtest: P1.7-types: the critical types are exactly the security-relevant ones (no rejected-attempt floods)
+ok 550 - P1.7-types: the critical types are exactly the security-relevant ones (no rejected-attempt floods)
+  ---
+  duration_ms: 0.368791
+  type: 'test'
+  ...
+# Subtest: P1.8-rebinding: the console refuses requests whose Host is not its own (DNS rebinding), and still serves its own host
+ok 551 - P1.8-rebinding: the console refuses requests whose Host is not its own (DNS rebinding), and still serves its own host
+  ---
+  duration_ms: 250.539712
+  type: 'test'
+  ...
+# Subtest: P1.8-fuzz: 1500 fuzzed console requests (no session, and with a real owner session) never hit an unhandled exception or change security state
+ok 552 - P1.8-fuzz: 1500 fuzzed console requests (no session, and with a real owner session) never hit an unhandled exception or change security state
+  ---
+  duration_ms: 543.096073
+  type: 'test'
+  ...
+# Subtest: verifier vs dishonest LEGACY_V5 vault (LOCAL_GATE)
+ok 553 - verifier vs dishonest LEGACY_V5 vault (LOCAL_GATE)
+  ---
+  duration_ms: 178.625268
+  type: 'test'
+  ...
+# Subtest: verifier vs dishonest LEGACY_V5 vault (HIGH_ASSURANCE)
+ok 554 - verifier vs dishonest LEGACY_V5 vault (HIGH_ASSURANCE)
+  ---
+  duration_ms: 138.067663
+  type: 'test'
+  ...
+# Subtest: honest LEGACY_V5 vault: a fingerprint-only payment through the V6 ceremony settles and the verifier accepts it
+ok 555 - honest LEGACY_V5 vault: a fingerprint-only payment through the V6 ceremony settles and the verifier accepts it
+  ---
+  duration_ms: 126.931809
+  type: 'test'
+  ...
+# Subtest: P1.9-secrets: planted credentials are detected; the scan never returns the value
+ok 556 - P1.9-secrets: planted credentials are detected; the scan never returns the value
+  ---
+  duration_ms: 2.787829
+  type: 'test'
+  ...
+# Subtest: P1.9-locks: both lockfiles are v3, every package has an integrity hash, direct dependencies are pinned exactly
+ok 557 - P1.9-locks: both lockfiles are v3, every package has an integrity hash, direct dependencies are pinned exactly
+  ---
+  duration_ms: 1.218697
+  type: 'test'
+  ...
+# Subtest: P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected
+ok 558 - P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected
+  ---
+  duration_ms: 1.435927
+  type: 'test'
+  ...
+# Subtest: gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)
+ok 559 - gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)
+  ---
+  duration_ms: 6.558599
+  type: 'test'
+  ...
+# Subtest: genesis: a gate key whose proof of possession is for another credential is refused
+ok 560 - genesis: a gate key whose proof of possession is for another credential is refused
+  ---
+  duration_ms: 101.115202
+  type: 'test'
+  ...
+# Subtest: genesis RP: the loopback exception is exactly http://localhost:<port>
+ok 561 - genesis RP: the loopback exception is exactly http://localhost:<port>
+  ---
+  duration_ms: 223.116235
+  type: 'test'
+  ...
+# Subtest: payment: the capability taskRef must be the binding hash
+ok 562 - payment: the capability taskRef must be the binding hash
+  ---
+  duration_ms: 74.912644
+  type: 'test'
+  ...
+# Subtest: payment: a Root-pinned challenge issued to another credential cannot be used
+ok 563 - payment: a Root-pinned challenge issued to another credential cannot be used
+  ---
+  duration_ms: 70.845421
+  type: 'test'
+  ...
+# Subtest: console: an approval carrying another proposal's challenge is refused before Root
+ok 564 - console: an approval carrying another proposal's challenge is refused before Root
+  ---
+  duration_ms: 177.74389
+  type: 'test'
+  ...
+# Subtest: device: a prepared challenge not signed by the Root-pinned issuer is not signed
+ok 565 - device: a prepared challenge not signed by the Root-pinned issuer is not signed
+  ---
+  duration_ms: 171.612925
+  type: 'test'
+  ...
+# Subtest: verifier6: a dishonest Vault that forgets consumed challenges, misreports levels or ignores the delegation policy is flagged
+ok 566 - verifier6: a dishonest Vault that forgets consumed challenges, misreports levels or ignores the delegation policy is flagged
+  ---
+  duration_ms: 362.661995
+  type: 'test'
+  ...
+# Subtest: \#25 case and PR \#28 residuals: newline, CR/LF, U+2028, U+2029 and ANSI CSI never reach the terminal raw
+ok 567 - \#25 case and PR \#28 residuals: newline, CR/LF, U+2028, U+2029 and ANSI CSI never reach the terminal raw
+  ---
+  duration_ms: 0.792614
+  type: 'test'
+  ...
+# Subtest: showcase: console line uses termSafe; the HTML viewer escapes kind, labels, text and time
+ok 568 - showcase: console line uses termSafe; the HTML viewer escapes kind, labels, text and time
+  ---
+  duration_ms: 1.525762
+  type: 'test'
+  ...
+# Subtest: E1: a vault that hides an open incident in its final 15 minutes is flagged (ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT)
+ok 569 - E1: a vault that hides an open incident in its final 15 minutes is flagged (ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT)
+  ---
+  duration_ms: 392.522905
+  type: 'test'
+  ...
+# Subtest: E1 control: the honest vault delays the same payment and verifies clean
+ok 570 - E1 control: the honest vault delays the same payment and verifies clean
+  ---
+  duration_ms: 273.231492
+  type: 'test'
+  ...
+# Subtest: E3: with two open incidents, a decision bound to the OLDER one (borrowing its review) is flagged
+ok 571 - E3: with two open incidents, a decision bound to the OLDER one (borrowing its review) is flagged
+  ---
+  duration_ms: 1945.070317
+  type: 'test'
+  ...
+# Subtest: E3 control: the honest vault binds the newest incident; the review of the older one does not release it
+ok 572 - E3 control: the honest vault binds the newest incident; the review of the older one does not release it
+  ---
+  duration_ms: 2012.689534
+  type: 'test'
+  ...
+# Subtest: Rapid-Use: a vault applying a grant beyond its session cap is flagged (only cap-covered payments verify)
+ok 573 - Rapid-Use: a vault applying a grant beyond its session cap is flagged (only cap-covered payments verify)
+  ---
+  duration_ms: 330.816041
+  type: 'test'
+  ...
+# Subtest: Rapid-Use control: the honest vault accelerates exactly the cap (3 x 0.01) and verifies clean
+ok 574 - Rapid-Use control: the honest vault accelerates exactly the cap (3 x 0.01) and verifies clean
+  ---
+  duration_ms: 350.02317
+  type: 'test'
+  ...
+# Subtest: Rapid-Use: per-payment maximum and asset are part of the grant scope
+ok 575 - Rapid-Use: per-payment maximum and asset are part of the grant scope
+  ---
+  duration_ms: 305.303053
+  type: 'test'
+  ...
+# Subtest: RS256 (Windows Hello style) registration and assertion verify; tampered signature and replayed counter fail
+ok 576 - RS256 (Windows Hello style) registration and assertion verify; tampered signature and replayed counter fail
+  ---
+  duration_ms: 73.625106
+  type: 'test'
+  ...
+# Subtest: RS256 keys below 2048 bits are refused
+ok 577 - RS256 keys below 2048 bits are refused
+  ---
+  duration_ms: 7.961873
+  type: 'test'
+  ...
+# Subtest: WinBioGate (emulated helper): genesis enrollment PoP, payment gate and FREEZE gate verify in Root/Vault
+ok 578 - WinBioGate (emulated helper): genesis enrollment PoP, payment gate and FREEZE gate verify in Root/Vault
+  ---
+  duration_ms: 390.25126
+  type: 'test'
+  ...
+# Subtest: WinBioGate: NO_MATCH / TIMEOUT / LOCKOUT / unsupported -> no gate, no payment (fail closed)
+ok 579 - WinBioGate: NO_MATCH / TIMEOUT / LOCKOUT / unsupported -> no gate, no payment (fail closed)
+  ---
+  duration_ms: 506.359434
+  type: 'test'
+  ...
+# Subtest: A-honest: UV phone and fingerprint-only laptop approvals settle after FIXED_600; verifier clean; evidence journaled
+ok 580 - A-honest: UV phone and fingerprint-only laptop approvals settle after FIXED_600; verifier clean; evidence journaled
+  ---
+  duration_ms: 168.685759
+  type: 'test'
+  ...
+# Subtest: A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)
+ok 581 - A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)
+  ---
+  duration_ms: 1103.860726
+  type: 'test'
+  ...
+# Subtest: A-challenge: reuse with a fresh signature, expiry, forged issuer -> refused
+ok 582 - A-challenge: reuse with a fresh signature, expiry, forged issuer -> refused
+  ---
+  duration_ms: 113.70054
+  type: 'test'
+  ...
+# Subtest: A-epoch: an approval made before an Epoch change is refused after it
+ok 583 - A-epoch: an approval made before an Epoch change is refused after it
+  ---
+  duration_ms: 93.700667
+  type: 'test'
+  ...
+# Subtest: A-fingerprint: no gate, PIN only, no match, lockout, timeout, unsupported sensor, wrong digest, stale or foreign gate -> no payment
+ok 584 - A-fingerprint: no gate, PIN only, no match, lockout, timeout, unsupported sensor, wrong digest, stale or foreign gate -> no payment
+  ---
+  duration_ms: 537.989836
+  type: 'test'
+  ...
+# Subtest: A-stolen PAY key: a stolen software key / V5-only paycap (no V6 approval) cannot pay under PER_TRANSACTION
+ok 585 - A-stolen PAY key: a stolen software key / V5-only paycap (no V6 approval) cannot pay under PER_TRANSACTION
+  ---
+  duration_ms: 53.613009
+  type: 'test'
+  ...
+# Subtest: A-delegation: bounded delegation is its own owner-signed policy; DISABLED refuses delegated effects
+ok 586 - A-delegation: bounded delegation is its own owner-signed policy; DISABLED refuses delegated effects
+  ---
+  duration_ms: 157.114431
+  type: 'test'
+  ...
+# Subtest: A-preserved: anomaly delay, HIGH-risk expiry and the 26 h horizon are unchanged under V6 approvals
+ok 587 - A-preserved: anomaly delay, HIGH-risk expiry and the 26 h horizon are unchanged under V6 approvals
+  ---
+  duration_ms: 258.192116
+  type: 'test'
+  ...
+# Subtest: A-verifier: a vault that drops or rewrites approval evidence is flagged
+ok 588 - A-verifier: a vault that drops or rewrites approval evidence is flagged
+  ---
+  duration_ms: 301.388776
+  type: 'test'
+  ...
+# Subtest: B-honest: link -> sign-in -> canonical incident -> exact FREEZE -> Root and Vault frozen -> settlement refused -> verifier clean -> recovery
+ok 589 - B-honest: link -> sign-in -> canonical incident -> exact FREEZE -> Root and Vault frozen -> settlement refused -> verifier clean -> recovery
+  ---
+  duration_ms: 298.704981
+  type: 'test'
+  ...
+# Subtest: B-scanner: GET / HEAD / preview / scanner visits of the link and the API change NO state and consume nothing
+ok 590 - B-scanner: GET / HEAD / preview / scanner visits of the link and the API change NO state and consume nothing
+  ---
+  duration_ms: 158.676724
+  type: 'test'
+  ...
+# Subtest: B-email: the email (or a forwarded copy) cannot freeze, approve or sign in: the locator alone authorizes nothing
+ok 591 - B-email: the email (or a forwarded copy) cannot freeze, approve or sign in: the locator alone authorizes nothing
+  ---
+  duration_ms: 164.695719
+  type: 'test'
+  ...
+# Subtest: B-csrf: POSTs need the exact Origin, JSON, the session cookie and the CSRF token (cross-site form / missing token fail before any effect)
+ok 592 - B-csrf: POSTs need the exact Origin, JSON, the session cookie and the CSRF token (cross-site form / missing token fail before any effect)
+  ---
+  duration_ms: 136.183148
+  type: 'test'
+  ...
+# Subtest: B-phishing: an assertion made on a look-alike origin, or for another RP, is refused; the link origin is only the owner-signed one
+ok 593 - B-phishing: an assertion made on a look-alike origin, or for another RP, is refused; the link origin is only the owner-signed one
+  ---
+  duration_ms: 189.049791
+  type: 'test'
+  ...
+# Subtest: B-replay: login, proposal, approval and Root challenge are all single-use
+ok 594 - B-replay: login, proposal, approval and Root challenge are all single-use
+  ---
+  duration_ms: 141.950654
+  type: 'test'
+  ...
+# Subtest: B-wrong-incident: unknown / malformed / mismatched incidents are refused; the reason is fixed by the console, not the client
+ok 595 - B-wrong-incident: unknown / malformed / mismatched incidents are refused; the reason is fixed by the console, not the client
+  ---
+  duration_ms: 124.143955
+  type: 'test'
+  ...
+# Subtest: B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)
+ok 596 - B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)
+  ---
+  duration_ms: 131.38579
+  type: 'test'
+  ...
+# Subtest: B-fingerprint: no gate / PIN only / no match / lockout / timeout / unsupported sensor -> no FREEZE, and never a silent PIN substitute
+ok 597 - B-fingerprint: no gate / PIN only / no match / lockout / timeout / unsupported sensor -> no FREEZE, and never a silent PIN substitute
+  ---
+  duration_ms: 939.947107
+  type: 'test'
+  ...
+# Subtest: B-confirm/expiry/epoch: no confirm phrase -> nothing; expired proposal; session dies on Epoch or credential change
+ok 598 - B-confirm/expiry/epoch: no confirm phrase -> nothing; expired proposal; session dies on Epoch or credential change
+  ---
+  duration_ms: 155.24346
+  type: 'test'
+  ...
+# Subtest: B-unfreeze/recovery: release needs every valid party (non-party refused); unsupported command types refused; Root decides quorum
+ok 599 - B-unfreeze/recovery: release needs every valid party (non-party refused); unsupported command types refused; Root decides quorum
+  ---
+  duration_ms: 162.809912
+  type: 'test'
+  ...
+# Subtest: B-forged freeze: a FREEZE naming an incident the Risk Engine never opened is flagged by the independent verifier
+ok 600 - B-forged freeze: a FREEZE naming an incident the Risk Engine never opened is flagged by the independent verifier
+  ---
+  duration_ms: 300.236525
+  type: 'test'
+  ...
+# Subtest: B-restart/outage: the hold survives Root and Vault restarts; console sessions do not (re-authentication required)
+ok 601 - B-restart/outage: the hold survives Root and Vault restarts; console sessions do not (re-authentication required)
+  ---
+  duration_ms: 202.556437
+  type: 'test'
+  ...
+# Subtest: B-concurrency: two confirms of one proposal race -> exactly one submission
+ok 602 - B-concurrency: two confirms of one proposal race -> exactly one submission
+  ---
+  duration_ms: 162.188321
+  type: 'test'
+  ...
+# Subtest: B-http: the real HTTP listener serves the page with no-store and refuses cross-origin POSTs
+ok 603 - B-http: the real HTTP listener serves the page with no-store and refuses cross-origin POSTs
+  ---
+  duration_ms: 145.354228
+  type: 'test'
+  ...
+1..603
+# tests 603
+# suites 0
+# pass 603
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 48737.22322

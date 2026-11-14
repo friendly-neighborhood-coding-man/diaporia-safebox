@@ -1,0 +1,177 @@
+{
+  "generatedBy": "scripts/v2/legacy-hardening-mutations.mjs",
+  "caught": 13,
+  "total": 14,
+  "patternErrors": 0,
+  "rows": [
+    {
+      "name": "#19 keygen private read follows symlinks",
+      "file": "src/v2/launch/keygen.mjs",
+      "tests": [
+        "tests/v2/keygen-exclusive.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "a private-key symlink is refused and its target is not read as the key"
+      ]
+    },
+    {
+      "name": "#19 keygen private mode check removed",
+      "file": "src/v2/launch/keygen.mjs",
+      "tests": [
+        "tests/v2/keygen-exclusive.test.mjs"
+      ],
+      "caught": false,
+      "failingTests": 0,
+      "examples": []
+    },
+    {
+      "name": "#21 find via sh -c string",
+      "file": "src/v2/launch/argv-exec.mjs",
+      "tests": [
+        "tests/v2/argv-exec.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "a directory name containing a shell separator is passed as one find argument",
+        "codeWritableReport stats the node binary without a shell"
+      ]
+    },
+    {
+      "name": "#21-cond absolute-path operand check removed",
+      "file": "src/v2/launch/argv-exec.mjs",
+      "tests": [
+        "tests/v2/argv-exec.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "find/stat path operands must be absolute: a dash-led or relative path is refused, not parsed as an expression (PR \\#28 \\#21 condition)"
+      ]
+    },
+    {
+      "name": "#21-cond find failure no longer recorded",
+      "file": "src/v2/launch/argv-exec.mjs",
+      "tests": [
+        "tests/v2/argv-exec.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "a find failure is recorded in the report instead of reading as \"nothing writable\""
+      ]
+    },
+    {
+      "name": "#23 V1 owner key read follows symlinks",
+      "file": "src/v1/authz.mjs",
+      "tests": [
+        "tests/v1/keyfile-nofollow.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "owner and executor key loads refuse a symlink and a permissive mode"
+      ]
+    },
+    {
+      "name": "#23 V1 executor key read follows symlinks",
+      "file": "src/v1/near/executor.mjs",
+      "tests": [
+        "tests/v1/keyfile-nofollow.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "owner and executor key loads refuse a symlink and a permissive mode"
+      ]
+    },
+    {
+      "name": "#24 owner log view follows symlinks",
+      "file": "src/v2/supervisor/owner.mjs",
+      "tests": [
+        "tests/v2/owner-log-fd.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "owner log view reads an append-only file and refuses a symlink"
+      ]
+    },
+    {
+      "name": "#24-cond owner log writer follows symlinks",
+      "file": "src/v2/supervisor/owner.mjs",
+      "tests": [
+        "tests/v2/owner-log-fd.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "owner log WRITER refuses a symlink at logPath and leaves the target untouched (PR \\#28 \\#24 condition)"
+      ]
+    },
+    {
+      "name": "F1 keygen private read blocks on a FIFO",
+      "file": "src/v2/launch/keygen.mjs",
+      "tests": [
+        "tests/v2/legacy-review-followup.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "a FIFO at the executor key path or the owner log path is refused, never blocks (review F1)"
+      ]
+    },
+    {
+      "name": "F1 owner log view blocks on a FIFO",
+      "file": "src/v2/supervisor/owner.mjs",
+      "tests": [
+        "tests/v2/legacy-review-followup.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "a FIFO at the executor key path or the owner log path is refused, never blocks (review F1)"
+      ]
+    },
+    {
+      "name": "F9 owner log view not bound to one file",
+      "file": "src/v2/supervisor/owner.mjs",
+      "tests": [
+        "tests/v2/legacy-review-followup.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "the incremental owner-log view refuses a log replaced by another file between refreshes (review F9)"
+      ]
+    },
+    {
+      "name": "F13 keygen loser renames over the winner",
+      "file": "src/v2/launch/keygen.mjs",
+      "tests": [
+        "tests/v2/keygen-exclusive.test.mjs",
+        "tests/v2/legacy-review-followup.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "keygen keeps a concurrent winner's private key: the loser links, it never renames over it (review F13)"
+      ]
+    },
+    {
+      "name": "F14 owner log view consumes a torn last line",
+      "file": "src/v2/supervisor/owner.mjs",
+      "tests": [
+        "tests/v2/owner-log-fd.test.mjs",
+        "tests/v2/legacy-review-followup.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "a torn last line is left for the next refresh and then applied once (review F14)"
+      ]
+    }
+  ]
+}

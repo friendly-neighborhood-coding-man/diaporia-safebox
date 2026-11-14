@@ -2,7 +2,7 @@
 // The executor accepts only an intent id. It reconstructs the transaction from the
 // trusted sealed-intent record, re-verifies the owner's signature against a PINNED
 // owner key, checks every parameter of the encoded transaction, and only then signs.
-import { readFileSync, statSync } from 'node:fs';
+import { closeSync, fstatSync, openSync, readSync, constants as C } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { KeyPair, KeyPairSigner, createTransaction, actions, baseDecode, baseEncode, Transaction, SignedTransaction } from 'near-api-js';
 import { fail, SafeBoxError } from '../canonical.mjs';
@@ -15,10 +15,32 @@ export function contractArgsBytes(row) {
 }
 
 /** Loads a near-cli style credential file. The key is captured in a closure and never serialised. */
+function readRestrictedFile(path, code) {
+  let fd;
+  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }
+  catch (e) {
+    if (e.code === 'ELOOP') fail(code + '_SYMLINK');
+    throw e;
+  }
+  try {
+    const st = fstatSync(fd);
+    if (!st.isFile()) fail(code + '_NOT_A_FILE');
+    if (process.platform !== 'win32' && (st.mode & 0o077) !== 0) fail(code + '_TOO_PERMISSIVE', 'chmod 600 required');
+    if (st.size > (1 << 20)) fail(code + '_TOO_LARGE');
+    const buf = Buffer.alloc(st.size);
+    let off = 0;
+    while (off < buf.length) {
+      const n = readSync(fd, buf, off, buf.length - off, null);
+      if (n === 0) break;
+      off += n;
+    }
+    if (off !== buf.length) fail(code + '_SHORT_READ');
+    return buf.toString('utf8');
+  } finally { closeSync(fd); }
+}
+
 export function loadExecutorSigner(path, expectedAccountId) {
-  const st = statSync(path);
-  if (process.platform !== 'win32' && (st.mode & 0o077) !== 0) fail('EXECUTOR_KEY_FILE_TOO_PERMISSIVE', 'chmod 600 required');
-  const f = JSON.parse(readFileSync(path, 'utf8'));
+  const f = JSON.parse(readRestrictedFile(path, 'EXECUTOR_KEY_FILE'));
   if (f.account_id !== expectedAccountId) fail('EXECUTOR_ACCOUNT_MISMATCH');
   const kp = KeyPair.fromString(f.private_key ?? f.secret_key);
   if (kp.getPublicKey().toString() !== f.public_key) fail('EXECUTOR_KEY_MISMATCH');

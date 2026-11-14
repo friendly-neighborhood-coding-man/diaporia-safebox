@@ -1,0 +1,143 @@
+{
+  "runner": "scripts/v6/real-device.mjs",
+  "startedAt": "2026-11-14T2103Z",
+  "labels": [
+    "MOCK LEDGER",
+    "REAL DEVICE AUTH (Windows Hello WebAuthn)",
+    "WINDOWS HELLO UV: PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)",
+    "FINGERPRINT ONLY NOT PROVEN",
+    "REAL GMAIL: NOT RUN",
+    "ATTACK DENIALS: 8/8 refused (attacker side SIMULATED; interface-level only)"
+  ],
+  "attacks": [
+    {
+      "id": "01",
+      "what": "immediate replay of the owner's real approval",
+      "refused": true,
+      "detail": "WEBAUTHN_SIGNCOUNT_NOT_INCREASING"
+    },
+    {
+      "id": "02",
+      "what": "AI asks to pay an address outside the purpose",
+      "refused": true,
+      "detail": "NOT_PREPARABLE RECIPIENT_NOT_IN_PURPOSE (no approval request created)"
+    },
+    {
+      "id": "03",
+      "what": "rogue AI client with a valid MCP session",
+      "refused": true,
+      "detail": "prepare -> AWAITING_OWNER_APPROVAL; tools offered: get_safebox_status, check_payment, prepare_payment, get_payment_status; after 40 min settledVerified=false"
+    },
+    {
+      "id": "04a",
+      "what": "amount changed 0.03 -> 0.06 NEAR after the summary",
+      "refused": true,
+      "detail": "CAPABILITY_MISMATCH [v6.payment]"
+    },
+    {
+      "id": "04b",
+      "what": "recipient swapped after the summary",
+      "refused": true,
+      "detail": "CAPABILITY_MISMATCH [recipientId]"
+    },
+    {
+      "id": "05",
+      "what": "stolen PAY key without a V6 owner approval",
+      "refused": true,
+      "detail": "V6_PAYMENT_APPROVAL_REQUIRED"
+    },
+    {
+      "id": "06",
+      "what": "fingerprint gate called without / with a foreign Origin",
+      "refused": true,
+      "detail": "no Origin -> HTTP 403, foreign Origin -> HTTP 403"
+    },
+    {
+      "id": "07",
+      "what": "6 scanner GET/HEAD visits of the Emergency Freeze link",
+      "refused": true,
+      "detail": "HTTP 200,200,200,200,200,200; state digest 5805a94c8074… -> 5805a94c8074…, frozen=false"
+    }
+  ],
+  "gateProbe": null,
+  "sensorCheck": [],
+  "gateEnrollment": "NOT_ATTEMPTED",
+  "gateLog": [],
+  "refusedSyncablePasskeys": [],
+  "webauthnCeremonies": [
+    {
+      "op": "create",
+      "at": "2026-11-14T21:03:52.672Z",
+      "what": "ENROLL: register this laptop's passkey as SafeBox credential k2-laptop and sign the account genesis records"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:53.271Z",
+      "what": "ENROLL: register this laptop's passkey as SafeBox credential k2-laptop and sign the account genesis records"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:53.855Z",
+      "what": "ENROLL: register this laptop's passkey as SafeBox credential k2-laptop and sign the account genesis records"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:54.441Z",
+      "what": "ENROLL: register this laptop's passkey as SafeBox credential k2-laptop and sign the account genesis records"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:55.021Z",
+      "what": "ENROLL: register this laptop's passkey as SafeBox credential k2-laptop and sign the account genesis records"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:55.605Z",
+      "what": "SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"
+    },
+    {
+      "op": "get",
+      "at": "2026-11-14T21:03:56.638Z",
+      "what": "SafeBox V5 - HOLD_RELEASE"
+    }
+  ],
+  "results": {
+    "workflowA": {
+      "prepared": "AWAITING_OWNER_APPROVAL",
+      "submitted": "SUBMITTED_TO_VAULT",
+      "assurance": "UV",
+      "settledVerified": true,
+      "vaultState": "SETTLED"
+    },
+    "alert": {
+      "transport": "MOCK",
+      "outboxState": "DELIVERED",
+      "api": "MOCK_DELIVERED",
+      "inbox": "INBOX_RECEIPT_NOT_VERIFIED",
+      "lastError": null,
+      "gmailLog": null
+    },
+    "workflowB": {
+      "frozen": true,
+      "holdId": "ef-dab98a45c7fe5105",
+      "holdClass": "PROVISIONAL_HOLD",
+      "paymentWhileFrozen": "FREEZE_ACTIVE",
+      "statesAfter30Min": [
+        "SETTLED",
+        "FROZEN",
+        "FROZEN",
+        "FROZEN",
+        "FROZEN"
+      ],
+      "verifierOk": true,
+      "settledWhileFrozen": 0
+    },
+    "recovery": {
+      "ok": true,
+      "error": null,
+      "frozenAfter": false
+    }
+  },
+  "ownerReportedModalities": "ASK THE OWNER: WebAuthn cannot tell which Windows Hello modality was used",
+  "git": "c86d4f4e3bddf8ad7babe9aae5f416a70d7fe297"
+}
