@@ -1,0 +1,6 @@
+{"n":63,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.672Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"console: freeze for an incident the engine never opened: INCIDENT_UNKNOWN"}
+{"n":64,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.672Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"console: made-up locator: LOCATOR_UNKNOWN"}
+{"n":65,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.687Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"INFO","text":"a stolen k1 key bypasses the console and freezes directly with a fake incident: Root accepts the PROVISIONAL_HOLD (owner protective hold, 24 h max)"}
+{"n":66,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.756Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"independent verifier: EMERGENCY_FREEZE_UNKNOWN_INCIDENT"}
+{"n":67,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.756Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: unknown incidents refused; a forged emergency reason is flagged"}
+{"n":68,"clip":"08-forged-freeze","at":"2026-11-14T14:28:13.756Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"INFO","text":"clean-up: the malicious hold is released by its own issuer (provenance rule)"}

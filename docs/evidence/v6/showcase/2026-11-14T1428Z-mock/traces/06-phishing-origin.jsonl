@@ -1,0 +1,2 @@
+{"n":59,"clip":"06-phishing-origin","at":"2026-11-14T14:28:13.669Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"assertion produced on the phishing origin, relayed to SafeBox: WEBAUTHN_ORIGIN_MISMATCH"}
+{"n":60,"clip":"06-phishing-origin","at":"2026-11-14T14:28:13.669Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: origin-bound WebAuthn: a phished assertion is useless"}

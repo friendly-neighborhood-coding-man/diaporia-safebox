@@ -1,6 +1,6 @@
 {
  "generatedBy": "scripts/v6/supply-chain.mjs",
- "commit": "fff3f8d095e2aca6877b53124d7be7edf13d5ba0",
+ "commit": "f80e6ace5dc9c47a121028e65ec9b883f33471ed",
  "scope": "LOCAL run (not CI)",
  "locks": [
   {
@@ -15,13 +15,18 @@
   }
  ],
  "secretScan": {
-  "files": 638,
+  "files": 647,
   "findings": []
  },
  "sbom": {
   "file": "sbom.cdx.json",
-  "sha256": "6c4977d82a38c0fa7958d8287b205d94b5dcb327f1b6cdd4191ae9c77803c705",
-  "components": 68
+  "sha256": "cb7c62e6c4fe63751337903a25ae1d90e4809a79d128b3788513ab224098050d",
+  "components": 68,
+  "externalInteractor": {
+   "file": "sbom-external-interactor.cdx.json",
+   "sha256": "9eb9840cf074e8d5e7c8c7660578b3e06250a109c0945151b49a5648f6ab2b20",
+   "components": 98
+  }
  },
  "notRun": [
   "npm audit / advisory database (needs network)",
