@@ -78,9 +78,14 @@ if (DEMO) {
   // already inside the documented same-user residual). Not available elsewhere: falls back to the manual step.
   let opened = false;
   if (flag('--open-edge') && process.platform === 'win32') {
-    try { spawn('cmd', ['/d', '/c', 'start', '""', 'msedge', '--app=' + bridge.url()], { stdio: 'ignore', detached: true, windowsHide: true }).unref(); opened = true; } catch { /* manual step below */ }
+    // Verbatim command line (Node would otherwise re-quote the empty start title). The URL is http://localhost:<port>
+    // plus a hex token, so it contains no cmd metacharacters; refuse anything else rather than pass it to cmd.
+    const u = bridge.url();
+    if (/^http:\/\/localhost:\d{1,5}\/bridge#t=[0-9a-f]+$/.test(u)) {
+      try { spawn('cmd', ['/d', '/s', '/c', `start "" msedge --app=${u}`], { stdio: 'ignore', detached: true, windowsHide: true, windowsVerbatimArguments: true }).unref(); opened = true; } catch { /* manual step below */ }
+    }
   }
-  if (opened) console.log(`STEP   The bridge opened in an Edge app window on THIS laptop (${ORIGIN}/bridge#t=<per-run secret, redacted>); keep that window open.`);
+  if (opened) console.log(`STEP   Asked Edge to open the bridge in an app window on THIS laptop (${ORIGIN}/bridge#t=<per-run secret, redacted>). If no window appears within a few seconds, open it manually from ${shown(uf)} (pause the recording first).`);
   else console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
 } else console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
 events.push({ at: new Date().toISOString(), kind: 'STEP', text: `Open ${ORIGIN}/bridge#t=<per-run secret, redacted> in Microsoft Edge` }); // the secret never reaches the evidence
