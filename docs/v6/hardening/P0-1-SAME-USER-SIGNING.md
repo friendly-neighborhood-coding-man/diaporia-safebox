@@ -84,5 +84,13 @@ Laptop protocol that can tell H1 from H2 (each run records `elapsedMs`, `quietDi
 | R3 | Click Start, touch deliberately, answer **No** | `BIOMETRIC_TOUCH_DISOWNED`, nothing signed | the disown path on real hardware |
 | R4 | Click Start, touch deliberately, answer **Yes** | MATCH, `ownerConfirmed = true` | honest path still works |
 
-Until these steps run, the root cause stays **unresolved**. The residual also stays: a stray touch followed by a
+**Results (real laptop, helper F5275765…, 2026-11-14 13:22-13:27Z, owner-attested touches; `docs/evidence/v6-hardening/p0-1-sensor-checks.jsonl`):**
+R2 hands-off: TIMEOUT, 0 discards (no spontaneous MATCH). R3 touch + No: `BIOMETRIC_TOUCH_DISOWNED`, nothing signed (the disown
+path now exercised on real hardware). R4 touch + Yes: MATCH, `ownerConfirmed=true`. R1 first attempt was misread by the owner
+(touched after Start): the MATCH was refused at the confirmation step. R1b (touch and lift BEFORE Start): TIMEOUT with
+`quietDiscards=0`, so the earlier touch was **not** delivered later as a queued sample. This is evidence against H2 on
+this sensor and leaves H1 (incidental contact during capture) as the more likely cause of runs 7/8, still not proven.
+The post-MATCH Yes/No confirmation is what counters H1.
+
+Root cause status: **H2 not reproduced; H1 likely, unproven**. The residual also stays: a stray touch followed by a
 careless "Yes" still approves.

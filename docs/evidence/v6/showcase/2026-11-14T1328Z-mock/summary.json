@@ -1,0 +1,258 @@
+{
+  "runner": "scripts/v6/showcase.mjs",
+  "startedAt": "2026-11-14T1328Z",
+  "mode": "MOCK",
+  "video": false,
+  "ffmpeg": true,
+  "ffmpegErrors": [],
+  "git": "c825f18d58739a92f255ab70f1ef860e5b42d262",
+  "labelsShown": [
+    "MOCK LEDGER",
+    "SIMULATED DEVICE",
+    "FINGERPRINT ONLY NOT PROVEN",
+    "REAL GMAIL: NOT RUN",
+    "REAL DEVICE AUTH: NOT RUN"
+  ],
+  "notRun": [
+    "REAL DEVICE AUTH (Windows Hello)",
+    "FINGERPRINT_ONLY on a real sensor",
+    "REAL GMAIL"
+  ],
+  "honesty": "All lines on screen are events emitted by this run. Devices are SIMULATED (Chromium virtual authenticator holding the Root-enrolled key; simulated fingerprint gate). Ledger is MOCK.",
+  "clips": [
+    {
+      "id": "main",
+      "title": "SafeBox V6 main demo: AI-prepared payment with owner fingerprint approval, then Gmail alert -> Emergency Freeze -> recovery",
+      "pass": true,
+      "checks": [
+        {
+          "what": "no signing / approval / biometric / key tool is reachable over MCP",
+          "ok": true
+        },
+        {
+          "what": "preparing created no Vault payment",
+          "ok": true
+        },
+        {
+          "what": "owner approval accepted by the Vault and buffered",
+          "ok": true
+        },
+        {
+          "what": "buffer is not skipped (FIXED_600)",
+          "ok": true
+        },
+        {
+          "what": "settled on the MOCK ledger, receipt matches the approved request",
+          "ok": true
+        },
+        {
+          "what": "Root and Vault replica report the GLOBAL hold",
+          "ok": true
+        },
+        {
+          "what": "the Vault refuses new payments while frozen",
+          "ok": true
+        },
+        {
+          "what": "recovery released the hold through the provenance rule",
+          "ok": true
+        },
+        {
+          "what": "independent V6 verifier: no unauthorized effect, freeze bound to an engine-opened incident",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE",
+        "FINGERPRINT ONLY NOT PROVEN",
+        "REAL GMAIL: NOT RUN",
+        "REAL DEVICE AUTH: NOT RUN"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "01-stolen-mcp-token",
+      "title": "Attack 01: stolen MCP access token",
+      "pass": true,
+      "checks": [
+        {
+          "what": "without the owner device nothing is approved or settled",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "02-missing-fingerprint",
+      "title": "Attack 02: approval without the fingerprint (gate skipped, PIN only, lockout)",
+      "pass": true,
+      "checks": [
+        {
+          "what": "no fingerprint, no payment",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE",
+        "FINGERPRINT ONLY NOT PROVEN"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "03-amount-substitution",
+      "title": "Attack 03: substituted amount / recipient after the owner saw the summary",
+      "pass": true,
+      "checks": [
+        {
+          "what": "substitution refused before the Vault; the Vault re-checks the binding too",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "04-challenge-replay",
+      "title": "Attack 04: replaying a genuine owner approval",
+      "pass": true,
+      "checks": [
+        {
+          "what": "one approval = one payment; no approval = no payment",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "05-scanner-get",
+      "title": "Attack 05: mail scanner / link preview visits the Emergency Freeze link",
+      "pass": true,
+      "checks": [
+        {
+          "what": "visiting the link changed nothing and froze nothing",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "06-phishing-origin",
+      "title": "Attack 06: phishing look-alike origin tries to harvest a login",
+      "pass": true,
+      "checks": [
+        {
+          "what": "origin-bound WebAuthn: a phished assertion is useless",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "07-csrf",
+      "title": "Attack 07: cross-site request forgery against a signed-in owner",
+      "pass": true,
+      "checks": [
+        {
+          "what": "no state change from a cross-site request",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "08-forged-freeze",
+      "title": "Attack 08: forged / wrong-incident emergency freeze",
+      "pass": true,
+      "checks": [
+        {
+          "what": "unknown incidents refused; a forged emergency reason is flagged",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "09-forged-unfreeze",
+      "title": "Attack 09: forged UNFREEZE (release by someone who did not place the hold)",
+      "pass": true,
+      "checks": [
+        {
+          "what": "only the hold's own valid parties can release it",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    },
+    {
+      "id": "10-email-cannot-approve",
+      "title": "Attack 10: compromised / forwarded email tries to approve or confirm",
+      "pass": true,
+      "checks": [
+        {
+          "what": "email carries no authority and asks for nothing",
+          "ok": true
+        }
+      ],
+      "labels": [
+        "MOCK LEDGER",
+        "SIMULATED DEVICE"
+      ],
+      "mp4": null,
+      "webm": null,
+      "error": null
+    }
+  ]
+}

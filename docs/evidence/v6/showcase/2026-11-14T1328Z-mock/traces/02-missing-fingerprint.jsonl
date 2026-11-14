@@ -1,0 +1,4 @@
+{"n":44,"clip":"02-missing-fingerprint","at":"2026-11-14T13:28:45.375Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"client skips the fingerprint gate: VAULT_REJECTED FINGERPRINT_GATE_REQUIRED"}
+{"n":45,"clip":"02-missing-fingerprint","at":"2026-11-14T13:28:45.376Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"PIN instead of fingerprint: device refuses (BIOMETRIC_PIN_NOT_ACCEPTED) - never silently substituted"}
+{"n":46,"clip":"02-missing-fingerprint","at":"2026-11-14T13:28:45.378Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"sensor lockout: BIOMETRIC_LOCKOUT"}
+{"n":47,"clip":"02-missing-fingerprint","at":"2026-11-14T13:28:45.378Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: no fingerprint, no payment"}

@@ -1,0 +1,3 @@
+{"n":48,"clip":"03-amount-substitution","at":"2026-11-14T13:28:45.401Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"binding amount changed 0.03 -> 0.06 NEAR: CAPABILITY_MISMATCH [v6.payment]"}
+{"n":49,"clip":"03-amount-substitution","at":"2026-11-14T13:28:45.403Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"capability recipient swapped: CAPABILITY_MISMATCH [recipientId]"}
+{"n":50,"clip":"03-amount-substitution","at":"2026-11-14T13:28:45.403Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: substitution refused before the Vault; the Vault re-checks the binding too"}

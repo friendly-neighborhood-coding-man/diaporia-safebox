@@ -85,15 +85,10 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
    * signs (plus the fingerprint gate for fingerprint-only credentials). Returns null on decline / mismatch / gate failure.
    */
   approvePrepared(state, { action, grant, command }, credId, { decide = this.decide, at = null, noGate = false, tamper = null, apc = true } = {}) {
-    const s = projectState(state, at ?? state.lastAt);
-    const party = s.creds[credId];
-    if (!party || command?.credId !== credId || grant?.statement?.credId !== credId) { this.gateErrors.push({ credId, code: 'PREPARED_NOT_FOR_THIS_DEVICE' }); return null; }
-    if (grant.statement.actionDigest !== actionDigest(action).toString('hex') || grant.statement.actionType !== action.type) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_MISMATCH' }); return null; }
-    if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_NOT_ROOT_PINNED' }); return null; }
-    const { statement, text: base } = buildCommand(s, action, grant.statement, party, { rootSeq: command.rootSeq });
-    // extra lines are derived by the DEVICE from the action itself (bound through actionDigest in the signed statement)
-    const text = [base, ...actionDetailLines(action)].join('\n');
-    if (canon(statement) !== canon(command)) { this.gateErrors.push({ credId, code: 'PREPARED_COMMAND_MISMATCH' }); return null; }
+    // one rule for every owner-side path (P0.2 review): the shared reviewer rebuilds and checks the prepared command
+    let rv; try { rv = reviewPrepared(state, { action, grant, command }, credId, at ?? state.lastAt); }
+    catch (e) { this.gateErrors.push({ credId, code: e.code ?? 'PREPARED_REJECTED' }); return null; }
+    const { statement, base, text } = rv;
     const m = this.metrics; m.prompts++; m.byCred[credId] = (m.byCred[credId] ?? 0) + 1;
     if (!decide({ title: action.type, text }, text, { credId, action, via: 'OWNER_CONSOLE' })) { m.declined++; return null; }
     this.onIntent?.(actionDigest(action).toString('hex')); // the human approved THIS action (ground truth for the verifier oracle)

@@ -1,0 +1,6 @@
+{"step":"R1","expected":"TIMEOUT with quietDiscards >= 1","startedAt":"2026-11-14T13:22:43.4574051Z","helper":{"ok":false,"code":"BIOMETRIC_TIMEOUT","detail":"MATCH but no confirmation click"}}
+{"step":"R2","expected":"TIMEOUT with discarded = 0","startedAt":"2026-11-14T13:23:53.0710584Z","helper":{"ok":false,"code":"BIOMETRIC_TIMEOUT","detail":"no fresh touch; discarded 0, quiet-phase discards 0, identify calls 2, window inactive 30450 ms while capturing"}}
+{"step":"R3","expected":"BIOMETRIC_TOUCH_DISOWNED","startedAt":"2026-11-14T13:25:00.5690212Z","helper":{"ok":false,"code":"BIOMETRIC_TOUCH_DISOWNED","detail":"MATCH but owner answered: I did not touch it; elapsedMs 1738"}}
+{"step":"R4","expected":"MATCH with ownerConfirmed = true","startedAt":"2026-11-14T13:25:20.4045488Z","helper":{"ok":true,"result":"MATCH","unit":3,"elapsedMs":1301,"subFactor":245,"discarded":0,"quietDiscards":0,"armedAfterMs":2357,"ownerConfirmed":true}}
+{"note":"R1 attempt 1, owner says misunderstood (touched after Start); MATCH was refused at the confirmation step (no click)","at":"2026-11-14T13:26:25.5980383Z"}
+{"step":"R1b","expected":"TIMEOUT with quietDiscards >= 1","startedAt":"2026-11-14T13:26:33.1441633Z","helper":{"ok":false,"code":"BIOMETRIC_TIMEOUT","detail":"no fresh touch; discarded 0, quiet-phase discards 0, identify calls 2, window inactive 0 ms while capturing"}}
