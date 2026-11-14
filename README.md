@@ -24,6 +24,8 @@ afterwards. If something looks wrong, the owner can trigger an Emergency Freeze 
 
 ---
 
+**Security roadmap landing page:** [website source](docs/landing/index.html) · GitHub Pages publication requires enabling Pages for the `docs/` directory on this branch.
+
 ## Contents
 
 1. [Problem](#problem)
@@ -38,6 +40,7 @@ afterwards. If something looks wrong, the owner can trigger an Emergency Freeze 
 10. [Known limitations and residual risks](#known-limitations-and-residual-risks)
 11. [Test reports and security reviews](#test-reports-and-security-reviews)
 12. [Repository map, history and disclosures](#repository-map-history-and-disclosures)
+13. [Planned security boundary: a sealed sensitive core](#planned-security-boundary-a-sealed-sensitive-core)
 
 ---
 
@@ -311,5 +314,54 @@ git diff --stat a8ce01840d79166403aec159c8c05e70bd916721 submission/near-hackath
   direction; commits show the agent as author or co-author.
 - Development history of V6 is on Draft pull requests (#13, #15, #29 and others); none are merged. The submission
   branch is the frozen candidate of Draft PR #29 plus this documentation.
+
+## Planned security boundary: a sealed sensitive core
+
+> **DESIGN COMMITMENT — NOT IMPLEMENTED IN V6.** SafeBox aims to limit the damage caused by a compromised application or software distribution pipeline. Its future sensitive core will favor a small trusted computing base, strict default-deny interfaces, independently authorized updates, and verifiable execution over convenient hot-patching. This is a roadmap, **not a currently proven isolation guarantee**.
+
+### Why assume the software itself could be hostile?
+
+An attacker does not need to persuade an agent if they can compromise the software the agent trusts. A developer's GitHub account, CI/CD workflow, build environment, signing authority, or update distribution path could be compromised. A correctly signed application update can still be malicious if an attacker controls the authorized signing or release process. Nor does an honest developer guarantee that every dependency and update source remains honest.
+
+The November 2026 *GODDESS OF VICTORY: NIKKE* PC-launcher compromise is a **real-world motivation**, not an exploit reproduced against SafeBox. The publisher reported tampered launcher scripts and distribution of malicious software; [the official NIKKE notice](https://nikke-en.com/) and [Bitdefender's launcher analysis](https://www.bitdefender.com/en-gb/blog/labs/nikke-game-launcher-malware) document the incident. The incident is not evidence that the NIKKE developer intentionally attacked users. SafeBox's research question is what damage an untrusted or compromised application could cause **even when the sensitive authority is supposed to remain separate**.
+
+### Release objective: deliberately inconvenient to modify
+
+Until a future deployment candidate is independently validated, the intended rule is **closed by default, including for the developer**. Convenience is not a sufficient reason to grant ordinary app or CI/CD code write access to the sensitive core.
+
+The proposed architecture will be evaluated against these conditions:
+
+1. **Minimal interfaces.** The agent and application may submit narrowly typed requests and read explicitly approved status. They must not receive arbitrary file, shell, signing, policy-edit, or core-update capabilities.
+2. **OS-enforced separation.** The sensitive service, signing material, protected state, update controller, and independently reachable owner freeze/recovery path should not share the compromised application's effective write authority. A separate process alone does not count as isolation.
+3. **Immutable code epoch.** A deployed core should execute from a verified, protected snapshot. No general in-place hot-patching; installing a candidate and activating a new epoch must be separate operations. Executed bytes must be the bytes that were verified.
+4. **Independently authorized changes.** A change to executable code, authority roots, permissions, spending ceilings, or recovery rules should require an external owner-controlled approval path that ordinary app deployments cannot impersonate. Replacing an ordinary GitHub release must not replace this approval.
+5. **Protected, monotonic state.** Spent budgets, used nonces, freeze state, epochs, and anti-rollback records still **must change** during normal operation. The goal is to make these changes policy-governed, auditable, and resistant to rollback—not to freeze the database forever.
+6. **Fail closed and limit blast radius.** Missing or unverifiable authority, ambiguous update provenance, stale state, unexpected file changes, or unavailable verification should deny sensitive effects. Independent ceilings, expiry, buffering, and freeze are intended to bound exposure when prevention fails.
+7. **Break-glass recovery is not an app API.** A wipeout or reset must not silently erase spending history, revive old credentials, lift a freeze, or re-enable a compromised epoch. Recovery must use independent owner authority and have a tested, explicit state-transfer and revocation procedure.
+
+**Randomness is not the root of trust.** Cryptographic nonces, fresh challenges, and unpredictable audit schedules may help, but authorization rules should remain deterministic and independently verifiable. If the attacker can patch the random rule generator, randomness does not protect the core.
+
+### Current implementation versus target
+
+| Property | Frozen V6 submission | Future sealed-core objective |
+|---|---|---|
+| Agent authority | Scoped MCP tools prepare requests; no MCP signing or settlement | Preserve a request-only, minimal interface |
+| Owner approvals | Exact request binding, WebAuthn UV, local Windows fingerprint-gate experiment | Independently held approval and update authority; separately trusted transaction display |
+| Execution and spending | Root/Vault policy checks, fixed 600-second buffer, holds, emergency freeze; **MOCK ledger** | OS-isolated production-grade sensitive execution; independently enforced, bounded real effects |
+| OS isolation for sensitive V6 components | **NOT IMPLEMENTED / NOT RUN** | Separate principals, protected update controller, explicit capability and file-descriptor boundaries |
+| Code/update immutability | **NOT IMPLEMENTED** | Verified bytes, protected execution snapshots, independently approved epoch transition and rollback refusal |
+| Hardware-backed independent signer | **NOT IMPLEMENTED**; local gate key is usable by same-user code | Owner-controlled independent key/approval path, with measured security properties |
+| Real-chain settlement | **NOT RUN**; no Testnet/Mainnet transaction | Requires separate deployment and verification before any real-funds claim |
+
+### Research evidence and honest limitations
+
+- **Frozen V6 (`a8ce018`) remains unchanged.** Submission evidence includes **586/586** regression tests, **40/40** MCP interactor tests, an **11/11** MOCK showcase and a real Windows sensor demonstration against a **MOCK** ledger. These results support specific interface-level claims, **not** resistance to same-user malware or a malicious signed update. See [the V6 evidence index](docs/v6/final-candidate/EVIDENCE-INDEX.md).
+- **SSTP is separate partial research.** [PR #34](https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/34) improves specific deterministic file-swap schedules but does **not** establish tamper-proof execution; retained writable mappings, coarse timestamp/inode reuse, and verify-then-use remain relevant. [PR #32](https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/32) has a failed F9 owner-log binding claim under inode reuse. [PR #33](https://github.com/friendly-neighborhood-coding-man/diaporia-safebox/pull/33) documents isolation requirements; it does not implement containment.
+- **Signed-launcher scenario (Track D): `BLOCKED_BY_SAFETY_GATE / NOT_RUN`.** This experiment produced **no security validation result** and must not be described as a successful attack defense or as an observed exploit in SafeBox.
+- **Threat-model limits.** The intended design does not promise to prevent every compromise, protect a fully compromised OS/kernel or boot trust root, guarantee a trustworthy app UI, reverse completed payments, prevent all service denial, or cap losses through unrelated credentials and channels. Any actual damage bound must be measured within a stated threat model and specific spending path.
+
+**Design principle:** *Flexible intelligence. Inflexible authority.* A compromised developer account should not automatically confer control over a user's sensitive authority. Whether a deployed SafeBox can enforce that distinction remains an open engineering and verification question.
+
+---
 
 *Let AI explore freely. Let only authorized actions execute.*
