@@ -1,0 +1,582 @@
+{
+ "tree": "<mutation-worktree>/secure-transition",
+ "baseline": {
+  "inCallBypass": 111,
+  "duringWalk": 0,
+  "renameBeforeLastCheck": 10
+ },
+ "caught": 14,
+ "total": 25,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "walk descends by slot PATH instead of the parent descriptor (PR #27 style)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "walk lists directories by PATH instead of the descriptor",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "child lstat follows symlinks (stat)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "openDir: O_NOFOLLOW removed",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "openDir: identity check removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 177,
+    "duringWalk": 46,
+    "renameBeforeLastCheck": 76,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "readAt: O_NOFOLLOW removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "verifySlot race: a file swapped for a symlink / another file / a FIFO after the lstat is refused, never read by path"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "readAt: identity check removed",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "readAt: post-read ctime/size check removed",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "final pass: entry re-check loop removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 165,
+    "duringWalk": 45,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "final pass: entry ctime comparison removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 165,
+    "duringWalk": 45,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "final pass: directory mtime/ctime check removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 397,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 275,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "final pass: directory name-set check removed",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 99,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 5,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "final pass: directories checked root-first (not deepest-first, root last)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "final pass: slot path checked last, after the root directory (review F2 order reverted)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 141,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 40,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "CLOSING_WINDOW_LARGER"
+  },
+  {
+   "name": "final pass: root directory never re-checked",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 238,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 125,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "final pass: slot path identity re-check removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 277,
+    "duringWalk": 116,
+    "renameBeforeLastCheck": 176,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "final pass re-checks entries and name sets by slot PATH (no held descriptors)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "protected path: not checked when expectUid is given",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid"
+    ]
+   },
+   "os": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "negative control: a subdirectory owned by the second uid is writable by it, and verifySlot(expectUid) refuses that slot"
+    ]
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "protected path: sticky bit excuses the slot itself",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "protected path: ancestors not walked (slot only)",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "protected path: any owner accepted",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid"
+    ]
+   },
+   "os": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "negative control: a subdirectory owned by the second uid is writable by it, and verifySlot(expectUid) refuses that slot"
+    ]
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "DOUBLE walk descends by PATH + directory mtime/ctime check removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 397,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 275,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "DOUBLE walk descends by PATH + entry re-check loop removed",
+   "unit": {
+    "fail": 1,
+    "timedOut": false,
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 240,
+    "duringWalk": 90,
+    "renameBeforeLastCheck": 85,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "DOUBLE child lstat follows + openDir O_NOFOLLOW removed",
+   "unit": {
+    "fail": 2,
+    "timedOut": false,
+    "failing": [
+     "verifySlot directories: a subdirectory replaced by a symlink to a byte-identical tree is refused (static case; the mid-walk swap is covered by pinDir/stillSame by construction)",
+     "static cases still refused: symlinked subdirectory, symlinked file, extra file, tampered bytes"
+    ]
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": true
+  },
+  {
+   "name": "DOUBLE readAt identity + post-read ctime/size check removed",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  }
+ ]
+}

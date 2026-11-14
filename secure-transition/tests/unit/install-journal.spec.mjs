@@ -41,7 +41,9 @@ test('verifySlot detects tampering after install', (t) => {
   installToSlot(slot, pkg, { allowList: [slot] });
   chmodSync(join(slot, 'main.mjs'), 0o666); rejects(() => verifySlot(slot, pkg.manifest), 'SLOT_WRITABLE_BY_OTHERS');
   installToSlot(slot, pkg, { allowList: [slot] });
-  rejects(() => verifySlot(slot, pkg.manifest, { expectUid: 4242 }), 'SLOT_WRONG_OWNER');
+  // As root the slot path is root-owned, so the entry owner check fires; as another user the path is owned by that
+  // user (neither root nor 4242) and the protected-path precondition refuses first (post-video hardening, review F4).
+  rejects(() => verifySlot(slot, pkg.manifest, { expectUid: 4242 }), process.getuid?.() === 0 ? 'SLOT_WRONG_OWNER' : 'SLOT_PATH_NOT_PROTECTED');
 });
 
 test('journal: hash chain, torn tail dropped, mid-file tamper detected', (t) => {

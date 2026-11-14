@@ -1,0 +1,3 @@
+{"tree":"<candidate>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":2,"refusals":{"SLOT_DIGEST_MISMATCH":31,"SLOT_CHANGED_DURING_VERIFY":2902,"SLOT_FILE_SET_MISMATCH":65}}
+{"tree":"<candidate>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":1,"refusals":{"SLOT_DIGEST_MISMATCH":18,"SLOT_CHANGED_DURING_VERIFY":2951,"SLOT_FILE_SET_MISMATCH":30}}
+{"tree":"<candidate>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":2,"refusals":{"SLOT_DIGEST_MISMATCH":37,"SLOT_CHANGED_DURING_VERIFY":2641,"SLOT_FILE_SET_MISMATCH":320}}

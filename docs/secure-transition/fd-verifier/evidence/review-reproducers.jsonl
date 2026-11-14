@@ -1,0 +1,7 @@
+{"when":"after-read","verifySlot":{"files":3},"attackFired":true,"aMjsAtReturn":"export const ok = \"EVIL!!!\";","matchesManifest":false,"ctimeUnchanged":true,"mtimeUnchanged":true,"inoUnchanged":true}
+{"when":"after-read","verifySlot":{"files":3},"attackFired":true,"aMjsAtReturn":"export const ok = \"EVIL!!!\";","matchesManifest":false,"ctimeUnchanged":true,"mtimeUnchanged":true,"inoUnchanged":true}
+{"when":"before-final","verifySlot":{"files":3},"attackFired":true,"aMjsAtReturn":"export const ok = \"EVIL!!!\";","matchesManifest":false,"ctimeUnchanged":true,"mtimeUnchanged":true,"inoUnchanged":true}
+{"when":"before-final","verifySlot":{"files":3},"attackFired":false,"aMjsAtReturn":"export const ok = \"genuine\";","matchesManifest":true,"ctimeUnchanged":true,"mtimeUnchanged":true,"inoUnchanged":true}
+{"tree":"<candidate>","iterations":3000,"outcomes":{"SUCCESS":1536,"SLOT_DIGEST_MISMATCH":1464},"successThenForeignOnImmediateReread":749,"ctimeUnchangedWholeRun":true}
+{"tree":"<candidate>","fired":true,"verifySlot":{"files":2},"aMjsAtReturn":"EVIL!!!"}
+{"tree":"<d6172ec>","fired":true,"verifySlot":{"files":2},"aMjsAtReturn":"EVIL!!!"}

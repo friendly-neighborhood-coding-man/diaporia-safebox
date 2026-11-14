@@ -1,0 +1,1087 @@
+{
+ "tree": "<d6172ec>",
+ "node": "v22.23.4",
+ "uid": 0,
+ "fsCallsPerVerify": 36,
+ "lastContentReadCall": 31,
+ "lastCheckCall": 36,
+ "closingWindowCalls": [
+  "closeSync",
+  "realpathSync",
+  "lstatSync",
+  "realpathSync",
+  "lstatSync"
+ ],
+ "control": "SUCCESS",
+ "summary": {
+  "A1 a.mjs replaced by an EVIL file (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 23,
+   "inCallBypass": 23,
+   "bypassDuringWalk": 18,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 23,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 7,
+    "SLOT_CHANGED_DURING_VERIFY": 6
+   },
+   "bypassAt": [
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A2 sub/ replaced by an EVIL directory (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 9,
+   "inCallBypass": 9,
+   "bypassDuringWalk": 4,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 9,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 14,
+    "SLOT_CHANGED_DURING_VERIFY": 13
+   },
+   "bypassAt": [
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A3 a.mjs rewritten in place, same inode and length (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 26,
+   "inCallBypass": 26,
+   "bypassDuringWalk": 21,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 26,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 10
+   },
+   "bypassAt": [
+    "11:closeSync",
+    "12:realpathSync",
+    "13:lstatSync",
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A4 extra file created inside sub/ (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 18,
+   "inCallBypass": 18,
+   "bypassDuringWalk": 13,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 18,
+   "refusals": {
+    "SLOT_FILE_SET_MISMATCH": 18
+   },
+   "bypassAt": [
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A5 a.mjs replaced by a symlink to a genuine file (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 23,
+   "inCallBypass": 23,
+   "bypassDuringWalk": 18,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 23,
+   "refusals": {
+    "SLOT_CONTAINS_SYMLINK": 12,
+    "SLOT_CHANGED_DURING_VERIFY": 1
+   },
+   "bypassAt": [
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A6 slot dir itself replaced by an EVIL copy (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 0,
+   "inCallBypass": 0,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 0,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 1,
+    "SLOT_CHANGED_DURING_VERIFY": 35
+   }
+  },
+  "A7 a.mjs chmod 0664 (persistent, writable by others at return)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 27,
+   "inCallBypass": 27,
+   "bypassDuringWalk": 22,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 27,
+   "refusals": {
+    "SLOT_WRITABLE_BY_OTHERS": 9
+   },
+   "bypassAt": [
+    "10:readFileSync",
+    "11:closeSync",
+    "12:realpathSync",
+    "13:lstatSync",
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A8 a.mjs in-place rewrite then utimes(old atime/mtime) (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 26,
+   "inCallBypass": 26,
+   "bypassDuringWalk": 21,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 26,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 10
+   },
+   "bypassAt": [
+    "11:closeSync",
+    "12:realpathSync",
+    "13:lstatSync",
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "A9 EVIL file hardlinked over a.mjs via link+rename (persistent)": {
+   "schedules": 36,
+   "fullyFired": 36,
+   "success": 23,
+   "inCallBypass": 23,
+   "bypassDuringWalk": 18,
+   "bypassInClosingWindow": 5,
+   "bypassBeforeLastCheck": 23,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 7,
+    "SLOT_CHANGED_DURING_VERIFY": 6
+   },
+   "bypassAt": [
+    "14:lstatSync",
+    "15:openSync",
+    "16:fstatSync",
+    "17:closeSync",
+    "18:readdirSync",
+    "19:lstatSync",
+    "20:openSync",
+    "21:fstatSync",
+    "22:readFileSync",
+    "23:closeSync",
+    "24:realpathSync",
+    "25:lstatSync",
+    "26:realpathSync",
+    "27:lstatSync",
+    "28:lstatSync",
+    "29:openSync",
+    "30:fstatSync",
+    "31:readFileSync",
+    "32:closeSync",
+    "33:realpathSync",
+    "34:lstatSync",
+    "35:realpathSync",
+    "36:lstatSync"
+   ]
+  },
+  "P4 whole slot swap-and-swap-back with a genuine twin slot (slot holds EVIL a.mjs)": {
+   "schedules": 666,
+   "fullyFired": 270,
+   "success": 17,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 8,
+   "bypassInClosingWindow": 8,
+   "bypassBeforeLastCheck": 16,
+   "refusals": {
+    "SLOT_CHANGED_DURING_VERIFY": 591,
+    "SLOT_DIGEST_MISMATCH": 58
+   },
+   "bypassAt": [
+    "4+14:fstatSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+14:closeSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+14:readdirSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+14:lstatSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync"
+   ]
+  },
+  "P5 ancestor dir swap-and-swap-back with a parent holding a genuine slot (slot holds EVIL a.mjs)": {
+   "schedules": 666,
+   "fullyFired": 270,
+   "success": 17,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 8,
+   "bypassInClosingWindow": 8,
+   "bypassBeforeLastCheck": 16,
+   "refusals": {
+    "SLOT_CHANGED_DURING_VERIFY": 591,
+    "SLOT_DIGEST_MISMATCH": 58
+   },
+   "bypassAt": [
+    "4+14:fstatSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+14:closeSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+14:readdirSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+14:lstatSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync"
+   ]
+  },
+  "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)": {
+   "schedules": 666,
+   "fullyFired": 488,
+   "success": 148,
+   "inCallBypass": 134,
+   "bypassDuringWalk": 64,
+   "bypassInClosingWindow": 70,
+   "bypassBeforeLastCheck": 134,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 153,
+    "SLOT_CHANGED_DURING_VERIFY": 365
+   },
+   "bypassAt": [
+    "1+28:lstatSync+lstatSync",
+    "1+29:lstatSync+openSync",
+    "1+30:lstatSync+fstatSync",
+    "1+31:lstatSync+readFileSync",
+    "1+32:lstatSync+closeSync",
+    "1+33:lstatSync+realpathSync",
+    "1+34:lstatSync+lstatSync",
+    "1+35:lstatSync+realpathSync",
+    "1+36:lstatSync+lstatSync",
+    "2+28:realpathSync+lstatSync",
+    "2+29:realpathSync+openSync",
+    "2+30:realpathSync+fstatSync",
+    "2+31:realpathSync+readFileSync",
+    "2+32:realpathSync+closeSync",
+    "2+33:realpathSync+realpathSync",
+    "2+34:realpathSync+lstatSync",
+    "2+35:realpathSync+realpathSync",
+    "2+36:realpathSync+lstatSync",
+    "3+28:openSync+lstatSync",
+    "3+29:openSync+openSync",
+    "3+30:openSync+fstatSync",
+    "3+31:openSync+readFileSync",
+    "3+32:openSync+closeSync",
+    "3+33:openSync+realpathSync",
+    "3+34:openSync+lstatSync",
+    "3+35:openSync+realpathSync",
+    "3+36:openSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+29:fstatSync+openSync",
+    "4+30:fstatSync+fstatSync",
+    "4+31:fstatSync+readFileSync",
+    "4+32:fstatSync+closeSync",
+    "4+33:fstatSync+realpathSync",
+    "4+34:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+29:closeSync+openSync",
+    "5+30:closeSync+fstatSync",
+    "5+31:closeSync+readFileSync",
+    "5+32:closeSync+closeSync",
+    "5+33:closeSync+realpathSync",
+    "5+34:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+29:readdirSync+openSync",
+    "6+30:readdirSync+fstatSync",
+    "6+31:readdirSync+readFileSync",
+    "6+32:readdirSync+closeSync",
+    "6+33:readdirSync+realpathSync",
+    "6+34:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+29:lstatSync+openSync",
+    "7+30:lstatSync+fstatSync",
+    "7+31:lstatSync+readFileSync",
+    "7+32:lstatSync+closeSync",
+    "7+33:lstatSync+realpathSync",
+    "7+34:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync",
+    "8+28:openSync+lstatSync",
+    "8+29:openSync+openSync",
+    "8+30:openSync+fstatSync",
+    "8+31:openSync+readFileSync",
+    "8+32:openSync+closeSync",
+    "8+33:openSync+realpathSync",
+    "8+34:openSync+lstatSync",
+    "8+35:openSync+realpathSync",
+    "8+36:openSync+lstatSync",
+    "9+28:fstatSync+lstatSync",
+    "9+29:fstatSync+openSync",
+    "9+30:fstatSync+fstatSync",
+    "9+31:fstatSync+readFileSync",
+    "9+32:fstatSync+closeSync",
+    "9+33:fstatSync+realpathSync",
+    "9+34:fstatSync+lstatSync",
+    "9+35:fstatSync+realpathSync",
+    "9+36:fstatSync+lstatSync",
+    "10+28:readFileSync+lstatSync",
+    "10+29:readFileSync+openSync",
+    "10+30:readFileSync+fstatSync",
+    "10+31:readFileSync+readFileSync",
+    "10+32:readFileSync+closeSync",
+    "10+33:readFileSync+realpathSync",
+    "10+34:readFileSync+lstatSync",
+    "10+35:readFileSync+realpathSync",
+    "10+36:readFileSync+lstatSync",
+    "11+28:closeSync+lstatSync",
+    "11+29:closeSync+openSync",
+    "11+30:closeSync+fstatSync",
+    "11+31:closeSync+readFileSync",
+    "11+32:closeSync+closeSync",
+    "11+33:closeSync+realpathSync",
+    "11+34:closeSync+lstatSync",
+    "11+35:closeSync+realpathSync",
+    "11+36:closeSync+lstatSync",
+    "12+28:realpathSync+lstatSync",
+    "12+29:realpathSync+openSync",
+    "12+30:realpathSync+fstatSync",
+    "12+31:realpathSync+readFileSync",
+    "12+32:realpathSync+closeSync",
+    "12+33:realpathSync+realpathSync",
+    "12+34:realpathSync+lstatSync",
+    "12+35:realpathSync+realpathSync",
+    "12+36:realpathSync+lstatSync",
+    "13+28:lstatSync+lstatSync",
+    "13+29:lstatSync+openSync",
+    "13+30:lstatSync+fstatSync",
+    "13+31:lstatSync+readFileSync",
+    "13+32:lstatSync+closeSync",
+    "13+33:lstatSync+realpathSync",
+    "13+34:lstatSync+lstatSync",
+    "13+35:lstatSync+realpathSync",
+    "13+36:lstatSync+lstatSync",
+    "14+28:lstatSync+lstatSync",
+    "14+29:lstatSync+openSync",
+    "14+30:lstatSync+fstatSync",
+    "14+31:lstatSync+readFileSync",
+    "14+32:lstatSync+closeSync",
+    "14+33:lstatSync+realpathSync",
+    "14+34:lstatSync+lstatSync",
+    "14+35:lstatSync+realpathSync",
+    "14+36:lstatSync+lstatSync",
+    "16+26:fstatSync+realpathSync",
+    "16+27:fstatSync+lstatSync",
+    "17+26:closeSync+realpathSync",
+    "17+27:closeSync+lstatSync",
+    "18+26:readdirSync+realpathSync",
+    "18+27:readdirSync+lstatSync",
+    "19+26:lstatSync+realpathSync",
+    "19+27:lstatSync+lstatSync"
+   ]
+  },
+  "P2 sub/ swap-and-swap-back with a SYMLINK to the genuine twin": {
+   "schedules": 666,
+   "fullyFired": 161,
+   "success": 0,
+   "inCallBypass": 0,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 0,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 148,
+    "SLOT_CONTAINS_SYMLINK": 459,
+    "SLOT_CHANGED_DURING_VERIFY": 59
+   }
+  },
+  "P3 a.mjs swap-and-swap-back with a genuine file (slot holds EVIL a.mjs)": {
+   "schedules": 666,
+   "fullyFired": 489,
+   "success": 168,
+   "inCallBypass": 161,
+   "bypassDuringWalk": 126,
+   "bypassInClosingWindow": 35,
+   "bypassBeforeLastCheck": 161,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 307,
+    "SLOT_CHANGED_DURING_VERIFY": 191
+   },
+   "bypassAt": [
+    "1+14:lstatSync+lstatSync",
+    "1+15:lstatSync+openSync",
+    "1+16:lstatSync+fstatSync",
+    "1+17:lstatSync+closeSync",
+    "1+18:lstatSync+readdirSync",
+    "1+19:lstatSync+lstatSync",
+    "1+20:lstatSync+openSync",
+    "1+21:lstatSync+fstatSync",
+    "1+22:lstatSync+readFileSync",
+    "1+23:lstatSync+closeSync",
+    "1+24:lstatSync+realpathSync",
+    "1+25:lstatSync+lstatSync",
+    "1+26:lstatSync+realpathSync",
+    "1+27:lstatSync+lstatSync",
+    "1+28:lstatSync+lstatSync",
+    "1+29:lstatSync+openSync",
+    "1+30:lstatSync+fstatSync",
+    "1+31:lstatSync+readFileSync",
+    "1+32:lstatSync+closeSync",
+    "1+33:lstatSync+realpathSync",
+    "1+34:lstatSync+lstatSync",
+    "1+35:lstatSync+realpathSync",
+    "1+36:lstatSync+lstatSync",
+    "2+14:realpathSync+lstatSync",
+    "2+15:realpathSync+openSync",
+    "2+16:realpathSync+fstatSync",
+    "2+17:realpathSync+closeSync",
+    "2+18:realpathSync+readdirSync",
+    "2+19:realpathSync+lstatSync",
+    "2+20:realpathSync+openSync",
+    "2+21:realpathSync+fstatSync",
+    "2+22:realpathSync+readFileSync",
+    "2+23:realpathSync+closeSync",
+    "2+24:realpathSync+realpathSync",
+    "2+25:realpathSync+lstatSync",
+    "2+26:realpathSync+realpathSync",
+    "2+27:realpathSync+lstatSync",
+    "2+28:realpathSync+lstatSync",
+    "2+29:realpathSync+openSync",
+    "2+30:realpathSync+fstatSync",
+    "2+31:realpathSync+readFileSync",
+    "2+32:realpathSync+closeSync",
+    "2+33:realpathSync+realpathSync",
+    "2+34:realpathSync+lstatSync",
+    "2+35:realpathSync+realpathSync",
+    "2+36:realpathSync+lstatSync",
+    "3+14:openSync+lstatSync",
+    "3+15:openSync+openSync",
+    "3+16:openSync+fstatSync",
+    "3+17:openSync+closeSync",
+    "3+18:openSync+readdirSync",
+    "3+19:openSync+lstatSync",
+    "3+20:openSync+openSync",
+    "3+21:openSync+fstatSync",
+    "3+22:openSync+readFileSync",
+    "3+23:openSync+closeSync",
+    "3+24:openSync+realpathSync",
+    "3+25:openSync+lstatSync",
+    "3+26:openSync+realpathSync",
+    "3+27:openSync+lstatSync",
+    "3+28:openSync+lstatSync",
+    "3+29:openSync+openSync",
+    "3+30:openSync+fstatSync",
+    "3+31:openSync+readFileSync",
+    "3+32:openSync+closeSync",
+    "3+33:openSync+realpathSync",
+    "3+34:openSync+lstatSync",
+    "3+35:openSync+realpathSync",
+    "3+36:openSync+lstatSync",
+    "4+14:fstatSync+lstatSync",
+    "4+15:fstatSync+openSync",
+    "4+16:fstatSync+fstatSync",
+    "4+17:fstatSync+closeSync",
+    "4+18:fstatSync+readdirSync",
+    "4+19:fstatSync+lstatSync",
+    "4+20:fstatSync+openSync",
+    "4+21:fstatSync+fstatSync",
+    "4+22:fstatSync+readFileSync",
+    "4+23:fstatSync+closeSync",
+    "4+24:fstatSync+realpathSync",
+    "4+25:fstatSync+lstatSync",
+    "4+26:fstatSync+realpathSync",
+    "4+27:fstatSync+lstatSync",
+    "4+28:fstatSync+lstatSync",
+    "4+29:fstatSync+openSync",
+    "4+30:fstatSync+fstatSync",
+    "4+31:fstatSync+readFileSync",
+    "4+32:fstatSync+closeSync",
+    "4+33:fstatSync+realpathSync",
+    "4+34:fstatSync+lstatSync",
+    "4+35:fstatSync+realpathSync",
+    "4+36:fstatSync+lstatSync",
+    "5+14:closeSync+lstatSync",
+    "5+15:closeSync+openSync",
+    "5+16:closeSync+fstatSync",
+    "5+17:closeSync+closeSync",
+    "5+18:closeSync+readdirSync",
+    "5+19:closeSync+lstatSync",
+    "5+20:closeSync+openSync",
+    "5+21:closeSync+fstatSync",
+    "5+22:closeSync+readFileSync",
+    "5+23:closeSync+closeSync",
+    "5+24:closeSync+realpathSync",
+    "5+25:closeSync+lstatSync",
+    "5+26:closeSync+realpathSync",
+    "5+27:closeSync+lstatSync",
+    "5+28:closeSync+lstatSync",
+    "5+29:closeSync+openSync",
+    "5+30:closeSync+fstatSync",
+    "5+31:closeSync+readFileSync",
+    "5+32:closeSync+closeSync",
+    "5+33:closeSync+realpathSync",
+    "5+34:closeSync+lstatSync",
+    "5+35:closeSync+realpathSync",
+    "5+36:closeSync+lstatSync",
+    "6+14:readdirSync+lstatSync",
+    "6+15:readdirSync+openSync",
+    "6+16:readdirSync+fstatSync",
+    "6+17:readdirSync+closeSync",
+    "6+18:readdirSync+readdirSync",
+    "6+19:readdirSync+lstatSync",
+    "6+20:readdirSync+openSync",
+    "6+21:readdirSync+fstatSync",
+    "6+22:readdirSync+readFileSync",
+    "6+23:readdirSync+closeSync",
+    "6+24:readdirSync+realpathSync",
+    "6+25:readdirSync+lstatSync",
+    "6+26:readdirSync+realpathSync",
+    "6+27:readdirSync+lstatSync",
+    "6+28:readdirSync+lstatSync",
+    "6+29:readdirSync+openSync",
+    "6+30:readdirSync+fstatSync",
+    "6+31:readdirSync+readFileSync",
+    "6+32:readdirSync+closeSync",
+    "6+33:readdirSync+realpathSync",
+    "6+34:readdirSync+lstatSync",
+    "6+35:readdirSync+realpathSync",
+    "6+36:readdirSync+lstatSync",
+    "7+14:lstatSync+lstatSync",
+    "7+15:lstatSync+openSync",
+    "7+16:lstatSync+fstatSync",
+    "7+17:lstatSync+closeSync",
+    "7+18:lstatSync+readdirSync",
+    "7+19:lstatSync+lstatSync",
+    "7+20:lstatSync+openSync",
+    "7+21:lstatSync+fstatSync",
+    "7+22:lstatSync+readFileSync",
+    "7+23:lstatSync+closeSync",
+    "7+24:lstatSync+realpathSync",
+    "7+25:lstatSync+lstatSync",
+    "7+26:lstatSync+realpathSync",
+    "7+27:lstatSync+lstatSync",
+    "7+28:lstatSync+lstatSync",
+    "7+29:lstatSync+openSync",
+    "7+30:lstatSync+fstatSync",
+    "7+31:lstatSync+readFileSync",
+    "7+32:lstatSync+closeSync",
+    "7+33:lstatSync+realpathSync",
+    "7+34:lstatSync+lstatSync",
+    "7+35:lstatSync+realpathSync",
+    "7+36:lstatSync+lstatSync"
+   ]
+  }
+ },
+ "totalInCallBypass": 502,
+ "totalBypassDuringWalk": 341,
+ "sampleBypasses": [
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    14
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    15
+   ],
+   "before": [
+    "openSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    16
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    17
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    18
+   ],
+   "before": [
+    "readdirSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    19
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    20
+   ],
+   "before": [
+    "openSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    21
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    22
+   ],
+   "before": [
+    "readFileSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    23
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    24
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    25
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    26
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    27
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    28
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    29
+   ],
+   "before": [
+    "openSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    30
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    31
+   ],
+   "before": [
+    "readFileSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    32
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    33
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    34
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    35
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    36
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    28
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    29
+   ],
+   "before": [
+    "openSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    30
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    31
+   ],
+   "before": [
+    "readFileSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    32
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    33
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    34
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    35
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    36
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    11
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    12
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    13
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    14
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    15
+   ],
+   "before": [
+    "openSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    16
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    17
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    18
+   ],
+   "before": [
+    "readdirSync"
+   ]
+  }
+ ]
+}
