@@ -105,11 +105,12 @@ static class WinBioGate {
   // Hello touch, while the owner reports no touch). A capture is accepted ONLY if:
   //   1. the owner first clicked "Start fingerprint check" in this window (a deliberate act for THIS prompt), AND
   //   2. capture began in a NEW window at least ArmDelayMs after that click (the window says TOUCH NOW only then), AND
-  //   3. WinBioIdentify took at least MinCaptureMs (a finger already resting on the sensor, or a capture queued by
+  //   3. the sensor first stayed SILENT for QuietMs after that pause (anything delivered then is discarded), AND
+  //   4. WinBioIdentify took at least MinCaptureMs (a finger already resting on the sensor, or a capture queued by
   //      the service, returns almost at once; such a result is DISCARDED and a NEW touch is required).
   // Discarded results are counted in the output. Diagnostics carry no biometric data (time, sub-factor index only).
-  const int ArmDelayMs = 1000, MinCaptureMs = 700, MaxDiscards = 25;
-  static long LastMs = -1; static byte LastSub = 0; static uint LastReject = 0; static int Discarded = 0; static long ArmedAfterMs = -1; static int Calls = 0; static int InactiveTicks = 0;
+  const int ArmDelayMs = 1000, MinCaptureMs = 700, MaxDiscards = 25, QuietMs = 3000, QuietMaxS = 30;
+  static long LastMs = -1; static byte LastSub = 0; static uint LastReject = 0; static int Discarded = 0; static long ArmedAfterMs = -1; static int Calls = 0; static int InactiveTicks = 0; static int QuietDiscards = 0;
 
   /** Phase 1: a window with a Start button (mouse only). Returns true if the owner clicked it before the deadline. */
   static bool ArmByClick(string prompt, DateTime deadline) {
@@ -138,7 +139,28 @@ static class WinBioGate {
     form.Controls.Add(label);
     Action<string> say = (txt) => { try { form.BeginInvoke((Action)(() => { label.Text = (prompt ?? "") + "\n\n" + txt; })); } catch { } };
     var t = new Thread(() => {
+      // QUIET PHASE (run 7 + run 8 finding: a MATCH arrived ~2 s into capture with no touch, each time a few seconds
+      // after a Windows Hello fingerprint use, i.e. the sensor/driver/service delivered an earlier capture). Before any
+      // capture can count, the sensor must stay silent for QuietMs: every result that arrives during a quiet window
+      // (match or not) is discarded and the quiet window restarts. Only after a full silent window does "TOUCH NOW"
+      // appear and the counted capture begin.
+      say("Checking the sensor is quiet: keep your finger OFF...");
+      var quietStart = DateTime.UtcNow;
       while (!stop) {
+        if ((DateTime.UtcNow - quietStart).TotalSeconds > QuietMaxS) { hr = unchecked((int)0x8009FFFE); fin = true; return; }
+        bool quietCancel = false;
+        using (var qt = new System.Threading.Timer((_) => { quietCancel = true; WinBioCancel(s); }, null, QuietMs, Timeout.Infinite)) {
+          uint qs2 = 0; byte qs = 0; Calls++;
+          WinBioIdentify(s, out u, ident, out qs, out qs2);
+        }
+        if (stop) return;
+        if (quietCancel) break;                    // a full window with nothing from the sensor
+        QuietDiscards++; Thread.Sleep(300);        // something arrived without a prompt: discard, start a new window
+        say("Something reached the sensor. LIFT your finger and keep it OFF...");
+      }
+      for (int i = 0; i < 128; i++) Marshal.WriteByte(ident, i, 0);
+      while (!stop) {
+        say("TOUCH the fingerprint sensor NOW.");
         uint sub2 = 0; byte sub = 0; Calls++; var sw = System.Diagnostics.Stopwatch.StartNew();
         int r = WinBioIdentify(s, out u, ident, out sub, out sub2); sw.Stop();
         LastMs = sw.ElapsedMilliseconds; LastSub = sub; LastReject = sub2;
@@ -178,9 +200,9 @@ static class WinBioGate {
       if (!ArmByClick(prompt, deadline)) return Fail("BIOMETRIC_TIMEOUT", 0, "not started (no click)");
       Thread.Sleep(ArmDelayMs); // a finger used just before has time to lift; no capture is pending during this pause
       IdentifyFocused(s, ident, deadline, prompt, out idHr, out unit, out done);
-      if (!done) return Fail("BIOMETRIC_TIMEOUT", 0, "no fresh touch; discarded " + Discarded + ", identify calls " + Calls + ", window inactive " + (InactiveTicks * 150) + " ms while capturing");
+      if (!done) return Fail("BIOMETRIC_TIMEOUT", 0, "no fresh touch; discarded " + Discarded + ", quiet-phase discards " + QuietDiscards + ", identify calls " + Calls + ", window inactive " + (InactiveTicks * 150) + " ms while capturing");
       Console.Error.Write("WinBioIdentify returned after " + LastMs + " ms (hr 0x" + idHr.ToString("X8") + ", subFactor " + LastSub + ", reject " + LastReject + ", discarded " + Discarded + ", armed after " + ArmedAfterMs + " ms)\n");
-      if (unchecked((uint)idHr) == 0x8009FFFE) return Fail("BIOMETRIC_STALE", 0, "finger never lifted: " + Discarded + " instant captures discarded");
+      if (unchecked((uint)idHr) == 0x8009FFFE) return Fail("BIOMETRIC_STALE", 0, "sensor never quiet / finger never lifted: " + Discarded + " instant + " + QuietDiscards + " quiet-phase captures discarded");
       if (idHr != 0) {
         uint u = unchecked((uint)idHr);
         // winerror.h: 0x80098003 WINBIO_E_UNKNOWN_ID, 0x80098004 WINBIO_E_CANCELED, 0x80098005 WINBIO_E_NO_MATCH,
@@ -199,7 +221,7 @@ static class WinBioGate {
       var sid = new byte[sidSize]; Marshal.Copy(IntPtr.Add(ident, 8), sid, 0, sidSize);
       var me = WindowsIdentity.GetCurrent().User; var mine = new byte[me.BinaryLength]; me.GetBinaryForm(mine, 0);
       if (Hex(sid) != Hex(mine)) return Fail("BIOMETRIC_NO_MATCH", 0, "different Windows account");
-      string diag = ",\"elapsedMs\":" + LastMs + ",\"subFactor\":" + LastSub + ",\"discarded\":" + Discarded + ",\"armedAfterMs\":" + ArmedAfterMs;
+      string diag = ",\"elapsedMs\":" + LastMs + ",\"subFactor\":" + LastSub + ",\"discarded\":" + Discarded + ",\"quietDiscards\":" + QuietDiscards + ",\"armedAfterMs\":" + ArmedAfterMs;
       if (!sign) return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + diag + "}");
       string kind; var k = OpenOrCreate(name, out kind);
       byte[] sig; using (var e = new ECDsaCng(k)) sig = e.SignHash(hash); // IEEE-P1363 r||s
