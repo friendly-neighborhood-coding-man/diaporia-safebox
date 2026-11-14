@@ -2,7 +2,7 @@
 // The owner signing key lives only in the owner authorizer (bin/safebox-owner.mjs).
 // The SafeBox service and executor hold only the owner's PUBLIC key, pinned in trusted config.
 import { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify } from 'node:crypto';
-import { readFileSync, writeFileSync, statSync } from 'node:fs';
+import { closeSync, fstatSync, openSync, readSync, writeFileSync, constants as C } from 'node:fs';
 import { baseDecode, baseEncode } from 'near-api-js';
 import {
   DOMAINS, fail, requireExactFields, canonicalJson, parseCanonical, domainBytes,
@@ -50,11 +50,33 @@ export function writeOwnerKeyFile(path, principalId) {
   return k.publicKey;
 }
 
+function readRestrictedFile(path, code) {
+  let fd;
+  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }
+  catch (e) {
+    if (e.code === 'ELOOP') fail(code + '_SYMLINK');
+    throw e;
+  }
+  try {
+    const st = fstatSync(fd);
+    if (!st.isFile()) fail(code + '_NOT_A_FILE');
+    if (process.platform !== 'win32' && (st.mode & 0o077) !== 0) fail(code + '_TOO_PERMISSIVE', 'chmod 600 required');
+    if (st.size > (1 << 20)) fail(code + '_TOO_LARGE');
+    const buf = Buffer.alloc(st.size);
+    let off = 0;
+    while (off < buf.length) {
+      const n = readSync(fd, buf, off, buf.length - off, null);
+      if (n === 0) break;
+      off += n;
+    }
+    if (off !== buf.length) fail(code + '_SHORT_READ');
+    return buf.toString('utf8');
+  } finally { closeSync(fd); }
+}
+
 // Opaque owner signer: the private key never leaves this closure.
 export function loadOwnerSigner(path) {
-  const st = statSync(path);
-  if (process.platform !== 'win32' && (st.mode & 0o077) !== 0) fail('OWNER_KEY_FILE_TOO_PERMISSIVE', 'chmod 600 required');
-  const f = JSON.parse(readFileSync(path, 'utf8'));
+  const f = JSON.parse(readRestrictedFile(path, 'OWNER_KEY_FILE'));
   requireExactFields(f, ['v', 'principalId', 'publicKey', 'privateKeyPkcs8'], 'INVALID_OWNER_KEY_FILE');
   const pk = createPrivateKey({ key: Buffer.from(f.privateKeyPkcs8, 'base64'), format: 'der', type: 'pkcs8' });
   const derivedRaw = Buffer.from(createPublicKey(pk).export({ format: 'jwk' }).x, 'base64url');
