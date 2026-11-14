@@ -67,7 +67,7 @@ const cmdFor = (who, script, args) => {
   const inner = ['setpriv', ...privArgs(who), NODE, '--disable-warning=ExperimentalWarning', join(ROOT, script), ...args];
   if (who !== 'gen') return [inner[0], inner.slice(1)];
   const q = shellSingleQuote;
-  const mounts = ['mount -t proc -o hidepid=invisible proc /proc', ...MASK.filter(existsSync).map(m => `mount -t tmpfs -o size=1m,mode=0755 none ${m}`)].join(' && ');
+  const mounts = ['mount -t proc -o hidepid=invisible proc /proc', ...MASK.filter(existsSync).map(m => `mount -t tmpfs -o size=1m,mode=0755 none ${q(m)}`)].join(' && ');
   return ['unshare', ['--net', '--mount', '--', 'sh', '-c', `${mounts} && exec ${inner.map(q).join(' ')}`]];
 };
 const runSync = (who, script, args) => { const [c, a] = cmdFor(who, script, args); const r = spawnSync(c, a, { env: env(who), cwd: '/' }); if (r.status !== 0) throw new Error(`${who} ${script} failed: ${r.stderr}`); return r.stdout.toString(); };

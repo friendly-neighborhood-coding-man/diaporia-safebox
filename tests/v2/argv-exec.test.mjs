@@ -36,3 +36,15 @@ test('codeWritableReport stats the node binary without a shell', () => {
   assert.equal(commandOnPath('sh'), true);
   assert.equal(commandOnPath('a;id'), false);
 });
+
+test('find/stat path operands must be absolute: a dash-led or relative path is refused, not parsed as an expression (PR #28 #21 condition)', () => {
+  assert.throws(() => writableLines(['-print']), (e) => e.code === 'PATH_NOT_ABSOLUTE');
+  assert.throws(() => writableLines(['src']), (e) => e.code === 'PATH_NOT_ABSOLUTE');
+  assert.throws(() => codeWritableReport({ roots: [join(process.cwd(), 'src/v2/launch')], statPaths: ['-c'] }), (e) => e.code === 'PATH_NOT_ABSOLUTE');
+});
+
+test('a find failure is recorded in the report instead of reading as "nothing writable"', () => {
+  const lines = writableLines([join(tmpdir(), 'does-not-exist-' + process.pid)], { limit: 5 });
+  assert.equal(lines.length, 1);
+  assert.match(lines[0], /^FIND_FAILED /);
+});

@@ -9,6 +9,14 @@ function assertArg(a) {
   }
 }
 
+/** Path operands for find/stat must be absolute: GNU find treats a leading '-' operand as an expression even after
+ *  '--' (PR #28 condition on #21), so a relative or dash-led path is refused instead of being interpreted. */
+export function assertAbsolutePath(p) {
+  assertArg(p);
+  if (!p.startsWith('/')) { const e = new Error('PATH_NOT_ABSOLUTE: ' + JSON.stringify(p).slice(0, 80)); e.code = 'PATH_NOT_ABSOLUTE'; throw e; }
+  return p;
+}
+
 export function execArgv(cmd, args) {
   assertArg(cmd);
   for (const a of args) assertArg(a);
@@ -25,12 +33,18 @@ export function commandOnPath(name) {
 export function writableLines(roots, { maxDepth = null, limit = 5 } = {}) {
   const lines = [];
   for (const root of roots) {
-    const args = [root];
+    const args = [assertAbsolutePath(root)];
     if (maxDepth != null) args.push('-maxdepth', String(maxDepth));
     args.push('!', '-type', 'l', '(', '-perm', '-o+w', '-o', '-perm', '-g+w', ')', '-print');
     let text = '';
     try { text = execArgv('find', args); }
-    catch (e) { text = e.stdout ? e.stdout.toString() : ''; if (!e.stdout && e.code !== 'ENOENT') { /* find prints errors on stderr and may exit 1 */ } }
+    catch (e) {
+      // find exits non-zero on unreadable entries; keep what it printed AND record the failure, so an empty report can
+      // no longer be mistaken for "nothing writable" (PR #28 condition on #21).
+      text = e.stdout ? e.stdout.toString() : '';
+      lines.push(`FIND_FAILED ${root} (${e.code ?? e.status ?? 'error'})`);
+      if (lines.length >= limit) return lines;
+    }
     for (const line of text.split('\n')) {
       if (!line) continue;
       lines.push(line);
@@ -42,7 +56,7 @@ export function writableLines(roots, { maxDepth = null, limit = 5 } = {}) {
 
 export function statOwners(paths) {
   if (!paths.length) return '';
-  return execArgv('stat', ['-c', '%U %a', ...paths]);
+  return execArgv('stat', ['-c', '%U %a', '--', ...paths.map(assertAbsolutePath)]);
 }
 
 export function codeWritableReport({ roots, statPaths = [], maxDepth = 6 }) {
