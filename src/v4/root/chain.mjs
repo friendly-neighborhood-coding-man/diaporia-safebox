@@ -621,7 +621,9 @@ export function applyTransition(state0, tr) {
   if (at < state0.lastAt) fail('TRANSITION_TIME_BACKWARDS');
   const s = clone(state0); const a = tr.action;
   checkActionHeader(s, a, at);
-  const Hd = HANDLERS4[a.type] ?? (V3_PASSTHROUGH.has(a.type) ? H3[a.type] : null);
+  const own4 = typeof a.type === 'string' && Object.hasOwn(HANDLERS4, a.type) ? HANDLERS4[a.type] : null;
+  const own3 = typeof a.type === 'string' && V3_PASSTHROUGH.has(a.type) && Object.hasOwn(H3, a.type) ? H3[a.type] : null;
+  const Hd = own4 ?? own3;
   if (!Hd) fail('TRANSITION_TYPE_UNKNOWN', a.type);
   const fx = [];
   const prevCase = s.case ? { caseId: s.case.caseId, subjectHolderId: s.case.subjectHolderId, planKeys: s.case.plan.map(p => p.publicKey) } : null;

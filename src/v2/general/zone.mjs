@@ -31,7 +31,7 @@ export class GeneralZone {
     return { kind: 'REPLAY_RESULT', eventId, replayed: sent.length, steps };
   }
   async runAttack(msg) {
-    const fn = ATTACKS[msg.technique];
+    const fn = typeof msg.technique === 'string' && Object.hasOwn(ATTACKS, msg.technique) ? ATTACKS[msg.technique] : undefined;
     if (!fn) return { kind: 'ATTACK_RESULT', technique: msg.technique, steps: [{ action: 'unknown technique', outcome: 'ERROR' }] };
     const steps = [];
     const sent = [];
