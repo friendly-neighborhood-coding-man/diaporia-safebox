@@ -1,0 +1,4 @@
+not ok 1 - verifier vs dishonest LEGACY_V5 vault (LOCAL_GATE)
+  error: 'GAP: verifier accepts a settled fingerprint-only payment without V6 approval'
+not ok 2 - verifier vs dishonest LEGACY_V5 vault (HIGH_ASSURANCE)
+  error: 'GAP: verifier accepts a settled fingerprint-only payment without V6 approval'

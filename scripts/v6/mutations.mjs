@@ -31,6 +31,10 @@ const M = [
   ['P1.8: console Host check skipped for the real listener', 'src/v6/emergency/console.mjs', "}, { requireHost: true });", "});"],
   // hardening P1.7: immediate checkpoints for security-critical events
   ['P1.7: critical events not checkpointed immediately', 'src/v5/journal/journal.mjs', "if (seq % this.checkpointEvery === 0 || CHECKPOINT_NOW_TYPES.has(event.type)) this.checkpoint();", "if (seq % this.checkpointEvery === 0) this.checkpoint();"],
+  // final independent review (1569fc6)
+  ['Review3: verifier checks fingerprint-only approvals only under PER_TRANSACTION', 'src/v6/supervisor/verifier.mjs', "if (s0.v6.policy.payment.mode === 'PER_TRANSACTION' || s0.v6.policy.fingerprintOnlyCreds.includes(approval.credId)) {", "if (s0.v6.policy.payment.mode === 'PER_TRANSACTION') {"],
+  ['Review3: gate prompt only neutralises the exact separator', 'src/v6/device/winbio-gate.mjs', ".replaceAll('|', '/')).join(' | ');", ".replaceAll(' | ', ' / ')).join(' | ');"],
+  ['Review3: wrapper accepts a helper without the owner confirmation', 'src/v6/device/winbio-gate.mjs', "if (j.ownerConfirmed !== true) fail(", "if (false) fail("],
   // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
   ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
   ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],

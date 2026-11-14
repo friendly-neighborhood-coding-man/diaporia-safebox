@@ -1,0 +1,41 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 3,
+ "total": 3,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "Review3: verifier checks fingerprint-only approvals only under PER_TRANSACTION",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "verifier vs dishonest LEGACY_V5 vault (LOCAL_GATE)",
+    "verifier vs dishonest LEGACY_V5 vault (HIGH_ASSURANCE)",
+    "honest LEGACY_V5 vault: a fingerprint-only payment through the V6 ceremony settles and the verifier accepts it"
+   ]
+  },
+  {
+   "name": "Review3: gate prompt only neutralises the exact separator",
+   "file": "src/v6/device/winbio-gate.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-display: free text never adds, removes or shifts a line in the gate window"
+   ]
+  },
+  {
+   "name": "Review3: wrapper accepts a helper without the owner confirmation",
+   "file": "src/v6/device/winbio-gate.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-helper: a helper build that does not report the post-MATCH owner confirmation is refused (no gate, no payment)"
+   ]
+  }
+ ]
+}

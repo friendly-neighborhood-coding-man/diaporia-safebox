@@ -34,7 +34,7 @@ produce something SafeBox accepts as a fingerprint-only approval?
 
 1. **Fingerprint-only cannot be enforced at signing time against same-user code with the Windows APIs V6 uses.**
    Labelled `INHERENT_RESIDUAL` for the `LOCAL_GATE` mode, and bounded. A forged gate authorizes nothing on its own: it
-   still needs the owner's own passkey assertion with UV, which is a human Windows Hello gesture (PIN or finger) for
+   still needs the owner credential's own signature: for a WebAuthn passkey that is an assertion with UV, i.e. a human Windows Hello gesture (for an ed25519 device credential, which the policy also accepts, it is only that device key's signature, with no human gesture guaranteed by SafeBox), which is a human Windows Hello gesture (PIN or finger) for
    that exact digest (test `P0.1-bound`). With that gesture it is accepted (`P0.1-residual`), so the worst case is
    **fingerprint-only degrades to Windows Hello UV**. It never degrades to "no human". The FIXED_600 buffer, holds,
    limits, anomaly delay and Emergency Freeze still apply.

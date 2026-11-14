@@ -44,7 +44,8 @@ export function verifyV6(args) {
     else {
       const t = proposalAt.get(paymentId) ?? Date.parse(cap.issuedAt);
       const s0 = stateAt(t);
-      if (s0.v6.policy.payment.mode === 'PER_TRANSACTION') {
+      // final review (MEDIUM): fingerprint-only credentials need their V6 approval in EVERY payment mode (as the Vault requires)
+      if (s0.v6.policy.payment.mode === 'PER_TRANSACTION' || s0.v6.policy.fingerprintOnlyCreds.includes(approval.credId)) {
         out.v6.ownerApprovals.checked++;
         const x = v6ByCap.get(capId);
         if (!x || x.payment_id !== paymentId) codes.push('OWNER_APPROVAL_MISSING');

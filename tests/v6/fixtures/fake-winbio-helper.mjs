@@ -29,6 +29,7 @@ if (cmd === 'verify-sign') {
   // sign the pre-computed hash: ECDSA over the digest (equivalent to signing the message with SHA-256)
   const h = Buffer.from(arg('--hash'), 'hex');
   const sig = ecdsaSignDigest(key(), h); // ECDSA over the given SHA-256 digest (what CNG NCryptSignHash does)
-  out({ ok: true, result: 'MATCH', unit: 1, kind: 'WINBIO_SOFTWARE_KEY', sig: sig.toString('hex') });
+  if (process.env.FAKE_WINBIO_OLD_HELPER === '1') out({ ok: true, result: 'MATCH', unit: 1, kind: 'WINBIO_SOFTWARE_KEY', sig: sig.toString('hex') }); // pre-confirmation build
+  out({ ok: true, result: 'MATCH', unit: 1, kind: 'WINBIO_SOFTWARE_KEY', sig: sig.toString('hex'), ownerConfirmed: true });
 }
 out({ ok: false, code: 'USAGE' });
