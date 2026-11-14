@@ -12,7 +12,7 @@ const MIN = 60_000, HOUR = 3600_000, DAY = 86_400_000;
 export const RISK_POLICY_V1 = Object.freeze({
   version: 'risk-policy-v1',
   windows: { short: String(10 * MIN), hour: String(HOUR), day: String(DAY) },
-  hard: { count10m: '6', count1h: '15', count24h: '40', value1hOfRemainingDaily: '0.40', value24hOfRemainingCumulative: '0.20', perHourCeilingDuringRapid: '30' },
+  hard: { count10m: '6', count1h: '15', count24h: '40', value1hOfRemainingDaily: '0.40', value24hOfRemainingCumulative: '0.20', perHourCeilingDuringRapid: '90' },
   coldStart: { minPayments: '20', minSpanMs: String(7 * DAY), count10m: '3', count1h: '5', count24h: '14', value1hOfDailyLimit: '0.15', value24hOfDailyLimit: '0.35' },
   baseline: { countFactor: '2', countSlack: '2', valueFactor: '2', minHistoryAgeMs: String(72 * HOUR), lookbackMs: String(30 * DAY), growthWindowMs: String(14 * DAY), baselineGrowthCap: '1.5', securityQuietMs: String(DAY) },
   soft: { sameMerchant1h: '4', largeFirstPaymentOfPerPaymentMax: '0.9', securityCorrelationFactor: '0.5', newActiveHourMinHistory: '30' },

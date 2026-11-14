@@ -83,9 +83,9 @@ test('deterministic termination: hold on the covered credential / epoch change e
 
   const w2 = buildV5();
   ok(await rapidRequest(w2, 'k1-phone')); ok(await rapidVote(w2, 'orc-1')); ok(await rapidVote(w2, 'k3-root-hw')); ok(await rapidActivate(w2));
-  // 31 payments inside one hour: the hard ceiling (30/h) still applies during Rapid-Use -> engine ends the grant
+  // 90 payments inside one hour: the hard ceiling (90/h) still applies during Rapid-Use -> engine ends the grant
   let n = 0;
-  for (let i = 0; i < 40 && w2.root.state.v5.rapid.grants['rq-1'].status === 'ACTIVE'; i++) { const r = await w2.pay({ amountYocto: Y(1) }); if (r.ok) n++; await w2.advance(60_000, 60_000); }
+  for (let i = 0; i < 120 && w2.root.state.v5.rapid.grants['rq-1'].status === 'ACTIVE'; i++) { const r = await w2.pay({ amountYocto: Y(1) }); if (r.ok) n++; await w2.advance(38_000, 38_000); }
   const g = w2.root.state.v5.rapid.grants['rq-1'];
   assert.equal(g.status, 'REVOKED', `after ${n} payments`);
   assert.match(g.endedBy, /^risk-engine:R3_VELOCITY_CEILING/);
