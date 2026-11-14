@@ -17,6 +17,10 @@ import { verifyCommand, TRUSTED_LEVELS } from './command.mjs';
 import { normalizeHolds, holdEffective, holdDigest, issuerUsage, chargeIssuer, pushHistory, assertScope, credentialParties, partyValid, HOLD_CLASSES, EVIDENCE_CLASSES, publicHold, effectiveHolds } from './holds.mjs';
 
 const { checkActionHeader, transitionHash, bumpEpoch, noCase, isLive, actionDigest, satisfies, ZERO } = V3;
+// Own-property lookup for request-supplied ids (independent review F1/F2 of the final candidate): an id such as
+// 'constructor' or 'toString' must never resolve to an Object.prototype member and pass an existence check.
+const own = (o, k) => (typeof k === 'string' && o != null && Object.hasOwn(o, k) ? o[k] : undefined);
+
 export { actionDigest };
 export const ACTION_V = V3.ACTION_V;
 export const TR_V = 'safebox.v5.transition';
@@ -153,7 +157,7 @@ const HANDLERS5 = {
     if (!HOLD_CLASSES.includes(b.class)) fail('HOLD_CLASS');
     assertScope(s, b.scope);
     const dur = Number(uint(b.durationMs, 'durationMs'));
-    if (b.reinforces !== undefined && !s.v5.holds[b.reinforces]) fail('HOLD_REINFORCES_UNKNOWN');
+    if (b.reinforces !== undefined && !own(s.v5.holds, b.reinforces)) fail('HOLD_REINFORCES_UNKNOWN');
     if (b.class === 'VERIFIED_INCIDENT_FREEZE') {
       // only the independent supervisor (trusted replay evidence), global, no expiry; never credentials
       noEvidenceBut(tr, ['attestation']);
@@ -199,7 +203,7 @@ const HANDLERS5 = {
   /** SUSPEND = TARGETED_QUARANTINE of one credential (72 h max unless independently confirmed). Reinforcement is allowed. */
   SUSPEND(s, a, tr, at, fx) {
     body(a, ['credId'], ['holdId', 'reason']);
-    const c = s.creds[a.body.credId]; if (!c || !isLive(c)) fail('SUSPEND_SUBJECT_NOT_LIVE');
+    const c = own(s.creds, a.body.credId); if (!c || !isLive(c)) fail('SUSPEND_SUBJECT_NOT_LIVE');
     noEvidenceBut(tr, ['approvals']);
     const [p] = commandParties(s, a, approvalsArr(tr, 1, 1, 'HOLD_ONE_SIGNER'), at);
     singleSignerHold(s, a, at, fx, p, { holdId: a.body.holdId ?? ('q-' + a.nonce.slice(0, 16)), cls: 'TARGETED_QUARANTINE', scope: { kind: 'CREDENTIAL', target: c.credId },
@@ -207,7 +211,7 @@ const HANDLERS5 = {
   },
   HOLD_CONFIRM(s, a, tr, at, fx) {
     body(a, ['holdId', 'holdDigest']);
-    const h = s.v5.holds[a.body.holdId]; if (!h || !holdEffective(h, at)) fail('HOLD_NOT_ACTIVE');
+    const h = own(s.v5.holds, a.body.holdId); if (!h || !holdEffective(h, at)) fail('HOLD_NOT_ACTIVE');
     if (a.body.holdDigest !== holdDigest(s, h)) fail('HOLD_DIGEST_MISMATCH');
     if (h.class === 'VERIFIED_INCIDENT_FREEZE') fail('INCIDENT_FREEZE_NEEDS_NO_CONFIRMATION');
     noEvidenceBut(tr, ['approvals']);
@@ -229,7 +233,7 @@ const HANDLERS5 = {
   },
   HOLD_RELEASE(s, a, tr, at, fx) {
     body(a, ['holdId', 'holdDigest']);
-    const h = s.v5.holds[a.body.holdId]; if (!h || h.status !== 'ACTIVE') fail('HOLD_NOT_ACTIVE');
+    const h = own(s.v5.holds, a.body.holdId); if (!h || h.status !== 'ACTIVE') fail('HOLD_NOT_ACTIVE');
     if (a.body.holdDigest !== holdDigest(s, h)) fail('HOLD_DIGEST_MISMATCH');
     if (h.class === 'VERIFIED_INCIDENT_FREEZE') {
       // owner UNFREEZE quorum (command-bound) AND the supervisor repair certificate bound to THIS hold
@@ -262,7 +266,7 @@ const HANDLERS5 = {
   /** UNSUSPEND releases ONLY the quarantine holds on that credential whose every valid party signs. */
   UNSUSPEND(s, a, tr, at, fx) {
     body(a, ['credId']);
-    const c = s.creds[a.body.credId]; if (!c || c.status !== 'suspended') fail('UNSUSPEND_SUBJECT_NOT_SUSPENDED');
+    const c = own(s.creds, a.body.credId); if (!c || c.status !== 'suspended') fail('UNSUSPEND_SUBJECT_NOT_SUSPENDED');
     noEvidenceBut(tr, ['approvals']);
     const ps = commandParties(s, a, approvalsArr(tr, 1, 6, 'APPROVALS_INVALID'), at, { allowSuspended: true });
     const signed = new Set(ps.map(p => p.credId));
@@ -277,7 +281,7 @@ const HANDLERS5 = {
   },
   HOLD_EXPIRE(s, a, tr, at, fx) {
     body(a, ['holdId']); noEvidenceBut(tr, []);
-    const h = s.v5.holds[a.body.holdId]; if (!h) fail('HOLD_UNKNOWN');
+    const h = own(s.v5.holds, a.body.holdId); if (!h) fail('HOLD_UNKNOWN');
     if (h.status === 'ACTIVE' && (h.expiresAt === null || at < Number(h.expiresAt))) fail('HOLD_NOT_EXPIRED');
     fx.push({ type: 'HOLD_HOUSEKEEPING', holdId: h.holdId, status: h.status });
   },
@@ -287,7 +291,7 @@ const HANDLERS5 = {
     noCase(s, 'RECOVERY_CASE_OPEN'); if (s.v4.gcase) fail('GOVERNANCE_CASE_OPEN');
     if (s.v5.contests.some(c => c.contestId === b.contestId)) fail('CONTEST_ID_REUSED');
     if (typeof b.reason !== 'string' || b.reason.length > 200) fail('CONTEST_REASON');
-    const suspect = s.creds[b.suspectCredId]; if (!suspect || !isLive(suspect)) fail('CONTEST_SUSPECT_NOT_LIVE');
+    const suspect = own(s.creds, b.suspectCredId); if (!suspect || !isLive(suspect)) fail('CONTEST_SUSPECT_NOT_LIVE');
     if (!Array.isArray(b.holdIds) || !b.holdIds.length || b.holdIds.length > 16 || new Set(b.holdIds).size !== b.holdIds.length) fail('CONTEST_HOLD_SET');
     for (const hid of b.holdIds) {
       const h = s.v5.holds[hid]; if (!h || !holdEffective(h, at)) fail('CONTEST_HOLD_NOT_ACTIVE', hid);
@@ -326,8 +330,8 @@ const HANDLERS5 = {
     const b = a.body; id(b.incidentId, 'incidentId');
     if (!['LEGITIMATE', 'FRAUD'].includes(b.verdict)) fail('INCIDENT_VERDICT');
     if (!/^[0-9a-f]{64}$/.test(b.evidenceDigest)) fail('INCIDENT_EVIDENCE_DIGEST');
-    if (!s.creds[b.credId]) fail('INCIDENT_UNKNOWN_CREDENTIAL');
-    if (s.v5.incidentReviews[b.incidentId]) fail('INCIDENT_ALREADY_REVIEWED');
+    if (!own(s.creds, b.credId)) fail('INCIDENT_UNKNOWN_CREDENTIAL');
+    if (own(s.v5.incidentReviews, b.incidentId)) fail('INCIDENT_ALREADY_REVIEWED');
     noEvidenceBut(tr, ['approvals']);
     const ps = commandParties(s, a, approvalsArr(tr, 1, 3, 'INCIDENT_APPROVALS'), at);
     // the reviewed flow's own credential can never vouch for itself (a thief would simply declare itself legitimate)
@@ -345,7 +349,7 @@ const HANDLERS5 = {
   DELEGATION_GRANT(s, a, tr, at, fx) {
     body(a, ['delegationId', 'delegateKey', 'operation', 'recipients', 'assets', 'perOpMaxYocto', 'cumulativeMaxYocto', 'maxUses', 'expiresAt', 'revokeOn']);
     const b = a.body; id(b.delegationId, 'delegationId');
-    if (s.v5.delegations[b.delegationId]) fail('DELEGATION_ID_IN_USE');
+    if (own(s.v5.delegations, b.delegationId)) fail('DELEGATION_ID_IN_USE');
     if (b.operation !== 'PAY') fail('DELEGATION_OPERATION');
     if (typeof b.delegateKey !== 'string' || !b.delegateKey.startsWith('ed25519:')) fail('DELEGATE_KEY');
     if (!Array.isArray(b.recipients) || !b.recipients.length || b.recipients.some(r => !s.purpose.recipients.includes(r))) fail('DELEGATION_RECIPIENT_NOT_IN_PURPOSE');
@@ -367,7 +371,7 @@ const HANDLERS5 = {
   },
   DELEGATION_REVOKE(s, a, tr, at, fx) {
     body(a, ['delegationId']);
-    const d = s.v5.delegations[a.body.delegationId]; if (!d || d.status !== 'ACTIVE') fail('DELEGATION_NOT_ACTIVE');
+    const d = own(s.v5.delegations, a.body.delegationId); if (!d || d.status !== 'ACTIVE') fail('DELEGATION_NOT_ACTIVE');
     noEvidenceBut(tr, ['approvals']);
     const [p] = commandParties(s, a, approvalsArr(tr, 1, 1, 'DELEGATION_ONE_SIGNER'), at, { allowSuspended: true });
     d.status = 'REVOKED'; d.endedAt = String(at); d.endedBy = p.credId;
@@ -378,7 +382,7 @@ const HANDLERS5 = {
   RAPID_USE_REQUEST(s, a, tr, at, fx) {
     body(a, ['requestId', 'scope', 'delayException', 'durationMs', 'explanation', 'incidentId']);
     const b = a.body; id(b.requestId, 'requestId');
-    if (s.v5.rapid.requests[b.requestId]) fail('RAPID_REQUEST_ID_REUSED', 'a new window always needs a fresh request');
+    if (own(s.v5.rapid.requests, b.requestId)) fail('RAPID_REQUEST_ID_REUSED', 'a new window always needs a fresh request');
     const x = exactFields(b.scope, ['credIds', 'delegationIds', 'recipients', 'asset', 'purposeId', 'purposeVersion', 'perPaymentMaxYocto', 'dailyLimitYocto', 'cumulativeLimitYocto', 'sessionCapYocto'], [], 'RAPID_SCOPE');
     // P3: the scope restates the CURRENT financial boundaries exactly; nothing can be enlarged
     if (x.purposeId !== s.purpose.purposeId || x.purposeVersion !== s.purpose.version) fail('RAPID_SCOPE_PURPOSE_MISMATCH');
@@ -409,7 +413,7 @@ const HANDLERS5 = {
   },
   RAPID_USE_APPROVE(s, a, tr, at, fx) {
     body(a, ['requestId', 'requestDigest', 'decision']);
-    const q = s.v5.rapid.requests[a.body.requestId]; if (!q || q.status !== 'PENDING') fail('RAPID_REQUEST_NOT_PENDING');
+    const q = own(s.v5.rapid.requests, a.body.requestId); if (!q || q.status !== 'PENDING') fail('RAPID_REQUEST_NOT_PENDING');
     if (a.body.requestDigest !== q.digest) fail('RAPID_REQUEST_DIGEST_MISMATCH');
     if (at >= Number(q.approveBy)) fail('RAPID_REQUEST_APPROVAL_WINDOW_CLOSED');
     if (!['APPROVE', 'REJECT'].includes(a.body.decision)) fail('RAPID_DECISION');
@@ -424,7 +428,7 @@ const HANDLERS5 = {
   },
   RAPID_USE_ACTIVATE(s, a, tr, at, fx) {
     body(a, ['requestId', 'requestDigest']); noEvidenceBut(tr, []);
-    const q = s.v5.rapid.requests[a.body.requestId]; if (!q || q.status !== 'PENDING') fail('RAPID_REQUEST_NOT_PENDING');
+    const q = own(s.v5.rapid.requests, a.body.requestId); if (!q || q.status !== 'PENDING') fail('RAPID_REQUEST_NOT_PENDING');
     if (a.body.requestDigest !== q.digest) fail('RAPID_REQUEST_DIGEST_MISMATCH');
     if (at >= Number(q.approveBy)) fail('RAPID_REQUEST_APPROVAL_WINDOW_CLOSED');
     if (q.epoch !== String(s.epoch)) fail('RAPID_REQUEST_STALE_EPOCH');
@@ -444,7 +448,7 @@ const HANDLERS5 = {
   /** "End Rapid-Use Mode": an approving owner, the holder of a covered flow, the ORC, or a predefined Risk-Engine rule. */
   RAPID_USE_REVOKE(s, a, tr, at, fx) {
     body(a, ['grantId', 'reason']);
-    const g = s.v5.rapid.grants[a.body.grantId]; if (!g || g.status !== 'ACTIVE') fail('RAPID_GRANT_NOT_ACTIVE');
+    const g = own(s.v5.rapid.grants, a.body.grantId); if (!g || g.status !== 'ACTIVE') fail('RAPID_GRANT_NOT_ACTIVE');
     if (typeof a.body.reason !== 'string' || a.body.reason.length > 200) fail('RAPID_REVOKE_REASON');
     let by;
     if (tr.attestation) {
@@ -468,7 +472,7 @@ const HANDLERS5 = {
   },
   RAPID_USE_EXPIRE(s, a, tr, at, fx) {
     body(a, ['grantId']); noEvidenceBut(tr, []);
-    const g = s.v5.rapid.grants[a.body.grantId]; if (!g) fail('RAPID_GRANT_UNKNOWN');
+    const g = own(s.v5.rapid.grants, a.body.grantId); if (!g) fail('RAPID_GRANT_UNKNOWN');
     if (g.status === 'ACTIVE' && at < Number(g.expiresAt)) fail('RAPID_GRANT_NOT_EXPIRED');
     fx.push({ type: 'RAPID_USE_HOUSEKEEPING', grantId: g.grantId, status: g.status });
   },
@@ -574,7 +578,7 @@ export function applyTransition(state0, tr) {
   const pre = []; const s = clone(state0);
   normalizeHolds(s, at, pre); normalizeRapid(s, at, pre);
   let out, fx;
-  if (HANDLERS5[a?.type]) {
+  if (typeof a?.type === 'string' && Object.hasOwn(HANDLERS5, a.type)) {
     checkActionHeader(s, a, at);
     // F-V5-04: authenticate every approval BEFORE any command-specific validation, so an unauthenticated submitter
     // learns nothing about policy (it gets the authentication error, never a business-rule error). Runs on a scratch

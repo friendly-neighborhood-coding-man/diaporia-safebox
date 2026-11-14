@@ -1,0 +1,36 @@
+{"at":"2026-11-14T18:40:12.142Z","kind":"STEP","text":"Open http://localhost:47800/bridge#t=<per-run secret, redacted> in Microsoft Edge"}
+{"at":"2026-11-14T18:40:12.644Z","kind":"OK","text":"bridge page connected"}
+{"at":"2026-11-14T18:40:12.645Z","kind":"INFO","text":"k2-laptop runs UV-only: FINGERPRINT ONLY NOT PROVEN, PIN FALLBACK POSSIBLE"}
+{"at":"2026-11-14T18:40:12.645Z","kind":"STEP","text":"Enrollment: approve each \"ENROLL\" request on the bridge page (Windows Hello)"}
+{"at":"2026-11-14T18:40:16.054Z","kind":"OK","text":"enrolled: k2-laptop credential V7ZmI1DkaOxY…, gate key none"}
+{"at":"2026-11-14T18:40:16.055Z","kind":"STEP","text":"Workflow A: the AI prepares a payment over MCP; approve it on the bridge page"}
+{"at":"2026-11-14T18:40:16.153Z","kind":"AI","text":"prepare_payment: AWAITING_OWNER_APPROVAL"}
+{"at":"2026-11-14T18:40:16.155Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.455Z","kind":"OK","text":"owner approval -> {\"requestId\":\"apr_b38a3a39ec5b8d0fd1b4b47bdeb5f712\",\"state\":\"SUBMITTED_TO_VAULT\",\"paymentId\":\"p_84ca6bfc52734c51819f2d04d1f803a2\",\"vaultState\":\"BUFFERED\"}"}
+{"at":"2026-11-14T18:40:16.459Z","kind":"DENY","text":"ATTACK 01 immediate replay of the owner's real approval: WEBAUTHN_SIGNCOUNT_NOT_INCREASING"}
+{"at":"2026-11-14T18:40:16.495Z","kind":"OK","text":"MOCK settlement after the 10-minute buffer: settledVerified=true"}
+{"at":"2026-11-14T18:40:16.496Z","kind":"STEP","text":"Attack denials: each attempt below must be refused or change nothing (no owner action needed; MOCK ledger)"}
+{"at":"2026-11-14T18:40:16.563Z","kind":"DENY","text":"ATTACK 02 AI asks to pay an address outside the purpose: NOT_PREPARABLE RECIPIENT_NOT_IN_PURPOSE (no approval request created)"}
+{"at":"2026-11-14T18:40:16.578Z","kind":"DENY","text":"ATTACK 03 rogue AI client with a valid MCP session: prepare -> AWAITING_OWNER_APPROVAL; tools offered: get_safebox_status, check_payment, prepare_payment, get_payment_status; after 40 min settledVerified=false"}
+{"at":"2026-11-14T18:40:16.588Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.590Z","kind":"DENY","text":"ATTACK 04a amount changed 0.03 -> 0.06 NEAR after the summary: CAPABILITY_MISMATCH [v6.payment]"}
+{"at":"2026-11-14T18:40:16.591Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.594Z","kind":"DENY","text":"ATTACK 04b recipient swapped after the summary: CAPABILITY_MISMATCH [recipientId]"}
+{"at":"2026-11-14T18:40:16.601Z","kind":"DENY","text":"ATTACK 05 stolen PAY key without a V6 owner approval: V6_PAYMENT_APPROVAL_REQUIRED"}
+{"at":"2026-11-14T18:40:16.610Z","kind":"DENY","text":"ATTACK 06 fingerprint gate called without / with a foreign Origin: no Origin -> HTTP 403, foreign Origin -> HTTP 403"}
+{"at":"2026-11-14T18:40:16.611Z","kind":"STEP","text":"Workflow B: a burst from k1-phone (simulated stolen key) triggers a Risk Engine incident and a security alert"}
+{"at":"2026-11-14T18:40:16.611Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.627Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.645Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.701Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:16.723Z","kind":"MAIL","text":"alert DELIVERED via MOCK: api=MOCK_DELIVERED, inbox=INBOX_RECEIPT_NOT_VERIFIED"}
+{"at":"2026-11-14T18:40:16.725Z","kind":"DENY","text":"ATTACK 07 6 scanner GET/HEAD visits of the Emergency Freeze link: HTTP 200,200,200,200,200,200; state digest 47741ad17ebd… -> 47741ad17ebd…, frozen=false"}
+{"at":"2026-11-14T18:40:16.725Z","kind":"STEP","text":"Open the Emergency Freeze link from the email (or http://localhost:47800/e/lb531f67335b0b594f462e66095eb2486), sign in with Windows Hello, review, type the phrase, approve."}
+{"at":"2026-11-14T18:40:17.728Z","kind":"OK","text":"FROZEN by the owner: hold ef-1658e4b2325bf3f5 (PROVISIONAL_HOLD)"}
+{"at":"2026-11-14T18:40:17.728Z","kind":"OWNER","text":"device shows: SafeBox V6 - PAYMENT APPROVAL (one payment, exact)"}
+{"at":"2026-11-14T18:40:17.734Z","kind":"OK","text":"new payment while frozen: FREEZE_ACTIVE"}
+{"at":"2026-11-14T18:40:17.741Z","kind":"INFO","text":"Vault payment states after 30 min frozen: [\"SETTLED\",\"FROZEN\",\"FROZEN\",\"FROZEN\",\"FROZEN\"]"}
+{"at":"2026-11-14T18:40:17.776Z","kind":"OK","text":"independent V6 verifier: ok=true, owner approvals=1, emergency freezes=1"}
+{"at":"2026-11-14T18:40:17.777Z","kind":"STEP","text":"Recovery: approve HOLD_RELEASE on the bridge page"}
+{"at":"2026-11-14T18:40:17.779Z","kind":"OWNER","text":"device shows: SafeBox V5 - HOLD_RELEASE"}
+{"at":"2026-11-14T18:40:17.963Z","kind":"OK","text":"HOLD_RELEASE: accepted; frozen now false"}

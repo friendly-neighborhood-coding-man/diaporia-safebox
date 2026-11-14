@@ -1,0 +1,25 @@
+{
+ "generatedBy": "scripts/v5/mutations.mjs",
+ "firstOrder": {
+  "caught": 0,
+  "total": 1
+ },
+ "higherOrder": {
+  "caught": 0,
+  "total": 0
+ },
+ "caught": 0,
+ "total": 1,
+ "rows": [
+  {
+   "name": "Verifier: flow from the vault row instead of signed evidence (F1)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  }
+ ]
+}

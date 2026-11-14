@@ -82,10 +82,10 @@ header{padding:12px 18px;background:#18212b;border-bottom:1px solid #2b3846}h1{f
 #log{padding:10px 18px}.e{padding:3px 0;border-bottom:1px solid #1c2630;white-space:pre-wrap}.k{display:inline-block;width:76px;color:#7fa7c9}
 .ok .k{color:#7bd88f}.deny .k{color:#ff8a80}.ai .k{color:#c7a6ff}.owner .k{color:#ffd479}.root .k{color:#80deea}.mail .k{color:#f48fb1}.t{color:#5c6b7a;font-size:12px}
 </style></head><body><header><h1 id="title"></h1><div id="labels"></div></header><div id="log"></div><script>
-const id=${JSON.stringify(id)};let seen=-1;
+const id=${JSON.stringify(id)};let seen=-1;const H=(x)=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function tick(){const r=await fetch('/events?clip='+encodeURIComponent(id)+'&after='+seen).then(r=>r.json());
-document.getElementById('title').textContent=r.title;document.getElementById('labels').innerHTML=r.labels.map(l=>'<span class="l '+(l.includes('NOT')?'no':l.includes('PIN')?'warn':'')+'">'+l+'</span>').join('');
-for(const e of r.events){seen=e.n;const d=document.createElement('div');d.className='e '+e.kind.toLowerCase();d.innerHTML='<span class="k">'+e.kind+'</span>'+e.text.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+' <span class="t">mock '+e.mockTime.slice(11,19)+'</span>';document.getElementById('log').appendChild(d);window.scrollTo(0,document.body.scrollHeight);}
+document.getElementById('title').textContent=r.title;document.getElementById('labels').innerHTML=r.labels.map(l=>'<span class="l '+(l.includes('NOT')?'no':l.includes('PIN')?'warn':'')+'">'+H(l)+'</span>').join('');
+for(const e of r.events){seen=e.n;const d=document.createElement('div');d.className='e '+String(e.kind).toLowerCase().replace(/[^a-z]/g,'');d.innerHTML='<span class="k">'+H(e.kind)+'</span>'+H(e.text)+' <span class="t">mock '+H(String(e.mockTime).slice(11,19))+'</span>';document.getElementById('log').appendChild(d);window.scrollTo(0,document.body.scrollHeight);}
 setTimeout(tick,250);}tick();</script></body></html>`;
 const titles = {}; const clipLabels = {};
 const viewSrv = createServer((req, res) => {

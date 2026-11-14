@@ -1,0 +1,223 @@
+{
+  "generatedBy": "scripts/v6/reconcile-mutations.mjs",
+  "caught": 15,
+  "total": 16,
+  "patternErrors": 0,
+  "rows": [
+    {
+      "name": "#20 V3 Root lookup reverted to HANDLERS[a.type]",
+      "file": "src/v3/root/chain.mjs",
+      "tests": [
+        "tests/v3/prototype-action.test.mjs",
+        "tests/v5/prototype-action.test.mjs",
+        "tests/v2/prototype-technique.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "V3 Root: inherited and planted action names are TRANSITION_TYPE_UNKNOWN and do not advance seq/head/nonce/epoch",
+        "V3 applyTransition directly: an inherited type throws TRANSITION_TYPE_UNKNOWN (no V4/V5 layer in front)"
+      ]
+    },
+    {
+      "name": "#20 V4 Root lookup reverted (HANDLERS4 / H3 passthrough)",
+      "file": "src/v4/root/chain.mjs",
+      "tests": [
+        "tests/v3/prototype-action.test.mjs",
+        "tests/v5/prototype-action.test.mjs",
+        "tests/v2/prototype-technique.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 3,
+      "examples": [
+        "V4 Root: inherited and planted action names (incl. the V3 passthrough table) do not advance state",
+        "V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached",
+        "prototype method names do not commit a V5 transition"
+      ]
+    },
+    {
+      "name": "#20 V4 own-property check on HANDLERS4 removed",
+      "file": "src/v4/root/chain.mjs",
+      "tests": [
+        "tests/v3/prototype-action.test.mjs",
+        "tests/v5/prototype-action.test.mjs",
+        "tests/v2/prototype-technique.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 3,
+      "examples": [
+        "V4 Root: inherited and planted action names (incl. the V3 passthrough table) do not advance state",
+        "V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached",
+        "prototype method names do not commit a V5 transition"
+      ]
+    },
+    {
+      "name": "#20 V5 Root lookup reverted to truthiness",
+      "file": "src/v5/root/chain.mjs",
+      "tests": [
+        "tests/v3/prototype-action.test.mjs",
+        "tests/v5/prototype-action.test.mjs",
+        "tests/v2/prototype-technique.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "V5 and V6 Root: inherited and planted action names do not advance state; a real handler is still reached",
+        "prototype method names do not commit a V5 transition"
+      ]
+    },
+    {
+      "name": "#20 V2 attack technique lookup reverted",
+      "file": "src/v2/general/zone.mjs",
+      "tests": [
+        "tests/v3/prototype-action.test.mjs",
+        "tests/v5/prototype-action.test.mjs",
+        "tests/v2/prototype-technique.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "attack technique names are own properties, not Object.prototype methods"
+      ]
+    },
+    {
+      "name": "#26/#22 Gmail loader follows symlinks",
+      "file": "src/v6/notify/gmail.mjs",
+      "tests": [
+        "tests/v6/gmail-cred-file.test.mjs",
+        "tests/v6/codeql-fixes.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "CQ-1 credentials: read through one descriptor; a symlink or a directory at the path is refused (POSIX)",
+        "credential load requires a regular 0600 file and refuses a symlink (POSIX)"
+      ]
+    },
+    {
+      "name": "#26 Gmail loader O_NONBLOCK removed (FIFO)",
+      "file": "src/v6/notify/gmail.mjs",
+      "tests": [
+        "tests/v6/gmail-cred-file.test.mjs"
+      ],
+      "caught": false,
+      "failingTests": null,
+      "noSummary": true,
+      "timedOut": true,
+      "status": 1,
+      "signal": null,
+      "examples": []
+    },
+    {
+      "name": "#22 Gmail loader mode check removed",
+      "file": "src/v6/notify/gmail.mjs",
+      "tests": [
+        "tests/v6/gmail-cred-file.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "credential load requires a regular 0600 file and refuses a symlink (POSIX)"
+      ]
+    },
+    {
+      "name": "#22 Gmail writer O_EXCL removed",
+      "file": "src/v6/notify/gmail.mjs",
+      "tests": [
+        "tests/v6/gmail-cred-file.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "credential write: exclusive create, mode 0600, refuses a symlink or dangling symlink, validates fields"
+      ]
+    },
+    {
+      "name": "#28-cond Gmail writer field validation removed",
+      "file": "src/v6/notify/gmail.mjs",
+      "tests": [
+        "tests/v6/gmail-cred-file.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "credential write: exclusive create, mode 0600, refuses a symlink or dangling symlink, validates fields"
+      ]
+    },
+    {
+      "name": "F1 HOLD_EXPIRE id lookup reverted to a bare bracket",
+      "file": "src/v5/root/chain.mjs",
+      "tests": [
+        "tests/v5/prototype-ids.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "V5: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing",
+        "V6: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing"
+      ]
+    },
+    {
+      "name": "F1 RAPID_USE_EXPIRE id lookup reverted to a bare bracket",
+      "file": "src/v5/root/chain.mjs",
+      "tests": [
+        "tests/v5/prototype-ids.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "V5: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing",
+        "V6: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing"
+      ]
+    },
+    {
+      "name": "F1 own() helper made a plain bracket lookup",
+      "file": "src/v5/root/chain.mjs",
+      "tests": [
+        "tests/v5/prototype-ids.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 2,
+      "examples": [
+        "V5: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing",
+        "V6: HOLD_EXPIRE / RAPID_USE_EXPIRE with an inherited id are refused and commit nothing"
+      ]
+    },
+    {
+      "name": "#26 termSafe bypassed in the showcase console line",
+      "file": "scripts/v6/showcase.mjs",
+      "tests": [
+        "tests/v6/showcase-log-reconcile.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "showcase: console line uses termSafe; the HTML viewer escapes kind, labels, text and time"
+      ]
+    },
+    {
+      "name": "#26 termSafe U+2028/2029 range removed",
+      "file": "src/v6/common/term.mjs",
+      "tests": [
+        "tests/v6/showcase-log-reconcile.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "\\#25 case and PR \\#28 residuals: newline, CR/LF, U+2028, U+2029 and ANSI CSI never reach the terminal raw"
+      ]
+    },
+    {
+      "name": "#25-cond viewer kind unescaped",
+      "file": "scripts/v6/showcase.mjs",
+      "tests": [
+        "tests/v6/showcase-log-reconcile.test.mjs"
+      ],
+      "caught": true,
+      "failingTests": 1,
+      "examples": [
+        "showcase: console line uses termSafe; the HTML viewer escapes kind, labels, text and time"
+      ]
+    }
+  ]
+}

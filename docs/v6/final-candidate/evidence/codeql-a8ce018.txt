@@ -1,0 +1,17 @@
+[36;1m  jq -r '.runs[] | "results: \(.results | length)", (.results[] | "\(.level // "warning")\t\(.ruleId)\t\(.locations[0].physicalLocati
+results: 15
+warning	js/bad-tag-filter	src/v5/sim/scenarios.mjs:215	This regular expression does not match upper case <SCRIPT> tags.
+warning	js/bad-tag-filter	tests/v5/notify.test.mjs:40	This regular expression does not match upper case <SCRIPT> tags.
+warning	js/shell-command-injection-from-environment	scripts/v2/run-isolated.mjs:31	This shell command depends on an uncontrolled [absolute p
+warning	js/unvalidated-dynamic-method-call	src/v2/launch/run-controller.mjs:39	Invocation of method with [user-controlled](1) name may dispa
+warning	js/unvalidated-dynamic-method-call	src/v2b/launch/run-controller-rt.mjs:33	Invocation of method with [user-controlled](1) name may d
+warning	js/file-system-race	scripts/v6/real-device.mjs:70	The file may have changed since it [was checked](1).
+warning	js/file-system-race	src/v1/authz.mjs:57	The file may have changed since it [was checked](1).
+warning	js/file-system-race	src/v1/near/executor.mjs:21	The file may have changed since it [was checked](1).
+warning	js/file-system-race	src/v2/launch/keygen.mjs:13	The file may have changed since it [was checked](1).
+warning	js/file-system-race	src/v2/launch/keygen.mjs:19	The file may have changed since it [was checked](1).
+warning	js/file-system-race	src/v2/supervisor/owner.mjs:34	The file may have changed since it [was checked](1). The file may have changed si
+warning	js/file-system-race	tests/v6/fixtures/fake-winbio-helper.mjs:7	The file may have changed since it [was checked](1).
+warning	js/http-to-file-access	scripts/v6/real-device.mjs:285	Write to file system depends on [Untrusted data](1). Write to file system depe
+warning	js/http-to-file-access	src/v6/notify/gmail.mjs:79	Write to file system depends on [Untrusted data](1).
+warning	js/indirect-command-line-injection	scripts/v2b/run-redteam.mjs:38	This command depends on an unsanitized [command-line argument](1).

@@ -16,7 +16,8 @@
 //     simulated k1-phone credential or replay recorded artefacts. Each one must be refused or change nothing.
 //   --demo: recording mode. The terminal never shows the per-run bridge secret (the full link is written to
 //     --bridge-url-file, default .demo-bridge-url in the repo root, mode 0600, and on Windows also copied to the
-//     clipboard) and evidence paths are printed relative to the repository.
+//     clipboard only with --clipboard) and evidence paths are printed relative to the repository.
+//   --open-edge (with --demo, Windows only): the runner opens the bridge in an Edge --app window itself.
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
@@ -68,8 +69,24 @@ if (DEMO) {
   try { if (lstatSync(uf).isFile()) unlinkSync(uf); else { console.error('refusing: ' + shown(uf) + ' is not a regular file'); process.exit(2); } } catch (e) { if (e.code !== 'ENOENT') throw e; }
   const ufd = openSync(uf, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); try { writeSync(ufd, bridge.url() + '\n'); } finally { closeSync(ufd); }
   process.on('exit', () => { try { unlinkSync(uf); } catch { /* already gone */ } }); // the per-run secret dies with the run
-  let clip = false; if (process.platform === 'win32') { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
-  console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
+  // Clipboard copy is OPT-IN (--clipboard) since the final candidate: Windows clipboard history (Win+V) and cloud
+  // clipboard sync can retain the per-run secret. --no-clipboard is still accepted (no-op). The recording runbook uses
+  // --open-edge, so the secret is never typed, pasted or shown.
+  let clip = false; if (process.platform === 'win32' && flag('--clipboard') && !flag('--no-clipboard')) { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
+  // --open-edge (Windows): the runner opens the bridge itself in an Edge app window (no address bar), so the secret is
+  // never typed, pasted or displayed on screen. It is passed on Edge's command line (visible to same-user processes,
+  // already inside the documented same-user residual). Not available elsewhere: falls back to the manual step.
+  let opened = false;
+  if (flag('--open-edge') && process.platform === 'win32') {
+    // Verbatim command line (Node would otherwise re-quote the empty start title). The URL is http://localhost:<port>
+    // plus a hex token, so it contains no cmd metacharacters; refuse anything else rather than pass it to cmd.
+    const u = bridge.url();
+    if (/^http:\/\/localhost:\d{1,5}\/bridge#t=[0-9a-f]+$/.test(u)) {
+      try { spawn('cmd', ['/d', '/s', '/c', `start "" msedge --app=${u}`], { stdio: 'ignore', detached: true, windowsHide: true, windowsVerbatimArguments: true }).unref(); opened = true; } catch { /* manual step below */ }
+    }
+  }
+  if (opened) console.log(`STEP   Asked Edge to open the bridge in an app window on THIS laptop (${ORIGIN}/bridge#t=<per-run secret, redacted>). If no window appears within a few seconds, open it manually from ${shown(uf)} (pause the recording first).`);
+  else console.log(`STEP   Open the bridge link in Microsoft Edge on THIS laptop and keep that tab open: ${ORIGIN}/bridge#t=<per-run secret, redacted> (full link ${clip ? 'copied to the clipboard and ' : ''}in ${shown(uf)}).`);
 } else console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
 events.push({ at: new Date().toISOString(), kind: 'STEP', text: `Open ${ORIGIN}/bridge#t=<per-run secret, redacted> in Microsoft Edge` }); // the secret never reaches the evidence
 for (let i = 0; ; i++) { if (Date.now() - (await bridge.lastPoll()) < 3000) break; if (i > 1200) { ev('FAIL', 'bridge page never opened (10 min)'); process.exit(4); } await sleep(500); }

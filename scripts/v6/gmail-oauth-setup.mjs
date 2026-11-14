@@ -11,11 +11,11 @@
 //   outside the repository. The token is never printed. The granted scope is checked to be exactly gmail.send.
 import { createServer } from 'node:http';
 import { createHash, randomBytes } from 'node:crypto';
-import { readFileSync, writeSync, openSync, closeSync, fsyncSync, fchmodSync, realpathSync, existsSync, constants as FS } from 'node:fs';
+import { readFileSync, realpathSync, existsSync } from 'node:fs';
 import { dirname, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
-import { GMAIL_SEND_SCOPE } from '../../src/v6/notify/gmail.mjs';
+import { GMAIL_SEND_SCOPE, writeGmailCredentialFile } from '../../src/v6/notify/gmail.mjs';
 
 const arg = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; };
 const clientPath = arg('--client'), sender = arg('--sender'), out = arg('--out');
@@ -58,12 +58,9 @@ const j = await r.json();
 if (r.status !== 200 || !j.refresh_token) { console.error('token exchange failed: HTTP ' + r.status + ' ' + (j.error ?? '')); process.exit(1); }
 const scopes = String(j.scope ?? '').split(/\s+/).filter(Boolean);
 if (scopes.length !== 1 || scopes[0] !== GMAIL_SEND_SCOPE) { console.error('granted scope is not exactly gmail.send (' + scopes.join(' ') + '); refusing to store it'); process.exit(1); }
-// CodeQL js/file-system-race: the existsSync check above is only an early, friendly refusal. The write itself is an
-// exclusive create (O_CREAT|O_EXCL, plus O_NOFOLLOW on POSIX), so a file or symlink planted after that check makes this
-// fail instead of being overwritten or followed.
-let fd;
-try { fd = openSync(outAbs, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); }
+// CodeQL js/file-system-race: the existsSync check above is only an early, friendly refusal. writeGmailCredentialFile
+// is an exclusive create (O_CREAT|O_EXCL, plus O_NOFOLLOW on POSIX), so a file or symlink planted after that check makes
+// this fail instead of being overwritten or followed. It also refuses empty / oversized / control-character fields.
+try { writeGmailCredentialFile(outAbs, { client_id: c.client_id, client_secret: c.client_secret, refresh_token: j.refresh_token, sender }); }
 catch (e) { console.error('refusing to write credentials: ' + (e.code ?? e.message) + ' at ' + outAbs); process.exit(2); }
-try { writeSync(fd, JSON.stringify({ client_id: c.client_id, client_secret: c.client_secret, refresh_token: j.refresh_token, sender }, null, 2)); fsyncSync(fd);
-  try { fchmodSync(fd, 0o600); } catch { /* Windows: rely on the user profile ACL */ } } finally { closeSync(fd); }
 console.log('Stored gmail.send credentials (refresh token not shown) at ' + outAbs);
