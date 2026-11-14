@@ -35,7 +35,7 @@ function classify(e) {
   const n = e?.constructor?.name ?? 'Error';
   const map = { ExpiredMetadataError: 'TUF_EXPIRED', EqualVersionError: 'TUF_ROLLBACK', BadVersionError: 'TUF_ROLLBACK', UnsignedMetadataError: 'TUF_BAD_SIGNATURE', LengthOrHashMismatchError: 'TUF_HASH_MISMATCH', DownloadLengthMismatchError: 'TUF_LENGTH_MISMATCH', DownloadHTTPError: 'TUF_MISSING_FILE', RepositoryError: 'TUF_REPOSITORY_ERROR' };
   const m = String(e?.message ?? '');
-  const byMsg = /expired/i.test(m) ? 'TUF_EXPIRED' : /version/i.test(m) ? 'TUF_ROLLBACK_OR_MIX' : /signature|threshold/i.test(m) ? 'TUF_BAD_SIGNATURE' : /hash|length/i.test(m) ? 'TUF_HASH_MISMATCH' : /not in spool|not found/i.test(m) ? 'TUF_MISSING_FILE' : null;
+  const byMsg = /expired/i.test(m) ? 'TUF_EXPIRED' : /version/i.test(m) ? 'TUF_ROLLBACK_OR_MIX' : /signature|threshold|signed by/i.test(m) ? 'TUF_BAD_SIGNATURE' : /hash|length/i.test(m) ? 'TUF_HASH_MISMATCH' : /not in spool|not found/i.test(m) ? 'TUF_MISSING_FILE' : null;
   return new VerifyError(map[n] && n !== 'RuntimeError' ? map[n] : (byMsg ?? map[n] ?? 'TUF_ERROR'), `${n}: ${m}`);
 }
 
