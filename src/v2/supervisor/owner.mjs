@@ -3,7 +3,7 @@
 // (standing limits) and owner-signed single-use task capabilities (one per intended payment).
 // The owner's issuance log is the independent verifier's ground truth of "authorized".
 import { randomUUID } from 'node:crypto';
-import { appendFileSync, closeSync, fstatSync, openSync, readSync, constants as C } from 'node:fs';
+import { closeSync, fstatSync, openSync, readSync, writeSync, constants as C } from 'node:fs';
 import { V2_DOMAINS, newSigner, makeSigner } from '../common/crypto.mjs';
 import { POLICY_V, CAP_V, REVOKE_V, UNFREEZE_V } from '../sensitive/statements.mjs';
 
@@ -22,7 +22,19 @@ export class OwnerSimulator {
     const signers = Object.fromEntries(Object.entries(map).map(([k, v]) => [k, makeSigner(v, k)]));
     return new OwnerSimulator({ signers, now, logPath });
   }
-  #log(r) { if (this.logPath) appendFileSync(this.logPath, JSON.stringify(r) + '\n', { mode: 0o600 }); }
+  // Writer side of the issuance log (PR #28 condition on #24): append through one O_NOFOLLOW descriptor, so a symlink
+  // planted at logPath is refused (OWNER_LOG_SYMLINK) instead of diverting the issuance record into its target.
+  #log(r) {
+    if (!this.logPath) return;
+    let fd;
+    try { fd = openSync(this.logPath, C.O_WRONLY | C.O_APPEND | C.O_CREAT | (C.O_NOFOLLOW ?? 0), 0o600); }
+    catch (e) { if (e.code === 'ELOOP') { const err = new Error('OWNER_LOG_SYMLINK'); err.code = 'OWNER_LOG_SYMLINK'; throw err; } throw e; }
+    try {
+      if (!fstatSync(fd).isFile()) { const err = new Error('OWNER_LOG_NOT_A_FILE'); err.code = 'OWNER_LOG_NOT_A_FILE'; throw err; }
+      const buf = Buffer.from(JSON.stringify(r) + '\n'); let off = 0;
+      while (off < buf.length) off += writeSync(fd, buf, off, buf.length - off);
+    } finally { closeSync(fd); }
+  }
   /** Read-only view of an issuance log written by another supervisor process (same OS principal). */
   static view(logPath) {
     const v = { issued: new Map(), revoked: new Map(), policies: new Map(), offset: 0,
