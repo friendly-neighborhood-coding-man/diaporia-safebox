@@ -146,9 +146,11 @@ export class RealAuthenticator {
       try { d = this.bridge.call('create', { rpId, challenge: b64u(challenge), userId: b64u(randomBytes(16)), userName: 'SafeBox ' + this.label }, this.bridge.display); break; }
       catch (e) {
         // a syncable passkey is refused by the page itself (nothing registered); let the owner retry twice
-        if (i >= 3 || !String(e.detail ?? e.message).includes('SYNCABLE_PASSKEY_REFUSED')) throw e;
+        const why = String(e.detail ?? e.message);
+        // retry (owner-visible) on a syncable passkey or a cancelled / timed-out OS prompt; an explicit Decline ends it
+        if (i >= 3 || !/SYNCABLE_PASSKEY_REFUSED|NotAllowedError|AbortError/.test(why)) throw e;
         this.refused.push({ at: new Date().toISOString(), detail: String(e.detail ?? e.message).slice(0, 120) });
-        this.bridge.notice?.('The last passkey was saved in a syncing password manager and was refused. Approve the request again and choose Windows Hello / this device.');
+        this.bridge.notice?.(why.includes('SYNCABLE') ? 'The last passkey was saved in a syncing password manager and was refused. Approve the request again and choose Windows Hello / this device.' : `The Windows Hello prompt was cancelled or timed out (attempt ${i} of 3). Approve the request again when ready.`);
       }
     }
     this.bridge.notice?.(null);
@@ -157,7 +159,14 @@ export class RealAuthenticator {
   }
   assert({ rpId, challenge }) {
     if (!this.credentialIdB64u) fail('REAL_AUTHENTICATOR_NOT_REGISTERED');
-    const d = this.bridge.call('get', { rpId, challenge: b64u(challenge), credentialId: this.credentialIdB64u }, this.bridge.display);
+    let d;
+    for (let i = 1; ; i++) {
+      try { d = this.bridge.call('get', { rpId, challenge: b64u(challenge), credentialId: this.credentialIdB64u }, this.bridge.display); break; }
+      catch (e) { const why = String(e.detail ?? e.message); if (i >= 3 || !/NotAllowedError|AbortError/.test(why)) throw e;
+        this.refused.push({ at: new Date().toISOString(), detail: why.slice(0, 120) });
+        this.bridge.notice?.(`The Windows Hello prompt was cancelled or timed out (attempt ${i} of 3). Approve the request again when ready.`); }
+    }
+    this.bridge.notice?.(null);
     this.ceremonies.push({ op: 'get', at: new Date().toISOString(), what: this.bridge.display.split('\n')[0] });
     return { credentialId: d.credentialId, authenticatorData: d.authenticatorData, clientDataJSON: d.clientDataJSON, signature: d.signature };
   }
