@@ -3,6 +3,7 @@
 // csLines/csAmount are 1:1 ports of WinBioGate.cs Lines() and AddAmount() (the C# cannot run in this container).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { promptOf, PROMPT_MAX } from '../../src/v6/device/winbio-gate.mjs';
 import { buildV6 } from './helpers6.mjs';
 import { paymentSummary } from '../../src/v6/vault/payment-approval.mjs';
@@ -38,7 +39,7 @@ test('P0.1-helper: a helper build that does not report the post-MATCH owner conf
   const { mkdtempSync } = await import('node:fs'); const { tmpdir } = await import('node:os'); const { join } = await import('node:path');
   const { WinBioGate } = await import('../../src/v6/device/winbio-gate.mjs');
   process.env.FAKE_WINBIO_KEYFILE = join(mkdtempSync(join(tmpdir(), 'wb-')), 'k.pem'); delete process.env.FAKE_WINBIO_OUTCOME;
-  const g = new WinBioGate({ credId: 'k2-laptop', exe: [process.execPath, new URL('./fixtures/fake-winbio-helper.mjs', import.meta.url).pathname] });
+  const g = new WinBioGate({ credId: 'k2-laptop', exe: [process.execPath, fileURLToPath(new URL('./fixtures/fake-winbio-helper.mjs', import.meta.url))] });
   const w = buildV6({ fingerprintOnly: ['k2-laptop'], gates: { 'k2-laptop': g } });
   process.env.FAKE_WINBIO_OLD_HELPER = '1';
   try {

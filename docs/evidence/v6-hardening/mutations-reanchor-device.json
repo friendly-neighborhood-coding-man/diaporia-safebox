@@ -1,0 +1,31 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 2,
+ "total": 2,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "Device: signs a prepared command that differs from its own rebuild",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt",
+    "B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)"
+   ]
+  },
+  {
+   "name": "Device: prepared grant not checked against Root-pinned issuer",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt",
+    "device: a prepared challenge not signed by the Root-pinned issuer is not signed"
+   ]
+  }
+ ]
+}

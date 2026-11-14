@@ -79,8 +79,8 @@ const M = [
   ['Console: approval not checked against prepared challenge', CON, "if (canon(ap.grant ?? null) !== canon(prop.grant)) deny(403, 'APPROVAL_NOT_FOR_PREPARED_CHALLENGE');", ''],
   ['Console: direct FREEZE may forge an emergency reason', CON, "if (String(b.reason ?? '').startsWith('EMERGENCY_FREEZE')) deny(400, 'USE_EMERGENCY_FREEZE_FLOW');", ''],
   // owner device
-  ['Device: signs a prepared command that differs from its own rebuild', KIT, "if (canon(statement) !== canon(command)) { this.gateErrors.push({ credId, code: 'PREPARED_COMMAND_MISMATCH' }); return null; }", ''],
-  ['Device: prepared grant not checked against Root-pinned issuer', KIT, "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_NOT_ROOT_PINNED' }); return null; }", ''],
+  ['Device: signs a prepared command that differs from its own rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
+  ['Device: prepared grant not checked against Root-pinned issuer', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],
   // V6 verifier
   ['Verifier6: missing owner approval not flagged', VER6, "if (!x || x.payment_id !== paymentId) codes.push('OWNER_APPROVAL_MISSING');", ''],
   ['Verifier6: reused challenge not flagged', VER6, "if (nonces.has(r.nonce) && nonces.get(r.nonce) !== capId) codes.push('OWNER_APPROVAL_CHALLENGE_REUSED');", ''],
