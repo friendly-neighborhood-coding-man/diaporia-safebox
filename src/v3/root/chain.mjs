@@ -201,7 +201,10 @@ export function genesisState(gen, { pinnedChainId = null } = {}) {
   if (pinnedChainId && chainId !== pinnedChainId) fail('GENESIS_NOT_PINNED');
   const b = exactFields(a.body, ['rp', 'config', 'matrix', 'capsule', 'channels', 'credentials', 'guardians', 'identityVerifiers', 'registrars', 'serviceKeys'], [], 'GENESIS_BODY');
   exactFields(b.rp, ['rpId', 'origin'], [], 'GENESIS_RP');
-  if (!/^[a-z0-9.-]{3,64}$/.test(b.rp.rpId) || b.rp.origin !== 'https://' + b.rp.rpId) fail('GENESIS_RP');
+  // V6 closeout: the WebAuthn loopback exception (rpId "localhost", origin http://localhost:<port>, a secure context in
+  // every browser) so a REAL platform authenticator can be enrolled for local device runs. Any other RP stays https-only.
+  const loopbackRp = b.rp.rpId === 'localhost' && /^http:\/\/localhost:[1-9][0-9]{1,4}$/.test(b.rp.origin);
+  if (!/^[a-z0-9.-]{3,64}$/.test(b.rp.rpId) || (b.rp.origin !== 'https://' + b.rp.rpId && !loopbackRp)) fail('GENESIS_RP');
   const matrix = parseMatrix(b.matrix); const capsule = parseCapsule(b.capsule); parseConfig(b.config);
   if (capsule.accountId !== a.accountId) fail('GENESIS_CAPSULE_ACCOUNT');
   const keyMap = (o, code) => { const m = {}; for (const [k, v] of Object.entries(o)) { id(k, code); exactFields(v, ['publicKey', 'holderId'], [], code); if (!v.publicKey.startsWith(ED_PREFIX)) fail(code); id(v.holderId, code); m[k] = { ...v, status: 'active' }; } return m; };

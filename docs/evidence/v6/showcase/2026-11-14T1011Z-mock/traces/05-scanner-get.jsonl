@@ -1,0 +1,4 @@
+{"n":57,"clip":"05-scanner-get","at":"2026-11-14T10:12:27.853Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"INFO","text":"state digest before: 7f3e6a269be6764b…"}
+{"n":58,"clip":"05-scanner-get","at":"2026-11-14T10:12:27.854Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"INFO","text":"6 scanner GET/HEAD requests sent"}
+{"n":59,"clip":"05-scanner-get","at":"2026-11-14T10:12:30.119Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"state digest after:  7f3e6a269be6764b… (frozen=false)"}
+{"n":60,"clip":"05-scanner-get","at":"2026-11-14T10:12:30.119Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: visiting the link changed nothing and froze nothing"}

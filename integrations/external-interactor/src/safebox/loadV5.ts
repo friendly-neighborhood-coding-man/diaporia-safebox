@@ -39,7 +39,9 @@ export interface V3Capsule {
 }
 export interface V3Canon { canon(o: unknown): string }
 
-export interface V5Modules { holds: V5Holds; chain: V5Chain; capsule: V3Capsule; canon: V3Canon }
+/** V6 (security closeout): per-transaction owner approval binding. Only the pure taskRef derivation is used here. */
+export interface V6PaymentApproval { taskRefFor(binding: Record<string, string>): string; BINDING_V: string }
+export interface V5Modules { holds: V5Holds; chain: V5Chain; capsule: V3Capsule; canon: V3Canon; v6pa: V6PaymentApproval }
 
 let cached: Promise<V5Modules> | null = null;
 export function loadV5(): Promise<V5Modules> {
@@ -48,6 +50,7 @@ export function loadV5(): Promise<V5Modules> {
     chain: await imp<V5Chain>("src/v5/root/chain.mjs"),
     capsule: await imp<V3Capsule>("src/v3/root/capsule.mjs"),
     canon: await imp<V3Canon>("src/v3/common/canon.mjs"),
+    v6pa: await imp<V6PaymentApproval>("src/v6/vault/payment-approval.mjs"),
   }))();
   return cached;
 }

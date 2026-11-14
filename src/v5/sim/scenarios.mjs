@@ -75,7 +75,7 @@ export async function scenarioA({ payments = 30, everyMs = 20_000, amount = near
 }
 
 /** Scenario B — the genuine owner needs the same high-volume pattern; Rapid-Use with ORC + separate owner key. */
-export async function scenarioB({ payments = 30, everyMs = 20_000, amount = near(0.05), ownerResponseMs = 10 * MIN, multiOwner = false } = {}) {
+export async function scenarioB({ payments = 30, everyMs = 20_000, amount = near(0.05), ownerResponseMs = 10 * MIN, multiOwner = false, ownerReviewsAfterEnd = true } = {}) {
   const w = multiOwner ? buildV5({ ownerWorld: multiOwnerWorld({ t0: T0, admins: ['alice', 'bob', 'carol', 'dave'] }) }) : buildV5();
   const payer = multiOwner ? 'alice-admin' : 'k1-phone';
   const out = { scenario: multiOwner ? 'B-multi' : 'B', desc: 'genuine urgent high-volume spending', params: { payments, everyMs, amount, ownerResponseMs, multiOwner }, steps: {} };
@@ -101,6 +101,12 @@ export async function scenarioB({ payments = 30, everyMs = 20_000, amount = near
   // back to standard protection: the same pattern is delayed again
   const after = [];
   for (let k = 0; k < 4; k++) { const r = await w.pay({ credId: payer, amountYocto: amount }); after.push(r.ok ? r.result.anomaly : r.error.code); await w.advance(everyMs, everyMs); }
+  // V5.1 (P1): the owner is present, so they resolve the delayed after-end payments with a trusted LEGITIMATE review
+  // (without it, HIGH-risk payments expire unsettled at the end of their delay and need renewed authorization)
+  const pend = w.vault.v5payments().filter(p => p.state === 'BUFFERED' && p.anomaly === 'ANOMALY_PAYMENT_DELAY' && p.incident_id);
+  const incs = [...new Set(pend.map(p => p.incident_id))];
+  out.steps.reviewAfterEnd = [];
+  if (ownerReviewsAfterEnd) for (const id of incs) out.steps.reviewAfterEnd.push(r2(await w.cmd('INCIDENT_REVIEW', { incidentId: id, credId: payer, verdict: 'LEGITIMATE', evidenceDigest: 'c'.repeat(64) }, multiOwner ? ['bob-admin', 'carol-admin'] : ['k3-root-hw'])));
   await w.advance(26 * H, 10 * MIN);
   const all = payStats(w);
   out.metrics = { legitimateProposed: all.proposed, legitimateSettled: all.settled, completionRate: all.settled / Math.max(1, all.proposed), attemptsDeniedAtProposal: Object.values(denied).reduce((a, b) => a + b, 0), completionRateOfAttempts: all.settled / Math.max(1, all.proposed + Object.values(denied).reduce((a, b) => a + b, 0)), settledWithin15MinOfActivation: during.settled,

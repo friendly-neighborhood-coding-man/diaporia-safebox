@@ -1,0 +1,5 @@
+{"n":41,"clip":"01-stolen-mcp-token","at":"2026-11-14T10:12:15.795Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"AI","text":"Thief replays the owner's OAuth access token from another host."}
+{"n":42,"clip":"01-stolen-mcp-token","at":"2026-11-14T10:12:15.803Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"AI","text":"thief prepare_payment -> AWAITING_OWNER_APPROVAL (an approval REQUEST only)"}
+{"n":43,"clip":"01-stolen-mcp-token","at":"2026-11-14T10:12:15.831Z","mockTime":"2026-11-14T00:55:00.000Z","kind":"DENY","text":"thief calls a signing tool: SDK_VALIDATION (tools available: get_safebox_status, check_payment, prepare_payment, get_payment_status)"}
+{"n":44,"clip":"01-stolen-mcp-token","at":"2026-11-14T10:12:15.842Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"after 40 min: request EXPIRED, settledVerified=false"}
+{"n":45,"clip":"01-stolen-mcp-token","at":"2026-11-14T10:12:15.842Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: without the owner device nothing is approved or settled"}

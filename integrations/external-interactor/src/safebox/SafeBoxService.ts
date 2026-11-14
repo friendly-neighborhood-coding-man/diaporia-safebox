@@ -363,7 +363,20 @@ export class SafeBoxService {
     if (cap.accountId !== r.vaultAccountId || cap.chainId !== r.chainId) mismatch.push("account");
     if (cap.epoch !== r.epoch) mismatch.push("epoch");
     if (cap.purposeId !== r.purposeId || cap.purposeVersion !== r.purposeVersion) mismatch.push("purpose");
-    if (cap.taskRef !== SafeBoxService.taskRefFor(r.requestDigest)) mismatch.push("taskRef(requestDigest)");
+    const v6 = signed.approval.v6;
+    if (v6 !== undefined) {
+      // V6 per-transaction owner approval: the binding names THIS request (id + digest) and the capability's taskRef is
+      // derived from the binding, so one device signature covers request, amount, recipient, asset, Purpose, Epoch,
+      // credential, policy version and expiry. The Vault re-verifies the binding, the one-time challenge and the gate.
+      const b = v6 && typeof v6 === "object" ? v6.binding : null;
+      if (!b || typeof b !== "object" || b.v !== this.v5.v6pa.BINDING_V) mismatch.push("v6.binding");
+      else {
+        if (b.requestId !== r.requestId) mismatch.push("v6.requestId");
+        if (b.requestDigest !== r.requestDigest) mismatch.push("v6.requestDigest");
+        if (b.recipientId !== r.recipientId || b.amountYocto !== r.amountYocto || b.asset !== r.asset) mismatch.push("v6.payment");
+        if (cap.taskRef !== this.v5.v6pa.taskRefFor(b)) mismatch.push("taskRef(v6.binding)");
+      }
+    } else if (cap.taskRef !== SafeBoxService.taskRefFor(r.requestDigest)) mismatch.push("taskRef(requestDigest)");
     if (typeof cap.capId !== "string" || !/^[0-9a-f-]{36}$/.test(cap.capId)) mismatch.push("capId");
     if (mismatch.length) { this.event(requestId, now, "OWNER_SUBMIT_MISMATCH", { fields: mismatch }); throw new InteractorError("CAPABILITY_MISMATCH", "The signed capability does not match this approval request", { fields: mismatch }); }
     // One-use: only one submission can move the request out of AWAITING.

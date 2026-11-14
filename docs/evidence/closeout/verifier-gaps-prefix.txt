@@ -1,0 +1,96 @@
+TAP version 13
+# Subtest: E1: a vault that hides an open incident in its final 15 minutes is flagged (ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT)
+not ok 1 - E1: a vault that hides an open incident in its final 15 minutes is flagged (ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT)
+  ---
+  duration_ms: 408.412202
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(codes(await verifyWorld(w)).includes('ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:29:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: E1 control: the honest vault delays the same payment and verifies clean
+ok 2 - E1 control: the honest vault delays the same payment and verifies clean
+  ---
+  duration_ms: 302.307132
+  type: 'test'
+  ...
+# Subtest: E3: with two open incidents, a decision bound to the OLDER one (borrowing its review) is flagged
+not ok 3 - E3: with two open incidents, a decision bound to the OLDER one (borrowing its review) is flagged
+  ---
+  duration_ms: 1708.95175
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:54:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(codes(await verifyWorld(w)).includes('ENGINE_DECISION_ON_OLDER_OPEN_INCIDENT'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:57:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E3 control: the honest vault binds the newest incident; the review of the older one does not release it
+ok 4 - E3 control: the honest vault binds the newest incident; the review of the older one does not release it
+  ---
+  duration_ms: 1948.878115
+  type: 'test'
+  ...
+# Subtest: Rapid-Use: a vault applying a grant beyond its session cap is flagged (only cap-covered payments verify)
+not ok 5 - Rapid-Use: a vault applying a grant beyond its session cap is flagged (only cap-covered payments verify)
+  ---
+  duration_ms: 341.242062
+  type: 'test'
+  location: '/home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:77:1'
+  failureType: 'testCodeFailure'
+  error: '[]'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/diaporia-safebox/tests/v6/verifier-gaps.test.mjs:81:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Rapid-Use control: the honest vault accelerates exactly the cap (3 x 0.01) and verifies clean
+ok 6 - Rapid-Use control: the honest vault accelerates exactly the cap (3 x 0.01) and verifies clean
+  ---
+  duration_ms: 354.624403
+  type: 'test'
+  ...
+# Subtest: Rapid-Use: per-payment maximum and asset are part of the grant scope
+ok 7 - Rapid-Use: per-payment maximum and asset are part of the grant scope
+  ---
+  duration_ms: 289.982193
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 4
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5609.663055

@@ -1,0 +1,3 @@
+{"n":61,"clip":"06-phishing-origin","at":"2026-11-14T10:12:35.398Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"browser on the look-alike origin: Browser refused: SecurityError: This is an invalid domain."}
+{"n":62,"clip":"06-phishing-origin","at":"2026-11-14T10:12:35.414Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"DENY","text":"assertion produced on the phishing origin, relayed to SafeBox: WEBAUTHN_ORIGIN_MISMATCH"}
+{"n":63,"clip":"06-phishing-origin","at":"2026-11-14T10:12:35.414Z","mockTime":"2026-11-14T01:35:00.000Z","kind":"OK","text":"CHECK PASS: origin-bound WebAuthn: a phished assertion is useless"}

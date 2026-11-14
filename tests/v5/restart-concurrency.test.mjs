@@ -59,8 +59,15 @@ test('two Root writers on one store: the second append is a fork and is refused 
 test('concurrent payment proposals: the pending limit and Purpose limits hold under Promise.all', async () => {
   const w = buildV5();
   const rs = await Promise.all(Array.from({ length: 25 }, () => w.pay({ amountYocto: Y(5) })));
-  assert.equal(rs.filter(r => r.ok).length, 16);
-  assert.ok(rs.filter(r => !r.ok).every(r => /PENDING_COUNT_LIMIT/.test(r.error.detail ?? r.error.code)));
+  // one flow: the burst opens an incident, after which the flow may hold at most 8 pending payments (V5.1 repair)
+  assert.equal(rs.filter(r => r.ok).length, 8);
+  assert.ok(rs.filter(r => !r.ok).every(r => /INCIDENT_FLOW_PENDING_LIMIT/.test(r.error.detail ?? r.error.code)));
+  // two flows concurrently: the global 16-slot limit still holds
+  const w2 = buildV5();
+  const r2 = await Promise.all(Array.from({ length: 25 }, (_, i) => w2.pay({ credId: i % 2 ? 'k1-phone' : 'k2-laptop', amountYocto: Y(5) })));
+  assert.ok(r2.filter(r => r.ok).length <= 16);
+  assert.ok(w2.vault.v5payments().filter(p => ['BUFFERED', 'RELEASED', 'UNKNOWN'].includes(p.state)).length <= 16);
+  assert.ok(r2.filter(r => !r.ok).every(r => /PENDING_COUNT_LIMIT|INCIDENT_FLOW_PENDING_LIMIT/.test(r.error.detail ?? r.error.code)));
 });
 
 test('concurrent delegated operations with the same sequence number: exactly one is accepted', async () => {

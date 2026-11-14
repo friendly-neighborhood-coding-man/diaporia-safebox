@@ -16,27 +16,30 @@ const seedCommit = () => createHash('sha256').update(randomBytes(32)).digest('he
 
 /** A device holding ONE credential (passkey or external Ed25519 key). */
 export class Device {
-  constructor({ credId, role, holderId, channelId, kind, syncProvider = 'none', backupEligible = false, deviceId = null, seedCommitment = null }) {
+  constructor({ credId, role, holderId, channelId, kind, syncProvider = 'none', backupEligible = false, deviceId = null, seedCommitment = null, rp = RP, authenticator = null }) {
     Object.assign(this, { credId, role, holderId, channelId, kind });
+    this.rp = rp; // the WebAuthn relying party this device's passkey is scoped to (the owner world sets its own RP)
     this.provenance = { deviceId: deviceId ?? ('dev-' + credId + '-' + randomBytes(3).toString('hex')), seedCommitment: seedCommitment ?? seedCommit(), syncProvider };
-    if (kind === 'passkey') this.auth = new SoftAuthenticator({ label: credId, backupEligible });
+    // `authenticator` lets an owner world plug in a different WebAuthn authenticator with the same register/assert API
+    // (V6: a bridge to a REAL platform authenticator in a browser). Default: the software authenticator (simulation).
+    if (kind === 'passkey') this.auth = authenticator ?? new SoftAuthenticator({ label: credId, backupEligible });
     else this.signer = newEdSigner(credId);
     this.lost = false; // a lost device can no longer sign for the owner (it may be in a thief's hands: see stolenBy)
   }
   enrollment(accountId, context) {
     const e = { credId: this.credId, role: this.role, holderId: this.holderId, channelId: this.channelId, kind: this.kind, provenance: { ...this.provenance } };
     const ch = enrollmentChallenge(accountId, e, context);
-    if (this.kind === 'passkey') e.registration = this.auth.register({ ...RP, challenge: ch });
+    if (this.kind === 'passkey') e.registration = this.auth.register({ ...this.rp, challenge: ch });
     else { e.publicKey = this.signer.publicKey; e.pop = this.signer.signDigest(V3_DOMAINS.ENROLL, ch); }
     return e;
   }
   /** Approve ONE action digest. opts let attack tests forge variants (uv false, wrong origin, ...). */
   approve(dig, opts = {}) {
-    if (this.kind === 'passkey') return { credId: this.credId, webauthn: this.auth.assert({ rpId: opts.rpId ?? RP.rpId, origin: opts.origin ?? RP.origin, challenge: dig, uv: opts.uv ?? true, up: opts.up ?? true, type: opts.type }) };
+    if (this.kind === 'passkey') return { credId: this.credId, webauthn: this.auth.assert({ rpId: opts.rpId ?? this.rp.rpId, origin: opts.origin ?? this.rp.origin, challenge: dig, uv: opts.uv ?? true, up: opts.up ?? true, type: opts.type }) };
     return { credId: this.credId, sig: this.signer.signDigest(V3_DOMAINS.ACTION, dig) };
   }
   approvePaycap(dig, opts = {}) {
-    if (this.kind === 'passkey') return { credId: this.credId, webauthn: this.auth.assert({ rpId: opts.rpId ?? RP.rpId, origin: opts.origin ?? RP.origin, challenge: dig, uv: opts.uv ?? true }) };
+    if (this.kind === 'passkey') return { credId: this.credId, webauthn: this.auth.assert({ rpId: opts.rpId ?? this.rp.rpId, origin: opts.origin ?? this.rp.origin, challenge: dig, uv: opts.uv ?? true }) };
     return { credId: this.credId, sig: this.signer.signDigest(V3_DOMAINS.PAYCAP, dig) };
   }
 }
@@ -56,8 +59,8 @@ export function defaultCapsule(t0, over = {}) {
  * key (RECOVERY); 3 guardians, 2 identity verifiers, 1 registrar, owner channels. profile 'multi-admin': 3 admins.
  */
 export class OwnerWorld {
-  constructor({ t0, profile = 'personal', config = {}, capsule = {}, guardians = 3, devices = null } = {}) {
-    this.t0 = t0; this.profile = profile;
+  constructor({ t0, profile = 'personal', config = {}, capsule = {}, guardians = 3, devices = null, rp = RP, authenticators = {} } = {}) {
+    this.t0 = t0; this.profile = profile; this.rp = Object.freeze({ rpId: rp.rpId, origin: rp.origin });
     this.channels = {}; this.channelKeys = {};
     const ch = (cid, holderId) => { const k = newEdSigner('ch-' + cid); this.channels[cid] = { publicKey: k.publicKey, holderId }; this.channelKeys[cid] = k; return cid; };
     if (profile === 'personal') {
@@ -80,6 +83,7 @@ export class OwnerWorld {
         new Device({ credId: 'ops-recovery', role: 'RECOVERY', holderId: 'ops', channelId: 'ch-ops', kind: 'ed25519' }),
       ];
     }
+    for (const d of this.devices) { d.rp = this.rp; if (d.kind === 'passkey' && authenticators[d.credId]) d.auth = authenticators[d.credId]; } // V6: real-authenticator bridge per credential
     this.guardianKeys = {}; this.guardians = {};
     for (let i = 1; i <= guardians; i++) { const k = newEdSigner('g' + i); this.guardianKeys['g' + i] = k; this.guardians['g' + i] = { publicKey: k.publicKey, holderId: 'guardian-' + i }; }
     this.idvKeys = { 'idv-1': newEdSigner('idv-1'), 'idv-2': newEdSigner('idv-2') };
@@ -93,7 +97,7 @@ export class OwnerWorld {
   genesis() {
     const n = mkNonce();
     const action = { v: ACTION_V, type: 'GENESIS', accountId: ACCOUNT, nonce: n, issuedAt: iso(this.t0), body: {
-      rp: { ...RP }, config: { ...this.config }, matrix: this.matrix, capsule: this.capsule, channels: this.channels,
+      rp: { ...this.rp }, config: { ...this.config }, matrix: this.matrix, capsule: this.capsule, channels: this.channels,
       credentials: this.devices.map(d => d.enrollment(ACCOUNT, 'genesis:' + n)),
       guardians: this.guardians, identityVerifiers: Object.fromEntries(Object.entries(this.idvKeys).map(([k, v]) => [k, { publicKey: v.publicKey, holderId: k }])),
       registrars: Object.fromEntries(Object.entries(this.registrarKeys).map(([k, v]) => [k, { publicKey: v.publicKey, holderId: k }])),
@@ -127,7 +131,7 @@ export class OwnerWorld {
       nonce: mkNonce(), issuedAt: iso(t), expiresAt: iso(t + ttlMs), ...over };
     return { capability: cap, approval: this.dev(credId).approvePaycap(paycapDigest(cap), { uv }) };
   }
-  newDevice(spec) { const d = new Device(spec); this.devices.push(d); return d; }
+  newDevice(spec) { const d = new Device({ rp: this.rp, ...spec }); this.devices.push(d); return d; }
 }
 
 /** Transition envelope helper. */

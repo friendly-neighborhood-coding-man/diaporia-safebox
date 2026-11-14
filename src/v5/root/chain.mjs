@@ -34,7 +34,16 @@ export const V5_DEFAULT_CONFIG = Object.freeze({
   rapidActivationsPer7d: '3',
   delegationMaxTtlMs: String(7 * D),
   delegationMaxUses: '500',
+  // V5.1 (P2): owner-signed maximum settlement horizon. A payment authorization (capability / delegated operation) must be
+  // CONSUMED before its own expiresAt (submission deadline); once consumed and reserved, the vault may settle it no later
+  // than issuedAt + settlementHorizonMs. Every owner device and the ORC sign this value in the genesis extension; no
+  // delay, review or Rapid-Use can move a payment past it (the vault and the verifier enforce it independently).
+  settlementHorizonMs: String(26 * H),
+  // V5.1 (P4): owner-signed settlement-buffer policy. FIXED_600 = the V5 fixed 10-minute buffer (Control A);
+  // EXP_30 = bufferSeconds(n) = min(600, 30 * 2^n) with a deterministic bounded risk tier n (Candidate B, experimental).
+  bufferPolicy: 'FIXED_600',
 });
+export const BUFFER_POLICIES = Object.freeze(['FIXED_600', 'EXP_30', 'EXP_30_HV']); // EXP_30_HV: exploratory variant only
 const CFG5 = Object.keys(V5_DEFAULT_CONFIG);
 /** Predefined deterministic Risk-Policy-Engine rules that may END a Rapid-Use grant (they can never start or extend one). */
 export const ENGINE_RAPID_RULES = Object.freeze(['R1_SCOPE_EXPLOIT', 'R2_CREDENTIAL_RESTRICTED', 'R3_VELOCITY_CEILING']);
@@ -42,10 +51,12 @@ const OWNER_ROLES_PERSONAL = new Set(['DAILY', 'ROOT', 'RECOVERY']);
 
 function parseV5Config(c) {
   exactFields(c, CFG5, [], 'V5_CONFIG_FIELDS');
-  const n = Object.fromEntries(CFG5.map(k => [k, Number(uint(c[k], k))]));
+  if (!BUFFER_POLICIES.includes(c.bufferPolicy)) fail('V5_CONFIG_BUFFER_POLICY');
+  const n = Object.fromEntries(CFG5.filter(k => k !== 'bufferPolicy').map(k => [k, Number(uint(c[k], k))]));
   if (n.provisionalMaxMs > 48 * H || n.quarantineMaxMs > 7 * D || n.provisionalMaxMs < H) fail('V5_CONFIG_HOLD_DURATIONS');
   if (n.rapidMaxMs > 24 * H || n.rapidMaxMs < 600_000) fail('V5_CONFIG_RAPID_MAX_24H');
   if (n.issuerBudgetMs < n.provisionalMaxMs) fail('V5_CONFIG_ISSUER_BUDGET');
+  if (n.settlementHorizonMs < H || n.settlementHorizonMs > 72 * H) fail('V5_CONFIG_SETTLEMENT_HORIZON', 'between 1 h and 72 h');
   return { ...c };
 }
 
