@@ -29,7 +29,11 @@ export class ExecutionVaultV6 extends ExecutionVaultV5 {
     const appr = args?.approval;
     let v6, inner = args;
     if (appr && typeof appr === 'object' && !Array.isArray(appr) && 'v6' in appr) { const { v6: x, ...rest } = appr; v6 = x; inner = { ...args, approval: rest }; }
-    const needs = this.policy6().payment.mode === 'PER_TRANSACTION' || v6 !== undefined;
+    const strict = this.policy6().payment.mode === 'PER_TRANSACTION' || v6 !== undefined;
+    // P0.1 review fix: a fingerprint-only credential ALWAYS needs its V6 approval (binding + challenge + gate), also
+    // under LEGACY_V5, where UV credentials keep the V5 behaviour
+    const fpCreds = this.policy6().fingerprintOnlyCreds;
+    const needs = strict || fpCreds.length > 0;
     let pre = null;
     if (needs) {
       try {
@@ -37,8 +41,10 @@ export class ExecutionVaultV6 extends ExecutionVaultV5 {
         if (this.rootAlarm()) fail('ROOT_INTEGRITY_ALARM');
         const floor = (c) => this.store.db.prepare('SELECT n FROM sign_floor WHERE cred_id=?').get(c)?.n ?? 0;
         const v = verifyPaycap(this.root, { capability: inner?.capability, approval: inner?.approval }, { now: this.now(), signCountFloor: floor });
-        pre = verifyPaymentApproval(this.root, { cap: v.cap, credId: v.credId, v6 }, this.now());
-        if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');
+        if (strict || fpCreds.includes(v.credId)) {
+          pre = verifyPaymentApproval(this.root, { cap: v.cap, credId: v.credId, v6 }, this.now());
+          if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');
+        }
       } catch (e) {
         this.store.decision('gz', 'PROPOSE', 'DENY', [e.code ?? 'INVALID'], args?.capability?.capId ?? null);
         try { this.journal?.writer('VAULT').attempt({ type: 'OWNER_APPROVAL_REJECTED', principal: '-', outcome: String(e.code ?? 'INVALID') }); } catch {}
@@ -65,6 +71,7 @@ export class ExecutionVaultV6 extends ExecutionVaultV5 {
       // an owner paycap reaching the V3 core without the V6 pre-verification is impossible by construction under
       // PER_TRANSACTION; fail closed instead of committing a payment with no approval evidence
       if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');
+      if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');
       return;
     }
     if (p.capId !== ctx.cap.capId) fail('V6_APPROVAL_CONTEXT_MISMATCH');

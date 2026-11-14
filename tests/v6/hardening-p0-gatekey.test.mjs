@@ -99,3 +99,24 @@ test('P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-o
     (e) => e.code === 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE');
   assert.equal(w.gates['k2-laptop'].log.length, 0);
 });
+
+// independent review of 9e230d2 (MEDIUM): with payment.mode LEGACY_V5 the Vault skipped the V6 layer entirely, so a
+// fingerprint-only credential paid with a UV passkey assertion alone (no gate), even under HIGH_ASSURANCE.
+for (const fingerprintAssurance of ['LOCAL_GATE', 'HIGH_ASSURANCE']) {
+  test(`P0.1-legacy (${fingerprintAssurance}): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5`, async () => {
+    const w = buildV6({ fingerprintOnly: ['k2-laptop'], policy6: { fingerprintAssurance, payment: { mode: 'LEGACY_V5', approvalTtlMs: String(5 * 60_000) } } });
+    // the V5 paycap alone (UV passkey assertion, no binding, no gate) is refused
+    const r = await w.v5pay({ credId: 'k2-laptop', amountYocto: Y(1) });
+    assert.equal(r.ok, false, 'paid: ' + JSON.stringify(r.result ?? r.error));
+    assert.match(r.error.code + ':' + (r.error.detail ?? ''), /V6_PAYMENT_APPROVAL_REQUIRED/);
+    assert.equal(w.vault.v5payments().length, 0);
+    // the V6 ceremony: LOCAL_GATE pays with the gate, HIGH_ASSURANCE fails closed before any prompt
+    const v6 = await w.pay({ credId: 'k2-laptop', amountYocto: Y(1) });
+    if (fingerprintAssurance === 'LOCAL_GATE') { ok(v6); assert.equal(w.vault.v6evidence().at(-1).level, 'LOCAL_FINGERPRINT_GATE_PASSED'); }
+    else { assert.equal(v6.ok, false); assert.equal(w.gates['k2-laptop'].log.length, 0); }
+    // UV credentials keep the legacy V5 behaviour
+    const before = w.vault.v5payments().length;
+    ok(await w.pay({ credId: 'k1-phone', amountYocto: Y(1) }));
+    assert.equal(w.vault.v5payments().length, before + 1);
+  });
+}
