@@ -46,6 +46,13 @@ export function coseToSpki(cose) {
     const k = createPublicKey({ key: { kty: 'OKP', crv: 'Ed25519', x: b64u(x) }, format: 'jwk' });
     return { alg: 'EdDSA', spki: b64u(k.export({ format: 'der', type: 'spki' })) };
   }
+  // V6 closeout: RSA (alg -257, RS256 / RSASSA-PKCS1-v1_5 SHA-256), which Windows Hello platform authenticators may use
+  if (kty === 3 && alg === -257) {
+    const n = cose.get(-1), e = cose.get(-2);
+    if (!Buffer.isBuffer(n) || !Buffer.isBuffer(e) || n.length < 256 || n.length > 512 || e.length < 1 || e.length > 8) fail('WEBAUTHN_COSE');
+    const k = createPublicKey({ key: { kty: 'RSA', n: b64u(n), e: b64u(e) }, format: 'jwk' });
+    return { alg: 'RS256', spki: b64u(k.export({ format: 'der', type: 'spki' })) };
+  }
   fail('WEBAUTHN_UNSUPPORTED_ALG');
 }
 
@@ -80,7 +87,7 @@ export function verifyRegistration({ attestationObject, clientDataJSON }, { rp, 
   if (fmt === 'packed') {
     const st = att.get('attStmt');
     if (st.has('x5c')) fail('WEBAUTHN_ATTESTATION_CERT_UNSUPPORTED'); // full attestation chains are out of scope (no trust anchors)
-    if ((st.get('alg') === -7 ? 'ES256' : st.get('alg') === -8 ? 'EdDSA' : null) !== key.alg) fail('WEBAUTHN_ATTESTATION_ALG');
+    if ((st.get('alg') === -7 ? 'ES256' : st.get('alg') === -8 ? 'EdDSA' : st.get('alg') === -257 ? 'RS256' : null) !== key.alg) fail('WEBAUTHN_ATTESTATION_ALG');
     if (!sigOk(key, Buffer.concat([att.get('authData'), sha256(raw)]), st.get('sig'))) fail('WEBAUTHN_ATTESTATION_SIGNATURE');
     attestation = 'self';
   } else if (fmt !== 'none') fail('WEBAUTHN_ATTESTATION_FORMAT');
@@ -92,7 +99,9 @@ function sigOk(key, data, sig) {
   if (!Buffer.isBuffer(sig)) return false;
   try {
     const pk = createPublicKey({ key: fromB64u(key.spki), format: 'der', type: 'spki' });
-    return key.alg === 'ES256' ? cverify('sha256', data, { key: pk, dsaEncoding: 'der' }, sig) : cverify(null, data, pk, sig);
+    if (key.alg === 'ES256') return cverify('sha256', data, { key: pk, dsaEncoding: 'der' }, sig);
+    if (key.alg === 'RS256') return pk.asymmetricKeyType === 'rsa' && pk.asymmetricKeyDetails.modulusLength >= 2048 && cverify('sha256', data, pk, sig);
+    return cverify(null, data, pk, sig);
   } catch { return false; }
 }
 
