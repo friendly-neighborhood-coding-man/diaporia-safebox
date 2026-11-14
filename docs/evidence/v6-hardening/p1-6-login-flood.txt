@@ -1,0 +1,8 @@
+# P1.6 pre-fix (console.mjs at ee18ad1)
+not ok 1 - P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in
+  error: 'pending logins grew to 20000'
+ok 2 - P1.6-login-race: a flood running BETWEEN the owner's login start and finish cannot evict the owner's pending login below the cap
+# post-fix
+ok 1 - P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in
+ok 2 - P1.6-login-race: a flood running BETWEEN the owner's login start and finish cannot evict the owner's pending login below the cap
+ok 3 - P1.6-residual: more than PENDING_LOGINS_MAX starts between the owner's start and finish evict the owner's pending login (fails closed; the owner retries)

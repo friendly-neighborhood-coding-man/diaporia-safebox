@@ -43,6 +43,7 @@ class HttpError extends Error { constructor(status, code, detail = '') { super(c
 const deny = (status, code, detail) => { throw new HttpError(status, code, detail); };
 const eq = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 
+export const PENDING_LOGINS_MAX = 1024, AUDIT_MAX = 5000;
 export class OwnerConsole {
   /**
    * deps: { origin, rootState(), submit(req) -> env, challenge (Root-pinned ChallengeService), buildAction(type, body, opts),
@@ -60,7 +61,12 @@ export class OwnerConsole {
     this.audit = []; // metadata only (no secrets): what was requested, by whom, outcome
   }
   #state() { const s = this.rootState(); return V6.projectState(s, Math.max(this.now(), s.lastAt)); }
-  #log(op, outcome, data = {}) { this.audit.push({ at: iso(this.now()), op, outcome, ...data }); }
+  // P1.6 (issue #14): bounded memory under a request flood. The audit log keeps the newest AUDIT_MAX entries and counts
+  // what it dropped; pending (unauthenticated) logins are capped at PENDING_LOGINS_MAX, oldest dropped first.
+  #log(op, outcome, data = {}) {
+    this.audit.push({ at: iso(this.now()), op, outcome, ...data });
+    if (this.audit.length > AUDIT_MAX) { const n = this.audit.length - AUDIT_MAX + AUDIT_MAX / 5; this.audit.splice(0, n); this.auditDropped = (this.auditDropped ?? 0) + n; }
+  }
 
   // ------------------------------------------------------------------ HTTP-shaped entry point (pure; used by tests and by listen())
   /** req: { method, path, headers (lower-case), body (string) } -> { status, headers, body } */
@@ -151,6 +157,7 @@ export class OwnerConsole {
       issuedAt: iso(t), expiresAt: iso(t + this.loginTtlMs), purpose: 'OWNER_CONSOLE_LOGIN_AUTHORIZES_NOTHING' };
     this.logins.set(loginId, { statement, digest: d6(V6_DOMAINS.SESSION, statement), used: false });
     for (const [k, v] of this.logins) if (Date.parse(v.statement.expiresAt) < t) this.logins.delete(k);
+    while (this.logins.size > PENDING_LOGINS_MAX) this.logins.delete(this.logins.keys().next().value); // oldest first (P1.6)
     this.#log('LOGIN_START', 'ISSUED', { credId: c.credId });
     return { loginId, statement, challengeHex: this.logins.get(loginId).digest.toString('hex'), kind: c.kind, credentialId: c.webauthn?.credentialId ?? null, rpId: s.rp?.rpId ?? null };
   }
