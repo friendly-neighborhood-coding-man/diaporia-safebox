@@ -8,12 +8,24 @@ import { ChallengeService } from '../v4/intent/intent.mjs';
 import { intentDigest } from '../v4/intent/intent.mjs';
 import { OwnerWorldV5, ACCOUNT, Device } from '../v5/kit.mjs';
 import { projectState } from '../v5/root/chain.mjs';
-import { commandDigest } from '../v5/root/command.mjs';
+import { buildCommand, commandDigest } from '../v5/root/command.mjs';
+import { actionDigest } from '../v3/root/chain.mjs';
+import { canon } from '../v3/common/canon.mjs';
+import { V4_DOMAINS, verifyObj } from '../v4/common/v4.mjs';
+import { V5_DOMAINS, signDigest5With } from '../v5/common/v5.mjs';
 import { V6_DOMAINS, d6, d6hex, DEFAULT_ASSURANCE_POLICY } from './common/v6.mjs';
 import { EXT6_V } from './root/chain.mjs';
 import { BINDING_V, PAY_ACTION_TYPE, taskRefFor, paymentSummary, summaryDigestOf, requiredAssurance } from './vault/payment-approval.mjs';
 
 export { ACCOUNT, Device };
+/** Device-derived detail lines for the human (the action is bound by actionDigest; nothing here comes from the page). */
+export function actionDetailLines(a) {
+  const out = [];
+  if (a.type === 'FREEZE') out.push(`Scope: GLOBAL (every unsettled payment of ${a.accountId} is held; settled payments cannot be undone)`, `Hold: ${a.body.freezeId} (${a.body.source === 'owner' ? 'PROVISIONAL_HOLD, 24 h unless independently confirmed' : a.body.source})`, `Reason: ${String(a.body.reason).slice(0, 160)}`);
+  if (a.type === 'HOLD_RELEASE') out.push(`Releases hold: ${a.body.holdId} (digest ${String(a.body.holdDigest).slice(0, 16)}...)`);
+  out.push(`Action expires: ${a.expiresAt}`);
+  return out;
+}
 const clonePolicy = (p) => JSON.parse(JSON.stringify(p));
 
 export class OwnerWorldV6 extends OwnerWorldV5 {
@@ -59,6 +71,40 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     const aps = super.authorize4(state, action, credIds, opts);
     return aps.map(ap => (!ap?.intent || this.orcs[ap.credId] || opts.noGate || !(this.fpOnly(ap.credId) || opts.withGate)) ? ap
       : this.#gate(ap, { subject: 'COMMAND', digestHex: intentDigest(ap.intent).toString('hex'), nonce: ap.grant.statement.challengeNonce, at: opts.at ?? state.lastAt })).filter(Boolean);
+  }
+  /**
+   * Owner device, console route: approve a command PREPARED by the SafeBox Owner Console. The device does not trust the
+   * page: it rebuilds the Command Statement from its OWN verified Root projection and the issuer-signed grant, refuses
+   * any difference (substituted action / scope / statement), shows its own text, lets the human decide, and only then
+   * signs (plus the fingerprint gate for fingerprint-only credentials). Returns null on decline / mismatch / gate failure.
+   */
+  approvePrepared(state, { action, grant, command }, credId, { decide = this.decide, at = null, noGate = false, tamper = null, apc = true } = {}) {
+    const s = projectState(state, at ?? state.lastAt);
+    const party = s.creds[credId];
+    if (!party || command?.credId !== credId || grant?.statement?.credId !== credId) { this.gateErrors.push({ credId, code: 'PREPARED_NOT_FOR_THIS_DEVICE' }); return null; }
+    if (grant.statement.actionDigest !== actionDigest(action).toString('hex') || grant.statement.actionType !== action.type) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_MISMATCH' }); return null; }
+    if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_NOT_ROOT_PINNED' }); return null; }
+    const { statement, text: base } = buildCommand(s, action, grant.statement, party, { rootSeq: command.rootSeq });
+    // extra lines are derived by the DEVICE from the action itself (bound through actionDigest in the signed statement)
+    const text = [base, ...actionDetailLines(action)].join('\n');
+    if (canon(statement) !== canon(command)) { this.gateErrors.push({ credId, code: 'PREPARED_COMMAND_MISMATCH' }); return null; }
+    const m = this.metrics; m.prompts++; m.byCred[credId] = (m.byCred[credId] ?? 0) + 1;
+    if (!decide({ title: action.type, text }, text, { credId, action, via: 'OWNER_CONSOLE' })) { m.declined++; return null; }
+    const st = tamper ? tamper(JSON.parse(JSON.stringify(statement))) ?? statement : statement;
+    const dig = commandDigest(st);
+    m.gestures++; m.signatures++;
+    const d = this.dev(credId);
+    let ap = { credId, command: st, grant };
+    if (d.kind === 'passkey') { ap.webauthn = d.auth.assert({ ...this.rp, challenge: dig, uv: true }); if (apc && this.apc[credId]) ap.apc = { sig: this.apc[credId].confirm(base, dig.toString('hex')) }; } // protected confirmation shows the Root summary verbatim
+    else ap.sig = signDigest5With(d.signer, V5_DOMAINS.COMMAND, dig);
+    if (!noGate && this.fpOnly(credId)) ap = this.#gate(ap, { subject: 'COMMAND', digestHex: dig.toString('hex'), nonce: grant.statement.challengeNonce, at: at ?? state.lastAt });
+    return ap;
+  }
+  /** Owner device: answer a console LOGIN challenge (authorizes nothing; proves possession + UV for a session). */
+  loginAssertion(credId, challengeHex, { origin = null, rpId = null, uv = true } = {}) {
+    const d = this.dev(credId); const dig = Buffer.from(challengeHex, 'hex');
+    if (d.kind === 'passkey') return { webauthn: d.auth.assert({ rpId: rpId ?? this.rp.rpId, origin: origin ?? this.rp.origin, challenge: dig, uv }) };
+    return { sig: d.signer.signDigest(V6_DOMAINS.SESSION, dig) };
   }
   /**
    * Owner device: per-transaction PAYMENT APPROVAL (Workflow A). Builds everything it shows from its own VERIFIED Root
