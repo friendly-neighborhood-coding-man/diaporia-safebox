@@ -1,0 +1,704 @@
+{
+ "generatedBy": "scripts/v5/mutations.mjs",
+ "firstOrder": {
+  "caught": 48,
+  "total": 48
+ },
+ "higherOrder": {
+  "caught": 4,
+  "total": 4
+ },
+ "caught": 52,
+ "total": 52,
+ "rows": [
+  {
+   "name": "Command: exact statement equality removed",
+   "files": [
+    "src/v5/root/command.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 18,
+   "examples": [
+    "a signed statement with a modified accountId is rejected",
+    "a signed statement with a modified chainId is rejected",
+    "a signed statement with a modified credId is rejected",
+    "a signed statement with a modified role is rejected",
+    "a signed statement with a modified commandType is rejected",
+    "a signed statement with a modified actionDigest is rejected"
+   ]
+  },
+  {
+   "name": "Command: challenge single-use removed",
+   "files": [
+    "src/v5/root/command.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)"
+   ]
+  },
+  {
+   "name": "Command: TRUSTED level not enforced",
+   "files": [
+    "src/v5/root/command.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "trusted-confirmation commands: DELEGATION_GRANT from a software-only key is refused, from protected confirmation accepted",
+    "personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged"
+   ]
+  },
+  {
+   "name": "Holds: confirmed-hold release without trusted confirmation",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONFIRMED_OWNER_HOLD release needs a trusted confirmation; UV-only signers are refused"
+   ]
+  },
+  {
+   "name": "Holds: incident-freeze release without trusted confirmation",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "VERIFIED_INCIDENT_FREEZE release with quorum + repair certificate still needs a trusted confirmation (multi-admin: all passkeys)"
+   ]
+  },
+  {
+   "name": "Holds: revoked-issuer holds keep restricting (anti-lockout removed)",
+   "files": [
+    "src/v5/root/holds.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "MANDATORY: stolen K1 FREEZE, K2 independently holds, owner revokes K1 => K1 hold removable, K2 hold stays",
+    "reverse order: K2 holds first, stolen K1 freezes later; revoking K1 leaves K2 hold",
+    "owner-origin hold: the owner's own freeze survives revocation of an unrelated stolen key",
+    "crash recovery: hold registry and effective freeze survive Root and Vault restarts (replayed from the chain)",
+    "full V4 recovery of a stolen key lifts the thief's holds only (anti-lockout through recovery)"
+   ]
+  },
+  {
+   "name": "Holds: one surviving party no longer keeps a confirmed hold (any revoked party drops it)",
+   "files": [
+    "src/v5/root/holds.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "MANDATORY variant: K2 CONFIRMS K1 hold instead; after revoking K1 the hold stays until K2 releases it",
+    "CONTEST_PROTECTIVE_HOLD: ORC + independent owner credential revokes the suspect and releases only its exclusive holds"
+   ]
+  },
+  {
+   "name": "Holds: issuer budget removed",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "repeated reinforcement by the same issuer is refused; issuer budget bounds re-freezing"
+   ]
+  },
+  {
+   "name": "Contest: ORC not required",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Contest: suspect may sign its own contest",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Contest: holds not attributable to the suspect can be dropped",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "CONTEST cannot: pay, run without ORC, be signed by the suspect, target holds not issued by the suspect"
+   ]
+  },
+  {
+   "name": "Incident review: LEGITIMATE verdict without trusted confirmation",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "owner incident review: FRAUD cancels the delayed payments; the affected credential cannot vouch for itself; LEGITIMATE needs trusted confirmation"
+   ]
+  },
+  {
+   "name": "Delegation: recipients outside the Purpose allowed",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "grant cannot exceed Purpose: recipients, asset, per-op, cumulative, TTL, mandatory revocation conditions"
+   ]
+  },
+  {
+   "name": "Rapid-Use: 24 h maximum removed",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "Rapid-Use can never enlarge Purpose: scope must restate exact limits and Purpose recipients"
+   ]
+  },
+  {
+   "name": "Rapid-Use: several keys of one human count as several votes",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "multi-owner: several keys of one human are one vote; non-owner roles and the ORC cannot vote",
+    "Scenario D: no unauthorized Rapid-Use activation, attempts audited and bounded, owner path intact"
+   ]
+  },
+  {
+   "name": "Rapid-Use: the bursting credential may vouch for itself",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "personal: anomaly delay -> owner requests Rapid-Use -> ORC + separate owner credential -> delayed payments released, limits unchanged",
+    "Scenario A: stolen DAILY key burst is detected, delayed, notified; attacker cannot self-approve or expand; owner responds"
+   ]
+  },
+  {
+   "name": "Vault: engine decision signature not checked",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "a decision not signed by the pinned engine key is refused by the vault"
+   ]
+  },
+  {
+   "name": "Vault: hard delay cap removed",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 16,
+   "examples": [
+    "delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged",
+    "vault enforces its own 24 h cap whatever the engine asks",
+    "delegate pays inside scope; per-op, cumulative, max uses, recipient, replay and forged signature all refused",
+    "vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive",
+    "Scenario B: genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes",
+    "Scenario B (multi-owner): genuine urgent spending completes under Rapid-Use, owner ends it, protection resumes"
+   ]
+  },
+  {
+   "name": "Vault: horizon deadline not written to the release check (P2)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 6,
+   "examples": [
+    "delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged",
+    "vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive",
+    "P1: LOW risk (short burst) -> bounded delay, then conditional settlement with the owner offline",
+    "P1: HIGH risk (hard ceiling) with the owner offline 72 h -> every delayed payment expires, none settles; no global freeze",
+    "P1: verifier flags a HIGH-risk payment settled without owner resolution (vault record downgraded to LOW)",
+    "F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution"
+   ]
+  },
+  {
+   "name": "Vault: Rapid-Use grant covers other flows",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "a Rapid-Use grant for k1 never removes anomaly delays of another flow (k2)",
+    "P3/rapid flow scope: a grant for k1 never accelerates k2 or a delegation; restart keeps the scope",
+    "F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1's grant"
+   ]
+  },
+  {
+   "name": "Vault: Rapid-Use ignores restricted credentials",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P3/rapid layer isolation: with the Root-side grant termination removed from the replica, the vault check alone refuses the grant"
+   ]
+  },
+  {
+   "name": "Vault: settlement gate ignores the horizon (P2)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P2: the vault enforces the horizon independently of the risk engine (2 h horizon < 6 h delay -> expired, not settled)"
+   ]
+  },
+  {
+   "name": "Vault: delay extends the latest settlement (P2)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P2: the vault enforces the horizon independently of the risk engine (2 h horizon < 6 h delay -> expired, not settled)",
+    "P2: an authorization issued near the end of its 2 h validity expires at its horizon when the delay would cross it"
+   ]
+  },
+  {
+   "name": "Vault: unresolved HIGH-risk payment auto-releases (P1)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "P4: Rapid-Use removes only the anomaly delay, never the signed buffer; HIGH unresolved never auto-releases at max buffer",
+    "P1: HIGH risk (hard ceiling) with the owner offline 72 h -> every delayed payment expires, none settles; no global freeze",
+    "P1: vault restart during a pending HIGH-risk payment: class, deadline and expiry survive",
+    "N4 (honest, no false positive): a reviewed LOW incident's payments settle cleanly although a later HIGH incident opens meanwhile",
+    "R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not"
+   ]
+  },
+  {
+   "name": "Vault: incident escalation not applied to pending payments (P1)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 8,
+   "examples": [
+    "P4: Rapid-Use removes only the anomaly delay, never the signed buffer; HIGH unresolved never auto-releases at max buffer",
+    "P1: HIGH risk (hard ceiling) with the owner offline 72 h -> every delayed payment expires, none settles; no global freeze",
+    "P1: a LOW incident that escalates to HIGH marks its pending payments HIGH (deadlines unchanged)",
+    "P1: vault restart during a pending HIGH-risk payment: class, deadline and expiry survive",
+    "F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution",
+    "N4 (honest, no false positive): a reviewed LOW incident's payments settle cleanly although a later HIGH incident opens meanwhile"
+   ]
+  },
+  {
+   "name": "Vault: release re-check of the delegation removed (P1)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1: release-time re-check: a delegation revoked while its payment waits cancels it"
+   ]
+  },
+  {
+   "name": "Vault: release re-check of Purpose removed (P1)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 16,
+   "examples": [
+    "tests/v5/analyst-report.test.mjs",
+    "tests/v5/anomaly.test.mjs",
+    "tests/v5/anti-lockout.test.mjs",
+    "tests/v5/buffer.test.mjs",
+    "tests/v5/command-binding.test.mjs",
+    "tests/v5/delegation.test.mjs"
+   ]
+  },
+  {
+   "name": "Engine: hard ceiling not classified HIGH (P1)",
+   "files": [
+    "src/v5/risk/engine.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1: riskClassOf is a deterministic function of the evaluation: each HIGH rule on its own"
+   ]
+  },
+  {
+   "name": "Engine: escalated incident not classified HIGH (P1)",
+   "files": [
+    "src/v5/risk/engine.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1: riskClassOf is a deterministic function of the evaluation: each HIGH rule on its own"
+   ]
+  },
+  {
+   "name": "Engine: security-correlated delay not classified HIGH (P1)",
+   "files": [
+    "src/v5/risk/engine.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1: riskClassOf is a deterministic function of the evaluation: each HIGH rule on its own"
+   ]
+  },
+  {
+   "name": "Verifier: settlement-horizon check removed (P2)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P2: verifier flags a settlement after the horizon even when the vault records are rewritten"
+   ]
+  },
+  {
+   "name": "Verifier: HIGH-risk resolution check removed (P1)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 4,
+   "examples": [
+    "P1: verifier flags a HIGH-risk payment settled without owner resolution (vault record downgraded to LOW)",
+    "F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution",
+    "N3: an owner LEGITIMATE review of a different incident id does not resolve the HIGH incident",
+    "F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1's grant"
+   ]
+  },
+  {
+   "name": "Genesis: settlement-horizon bounds removed (P2)",
+   "files": [
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P2: settlementHorizonMs (26 h) is part of the genesis extension every owner device and the ORC sign; out-of-range values are refused"
+   ]
+  },
+  {
+   "name": "Vault: signed tier ignored, every payment gets the 30 s floor (P4)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "P4: verifier recomputes the tier, checks the signature and flags a payment released before its signed buffer",
+    "exploratory EXP_30_HV: a flow reaching half the per-payment maximum within an hour always waits 600 s",
+    "F3: an effect whose V5 record was deleted, or whose proposal time was rewritten, is flagged"
+   ]
+  },
+  {
+   "name": "Vault: engine statement for another buffer policy accepted (P4)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P4: the vault refuses an engine statement made for another buffer policy (ENGINE_BUFFER_POLICY_MISMATCH)"
+   ]
+  },
+  {
+   "name": "Vault: fail-closed cancellation of unevaluated payments removed (F2/N2)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P4 / F2: a payment reserved but never evaluated is cancelled (fail closed), on restart and at runtime",
+    "N2: a crash after the v5_pay insert but before the evaluation completes leaves the payment cancelled on restart"
+   ]
+  },
+  {
+   "name": "Vault: evaluation-complete marker ignored (N2)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "N2: a crash after the v5_pay insert but before the evaluation completes leaves the payment cancelled on restart"
+   ]
+  },
+  {
+   "name": "Verifier: cap evidence not bound to the tx paymentId (N1)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "N1: a ledger effect spending capability X under an older payment id Y is flagged (cap not bound to payment)"
+   ]
+  },
+  {
+   "name": "Verifier: HIGH resolution accepts any LEGITIMATE review of the credential (N3)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "N3: an owner LEGITIMATE review of a different incident id does not resolve the HIGH incident"
+   ]
+  },
+  {
+   "name": "Verifier: hidden open incident not checked (R8)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not"
+   ]
+  },
+  {
+   "name": "Verifier: flow from the vault row instead of signed evidence (F1)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1's grant"
+   ]
+  },
+  {
+   "name": "Buffer: sticky tier floor removed (P4 anti-reset)",
+   "files": [
+    "src/v5/risk/buffer.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P4: the tier is a deterministic bounded function of the signed inputs; each input moves it; sticky floor; cap 5",
+    "P4: a compromised vault that lowers stored tiers to reset the next decision is exposed (BUFFER_TIER_RESET)"
+   ]
+  },
+  {
+   "name": "Buffer: flow value uses this payment only (P4 anti-splitting)",
+   "files": [
+    "src/v5/risk/buffer.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P4 anti-splitting: the tier input counts the flow's whole last-hour value, not the single payment"
+   ]
+  },
+  {
+   "name": "Buffer: open incident does not raise the tier (P4)",
+   "files": [
+    "src/v5/risk/buffer.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P4: the tier is a deterministic bounded function of the signed inputs; each input moves it; sticky floor; cap 5"
+   ]
+  },
+  {
+   "name": "Verifier: early release before the signed buffer not flagged (P4)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P4: verifier recomputes the tier, checks the signature and flags a payment released before its signed buffer",
+    "F3: an effect whose V5 record was deleted, or whose proposal time was rewritten, is flagged"
+   ]
+  },
+  {
+   "name": "Verifier: tier not recomputed from the signed inputs (P4)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P4: a compromised engine that signs (and journals) a tier inconsistent with its own signed inputs is flagged"
+   ]
+  },
+  {
+   "name": "Verifier: tier-reset check removed (P4)",
+   "files": [
+    "src/v5/supervisor/verifier.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P4: a compromised vault that lowers stored tiers to reset the next decision is exposed (BUFFER_TIER_RESET)",
+    "F4: rewriting the vault's flow column does not hide a tier reset (flows come from signed evidence)"
+   ]
+  },
+  {
+   "name": "Vault: incident-flow pending cap removed (repair)",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "concurrent payment proposals: the pending limit and Purpose limits hold under Promise.all",
+    "repair (A/B scenario 14): a flow under an open incident holds at most 8 pending slots; the owner's other flow keeps paying"
+   ]
+  },
+  {
+   "name": "HO: challenge single-use + action-nonce replay check removed",
+   "files": [
+    "src/v5/root/command.mjs",
+    "src/v3/root/chain.mjs"
+   ],
+   "order": 2,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "replay: the same approved request cannot be applied twice (nonce + one-time challenge)",
+    "a consumed challenge grant cannot be reused, even inside a fresh action carrying the same approval",
+    "P3/challenge: an accepted command replayed verbatim is refused (ACTION_REPLAY), also after a Root restart",
+    "P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)",
+    "Scenario C: evasive strategies"
+   ]
+  },
+  {
+   "name": "HO: challenge single-use + duplicate-approval check removed",
+   "files": [
+    "src/v5/root/command.mjs",
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 2,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P3/challenge: one approval (one challenge) duplicated inside a request is refused (challenge probe or DUPLICATE_APPROVAL)",
+    "P3/challenge layer isolation: with the action-nonce record removed from the state, the challenge alone refuses the replay (Ed25519 key, no sign counter)"
+   ]
+  },
+  {
+   "name": "HO: Rapid-Use restricted-scope check removed in the vault AND on the Root",
+   "files": [
+    "src/v5/vault/vault.mjs",
+    "src/v5/root/chain.mjs"
+   ],
+   "order": 2,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "P3/rapid: an active grant whose scope credential is then suspended ends at that transition (no window for acceleration)",
+    "P3/rapid layer isolation: with the Root-side grant termination removed from the replica, the vault check alone refuses the grant",
+    "deterministic termination: hold on the covered credential / epoch change ends the grant; monitoring continues; velocity ceiling ends it via engine attestation"
+   ]
+  },
+  {
+   "name": "HO: horizon gate + horizon deadline in the release check both removed",
+   "files": [
+    "src/v5/vault/vault.mjs"
+   ],
+   "order": 2,
+   "caught": true,
+   "failingTests": 6,
+   "examples": [
+    "delay is BOUNDED: delayed payments settle by themselves after the delay (no unlimited delay); amount/recipient unchanged",
+    "vault restart in the middle of an anomaly delay: delays, incidents and the bounded release survive",
+    "P2: the vault enforces the horizon independently of the risk engine (2 h horizon < 6 h delay -> expired, not settled)",
+    "P1: LOW risk (short burst) -> bounded delay, then conditional settlement with the owner offline",
+    "P1: verifier flags a HIGH-risk payment settled without owner resolution (vault record downgraded to LOW)",
+    "F1: clearing the vault's incident_id / flow / risk_class does not hide a HIGH payment settled without resolution"
+   ]
+  }
+ ]
+}
