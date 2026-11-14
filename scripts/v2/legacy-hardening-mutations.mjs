@@ -6,18 +6,18 @@ import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 const M = [
   // PR #19 keygen
-  ['#19 keygen private read follows symlinks', 'src/v2/launch/keygen.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }", 'try { fd = openSync(path, C.O_RDONLY); }', ['tests/v2/keygen-exclusive.test.mjs']],
+  ['#19 keygen private read follows symlinks', 'src/v2/launch/keygen.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(path, C.O_RDONLY | (C.O_NONBLOCK ?? 0)); }', ['tests/v2/keygen-exclusive.test.mjs']],
   ['#19 keygen private mode check removed', 'src/v2/launch/keygen.mjs', "if (mode === 0o600 && (st.mode & 0o077) !== 0) fail('KEY_FILE_TOO_PERMISSIVE', path);", '', ['tests/v2/keygen-exclusive.test.mjs']],
   // PR #21 launcher argv + PR #28 conditions
   ['#21 find via sh -c string', 'src/v2/launch/argv-exec.mjs', "return execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' });", "return execFileSync('sh', ['-c', [cmd, ...args].join(' ')], { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' });", ['tests/v2/argv-exec.test.mjs']],
   ['#21-cond absolute-path operand check removed', 'src/v2/launch/argv-exec.mjs', "if (!p.startsWith('/')) {", 'if (false) {', ['tests/v2/argv-exec.test.mjs']],
   ['#21-cond find failure no longer recorded', 'src/v2/launch/argv-exec.mjs', "lines.push(`FIND_FAILED ${root} (${e.code ?? e.status ?? 'error'})`);", '', ['tests/v2/argv-exec.test.mjs']],
   // PR #23 V1 key files
-  ['#23 V1 owner key read follows symlinks', 'src/v1/authz.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }", 'try { fd = openSync(path, C.O_RDONLY); }', ['tests/v1/keyfile-nofollow.test.mjs']],
-  ['#23 V1 executor key read follows symlinks', 'src/v1/near/executor.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }", 'try { fd = openSync(path, C.O_RDONLY); }', ['tests/v1/keyfile-nofollow.test.mjs']],
+  ['#23 V1 owner key read follows symlinks', 'src/v1/authz.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(path, C.O_RDONLY | (C.O_NONBLOCK ?? 0)); }', ['tests/v1/keyfile-nofollow.test.mjs']],
+  ['#23 V1 executor key read follows symlinks', 'src/v1/near/executor.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(path, C.O_RDONLY | (C.O_NONBLOCK ?? 0)); }', ['tests/v1/keyfile-nofollow.test.mjs']],
   // PR #24 owner log + PR #28 writer condition
-  ['#24 owner log view follows symlinks', 'src/v2/supervisor/owner.mjs', "try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW); }", 'try { fd = openSync(logPath, C.O_RDONLY); }', ['tests/v2/owner-log-fd.test.mjs']],
-  ['#24-cond owner log writer follows symlinks', 'src/v2/supervisor/owner.mjs', "C.O_WRONLY | C.O_APPEND | C.O_CREAT | (C.O_NOFOLLOW ?? 0), 0o600", 'C.O_WRONLY | C.O_APPEND | C.O_CREAT, 0o600', ['tests/v2/owner-log-fd.test.mjs']],
+  ['#24 owner log view follows symlinks', 'src/v2/supervisor/owner.mjs', "try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(logPath, C.O_RDONLY | (C.O_NONBLOCK ?? 0)); }', ['tests/v2/owner-log-fd.test.mjs']],
+  ['#24-cond owner log writer follows symlinks', 'src/v2/supervisor/owner.mjs', "C.O_WRONLY | C.O_APPEND | C.O_CREAT | (C.O_NOFOLLOW ?? 0) | (C.O_NONBLOCK ?? 0), 0o600", 'C.O_WRONLY | C.O_APPEND | C.O_CREAT | (C.O_NONBLOCK ?? 0), 0o600', ['tests/v2/owner-log-fd.test.mjs']],
   // Independent-review follow-ups (Mission 2): F1 FIFO, F9 replaced log, F13 link-not-rename, F14 torn line
   ['F1 keygen private read blocks on a FIFO', 'src/v2/launch/keygen.mjs', "try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }', ['tests/v2/legacy-review-followup.test.mjs']],
   ['F1 owner log view blocks on a FIFO', 'src/v2/supervisor/owner.mjs', "try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW | (C.O_NONBLOCK ?? 0)); }", 'try { fd = openSync(logPath, C.O_RDONLY | C.O_NOFOLLOW); }', ['tests/v2/legacy-review-followup.test.mjs']],
