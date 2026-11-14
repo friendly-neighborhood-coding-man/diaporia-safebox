@@ -158,3 +158,4 @@ keys/
 contract/target/
 contract-v3/target/
 contract-v4/target/
+.demo-bridge-url

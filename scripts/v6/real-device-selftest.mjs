@@ -19,8 +19,15 @@ const page = await ctx.newPage(); const cdp = await ctx.newCDPSession(page);
 await cdp.send('WebAuthn.enable');
 // SELFTEST_SYNCABLE=1: the virtual authenticator behaves like a syncing password manager (backup-eligible), to exercise the refusal path
 const { authenticatorId } = await cdp.send('WebAuthn.addVirtualAuthenticator', { options: { protocol: 'ctap2', transport: 'internal', hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true, ...(process.env.SELFTEST_SYNCABLE === '1' ? { defaultBackupEligibility: true } : {}) } });
-const bm = await until(/Open (http:\/\/localhost:\d+\/bridge#t=[0-9a-f]+)/);
-await page.goto(bm[1]);
+// --demo: the runner prints the bridge link redacted and writes it to --bridge-url-file (default .demo-bridge-url)
+let bridgeUrl;
+if (process.argv.includes('--demo')) {
+  await until(/Open the bridge link .*#t=<per-run secret, redacted>/);
+  const i = process.argv.indexOf('--bridge-url-file');
+  bridgeUrl = (await import('node:fs')).readFileSync(i > 0 ? resolve(process.argv[i + 1]) : join(REPO, '.demo-bridge-url'), 'utf8').trim();
+  if (/#t=[0-9a-f]+/.exec(log.replace(bridgeUrl, ''))?.[0] && log.includes(bridgeUrl.split('#')[1])) throw new Error('bridge secret leaked to the terminal');
+} else bridgeUrl = (await until(/Open (http:\/\/localhost:\d+\/bridge#t=[0-9a-f]+)/))[1];
+await page.goto(bridgeUrl);
 let clicks = 0; let stop = false;
 (async () => { while (!stop) { try { const b = await page.$('#go'); if (b) { await b.click(); clicks++; await page.waitForTimeout(400); } } catch {} await page.waitForTimeout(150); } })();
 const m = await until(/Open the Emergency Freeze link from the email \(or (http:\/\/localhost:\d+\/e\/l[0-9a-f]{32})\)/, 300000);
