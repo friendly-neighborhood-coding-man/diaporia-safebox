@@ -34,10 +34,15 @@ produce something SafeBox accepts as a fingerprint-only approval?
 
 1. **Fingerprint-only cannot be enforced at signing time against same-user code with the Windows APIs V6 uses.**
    Labelled `INHERENT_RESIDUAL` for the `LOCAL_GATE` mode, and bounded. A forged gate authorizes nothing on its own: it
-   still needs the owner credential's own signature: for a WebAuthn passkey that is an assertion with UV, i.e. a human Windows Hello gesture (for an ed25519 device credential, which the policy also accepts, it is only that device key's signature, with no human gesture guaranteed by SafeBox), which is a human Windows Hello gesture (PIN or finger) for
-   that exact digest (test `P0.1-bound`). With that gesture it is accepted (`P0.1-residual`), so the worst case is
-   **fingerprint-only degrades to Windows Hello UV**. It never degrades to "no human". The FIXED_600 buffer, holds,
-   limits, anomaly delay and Emergency Freeze still apply.
+   still needs the owner credential's own signature over that exact digest (test `P0.1-bound`).
+   * **Passkey credential (the laptop's k2-laptop):** that is a WebAuthn assertion with UV, i.e. a human Windows Hello
+     gesture (PIN or finger). With it the forged gate is accepted (`P0.1-residual`), so the worst case is
+     **fingerprint-only degrades to Windows Hello UV**, never to "no human".
+   * **ed25519 device credential (also accepted by the policy):** it is only that device key's signature. SafeBox
+     guarantees no human gesture there, so same-user code holding both keys can approve without a human.
+     Fingerprint-only on such a credential must be treated as device possession only.
+
+   In both cases the FIXED_600 buffer, holds, limits, anomaly delay and Emergency Freeze still apply.
 2. **New fail-closed high-assurance mode (`fingerprintAssurance: "HIGH_ASSURANCE"` in the owner-signed genesis policy).**
    Only a gate key kind in `ISOLATED_GATE_KINDS` can satisfy fingerprint-only there. That list is **empty** in V6,
    because SIMULATED, WINBIO_TPM and WINBIO_SOFTWARE_KEY are all same-user keys. Every fingerprint-only payment and

@@ -13,7 +13,7 @@ const plain = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 /** Device-derived detail lines for the human (the action is bound by actionDigest; nothing here comes from the page). */
 export function actionDetailLines(a) {
   const out = [];
-  if (a.type === 'FREEZE') out.push(`Scope: GLOBAL (every unsettled payment of ${a.accountId} is held; settled payments cannot be undone)`, `Hold: ${a.body.freezeId} (${a.body.source === 'owner' ? 'PROVISIONAL_HOLD, 24 h unless independently confirmed' : a.body.source})`, `Reason: ${String(a.body.reason).slice(0, 160)}`);
+  if (a.type === 'FREEZE') out.push(`Scope: GLOBAL (every unsettled payment of ${a.accountId} is held; settled payments cannot be undone)`, `Hold: ${a.body.freezeId} (${a.body.source === 'owner' ? 'PROVISIONAL_HOLD, 24 h unless independently confirmed' : a.body.source})`, `Reason: ${String(a.body.reason).replace(/[^\x20-\x7e]/g, '?').slice(0, 160)}`);
   if (a.type === 'HOLD_RELEASE') out.push(`Releases hold: ${a.body.holdId} (digest ${String(a.body.holdDigest).slice(0, 16)}...)`);
   out.push(`Action expires: ${a.expiresAt}`);
   return out;

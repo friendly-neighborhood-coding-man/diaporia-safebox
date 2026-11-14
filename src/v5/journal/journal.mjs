@@ -28,7 +28,7 @@ export const EVENT_V = 'safebox.v5.journal-event';
  */
 export const CHECKPOINT_NOW_TYPES = new Set(['OWNER_PAYMENT_APPROVAL_VERIFIED', 'PAYMENT_ACCELERATED_RAPID_USE', 'FROZEN', 'UNFROZEN',
   'HOLD_CREATED', 'HOLD_CONFIRMED', 'HOLD_RELEASED', 'HOLD_ESCALATED', 'HOLD_EXPIRED', 'HOLDS_RELEASED_BY_UNSUSPEND', 'REVOKED', 'SUSPENDED', 'UNSUSPENDED',
-  'INCIDENT_OPENED', 'INCIDENT_ESCALATED', 'DELEGATION_GRANTED', 'DELEGATION_REVOKED', 'RAPID_USE_ACTIVATED', 'RAPID_USE_REVOKED', 'CONTEST_RESOLVED', 'ROOT_REJECTED']);
+  'INCIDENT_OPENED', 'INCIDENT_ESCALATED', 'DELEGATION_GRANTED', 'DELEGATION_REVOKED', 'RAPID_USE_ACTIVATED', 'RAPID_USE_REVOKED', 'CONTEST_RESOLVED']);
 const ZERO = '0'.repeat(64);
 const FORBIDDEN_KEY = /^(private_?key|privatekey|secret|recovery_?secret|seed|pin|passcode|password|biometric\w*|fingerprint|face_?data|webauthn|assertion|signature|sig|challenge_?response|mnemonic|api_?key|auth_?token|otp)$/i;
 const FORBIDDEN_VALUE = /(-----BEGIN|PRIVATE KEY|"authenticatorData"|clientDataJSON)/;

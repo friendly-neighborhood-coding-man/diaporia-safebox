@@ -12,8 +12,9 @@ import { GATE_V } from './biometric.mjs';
 const hashOf = (domain, obj) => createHash('sha256').update(Buffer.concat([Buffer.from(domain), Buffer.from(canon(obj))])).digest('hex');
 // the helper shows the prompt in its windows; lines are passed as ' | ' and split again by the helper
 export const PROMPT_MAX = 1400;
-// final review (MEDIUM): EVERY '|' inside a line becomes '/', so no line content (memo, reason, explanation) can ever
-// form the ' | ' separator and forge an extra line in the helper window
+// final review (MEDIUM): EVERY '|' inside a line becomes '/', so no line content can form the ' | ' separator. Raw
+// newlines cannot occur inside a reviewed action (canonical encoding rejects them before any grant exists) and the
+// display builders also replace non-printable characters in free text (memo, FREEZE reason, RAPID_USE explanation).
 export const promptOf = (text) => String(text).split('\n').map((l) => l.replace(/[^\x20-\x7e]/g, '?').replaceAll('|', '/')).join(' | ');
 const KNOWN = new Set(['BIOMETRIC_NO_MATCH', 'BIOMETRIC_TIMEOUT', 'BIOMETRIC_LOCKOUT', 'BIOMETRIC_CANCELLED', 'BIOMETRIC_STALE', 'BIOMETRIC_TOUCH_DISOWNED', 'FINGERPRINT_ONLY_UNSUPPORTED']);
 

@@ -119,7 +119,7 @@ static class WinBioGate {
   static void AddAmount(Form form, Label main, string prompt) {
     if (prompt == null) return;
     // final review (MEDIUM): only a PAYMENT APPROVAL prompt has an amount, and only its FIXED third line is used (the
-    // Node wrapper turns every '|' inside a line into '/', so free text can never add or shift lines)
+    // Node wrapper turns every '|' inside a line into '/', so free text cannot form the separator; raw newlines are rejected upstream)
     var ls = prompt.Split('\n');
     if (ls.Length < 3 || !ls[0].EndsWith("SafeBox V6 - PAYMENT APPROVAL (one payment, exact)") || !ls[2].StartsWith("Pay exactly:")) return;
     string line = ls[2];

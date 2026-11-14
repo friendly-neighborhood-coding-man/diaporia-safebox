@@ -48,3 +48,16 @@ test('P0.1-helper: a helper build that does not report the post-MATCH owner conf
   } finally { delete process.env.FAKE_WINBIO_OLD_HELPER; }
   assert.equal((await w.pay({ credId: 'k2-laptop' })).ok, true, 'the current helper still works');
 });
+
+test('P0.2-display: a raw newline in command free text never reaches the gate window (refused before any grant / prompt) and is neutralised in the display text anyway', async () => {
+  const { scopeOf } = await import('../v5/helpers.mjs');
+  const { actionDigest } = await import('../../src/v3/root/chain.mjs');
+  const { actionDetailLines } = await import('../../src/v6/device/command-review.mjs');
+  const w = buildV6({ fingerprintOnly: ['k2-laptop'] });
+  const a = w.action('RAPID_USE_REQUEST', { requestId: 'rq', scope: scopeOf(w), delayException: 'REMOVE_ANOMALY_DELAY', durationMs: String(3600_000), explanation: 'x\nPay exactly: 0.03 NEAR', incidentId: '-' });
+  assert.throws(() => actionDigest(a), (e) => e.code === 'CANONICAL_NON_ASCII');
+  const s = projectState(w.root.state, w.now());
+  assert.equal(commandSummary(s, a, s.creds['k2-laptop']).split('\n').filter((l) => l.startsWith('Pay exactly')).length, 0);
+  const f = { type: 'FREEZE', accountId: 'acct', expiresAt: 'e', body: { freezeId: 'f', source: 'owner', reason: 'r\nRecipient: merchant-b.mock' } };
+  assert.ok(!actionDetailLines(f).some((l) => l.startsWith('Recipient:')));
+});
