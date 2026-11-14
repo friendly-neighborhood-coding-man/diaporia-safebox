@@ -3,7 +3,7 @@
 // signed evidence (owner / delegate signatures) and the engine's own append-only RISK journal.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildV5, ok, H, D, Y, near, burst } from './helpers.mjs';
+import { buildV5, ok, H, D, Y, near, burst, rapidRequest, rapidVote, rapidActivate } from './helpers.mjs';
 import { verifyWorld } from '../../src/v5/supervisor/verifier.mjs';
 
 const MIN = 60_000;
@@ -195,4 +195,17 @@ test('R8: a compromised vault that hides an open HIGH incident from the engine i
   const v = await verifyWorld(c);
   assert.ok(!codes(v).includes('ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'), JSON.stringify(codes(v)));
   assert.equal(v.ok, true, JSON.stringify(codes(v)));
+});
+
+test('F1b: relabelling a HIGH k2 flow as the Rapid-covered k1 flow does not borrow k1\'s grant', async () => {
+  const w = buildV5();
+  ok(await rapidRequest(w, 'k1-phone')); ok(await rapidVote(w, 'orc-1')); ok(await rapidVote(w, 'k3-root-hw')); ok(await rapidActivate(w));
+  await burst(w, 8, { credId: 'k2-laptop', step: MIN, amountYocto: Y(1) });
+  assert.ok(w.vault.v5payments().some(p => p.cred_id === 'k2-laptop' && p.risk_class === 'HIGH'));
+  w.vault.store.db.prepare("UPDATE v5_pay SET cred_id='k1-phone', flow='cred:k1-phone', risk_class='LOW', anomaly='RELEASED_BY_RAPID' WHERE cred_id='k2-laptop'").run();
+  w.vault.store.db.prepare("UPDATE payments SET release_at=proposed_at+600000 WHERE state='BUFFERED'").run();
+  await w.advance(30 * MIN, MIN);
+  assert.ok(w.vault.v5payments().some(p => p.state === 'SETTLED'));
+  const c = codes(await verifyWorld(w));
+  assert.ok(c.includes('HIGH_RISK_SETTLED_WITHOUT_RESOLUTION'), JSON.stringify(c));
 });
