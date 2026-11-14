@@ -178,3 +178,21 @@ test('N3b: a compromised vault that hands the engine an already-reviewed inciden
   await w.advance(2 * H, 15 * MIN);
   assert.ok(codes(await verifyWorld(w)).includes('ENGINE_DECISION_ON_FOREIGN_OR_CLOSED_INCIDENT'));
 });
+
+test('R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not', async () => {
+  const w = buildV5();
+  await burst(w, 8, { step: MIN, amountYocto: Y(1) });
+  await w.advance(6 * H, 15 * MIN);
+  w.vault.store.db.prepare("UPDATE v5_incidents SET state='LAPSED'").run(); // hidden from the engine context
+  await burst(w, 3, { step: 20 * MIN, amountYocto: Y(1) });
+  await w.advance(2 * H, 15 * MIN);
+  assert.ok(codes(await verifyWorld(w)).includes('ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'));
+  const c = buildV5(); // control: the owner stays offline, the incident lapses on its own after 24 h quiet
+  await burst(c, 8, { step: MIN, amountYocto: Y(1) });
+  await c.advance(26 * H, 15 * MIN);
+  await burst(c, 2, { step: 3 * H, amountYocto: Y(1) });
+  await c.advance(2 * H, 15 * MIN);
+  const v = await verifyWorld(c);
+  assert.ok(!codes(v).includes('ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'), JSON.stringify(codes(v)));
+  assert.equal(v.ok, true, JSON.stringify(codes(v)));
+});

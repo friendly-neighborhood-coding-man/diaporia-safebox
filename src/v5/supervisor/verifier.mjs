@@ -111,6 +111,28 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
       if (e.data.riskClass === 'HIGH' && !(highAt.get(inc) <= at)) highAt.set(inc, at);
     }
   }
+  // P1 (R8): the engine's context comes from the vault, so a vault could hide an OPEN incident and obtain NONE decisions.
+  // Rebuild each incident's lifetime from the RISK journal (opened by a decision, kept open by its DELAY decisions, closed
+  // by an exact-id Root review or after incidentQuietCloseMs without a trigger) and flag any decision on the same signed
+  // flow inside that lifetime that does not name an open incident, unless a Rapid-Use grant covered the payment.
+  const quiet = Number(RISK_POLICY_V1.delay.incidentQuietCloseMs);
+  const decOf = new Map();
+  for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'ENGINE_DECISION' && !decOf.has(e.relatedId)) decOf.set(e.relatedId, e); }
+  const hidden = []; const liveInc = new Map(); // flow -> Map(incidentId -> {t0, last})
+  for (const [pid, at] of [...engineAt.entries()].sort((a, b) => a[1] - b[1])) {
+    const f = flowOf(pid); if (!f) continue;
+    const e = decOf.get(pid); const out_ = e?.outcome ?? 'NONE'; const ref = e?.data?.incidentRef ?? '-';
+    const sA = stateAt(at); const incs = liveInc.get(f.flow) ?? liveInc.set(f.flow, new Map()).get(f.flow);
+    const open = [...incs.entries()].filter(([id, x]) => { const rv = sA.v5.incidentReviews[id]; return !(rv && Number(rv.at) <= at) && at < x.last + quiet - tickSlackMs; }).map(([id]) => id);
+    const reviewedLately = [...incs.keys()].some(id => { const rv = sA.v5.incidentReviews[id]; return rv && Number(rv.at) > at - tickSlackMs; });
+    if (open.length && !open.includes(ref) && !reviewedLately) {
+      let recipient = null; try { const c = JSON.parse(evByPay.get(pid).cap); recipient = c.delegated ? c.delegated.recipientId : c.recipientId; } catch {}
+      const grant = Object.values(sA.v5.rapid.grants).some(g => g.status === 'ACTIVE' && Number(g.activatedAt) <= at && at < Number(g.expiresAt) && (g.scope.credIds.includes(f.credId) || (f.delegationId && g.scope.delegationIds.includes(f.delegationId))) && g.scope.recipients.includes(recipient));
+      if (!grant) hidden.push(pid);
+    }
+    if (out_ !== 'NONE') { if (ref === '-') incs.set(incidentIdFor(pid), { t0: at, last: at }); else if (incs.has(ref)) incs.get(ref).last = at; }
+  }
+  if (hidden.length) out.financial.violations.push({ txId: '-', paymentId: hidden[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'] });
   const incidentOf = (pid, f, tP) => ownIncident.get(pid) ?? (flowDecisions.get(f.flow) ?? []).find(d => d.at >= tP)?.inc ?? null;
   if (badRefs.length) out.financial.violations.push({ txId: '-', paymentId: badRefs[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_DECISION_ON_FOREIGN_OR_CLOSED_INCIDENT'] });
   if (unmapped.length) out.financial.violations.push({ txId: '-', paymentId: unmapped[0], recipient: '-', amountYocto: '0', codes: ['HIGH_DECISION_WITHOUT_SIGNED_EVIDENCE'] });
