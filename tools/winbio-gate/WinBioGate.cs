@@ -113,7 +113,7 @@ static class WinBioGate {
 
   /** Runs WinBioIdentify on a worker thread while a top-most window of this process holds the foreground. */
   static void IdentifyFocused(IntPtr s, IntPtr ident, int timeoutS, string prompt, out int idHr, out uint unit, out bool done) {
-    int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false; bool stop = false; var shown = new System.Diagnostics.Stopwatch();
+    int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false; bool stop = false; bool started = false; var shown = new System.Diagnostics.Stopwatch();
     var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 280, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
     var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
       Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint (" + timeoutS + " s)." };
@@ -141,7 +141,7 @@ static class WinBioGate {
     var deadline = DateTime.UtcNow.AddSeconds(timeoutS);
     // mouse only: MouseClick never fires for Space/Enter, so a keystroke typed into the focused gate window cannot arm it
     btn.MouseClick += (o, e) => {
-      if (t.IsAlive || fin) return;
+      if (started || fin) return; started = true;
       ArmedAfterMs = shown.ElapsedMilliseconds; btn.Enabled = false; btn.Text = "Checking...";
       form.Activate(); SetForegroundWindow(form.Handle); t.Start();
     };
@@ -149,7 +149,7 @@ static class WinBioGate {
     timer.Tick += (o, e) => { if (fin || DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } else if (Form.ActiveForm != form) { label.ForeColor = Color.DarkRed; if (t.IsAlive) InactiveTicks++; } else { label.ForeColor = Color.Black; } };
     form.Shown += (o, e) => { shown.Start(); form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
     Application.Run(form);
-    if (!fin) { stop = true; WinBioCancel(s); t.Join(3000); }
+    if (!fin) { stop = true; if (started) { WinBioCancel(s); t.Join(3000); } }
     idHr = hr; unit = u; done = fin;
   }
 
