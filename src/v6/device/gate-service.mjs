@@ -3,6 +3,7 @@
 import { commandDigest } from '../../v5/root/command.mjs';
 import { exactFields, fail } from '../../v3/common/canon.mjs';
 import { reviewPrepared } from './command-review.mjs';
+import { highAssuranceGate } from './biometric.mjs';
 
 /**
  * LEGACY decision (bf7403d, extracted verbatim from scripts/v6/real-device.mjs, kept for the P0.2 reproducer):
@@ -28,8 +29,10 @@ export function consoleGate({ rootState, gates, now }, q) {
   const r0 = exactFields(q, ['subject', 'credId', 'action', 'grant', 'command'], ['accountId', 'chainId', 'boundDigestHex', 'challengeNonce'], 'GATE_REQUEST_FIELDS');
   if (r0.subject !== 'COMMAND') fail('GATE_REQUEST_SUBJECT');
   const g = gates[r0.credId]; if (!g) fail('FINGERPRINT_ONLY_UNSUPPORTED');
-  const at = now();
-  const rv = reviewPrepared(rootState(), { action: r0.action, grant: r0.grant, command: r0.command }, r0.credId, at);
+  const at = now(); const st = rootState();
+  // P0.1: never prompt for a fingerprint the Root will refuse (HIGH_ASSURANCE with a same-user gate key)
+  if ((st.v6?.policy?.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(st.v6?.gateKeys?.[r0.credId])) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE');
+  const rv = reviewPrepared(st, { action: r0.action, grant: r0.grant, command: r0.command }, r0.credId, at);
   // the page's own digest/nonce hints (if any) must agree; they never select what is signed
   if (r0.boundDigestHex !== undefined && r0.boundDigestHex !== rv.digestHex) fail('GATE_REQUEST_DIGEST_MISMATCH');
   if (r0.challengeNonce !== undefined && r0.challengeNonce !== r0.grant.statement.challengeNonce) fail('GATE_REQUEST_NONCE_MISMATCH');

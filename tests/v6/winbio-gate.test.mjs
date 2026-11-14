@@ -26,7 +26,7 @@ test('WinBioGate (emulated helper): genesis enrollment PoP, payment gate and FRE
 test('WinBioGate: NO_MATCH / TIMEOUT / LOCKOUT / unsupported -> no gate, no payment (fail closed)', async () => {
   const g = setup();
   const w = buildV6({ fingerprintOnly: ['k2-laptop'], gates: { 'k2-laptop': g } });
-  for (const code of ['BIOMETRIC_NO_MATCH', 'BIOMETRIC_TIMEOUT', 'BIOMETRIC_LOCKOUT', 'FINGERPRINT_ONLY_UNSUPPORTED', 'WEIRD_HELPER_CODE']) {
+  for (const code of ['BIOMETRIC_NO_MATCH', 'BIOMETRIC_TIMEOUT', 'BIOMETRIC_LOCKOUT', 'BIOMETRIC_TOUCH_DISOWNED', 'BIOMETRIC_STALE', 'BIOMETRIC_CANCELLED', 'FINGERPRINT_ONLY_UNSUPPORTED', 'WEIRD_HELPER_CODE']) {
     process.env.FAKE_WINBIO_OUTCOME = code;
     const r = await w.pay({ credId: 'k2-laptop' }); assert.equal(r.ok, false, code);
     assert.equal(w.owner.gateErrors.at(-1).code, code === 'WEIRD_HELPER_CODE' ? 'FINGERPRINT_ONLY_UNSUPPORTED' : code);

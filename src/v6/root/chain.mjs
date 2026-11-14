@@ -16,7 +16,7 @@ import * as V5 from '../../v5/root/chain.mjs';
 import { commandDigest } from '../../v5/root/command.mjs';
 import { intentDigest } from '../../v4/intent/intent.mjs';
 import { V6_DOMAINS, PROTOCOL6, d6, d6hex, parsePolicy, verifyEs256Obj } from '../common/v6.mjs';
-import { verifyGate } from '../device/biometric.mjs';
+import { verifyGate, gateKeyProtection } from '../device/biometric.mjs';
 
 export * from '../../v5/root/chain.mjs';
 export const EXT6_V = 'safebox.v6.genesis-ext';
@@ -87,7 +87,7 @@ export function checkGates(s, tr, at) {
       const dig = approvedDigestHex(ap); const g = ap.grant?.statement;
       if (!dig || !g || typeof g.challengeNonce !== 'string') fail('FINGERPRINT_GATE_NEEDS_BOUND_APPROVAL', 'only command- or intent-bound approvals can carry a gate');
       verifyGate(gate, { accountId: s.accountId, chainId: s.chainId, credId: ap.credId, subject: 'COMMAND', boundDigestHex: dig, challengeNonce: g.challengeNonce,
-        notBeforeMs: isoMs(g.issuedAt, 'issuedAt'), notAfterMs: isoMs(g.expiresAt, 'expiresAt'), at, maxAgeMs: Number(s.v6.policy.gateMaxAgeMs), skewMs: Number(s.config.skewMs), gateKeys: s.v6.gateKeys });
+        notBeforeMs: isoMs(g.issuedAt, 'issuedAt'), notAfterMs: isoMs(g.expiresAt, 'expiresAt'), at, maxAgeMs: Number(s.v6.policy.gateMaxAgeMs), skewMs: Number(s.config.skewMs), gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });
       levels.push(`${ap.credId}:LOCAL_FINGERPRINT_GATE_PASSED`);
     }
     out.push(rest);
@@ -115,6 +115,7 @@ export function replayChain(genesis, transitions, { pinnedChainId }) {
 }
 export function rootView(st) {
   return { ...V5.rootView(st), protocol6: PROTOCOL6, assurancePolicy: { version: st.v6.policy.version, paymentMode: st.v6.policy.payment.mode, fingerprintOnlyCreds: [...st.v6.policy.fingerprintOnlyCreds],
-    gateCreds: Object.keys(st.v6.gateKeys), emergencyOrigin: st.v6.policy.emergency.origin } };
+    gateCreds: Object.keys(st.v6.gateKeys), emergencyOrigin: st.v6.policy.emergency.origin,
+    fingerprintAssurance: st.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE', gateKeyProtection: Object.fromEntries(Object.entries(st.v6.gateKeys).map(([c, k]) => [c, gateKeyProtection(k)])) } };
 }
 export { clone };

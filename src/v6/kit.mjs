@@ -12,6 +12,7 @@ import { buildCommand, commandDigest } from '../v5/root/command.mjs';
 import { actionDigest } from '../v3/root/chain.mjs';
 import { canon } from '../v3/common/canon.mjs';
 import { actionDetailLines, reviewPrepared } from './device/command-review.mjs';
+import { highAssuranceGate } from './device/biometric.mjs';
 import { V4_DOMAINS, verifyObj } from '../v4/common/v4.mjs';
 import { V5_DOMAINS, signDigest5With } from '../v5/common/v5.mjs';
 import { V6_DOMAINS, d6, d6hex, DEFAULT_ASSURANCE_POLICY } from './common/v6.mjs';
@@ -51,10 +52,13 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     return this.genesis6Record;
   }
   fpOnly(credId) { return this.policy6.fingerprintOnlyCreds.includes(credId); }
+  /** P0.1: under HIGH_ASSURANCE a same-user gate key can never satisfy fingerprint-only; refuse before prompting the sensor. */
+  #highUnavailable(g) { return (this.policy6.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate({ kind: g.kind }); }
   /** Attach the fingerprint gate to an approval (only on a MATCH; any other outcome discards the approval: fail closed). */
   #gate(ap, { subject, digestHex, nonce, at, display = null }) {
     const g = this.gates[ap.credId];
     if (!g) { this.gateErrors.push({ credId: ap.credId, code: 'FINGERPRINT_ONLY_UNSUPPORTED' }); return null; }
+    if (this.#highUnavailable(g)) { this.gateErrors.push({ credId: ap.credId, code: 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE' }); return null; }
     try { return { ...ap, gate: g.attest({ accountId: ACCOUNT, chainId: this.chainId6, subject, boundDigestHex: digestHex, challengeNonce: nonce, at, display }) }; }
     catch (e) { this.gateErrors.push({ credId: ap.credId, code: e.code ?? 'BIOMETRIC_FAILED' }); return null; }
   }
@@ -139,6 +143,7 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     if (!noGate && (binding.assurance === 'FINGERPRINT_ONLY')) {
       const g = this.gates[credId];
       if (!g) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_UNSUPPORTED' }); return null; }
+      if ((s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(s.v6.gateKeys[credId])) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE' }); return null; }
       try { gate = g.attest({ accountId: s.accountId, chainId: s.chainId, subject: 'PAYMENT', boundDigestHex: dig.toString('hex'), challengeNonce: grant.statement.challengeNonce, at, display: lines.join('\n') }); }
       catch (e) { this.gateErrors.push({ credId, code: e.code ?? 'BIOMETRIC_FAILED' }); return null; }
     }

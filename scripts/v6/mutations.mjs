@@ -15,6 +15,15 @@ const M = [
   ['P0.3: V3 in-transaction record hook not called', 'src/v3/vault/vault.mjs', "this.proposeTxRecord({ paymentId, cap, credId: v.credId });", ''],
   ['P0.3: core reached without V6 verification accepted', VA, "if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');", ''],
   ['P0.3: in-transaction challenge check removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''],
+  // hardening P0.1: HIGH_ASSURANCE fails closed for same-user gate keys
+  ['P0.1: verifyGate HIGH_ASSURANCE check removed', BIO, "if (assurance !== 'LOCAL_GATE' && !highAssuranceGate(k)) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE', `${credId}: gate key ${k.kind} is usable by same-user code without a finger`);", ''],
+  ['P0.1: a TPM-backed same-user key treated as isolated', BIO, "export const ISOLATED_GATE_KINDS = Object.freeze([]);", "export const ISOLATED_GATE_KINDS = Object.freeze(['WINBIO_TPM', 'SIMULATED']);"],
+  ['P0.1: Root command gates verified without the assurance mode', RC, "gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });", "gateKeys: s.v6.gateKeys });"],
+  ['P0.1: Vault payment gates verified without the assurance mode', PA, "gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });", "gateKeys: s.v6.gateKeys });"],
+  ['P0.1: device prompts the sensor for a command that cannot be accepted', 'src/v6/kit.mjs', "#highUnavailable(g) { return (this.policy6.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate({ kind: g.kind }); }", "#highUnavailable(g) { return false; }"],
+  ['P0.1: device prompts the sensor for a payment that cannot be accepted', 'src/v6/kit.mjs', "if ((s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(s.v6.gateKeys[credId])) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE' }); return null; }", ''],
+  ['P0.1: console gate prompts for a command that cannot be accepted', 'src/v6/device/gate-service.mjs', "if ((st.v6?.policy?.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(st.v6?.gateKeys?.[r0.credId])) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE');", ''],
+  ['P0.1: assurance mode not validated', 'src/v6/common/v6.mjs', "if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');", ''],
   // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
   ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
   ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],

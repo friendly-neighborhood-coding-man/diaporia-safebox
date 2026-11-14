@@ -1,0 +1,93 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 8,
+ "total": 8,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P0.1: verifyGate HIGH_ASSURANCE check removed",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor",
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: a TPM-backed same-user key treated as isolated",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 4,
+   "examples": [
+    "P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV",
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor",
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root",
+    "P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt"
+   ]
+  },
+  {
+   "name": "P0.1: Root command gates verified without the assurance mode",
+   "file": "src/v6/root/chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: Vault payment gates verified without the assurance mode",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor"
+   ]
+  },
+  {
+   "name": "P0.1: device prompts the sensor for a command that cannot be accepted",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: device prompts the sensor for a payment that cannot be accepted",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor"
+   ]
+  },
+  {
+   "name": "P0.1: console gate prompts for a command that cannot be accepted",
+   "file": "src/v6/device/gate-service.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt"
+   ]
+  },
+  {
+   "name": "P0.1: assurance mode not validated",
+   "file": "src/v6/common/v6.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated"
+   ]
+  }
+ ]
+}

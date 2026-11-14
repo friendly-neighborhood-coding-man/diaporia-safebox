@@ -87,7 +87,7 @@ export function verifyPaymentApproval(s, { cap, credId, v6 }, at, { skewMs = Num
   let level = 'UV';
   if (b.assurance === 'FINGERPRINT_ONLY' || x.gate !== undefined) {
     verifyGate(x.gate, { accountId: s.accountId, chainId: s.chainId, credId, subject: 'PAYMENT', boundDigestHex: paycapDigest(cap).toString('hex'), challengeNonce: g.challengeNonce,
-      notBeforeMs: ia, notAfterMs: ea, at, maxAgeMs: Number(s.v6.policy.gateMaxAgeMs), skewMs, gateKeys: s.v6.gateKeys });
+      notBeforeMs: ia, notAfterMs: ea, at, maxAgeMs: Number(s.v6.policy.gateMaxAgeMs), skewMs, gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });
     level = 'LOCAL_FINGERPRINT_GATE_PASSED';
   }
   return { binding: b, grant: g, level, nonce: g.challengeNonce };
