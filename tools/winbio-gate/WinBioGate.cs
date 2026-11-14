@@ -46,6 +46,8 @@ static class WinBioGate {
   [DllImport("winbio.dll")] static extern int WinBioEnumBiometricUnits(uint factor, out IntPtr unitSchemaArray, out UIntPtr unitCount);
   [DllImport("winbio.dll")] static extern int WinBioFree(IntPtr address);
 
+  // the Node wrapper passes multi-line prompts (the owner-side command text, P0.2) as " | "-separated lines
+  static string Lines(string p) { return p == null ? null : (p.Length > 1400 ? p.Substring(0, 1400) : p).Replace(" | ", "\n"); }
   static string Arg(string[] a, string k) { for (int i = 0; i + 1 < a.Length; i++) if (a[i] == k) return a[i + 1]; return null; }
   static string Hex(byte[] b) { var s = new StringBuilder(b.Length * 2); foreach (var x in b) s.Append(x.ToString("x2")); return s.ToString(); }
   static string Q(string s) { return "\"" + s.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\""; }
@@ -61,8 +63,8 @@ static class WinBioGate {
       string cmd = args.Length > 0 ? args[0] : "";
       if (cmd == "probe") return Probe();
       if (cmd == "key") return Key(Arg(args, "--name"));
-      if (cmd == "identify") return VerifySign(null, null, int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), false);
-      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "60"), Arg(args, "--prompt"), true);
+      if (cmd == "identify") return VerifySign(null, null, int.Parse(Arg(args, "--timeout") ?? "60"), Lines(Arg(args, "--prompt")), false);
+      if (cmd == "verify-sign") return VerifySign(Arg(args, "--name"), Arg(args, "--hash"), int.Parse(Arg(args, "--timeout") ?? "60"), Lines(Arg(args, "--prompt")), true);
       return Fail("USAGE", 0, "probe | key --name N | identify [--timeout S] [--prompt T] | verify-sign --name N --hash HEX [--timeout S] [--prompt T]");
     } catch (Exception e) { return Fail("HELPER_EXCEPTION", 0, e.GetType().Name); }
   }
@@ -109,19 +111,33 @@ static class WinBioGate {
   //   4. WinBioIdentify took at least MinCaptureMs (a finger already resting on the sensor, or a capture queued by
   //      the service, returns almost at once; such a result is DISCARDED and a NEW touch is required).
   // Discarded results are counted in the output. Diagnostics carry no biometric data (time, sub-factor index only).
-  const int ArmDelayMs = 1000, MinCaptureMs = 700, MaxDiscards = 25, QuietMs = 3000, QuietMaxS = 30;
+  const int ArmDelayMs = 1000, MinCaptureMs = 700, MaxDiscards = 25, QuietMs = 3000, QuietMaxS = 30, MinClickMs = 500;
   static long LastMs = -1; static byte LastSub = 0; static uint LastReject = 0; static int Discarded = 0; static long ArmedAfterMs = -1; static int Calls = 0; static int InactiveTicks = 0; static int QuietDiscards = 0;
+
+  /** Owner request (run 11): the amount a PAYMENT moves is repeated in bold at the top of every gate window. The line is
+   *  taken verbatim from the owner-side text (built from the Root replica, P0.2); nothing is parsed or reformatted. */
+  static void AddAmount(Form form, Label main, string prompt) {
+    if (prompt == null) return;
+    // final review (MEDIUM): only a PAYMENT APPROVAL prompt has an amount, and only its FIXED third line is used (the
+    // Node wrapper turns every '|' inside a line into '/', so free text cannot form the separator; raw newlines are rejected upstream)
+    var ls = prompt.Split('\n');
+    if (ls.Length < 3 || !ls[0].EndsWith("SafeBox V6 - PAYMENT APPROVAL (one payment, exact)") || !ls[2].StartsWith("Pay exactly:")) return;
+    string line = ls[2];
+    var amt = new Label { Dock = DockStyle.Top, Height = 60, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 15f, FontStyle.Bold), ForeColor = Color.DarkRed, Text = line };
+    form.Controls.Add(amt); main.BringToFront(); // the Fill label takes the space left under the bold amount
+  }
 
   /** Phase 1: a window with a Start button (mouse only). Returns true if the owner clicked it before the deadline. */
   static bool ArmByClick(string prompt, DateTime deadline) {
     bool clicked = false; var shown = new System.Diagnostics.Stopwatch();
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 280, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 520, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint." };
     var btn = new Button { Text = "Start fingerprint check", TabStop = false, Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
-    form.Controls.Add(label); form.Controls.Add(btn);
+    form.Controls.Add(label); form.Controls.Add(btn); AddAmount(form, label, prompt);
     // mouse only: MouseClick never fires for Space/Enter, so a keystroke typed into the focused gate window cannot arm it
-    btn.MouseClick += (o, e) => { if (clicked) return; clicked = true; ArmedAfterMs = shown.ElapsedMilliseconds; form.Close(); };
+    // final review (LOW): a click in the first 500 ms after the window appears is ignored (no click-through)
+    btn.MouseClick += (o, e) => { if (clicked || shown.ElapsedMilliseconds < MinClickMs) return; clicked = true; ArmedAfterMs = shown.ElapsedMilliseconds; form.Close(); };
     var timer = new System.Windows.Forms.Timer { Interval = 150 };
     timer.Tick += (o, e) => { if (DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } };
     form.Shown += (o, e) => { shown.Start(); form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
@@ -133,10 +149,10 @@ static class WinBioGate {
    *  when it is shown. Results faster than MinCaptureMs are discarded and a new touch is required. */
   static void IdentifyFocused(IntPtr s, IntPtr ident, DateTime deadline, string prompt, out int idHr, out uint unit, out bool done) {
     int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false; bool stop = false;
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 230, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 480, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nTOUCH the fingerprint sensor NOW.\n\nIf nothing happens when you touch it, click this window once, then touch again." };
-    form.Controls.Add(label);
+    form.Controls.Add(label); AddAmount(form, label, prompt);
     Action<string> say = (txt) => { try { form.BeginInvoke((Action)(() => { label.Text = (prompt ?? "") + "\n\n" + txt; })); } catch { } };
     var t = new Thread(() => {
       // QUIET PHASE (run 7 + run 8 finding: a MATCH arrived ~2 s into capture with no touch, each time a few seconds
@@ -188,20 +204,21 @@ static class WinBioGate {
    *  after a fresh MATCH for this prompt. */
   static int ConfirmTouch(string prompt, DateTime deadline) {
     int answer = 0; // 0 none, 1 yes, 2 no
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 600, Height = 300, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ControlBox = false };
-    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 720, Height = 540, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ControlBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 10f),
       Text = (prompt ?? "") + "\n\nYour fingerprint was read.\nDid YOU just touch the sensor to approve this?" };
     var panel = new TableLayoutPanel { Dock = DockStyle.Bottom, Height = 56, ColumnCount = 2 };
     panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50)); panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
     var no = new Button { Text = "No, I did not touch it", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f) };
     var yes = new Button { Text = "Yes, I touched it: approve", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f, FontStyle.Bold) };
     panel.Controls.Add(no, 0, 0); panel.Controls.Add(yes, 1, 0);
-    form.Controls.Add(label); form.Controls.Add(panel);
-    no.MouseClick += (o, e) => { answer = 2; form.Close(); };
-    yes.MouseClick += (o, e) => { answer = 1; form.Close(); };
+    form.Controls.Add(label); form.Controls.Add(panel); AddAmount(form, label, prompt);
+    var up = new System.Diagnostics.Stopwatch();
+    no.MouseClick += (o, e) => { answer = 2; form.Close(); };               // "No" always counts (refusing is never unsafe)
+    yes.MouseClick += (o, e) => { if (up.ElapsedMilliseconds < MinClickMs) return; answer = 1; form.Close(); }; // final review (LOW): no click-through
     var timer = new System.Windows.Forms.Timer { Interval = 150 };
     timer.Tick += (o, e) => { if (DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } };
-    form.Shown += (o, e) => { form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
+    form.Shown += (o, e) => { up.Start(); form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
     Application.Run(form);
     return answer;
   }

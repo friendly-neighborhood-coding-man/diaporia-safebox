@@ -1,0 +1,2 @@
+not ok 1 - P0.2-display: free text never adds, removes or shifts a line in the gate window
+  error: |-

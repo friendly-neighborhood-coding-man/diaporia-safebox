@@ -1,0 +1,9 @@
+# P0.1 same-user signing probe on the real laptop (LG 16Z90RU), 2026-11-14 ~13:20Z
+# worktree D:\APORIA\safebox-v6-hardening at 9e230d2; winbio-gate.exe built with csc (no warnings),
+# SHA-256 F527576567E6A7213562A1453D878DCE34FBDE8B1D1CB1D34A630B076BE67048 (not committed)
+# command (non-elevated, same Windows user): powershell -NoProfile -ExecutionPolicy Bypass -File tools\winbio-gate\same-user-sign-probe.ps1 -KeyName SafeBoxGate-k2-laptop
+# key = the run 10 enrollment key. Username redacted. No signature printed.
+{"probe":"safebox.v6.p0.1.same-user-sign","keyName":"SafeBoxGate-k2-laptop","user":"<redacted>","elevated":false,"opened":true,"provider":"Microsoft Platform Crypto Provider","exportPolicy":"None","uiProtectionLevel":"None","isMachineKey":false,"signedWithoutFingerprint":true,"signatureVerified":true,"elapsedMs":480,"error":null}
+# Result: CONFIRMED on real hardware. A same-user process signs with the TPM-backed, non-exportable gate key
+# without the helper, the sensor or any prompt. The gate signature proves "same user + this TPM", not a finger.
+# Windows local tests at 9e230d2: hardening-p0-gatekey + hardening-p0-console + winbio-gate: 13/13 pass (Node v24.22.1; local run, not CI).

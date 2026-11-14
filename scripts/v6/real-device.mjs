@@ -18,6 +18,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
 import { BrowserBridge, RealAuthenticator } from '../../src/v6/device/browser-bridge.mjs';
 import { WinBioGate } from '../../src/v6/device/winbio-gate.mjs';
+import { consoleGate } from '../../src/v6/device/gate-service.mjs';
 import { consoleForWorld, emergencyReason } from '../../src/v6/emergency/console.mjs';
 import { verifyWorld6 } from '../../src/v6/supervisor/verifier.mjs';
 import { commandDigest } from '../../src/v5/root/command.mjs';
@@ -122,13 +123,9 @@ const gateSrv = createServer((req, res) => {
   if (req.headers.origin !== ORIGIN) { res.writeHead(403); return res.end('{"ok":false,"code":"GATE_ORIGIN_REJECTED"}'); }
   if (req.method === 'OPTIONS') { res.writeHead(204, cors); return res.end(); }
   let b = ''; req.on('data', (d) => { b += d; }); req.on('end', () => {
-    try { const q = JSON.parse(b); const g = w.gates[q.credId]; if (!g) throw Object.assign(new Error('no gate'), { code: 'FINGERPRINT_ONLY_UNSUPPORTED' });
-      // review: Origin can be forged by a local process, so the gate signs ONLY a digest the console itself prepared
-      // and still holds as PREPARED (an exact FREEZE proposal or an open command bundle) - never an arbitrary digest
-      const prepared = new Set([...[...consoleObj.proposals.values()].filter((x) => x.state === 'PREPARED').map((x) => commandDigest(x.command).toString('hex')),
-        ...[...consoleObj.bundles.values()].filter((x) => x.state === 'OPEN').flatMap((x) => [...x.challenges.values()].map((c) => c.command ? commandDigest(c.command).toString('hex') : null))]);
-      if (q.subject !== 'COMMAND' || !prepared.has(q.boundDigestHex)) throw Object.assign(new Error('not prepared'), { code: 'GATE_DIGEST_NOT_PREPARED_BY_CONSOLE' });
-      const gate = g.attest({ accountId: q.accountId, chainId: q.chainId, subject: q.subject, boundDigestHex: q.boundDigestHex, challengeNonce: q.challengeNonce, at: w.now() });
+    try { const q = JSON.parse(b);
+      // P0.2: rebuilt from the runner's Root replica; the console's proposal list is not consulted
+      const gate = consoleGate({ rootState: () => w.root.state, gates: w.gates, now: w.now }, q);
       ev('OK', 'REAL fingerprint gate MATCH for the console command'); res.writeHead(200, cors); res.end(JSON.stringify({ ok: true, gate })); }
     catch (e) { ev('DENY', 'fingerprint gate: ' + (e.code ?? e.message)); res.writeHead(200, cors); res.end(JSON.stringify({ ok: false, code: e.code ?? 'GATE_ERROR' })); }
   });

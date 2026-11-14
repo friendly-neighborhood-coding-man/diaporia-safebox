@@ -74,8 +74,8 @@ export function commandSummary(s, a, cred) {
   const lines = [`SafeBox V5 - ${a.type}`, `Account: ${s.accountId}`, `Signing credential: ${cred.credId} (${cred.role})`];
   for (const r of affectedResources(s, a)) lines.push(`Affects: ${r}`);
   const f = financialScope(s, a); if (f !== '-') lines.push(`Financial scope (unchanged Purpose limits): ${f}`);
-  if (a.type === 'RAPID_USE_REQUEST') lines.push(`Duration: ${Number(a.body.durationMs) / 60_000} min (max 24 h, never renews)`, `Explanation: ${String(a.body.explanation).slice(0, 120)}`);
-  if (a.type === 'RAPID_USE_APPROVE') { const q = s.v5.rapid.requests[a.body.requestId]; if (q) lines.push(`Duration: ${Number(q.durationMs) / 60_000} min`, `Explanation: ${q.explanation}`, `Decision: ${a.body.decision}`); }
+  if (a.type === 'RAPID_USE_REQUEST') lines.push(`Duration: ${Number(a.body.durationMs) / 60_000} min (max 24 h, never renews)`, `Explanation: ${String(a.body.explanation).replace(/[^\x20-\x7e]/g, '?').slice(0, 120)}`);
+  if (a.type === 'RAPID_USE_APPROVE') { const q = s.v5.rapid.requests[a.body.requestId]; if (q) lines.push(`Duration: ${Number(q.durationMs) / 60_000} min`, `Explanation: ${String(q.explanation).replace(/[^\x20-\x7e]/g, '?')}`, `Decision: ${a.body.decision}`); }
   lines.push('Purpose, recipients and spending limits are NOT changed by this command.', `This approval authorizes exactly this ${a.type} once and nothing else.`);
   return lines.join('\n');
 }

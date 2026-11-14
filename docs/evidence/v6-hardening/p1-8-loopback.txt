@@ -1,0 +1,24 @@
+# P1.8 pre-fix (console.mjs at db3d100): rebinding test
+not ok 1 - P1.8-rebinding ... error: Host "rebind.attacker.example:47929" was served: 200
+ok 2 - P1.8-fuzz (1500 requests, seed 1414): already passing before the change: no unhandled exception, no accepted fuzzed approval, no state change
+
+# post-fix 2026-11-14T13:46:09Z
+ok 1 - P1.8-rebinding: the console refuses requests whose Host is not its own (DNS rebinding), and still serves its own host
+ok 2 - P1.8-fuzz: 1500 fuzzed console requests (no session, and with a real owner session) never hit an unhandled exception or change security state
+ok 3 - B-honest: link -> sign-in -> canonical incident -> exact FREEZE -> Root and Vault frozen -> settlement refused -> verifier clean -> recovery
+ok 4 - B-scanner: GET / HEAD / preview / scanner visits of the link and the API change NO state and consume nothing
+ok 5 - B-email: the email (or a forwarded copy) cannot freeze, approve or sign in: the locator alone authorizes nothing
+ok 6 - B-csrf: POSTs need the exact Origin, JSON, the session cookie and the CSRF token (cross-site form / missing token fail before any effect)
+ok 7 - B-phishing: an assertion made on a look-alike origin, or for another RP, is refused; the link origin is only the owner-signed one
+ok 8 - B-replay: login, proposal, approval and Root challenge are all single-use
+ok 9 - B-wrong-incident: unknown / malformed / mismatched incidents are refused; the reason is fixed by the console, not the client
+ok 10 - B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)
+ok 11 - B-fingerprint: no gate / PIN only / no match / lockout / timeout / unsupported sensor -> no FREEZE, and never a silent PIN substitute
+ok 12 - B-confirm/expiry/epoch: no confirm phrase -> nothing; expired proposal; session dies on Epoch or credential change
+ok 13 - B-unfreeze/recovery: release needs every valid party (non-party refused); unsupported command types refused; Root decides quorum
+ok 14 - B-forged freeze: a FREEZE naming an incident the Risk Engine never opened is flagged by the independent verifier
+ok 15 - B-restart/outage: the hold survives Root and Vault restarts; console sessions do not (re-authentication required)
+ok 16 - B-concurrency: two confirms of one proposal race -> exactly one submission
+ok 17 - B-http: the real HTTP listener serves the page with no-store and refuses cross-origin POSTs
+# pass 17
+# fail 0

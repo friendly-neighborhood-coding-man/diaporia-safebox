@@ -11,6 +11,42 @@ const VA = 'src/v6/vault/vault.mjs', PA = 'src/v6/vault/payment-approval.mjs', R
 const M = [
   // Vault
   ['Vault: V6 challenge nonce single-use removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');", ''],
+  // hardening P0.3: evidence and single use inside the payment transaction
+  ['P0.3: V3 in-transaction record hook not called', 'src/v3/vault/vault.mjs', "this.proposeTxRecord({ paymentId, cap, credId: v.credId });", ''],
+  ['P0.3: core reached without V6 verification accepted', VA, "if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');", ''],
+  ['P0.3: in-transaction challenge check removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''],
+  // hardening P0.1: HIGH_ASSURANCE fails closed for same-user gate keys
+  ['P0.1: verifyGate HIGH_ASSURANCE check removed', BIO, "if (assurance !== 'LOCAL_GATE' && !highAssuranceGate(k)) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE', `${credId}: gate key ${k.kind} is usable by same-user code without a finger`);", ''],
+  ['P0.1: a TPM-backed same-user key treated as isolated', BIO, "export const ISOLATED_GATE_KINDS = Object.freeze([]);", "export const ISOLATED_GATE_KINDS = Object.freeze(['WINBIO_TPM', 'SIMULATED']);"],
+  ['P0.1: Root command gates verified without the assurance mode', RC, "gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });", "gateKeys: s.v6.gateKeys });"],
+  ['P0.1: Vault payment gates verified without the assurance mode', PA, "gateKeys: s.v6.gateKeys, assurance: s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE' });", "gateKeys: s.v6.gateKeys });"],
+  ['P0.1: device prompts the sensor for a command that cannot be accepted', 'src/v6/kit.mjs', "#highUnavailable(g) { return (this.policy6.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate({ kind: g.kind }); }", "#highUnavailable(g) { return false; }"],
+  ['P0.1: device prompts the sensor for a payment that cannot be accepted', 'src/v6/kit.mjs', "if ((s.v6.policy.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(s.v6.gateKeys[credId])) { this.gateErrors.push({ credId, code: 'FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE' }); return null; }", ''],
+  ['P0.1: console gate prompts for a command that cannot be accepted', 'src/v6/device/gate-service.mjs', "if ((st.v6?.policy?.fingerprintAssurance ?? 'LOCAL_GATE') !== 'LOCAL_GATE' && !highAssuranceGate(st.v6?.gateKeys?.[r0.credId])) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE');", ''],
+  ['P0.1: assurance mode not validated', 'src/v6/common/v6.mjs', "if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');", ''],
+  ['P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5', VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"],
+  ['P0.1 review: in-transaction fingerprint-only guard removed', VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", ''],
+  // hardening P1.9 (final delta review): key material in source-literal / legacy-encrypted form
+  ['P1.9: key-material unwrapping removed (concatenated PEM literals missed)', 'scripts/v6/supply-chain.mjs', "for (const l of ls.slice(i + 1, i + 6).map(unwrap))", "for (const l of ls.slice(i + 1, i + 2).map((x) => x.trim()))"],
+  ['P1.9: JWK private key rule removed', 'scripts/v6/supply-chain.mjs', "  ['JWK_PRIVATE_KEY', /\"d\"\\s*:\\s*\"[A-Za-z0-9_-]{32,}\"/],\n", ''],
+  // hardening P1.8: DNS rebinding
+  ['P1.8: console Host check removed', 'src/v6/emergency/console.mjs', "if (!this.#hostOk(String(req.headers?.host ?? ''))) {", "if (false) {"],
+  ['P1.8: console Host check skipped for the real listener', 'src/v6/emergency/console.mjs', "}, { requireHost: true });", "});"],
+  // hardening P1.7: immediate checkpoints for security-critical events
+  ['P1.7: critical events not checkpointed immediately', 'src/v5/journal/journal.mjs', "if (seq % this.checkpointEvery === 0 || CHECKPOINT_NOW_TYPES.has(event.type)) this.checkpoint();", "if (seq % this.checkpointEvery === 0) this.checkpoint();"],
+  // final independent review (1569fc6)
+  ['Review3: verifier checks fingerprint-only approvals only under PER_TRANSACTION', 'src/v6/supervisor/verifier.mjs', "if (s0.v6.policy.payment.mode === 'PER_TRANSACTION' || s0.v6.policy.fingerprintOnlyCreds.includes(approval.credId)) {", "if (s0.v6.policy.payment.mode === 'PER_TRANSACTION') {"],
+  ['Review3: gate prompt only neutralises the exact separator', 'src/v6/device/winbio-gate.mjs', ".replaceAll('|', '/')).join(' | ');", ".replaceAll(' | ', ' / ')).join(' | ');"],
+  ['Review3: wrapper accepts a helper without the owner confirmation', 'src/v6/device/winbio-gate.mjs', "if (j.ownerConfirmed !== true) fail(", "if (false) fail("],
+  // hardening P1.6: bounded console memory under a flood
+  ['P1.6: pending logins not capped', 'src/v6/emergency/console.mjs', "while (this.logins.size > PENDING_LOGINS_MAX) this.logins.delete(this.logins.keys().next().value);", ''],
+  ['P1.6: audit log not bounded', 'src/v6/emergency/console.mjs', "if (this.audit.length > AUDIT_MAX) {", "if (false) {"],
+  // hardening P0.2: the gate reviews the console's prepared object against its own Root replica
+  ['P0.2: prepared command not compared to the Root rebuild', 'src/v6/device/command-review.mjs', "if (canon(statement) !== canon(command)) fail('PREPARED_COMMAND_MISMATCH');", ''],
+  ['P0.2: prepared grant not Root-pinned', 'src/v6/device/command-review.mjs', "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) fail('PREPARED_GRANT_NOT_ROOT_PINNED');", ''],
+  ['P0.2: future rootSeq accepted', 'src/v6/device/command-review.mjs', "|| Number(command.rootSeq) > Number(s.seq)", ''],
+  ['P0.2: gate shows the console digest instead of the rebuilt text', 'src/v6/device/gate-service.mjs', "challengeNonce: r0.grant.statement.challengeNonce, at, display: rv.text });", "challengeNonce: r0.grant.statement.challengeNonce, at, display: null });"],
+  ['P0.2: payment summaryDigest not recomputed', PA, "if (b.summaryDigest !== summaryDigestOf(paymentSummary(s, b, { memo: null }))) fail('V6_SUMMARY_NOT_CANONICAL');", ''],
   ['Vault: delegation policy check removed', VA, "if (this.policy6().delegation !== 'BOUNDED_DELEGATION_ALLOWED') fail('DELEGATION_DISABLED_BY_POLICY');", ''],
   // payment approval binding
   ['Payment: owner approval not required', PA, "if (!v6) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'per-transaction owner approval policy');", "if (!v6) return null;"],
@@ -46,8 +82,6 @@ const M = [
   ['Console: approval not checked against prepared challenge', CON, "if (canon(ap.grant ?? null) !== canon(prop.grant)) deny(403, 'APPROVAL_NOT_FOR_PREPARED_CHALLENGE');", ''],
   ['Console: direct FREEZE may forge an emergency reason', CON, "if (String(b.reason ?? '').startsWith('EMERGENCY_FREEZE')) deny(400, 'USE_EMERGENCY_FREEZE_FLOW');", ''],
   // owner device
-  ['Device: signs a prepared command that differs from its own rebuild', KIT, "if (canon(statement) !== canon(command)) { this.gateErrors.push({ credId, code: 'PREPARED_COMMAND_MISMATCH' }); return null; }", ''],
-  ['Device: prepared grant not checked against Root-pinned issuer', KIT, "if (!verifyObj(V4_DOMAINS.CHALLENGE, grant.statement, grant.sig, s.v4.challengeIssuer.publicKey)) { this.gateErrors.push({ credId, code: 'PREPARED_GRANT_NOT_ROOT_PINNED' }); return null; }", ''],
   // V6 verifier
   ['Verifier6: missing owner approval not flagged', VER6, "if (!x || x.payment_id !== paymentId) codes.push('OWNER_APPROVAL_MISSING');", ''],
   ['Verifier6: reused challenge not flagged', VER6, "if (nonces.has(r.nonce) && nonces.get(r.nonce) !== capId) codes.push('OWNER_APPROVAL_CHALLENGE_REUSED');", ''],
@@ -68,6 +102,8 @@ const M = [
 ];
 // Higher-order mutants: a first-order survivor whose higher-order mutant is caught is a verified redundant check.
 const HO = [
+  ['HO: P0.3 challenge single use removed in the pre-check, the transaction AND the primary key', [[VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');", ''], [VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''], [VA, 'v6_challenges (nonce TEXT PRIMARY KEY,', 'v6_challenges (nonce TEXT,']]],
+  ['HO: P0.1 review: fingerprint-only LEGACY_V5 guard removed in the pre-check AND the transaction', [[VA, "if (v && (strict || fpCreds.includes(v.credId))) {", "if (v && strict) {"], [VA, "if (this.policy6().fingerprintOnlyCreds.includes(ctx.credId)) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'fingerprint-only credential without a verified approval');", '']]],
   ['HO: RS256 modulus minimum removed in BOTH the COSE parser and the signature check', [[WA, "pk.asymmetricKeyDetails.modulusLength >= 2048 && ", ''], [WA, "n.length < 256 || ", '']]],
 ];
 const ONLY = process.env.MUTANTS ? new RegExp(process.env.MUTANTS) : null;

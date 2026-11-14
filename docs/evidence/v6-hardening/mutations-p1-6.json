@@ -1,0 +1,30 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 2,
+ "total": 2,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P1.6: pending logins not capped",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in",
+    "P1.6-residual: more than PENDING_LOGINS_MAX starts between the owner's start and finish evict the owner's pending login (fails closed; the owner retries)"
+   ]
+  },
+  {
+   "name": "P1.6: audit log not bounded",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.6-login-flood: 20 000 unauthenticated login starts keep console memory bounded and the owner can still log in"
+   ]
+  }
+ ]
+}

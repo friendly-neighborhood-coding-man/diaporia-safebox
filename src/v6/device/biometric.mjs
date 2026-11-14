@@ -17,6 +17,14 @@ export const GATE_V = 'safebox.v6.biometric-gate';
 export const GATE_FIELDS = ['v', 'accountId', 'chainId', 'credId', 'gateKeyId', 'method', 'result', 'subject', 'boundDigest', 'challengeNonce', 'verifiedAt', 'sensorClass'];
 export const GATE_SUBJECTS = Object.freeze(['COMMAND', 'PAYMENT']);
 
+/**
+ * P0.1 (issue #14): gate key kinds whose signing is isolated from code running as the owner's OS user (an independent
+ * signer with its own display and an on-device biometric match bound to key use). EMPTY in V6: SIMULATED, WINBIO_TPM
+ * and WINBIO_SOFTWARE_KEY are per-user CNG/software keys with no UI policy, so same-user code can sign with them.
+ */
+export const ISOLATED_GATE_KINDS = Object.freeze([]);
+export const highAssuranceGate = (k) => ISOLATED_GATE_KINDS.includes(k?.kind);
+export const gateKeyProtection = (k) => (highAssuranceGate(k) ? 'ISOLATED_SIGNER' : 'SAME_USER_KEY');
 /** Outcomes a fingerprint attempt can have on the device. Only MATCH produces a gate attestation. */
 export const BIO_OUTCOMES = Object.freeze({ MATCH: 'MATCH', NO_MATCH: 'NO_MATCH', PIN_ONLY: 'PIN_ONLY', LOCKOUT: 'LOCKOUT', TIMEOUT: 'TIMEOUT', UNSUPPORTED: 'UNSUPPORTED', CANCELLED: 'CANCELLED' });
 const OUTCOME_CODE = { NO_MATCH: 'BIOMETRIC_NO_MATCH', PIN_ONLY: 'BIOMETRIC_PIN_NOT_ACCEPTED', LOCKOUT: 'BIOMETRIC_LOCKOUT', TIMEOUT: 'BIOMETRIC_TIMEOUT', UNSUPPORTED: 'FINGERPRINT_ONLY_UNSUPPORTED', CANCELLED: 'BIOMETRIC_CANCELLED' };
@@ -25,9 +33,11 @@ const OUTCOME_CODE = { NO_MATCH: 'BIOMETRIC_NO_MATCH', PIN_ONLY: 'BIOMETRIC_PIN_
  * Root/Vault-side verification of ONE gate attestation. `gateKeys`: credId -> {gateKeyId, spki, sensorClass} from the
  * replayed owner-signed V6 genesis. Window: [notBefore - skew, notAfter] (the challenge grant window) and max age.
  */
-export function verifyGate(gate, { accountId, chainId, credId, subject, boundDigestHex, challengeNonce, notBeforeMs, notAfterMs, at, maxAgeMs, skewMs = 30_000, gateKeys }) {
+export function verifyGate(gate, { accountId, chainId, credId, subject, boundDigestHex, challengeNonce, notBeforeMs, notAfterMs, at, maxAgeMs, skewMs = 30_000, gateKeys, assurance = 'LOCAL_GATE' }) {
   const k = gateKeys[credId];
   if (!k) fail('FINGERPRINT_ONLY_UNSUPPORTED', `no gate key enrolled for ${credId}`);
+  // P0.1: a same-user gate key cannot prove a finger against same-user code; HIGH_ASSURANCE refuses it outright
+  if (assurance !== 'LOCAL_GATE' && !highAssuranceGate(k)) fail('FINGERPRINT_ONLY_HIGH_ASSURANCE_UNAVAILABLE', `${credId}: gate key ${k.kind} is usable by same-user code without a finger`);
   if (!gate) fail('FINGERPRINT_GATE_REQUIRED', credId);
   const x = exactFields(gate, ['statement', 'sig'], [], 'GATE_FIELDS');
   const st = exactFields(x.statement, GATE_FIELDS, [], 'GATE_STATEMENT_FIELDS');

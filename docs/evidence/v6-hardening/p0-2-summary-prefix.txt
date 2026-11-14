@@ -1,0 +1,21 @@
+pre-fix reproducer run, 2026-11-14T12:57:55Z
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3) (101.694461ms)
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient) (72.786857ms)
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another epoch) (67.067183ms)
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance) (91.122936ms)
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (arbitrary digest) (80.220387ms)
+✔ P0.2-summary: the honest summary (with the untrusted requester note shown) still verifies at the Vault and the verifier (145.78774ms)
+ℹ tests 6
+ℹ pass 1
+ℹ fail 5
+✖ failing tests:
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3) (101.694461ms)
+  AssertionError [ERR_ASSERTION]: expected denial for V6_SUMMARY_NOT_CANONICAL
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient) (72.786857ms)
+  AssertionError [ERR_ASSERTION]: expected denial for V6_SUMMARY_NOT_CANONICAL
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another epoch) (67.067183ms)
+  AssertionError [ERR_ASSERTION]: expected denial for V6_SUMMARY_NOT_CANONICAL
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance) (91.122936ms)
+  AssertionError [ERR_ASSERTION]: expected denial for V6_SUMMARY_NOT_CANONICAL
+✖ P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (arbitrary digest) (80.220387ms)
+  AssertionError [ERR_ASSERTION]: expected denial for V6_SUMMARY_NOT_CANONICAL

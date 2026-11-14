@@ -1,0 +1,14 @@
+# P0.1 pre-fix: tests/v6/hardening-p0-gatekey.test.mjs run against a566a6c (before the HIGH_ASSURANCE mode). Test 2 failed only on the new Root view fields: the forged gate + UV payment itself was ACCEPTED (the residual being characterized).
+ok 1 - P0.1-bound: a forged gate without the owner's own UV assertion authorizes no payment
+not ok 2 - P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV
+  error: |-
+  code: 'ERR_ASSERTION'
+not ok 3 - P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor
+  error: 'V6_POLICY_FIELDS: unknown=fingerprintAssurance'
+  code: 'V6_POLICY_FIELDS'
+not ok 4 - P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root
+  error: 'V6_POLICY_FIELDS: unknown=fingerprintAssurance'
+  code: 'V6_POLICY_FIELDS'
+not ok 5 - P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated
+  error: 'V6_POLICY_FIELDS: unknown=fingerprintAssurance'
+  code: 'V6_POLICY_FIELDS'

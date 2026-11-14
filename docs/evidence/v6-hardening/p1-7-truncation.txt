@@ -1,0 +1,10 @@
+# P1.7 pre-fix (journal.mjs at 6900135; first two lines only, the types test had no set yet)
+not ok 1 - P1.7-truncate: deleting an owner payment approval (and everything after it) from the local journal is detected
+    truncation of OWNER_PAYMENT_APPROVAL_VERIFIED at seq 3 went undetected (journal: {"ok":true,"events":2,"problems":[],"checkpointsVerified":0})
+not ok 2 - P1.7-truncate: deleting an owner FREEZE (and everything after it) from the local journal is detected
+    truncation of HOLD_CREATED at seq 1 went undetected (journal: {"ok":true,"events":0,"problems":[],"checkpointsVerified":0})
+not ok 3 - P1.7-types: the critical types are exactly the security-relevant ones (no rejected-attempt floods)
+# post-fix
+ok 1 - P1.7-truncate: deleting an owner payment approval (and everything after it) from the local journal is detected
+ok 2 - P1.7-truncate: deleting an owner FREEZE (and everything after it) from the local journal is detected
+ok 3 - P1.7-types: the critical types are exactly the security-relevant ones (no rejected-attempt floods)

@@ -1,0 +1,7 @@
+# review finding (MEDIUM) pre-fix: final test version against vault.mjs at 9621e99 (world.mjs fix applied)
+not ok 1 - P0.1-legacy (LOCAL_GATE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+    paid: {"paymentId":"p_a283148652604e8b94fc31028446f3ac","state":"BUFFERED","releaseAt":1794615000000,"anomaly":"NONE"}
+not ok 2 - P0.1-legacy (HIGH_ASSURANCE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5
+    paid: {"paymentId":"p_92a8f4232c8f4f878dd74c537dee8520","state":"BUFFERED","releaseAt":1794615000000,"anomaly":"NONE"}
+# pass 0
+# fail 2

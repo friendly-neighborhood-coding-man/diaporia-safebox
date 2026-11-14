@@ -28,7 +28,8 @@ export function buildV6(opts = {}) {
   const v5pay = w.pay;
   /** Owner payment through the V6 owner device ceremony (per-transaction approval); V5 path only under LEGACY_V5. */
   w.pay = async ({ credId = 'k1-phone', recipientId = 'merchant-a.mock', amountYocto = (3n * 10n ** 22n).toString(), request = {}, decide, noGate, tamper, requestId, requestDigest, memo } = {}) => {
-    if (w.root.state.v6.policy.payment.mode === 'LEGACY_V5') return v5pay({ credId, recipientId, amountYocto, request });
+    // LEGACY_V5: UV credentials use the V5 path; fingerprint-only credentials always go through the V6 ceremony (P0.1)
+    if (w.root.state.v6.policy.payment.mode === 'LEGACY_V5' && !w.root.state.v6.policy.fingerprintOnlyCreds.includes(credId)) return v5pay({ credId, recipientId, amountYocto, request });
     const pa = w.owner.paymentApproval(w.root.state, { credId, recipientId, amountYocto, at: w.now(), decide, noGate, tamper, requestId, requestDigest, memo });
     if (!pa) return { ok: false, error: { code: w.owner.gateErrors.at(-1)?.code ?? 'OWNER_DECLINED' }, declined: true };
     w.lastApproval = pa;

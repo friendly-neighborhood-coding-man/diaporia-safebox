@@ -1,0 +1,4 @@
+ok 1 - P1.9-secrets: planted credentials are detected; the scan never returns the value
+ok 2 - P1.9-locks: both lockfiles are v3, every package has an integrity hash, direct dependencies are pinned exactly
+not ok 3 - P1.9-secrets (review): key material in source-literal, legacy-encrypted, DSA, PGP and JWK form is detected
+  error: 'not detected: concatenated'

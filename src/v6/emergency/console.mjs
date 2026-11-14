@@ -43,6 +43,7 @@ class HttpError extends Error { constructor(status, code, detail = '') { super(c
 const deny = (status, code, detail) => { throw new HttpError(status, code, detail); };
 const eq = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 
+export const PENDING_LOGINS_MAX = 1024, AUDIT_MAX = 5000;
 export class OwnerConsole {
   /**
    * deps: { origin, rootState(), submit(req) -> env, challenge (Root-pinned ChallengeService), buildAction(type, body, opts),
@@ -60,15 +61,26 @@ export class OwnerConsole {
     this.audit = []; // metadata only (no secrets): what was requested, by whom, outcome
   }
   #state() { const s = this.rootState(); return V6.projectState(s, Math.max(this.now(), s.lastAt)); }
-  #log(op, outcome, data = {}) { this.audit.push({ at: iso(this.now()), op, outcome, ...data }); }
+  // P1.6 (issue #14): bounded memory under a request flood. The audit log keeps the newest AUDIT_MAX entries and counts
+  // what it dropped; pending (unauthenticated) logins are capped at PENDING_LOGINS_MAX, oldest dropped first.
+  #log(op, outcome, data = {}) {
+    this.audit.push({ at: iso(this.now()), op, outcome, ...data });
+    if (this.audit.length > AUDIT_MAX) { const n = this.audit.length - AUDIT_MAX + AUDIT_MAX / 5; this.audit.splice(0, n); this.auditDropped = (this.auditDropped ?? 0) + n; }
+  }
 
   // ------------------------------------------------------------------ HTTP-shaped entry point (pure; used by tests and by listen())
   /** req: { method, path, headers (lower-case), body (string) } -> { status, headers, body } */
-  async handle(req) {
+  async handle(req, opts = {}) {
     const method = String(req.method ?? 'GET').toUpperCase(); const url = new URL(req.path ?? '/', 'http://x'); const p = url.pathname;
     const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'x-frame-options': 'DENY',
       'content-security-policy': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' ${this.gateOrigin}; frame-ancestors 'none'; form-action 'none'; base-uri 'none'` };
     try {
+      // P1.8 (issue #14): DNS rebinding. A rebound attacker page carries ITS hostname in Host; only the console's own
+      // host (and, for a localhost console, its loopback address on the same port) is served. requireHost is set by
+      // listen(); in-process callers (tests) may omit the header.
+      if (opts.requireHost || req.headers?.host !== undefined) {
+        if (!this.#hostOk(String(req.headers?.host ?? ''))) { this.#log('HTTP', 'MISDIRECTED_HOST', { method }); return { status: 421, headers: { ...headers, 'content-type': 'application/json' }, body: '{"ok":false,"error":{"code":"MISDIRECTED_HOST"}}' }; }
+      }
       if (method === 'GET' || method === 'HEAD') {
         let res;
         if (p === '/' || p === '/app') res = this.#page(null);
@@ -98,6 +110,15 @@ export class OwnerConsole {
       this.#log('HTTP', code, { method, path: p.startsWith('/e/') ? '/e/<locator>' : p });
       return { status, headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify({ ok: false, error: { code, detail: String(e.detail ?? '').slice(0, 160) } }) };
     }
+  }
+  #hostOk(host) {
+    const o = new URL(this.origin); const port = o.port || (o.protocol === 'https:' ? '443' : '80');
+    const allowed = new Set([o.host]);
+    if (o.hostname === 'localhost') allowed.add('127.0.0.1:' + port);
+    if (o.hostname === '127.0.0.1') allowed.add('localhost:' + port);
+    // the literal loopback address this listener is bound to (a rebound page always sends the ATTACKER's hostname)
+    if (this.boundPort) for (const h of ['127.0.0.1', 'localhost', '[::1]']) allowed.add(h + ':' + this.boundPort);
+    return allowed.has(host.toLowerCase());
   }
   #reply(res, headers, head = false) {
     const h = { ...headers };
@@ -136,6 +157,7 @@ export class OwnerConsole {
       issuedAt: iso(t), expiresAt: iso(t + this.loginTtlMs), purpose: 'OWNER_CONSOLE_LOGIN_AUTHORIZES_NOTHING' };
     this.logins.set(loginId, { statement, digest: d6(V6_DOMAINS.SESSION, statement), used: false });
     for (const [k, v] of this.logins) if (Date.parse(v.statement.expiresAt) < t) this.logins.delete(k);
+    while (this.logins.size > PENDING_LOGINS_MAX) this.logins.delete(this.logins.keys().next().value); // oldest first (P1.6)
     this.#log('LOGIN_START', 'ISSUED', { credId: c.credId });
     return { loginId, statement, challengeHex: this.logins.get(loginId).digest.toString('hex'), kind: c.kind, credentialId: c.webauthn?.credentialId ?? null, rpId: s.rp?.rpId ?? null };
   }
@@ -274,11 +296,11 @@ export class OwnerConsole {
       const chunks = []; let size = 0;
       req.on('data', (c) => { size += c.length; if (size > 64 * 1024) req.destroy(); else chunks.push(c); });
       req.on('end', async () => {
-        const out = await this.handle({ method: req.method, path: req.url, headers: req.headers, body: Buffer.concat(chunks).toString('utf8') });
+        const out = await this.handle({ method: req.method, path: req.url, headers: req.headers, body: Buffer.concat(chunks).toString('utf8') }, { requireHost: true });
         res.writeHead(out.status, out.headers); res.end(out.body);
       });
     });
-    return new Promise((ok) => srv.listen(port, host, () => ok(srv)));
+    return new Promise((ok) => srv.listen(port, host, () => { this.boundPort = String(srv.address().port); ok(srv); }));
   }
 }
 

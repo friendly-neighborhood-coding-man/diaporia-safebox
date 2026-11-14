@@ -1,0 +1,678 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 63,
+ "total": 65,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "Vault: V6 challenge nonce single-use removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "P0.3: V3 in-transaction record hook not called",
+   "file": "src/v3/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 12,
+   "examples": [
+    "P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV",
+    "P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence",
+    "P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence",
+    "P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record"
+   ]
+  },
+  {
+   "name": "P0.3: core reached without V6 verification accepted",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)"
+   ]
+  },
+  {
+   "name": "P0.3: in-transaction challenge check removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "P0.1: verifyGate HIGH_ASSURANCE check removed",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor",
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: a TPM-backed same-user key treated as isolated",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 4,
+   "examples": [
+    "P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV",
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor",
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root",
+    "P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt"
+   ]
+  },
+  {
+   "name": "P0.1: Root command gates verified without the assurance mode",
+   "file": "src/v6/root/chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: Vault payment gates verified without the assurance mode",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor"
+   ]
+  },
+  {
+   "name": "P0.1: device prompts the sensor for a command that cannot be accepted",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root"
+   ]
+  },
+  {
+   "name": "P0.1: device prompts the sensor for a payment that cannot be accepted",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor"
+   ]
+  },
+  {
+   "name": "P0.1: console gate prompts for a command that cannot be accepted",
+   "file": "src/v6/device/gate-service.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt"
+   ]
+  },
+  {
+   "name": "P0.1: assurance mode not validated",
+   "file": "src/v6/common/v6.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated"
+   ]
+  },
+  {
+   "name": "P0.2: prepared command not compared to the Root rebuild",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: prepared grant not Root-pinned",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: future rootSeq accepted",
+   "file": "src/v6/device/command-review.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt"
+   ]
+  },
+  {
+   "name": "P0.2: gate shows the console digest instead of the rebuilt text",
+   "file": "src/v6/device/gate-service.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix",
+    "P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE"
+   ]
+  },
+  {
+   "name": "P0.2: payment summaryDigest not recomputed",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed a later approval expiry)",
+    "P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance)"
+   ]
+  },
+  {
+   "name": "Vault: delegation policy check removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-delegation: bounded delegation is its own owner-signed policy; DISABLED refuses delegated effects"
+   ]
+  },
+  {
+   "name": "Payment: owner approval not required",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-stolen PAY key: a stolen software key / V5-only paycap (no V6 approval) cannot pay under PER_TRANSACTION"
+   ]
+  },
+  {
+   "name": "Payment: binding mismatch ignored",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "payment: the capability taskRef must be the binding hash",
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: amount not bound",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: recipient not bound",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: policy version not bound",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: taskRef not bound to binding",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "payment: the capability taskRef must be the binding hash"
+   ]
+  },
+  {
+   "name": "Payment: assurance downgrade accepted",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: challenge signature not checked",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-challenge: reuse with a fresh signature, expiry, forged issuer -> refused"
+   ]
+  },
+  {
+   "name": "Payment: challenge not bound to request digest",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-binding: every bound field is checked (amount, recipient, asset, Purpose, credential, Epoch, policy version, request, expiry, assurance)"
+   ]
+  },
+  {
+   "name": "Payment: challenge not bound to credential",
+   "file": "src/v6/vault/payment-approval.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "payment: a Root-pinned challenge issued to another credential cannot be used"
+   ]
+  },
+  {
+   "name": "Gate: fingerprint-only credential needs no gate",
+   "file": "src/v6/root/chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-fingerprint: no gate / PIN only / no match / lockout / timeout / unsupported sensor -> no FREEZE, and never a silent PIN substitute"
+   ]
+  },
+  {
+   "name": "Gate: gate key PoP not checked at genesis",
+   "file": "src/v6/root/chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "genesis: a gate key whose proof of possession is for another credential is refused"
+   ]
+  },
+  {
+   "name": "Gate: missing gate accepted",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "A-fingerprint: no gate, PIN only, no match, lockout, timeout, unsupported sensor, wrong digest, stale or foreign gate -> no payment",
+    "B-fingerprint: no gate / PIN only / no match / lockout / timeout / unsupported sensor -> no FREEZE, and never a silent PIN substitute"
+   ]
+  },
+  {
+   "name": "Gate: method not checked (PIN/UV accepted as fingerprint)",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Gate: result not checked",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Gate: bound digest not checked",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Gate: challenge nonce not checked",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Gate: signature not checked",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "A-fingerprint: no gate, PIN only, no match, lockout, timeout, unsupported sensor, wrong digest, stale or foreign gate -> no payment"
+   ]
+  },
+  {
+   "name": "Gate: staleness not checked",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Gate: wrong credential accepted",
+   "file": "src/v6/device/biometric.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "gate: every statement field is checked even under a VALID gate-key signature (a lying or buggy helper)"
+   ]
+  },
+  {
+   "name": "Console: Origin check removed",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "B-csrf: POSTs need the exact Origin, JSON, the session cookie and the CSRF token (cross-site form / missing token fail before any effect)",
+    "B-http: the real HTTP listener serves the page with no-store and refuses cross-origin POSTs"
+   ]
+  },
+  {
+   "name": "Console: CSRF token not checked",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-csrf: POSTs need the exact Origin, JSON, the session cookie and the CSRF token (cross-site form / missing token fail before any effect)"
+   ]
+  },
+  {
+   "name": "Console: login challenge reusable",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-replay: login, proposal, approval and Root challenge are all single-use"
+   ]
+  },
+  {
+   "name": "Console: proposal reusable",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "B-replay: login, proposal, approval and Root challenge are all single-use",
+    "B-concurrency: two confirms of one proposal race -> exactly one submission"
+   ]
+  },
+  {
+   "name": "Console: proposal not bound to session",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)"
+   ]
+  },
+  {
+   "name": "Console: confirm phrase not required",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-confirm/expiry/epoch: no confirm phrase -> nothing; expired proposal; session dies on Epoch or credential change"
+   ]
+  },
+  {
+   "name": "Console: unknown incident accepted",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-wrong-incident: unknown / malformed / mismatched incidents are refused; the reason is fixed by the console, not the client"
+   ]
+  },
+  {
+   "name": "Console: approval not checked against prepared command",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "B-replay: login, proposal, approval and Root challenge are all single-use",
+    "B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)"
+   ]
+  },
+  {
+   "name": "Console: approval not checked against prepared challenge",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "console: an approval carrying another proposal's challenge is refused before Root"
+   ]
+  },
+  {
+   "name": "Console: direct FREEZE may forge an emergency reason",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-wrong-incident: unknown / malformed / mismatched incidents are refused; the reason is fixed by the console, not the client"
+   ]
+  },
+  {
+   "name": "Device: signs a prepared command that differs from its own rebuild",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-substitution: a compromised console/page that alters the action or statement is caught by the device (and by Root)"
+   ]
+  },
+  {
+   "name": "Device: prepared grant not checked against Root-pinned issuer",
+   "file": "src/v6/kit.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "device: a prepared challenge not signed by the Root-pinned issuer is not signed"
+   ]
+  },
+  {
+   "name": "Verifier6: missing owner approval not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 5,
+   "examples": [
+    "tests/v6/hardening-p0-nonce.test.mjs",
+    "tests/v6/hardening-p0-summary.test.mjs",
+    "tests/v6/mutation-gaps.test.mjs",
+    "tests/v6/workflow-a-payment.test.mjs"
+   ]
+  },
+  {
+   "name": "Verifier6: reused challenge not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "verifier6: a dishonest Vault that forgets consumed challenges, misreports levels or ignores the delegation policy is flagged"
+   ]
+  },
+  {
+   "name": "Verifier6: misreported level not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "verifier6: a dishonest Vault that forgets consumed challenges, misreports levels or ignores the delegation policy is flagged"
+   ]
+  },
+  {
+   "name": "Verifier6: delegated effect while disabled not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "verifier6: a dishonest Vault that forgets consumed challenges, misreports levels or ignores the delegation policy is flagged"
+   ]
+  },
+  {
+   "name": "Verifier6: malformed emergency reason not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-forged freeze: a FREEZE naming an incident the Risk Engine never opened is flagged by the independent verifier"
+   ]
+  },
+  {
+   "name": "Verifier6: freeze for unknown incident not flagged",
+   "file": "src/v6/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "B-forged freeze: a FREEZE naming an incident the Risk Engine never opened is flagged by the independent verifier"
+   ]
+  },
+  {
+   "name": "Verifier5 E3: older-open-incident decision not flagged",
+   "file": "src/v5/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "E3: with two open incidents, a decision bound to the OLDER one (borrowing its review) is flagged"
+   ]
+  },
+  {
+   "name": "Verifier5 E1: hidden open incident not flagged",
+   "file": "src/v5/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "R8: a compromised vault that hides an open HIGH incident from the engine is flagged; a natural 24 h lapse is not",
+    "E1: a vault that hides an open incident in its final 15 minutes is flagged (ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT)"
+   ]
+  },
+  {
+   "name": "Verifier5 Rapid: early release covered without a grant",
+   "file": "src/v5/supervisor/verifier.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 2,
+   "examples": [
+    "compromised vault releases a delayed payment early -> DELAYED_PAYMENT_RELEASED_EARLY",
+    "compromised vault erases its own delay record -> engine journal exposes DELAY_RECORD_MISMATCH"
+   ]
+  },
+  {
+   "name": "Gmail: scope not checked",
+   "file": "src/v6/notify/gmail.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "G-scope: a token whose scope is not exactly gmail.send is refused and nothing is sent (least privilege)"
+   ]
+  },
+  {
+   "name": "Gmail: ON without SAFEBOX_ALLOW_REAL_EMAIL",
+   "file": "src/v6/notify/gmail.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "G-off-by-default: without SAFEBOX_ALLOW_REAL_EMAIL=1, credentials and an allowlist nothing leaves the process"
+   ]
+  },
+  {
+   "name": "Gmail: recipient allowlist removed",
+   "file": "src/v6/notify/gmail.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "G-off-by-default: without SAFEBOX_ALLOW_REAL_EMAIL=1, credentials and an allowlist nothing leaves the process"
+   ]
+  },
+  {
+   "name": "Genesis RP: loopback exception widened to any http origin",
+   "file": "src/v3/root/chain.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "genesis RP: the loopback exception is exactly http://localhost:<port>"
+   ]
+  },
+  {
+   "name": "HO: P0.3 challenge single use removed in the pre-check, the transaction AND the primary key",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 3,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence",
+    "P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence",
+    "A-challenge: reuse with a fresh signature, expiry, forged issuer -> refused"
+   ]
+  },
+  {
+   "name": "HO: RS256 modulus minimum removed in BOTH the COSE parser and the signature check",
+   "file": "src/v3/webauthn/verify.mjs",
+   "order": 2,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "RS256 keys below 2048 bits are refused"
+   ]
+  }
+ ]
+}

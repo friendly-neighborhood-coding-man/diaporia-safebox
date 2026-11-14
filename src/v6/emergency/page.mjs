@@ -82,7 +82,8 @@ $('go').onclick = async () => {
     const approval = { credId: P.command.credId, command: P.command, grant: P.grant, webauthn: await assertWith(P.digestHex, P.credentialId, P.rpId) };
     if (P.gateRequired) {
       const g = await fetch(GATE_URL + '/attest', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ subject: 'COMMAND', credId: P.command.credId,
-        accountId: P.command.accountId, chainId: P.command.chainId, boundDigestHex: P.digestHex, challengeNonce: P.grant.statement.challengeNonce }) }).then(r => r.json());
+        // P0.2: the owner side rebuilds this from its own Root replica and shows ITS text in the gate window
+        action: P.action, grant: P.grant, command: P.command, boundDigestHex: P.digestHex, challengeNonce: P.grant.statement.challengeNonce }) }).then(r => r.json());
       if (!g.ok) throw new Error('fingerprint gate: ' + g.code + ' (nothing was submitted)');
       approval.gate = g.gate;
     }

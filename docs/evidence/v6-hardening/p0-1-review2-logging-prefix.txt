@@ -1,0 +1,1 @@
+not ok 1 - P0.1-legacy: with fingerprint-only credentials configured, a UV credential's bad paycap under LEGACY_V5 is still refused and attributed by the V5 core

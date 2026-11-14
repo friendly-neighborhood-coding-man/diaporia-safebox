@@ -13,6 +13,7 @@
 // anything that did not run. The browser's WebAuthn credential is the SAME key Root enrolled (injected into Chromium's
 // virtual authenticator over CDP): this is protocol-real but NOT a hardware or biometric proof.
 import { createRequire } from 'node:module';
+import { consoleGate } from '../../src/v6/device/gate-service.mjs';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
@@ -99,8 +100,9 @@ const gateSrv = createServer((req, res) => {
   if (req.headers.origin && req.headers.origin !== ORIGIN) { res.writeHead(403, { 'content-type': 'application/json' }); return res.end('{"ok":false,"code":"GATE_ORIGIN_REJECTED"}'); }
   if (req.method === 'OPTIONS') { res.writeHead(204, cors); return res.end(); }
   let b = ''; req.on('data', (d) => { b += d; }); req.on('end', () => {
-    try { const q = JSON.parse(b); const gate = w.gates[q.credId].attest({ accountId: q.accountId, chainId: q.chainId, subject: q.subject, boundDigestHex: q.boundDigestHex, challengeNonce: q.challengeNonce, at: w.now() });
-      ev('OWNER', `SIMULATED fingerprint gate: MATCH for ${q.credId}, bound to digest ${q.boundDigestHex.slice(0, 16)}… (not a real sensor)`); res.writeHead(200, cors); res.end(JSON.stringify({ ok: true, gate })); }
+    // P0.2 review: the same gate decision as the real-device runner (rebuild from Root, show that text, refuse otherwise)
+    try { const q = JSON.parse(b); const gate = consoleGate({ rootState: () => w.root.state, gates: w.gates, now: w.now }, q);
+      ev('OWNER', `SIMULATED fingerprint gate: MATCH for ${q.credId}, bound to the command rebuilt from Root ${gate.statement.boundDigest.slice(0, 16)}… (not a real sensor)`); res.writeHead(200, cors); res.end(JSON.stringify({ ok: true, gate })); }
     catch (e) { ev('DENY', `SIMULATED fingerprint gate refused: ${e.code ?? e.message}`); res.writeHead(200, cors); res.end(JSON.stringify({ ok: false, code: e.code ?? 'GATE_ERROR' })); }
   });
 });

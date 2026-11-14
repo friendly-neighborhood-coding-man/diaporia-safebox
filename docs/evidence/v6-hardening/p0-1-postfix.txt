@@ -1,0 +1,11 @@
+# P0.1 post-fix 2026-11-14T13:14:37Z
+ok 1 - P0.1-bound: a forged gate without the owner's own UV assertion authorizes no payment
+ok 2 - P0.1-residual (LOCAL_GATE): a forged gate next to a UV-only assertion is accepted, so fingerprint-only degrades to Windows Hello UV
+ok 3 - P0.1-high: HIGH_ASSURANCE fails closed for every fingerprint-only payment (honest or forged) and never prompts the sensor
+ok 4 - P0.1-high: HIGH_ASSURANCE fails closed for fingerprint-only commands (FREEZE), honest or forged, at the Root
+ok 5 - P0.1-policy: the assurance mode is owner-signed at genesis, optional (default LOCAL_GATE, digest unchanged) and strictly validated
+ok 6 - P0.1-high: the console gate service refuses a HIGH_ASSURANCE fingerprint-only command before any prompt
+ok 7 - WinBioGate (emulated helper): genesis enrollment PoP, payment gate and FREEZE gate verify in Root/Vault
+ok 8 - WinBioGate: NO_MATCH / TIMEOUT / LOCKOUT / unsupported -> no gate, no payment (fail closed)
+# pass 8
+# fail 0

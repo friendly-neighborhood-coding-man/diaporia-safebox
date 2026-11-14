@@ -1,0 +1,29 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 2,
+ "total": 2,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P1.8: console Host check removed",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.8-rebinding: the console refuses requests whose Host is not its own (DNS rebinding), and still serves its own host"
+   ]
+  },
+  {
+   "name": "P1.8: console Host check skipped for the real listener",
+   "file": "src/v6/emergency/console.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P1.8-rebinding: the console refuses requests whose Host is not its own (DNS rebinding), and still serves its own host"
+   ]
+  }
+ ]
+}

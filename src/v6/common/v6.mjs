@@ -59,8 +59,13 @@ export const DEFAULT_ASSURANCE_POLICY = Object.freeze({
 });
 
 const POLICY_FIELDS = ['version', 'payment', 'fingerprintOnlyCreds', 'delegation', 'gateMaxAgeMs', 'emergency'];
+// P0.1 (issue #14): how much a fingerprint gate may claim. LOCAL_GATE (default when absent, so earlier genesis digests are
+// unchanged): a gate key on the owner's OS, usable by same-user code without a finger. HIGH_ASSURANCE: only a gate key
+// isolated from same-user code may satisfy fingerprint-only; none exists in V6, so such approvals fail closed.
+export const FP_ASSURANCE = Object.freeze(['LOCAL_GATE', 'HIGH_ASSURANCE']);
 export function parsePolicy(p) {
-  exactFields(p, POLICY_FIELDS, [], 'V6_POLICY_FIELDS');
+  exactFields(p, POLICY_FIELDS, ['fingerprintAssurance'], 'V6_POLICY_FIELDS');
+  if ('fingerprintAssurance' in p && !FP_ASSURANCE.includes(p.fingerprintAssurance)) fail('V6_POLICY_FP_ASSURANCE');
   if (!/^[1-9][0-9]{0,6}$/.test(p.version)) fail('V6_POLICY_VERSION');
   exactFields(p.payment, ['mode', 'approvalTtlMs'], [], 'V6_POLICY_PAYMENT');
   if (!Object.values(PAYMENT_MODES).includes(p.payment.mode)) fail('V6_POLICY_PAYMENT_MODE');

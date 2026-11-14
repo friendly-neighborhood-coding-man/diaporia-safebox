@@ -1,0 +1,23 @@
+# P0.2 post-fix: 7734439+worktree, 2026-11-14T13:07:28Z
+ok 1 - P0.2-display: the gate window shows the command rebuilt from Root (type, scope, hold), not a digest prefix
+ok 2 - P0.2-substitution: a console that shows FREEZE but asks the gate for a HOLD_RELEASE gets a window that says HOLD_RELEASE
+ok 3 - P0.2-forged: commands the Root would not produce are refused before any fingerprint prompt
+ok 4 - P0.2-format: a digest-only gate request (no prepared object) is refused
+ok 5 - P0.2-display (device route): a HOLD_RELEASE approved on the device shows the rebuilt command on the gate window, not a digest prefix
+ok 6 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed amount 1 instead of 3)
+ok 7 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed another recipient)
+ok 8 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed a later approval expiry)
+ok 9 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (displayed weaker assurance)
+ok 10 - P0.2-summary: an approval whose summaryDigest is not the canonical Root summary is refused (arbitrary digest)
+ok 11 - P0.2-summary: the honest summary (with the untrusted requester note shown) still verifies at the Vault and the verifier
+# pass 11
+# fail 0
+
+# real-device self-test (fake WinBio helper, MOCK ledger) gate prompts:
+[runner] TOUCH  Touch the fingerprint sensor now (SENSOR_CHECK)
+[runner] TOUCH  Touch the fingerprint sensor now (ENROLL_GATE_KEY)
+[runner] TOUCH  Touch the fingerprint sensor now (SafeBox V6 - PAYMENT APPROVAL (one payment, exact) | Account: vault-alice.mock | Pay exactly: 30000000000000000000000 yoctoNEAR (0.03 NEAR) | Recipient: merchant-a.mock | Purpose: household-shopping v1 - Pay allow-listed household merchants for owner-requested purchases only. | Epoch: 1; assurance policy v1 | Signing credential: k2-laptop (DAILY); 
+[runner] TOUCH  Touch the fingerprint sensor now (SafeBox V5 - FREEZE | Account: vault-alice.mock | Signing credential: k2-laptop (DAILY) | Affects: action:FREEZE | Purpose, recipients and spending limits are NOT changed by this command. | This approval authorizes exactly this FREEZE once and nothing else. | Scope: GLOBAL (every unsettled payment of vault-alice.mock is held; settled payments canno
+[runner] TOUCH  Touch the fingerprint sensor now (SafeBox V5 - HOLD_RELEASE | Account: vault-alice.mock | Signing credential: k2-laptop (DAILY) | Affects: hold:ef-d9c9f91cd1ad898a | Affects: scope:GLOBAL:* | Purpose, recipients and spending limits are NOT changed by this command. | This approval authorizes exactly this HOLD_RELEASE once and nothing else. | Releases hold: ef-d9c9f91cd1ad898a (diges
+[runner] OK     HOLD_RELEASE: accepted; frozen now false
+[runner] DONE   evidence: /tmp/claude-0/st3

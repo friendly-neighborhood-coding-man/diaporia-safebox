@@ -1,0 +1,42 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 3,
+ "total": 3,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "P0.1 review: fingerprint-only credential pays without V6 approval under LEGACY_V5",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-legacy (pre-check): a fingerprint-only V5 paycap is refused BEFORE the payment transaction, as an owner-approval rejection"
+   ]
+  },
+  {
+   "name": "P0.1 review: in-transaction fingerprint-only guard removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.1-legacy (transaction guard): a fingerprint-only paycap that reaches the core without the V6 layer is refused inside the transaction"
+   ]
+  },
+  {
+   "name": "HO: P0.1 review: fingerprint-only LEGACY_V5 guard removed in the pre-check AND the transaction",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 2,
+   "caught": true,
+   "failingTests": 4,
+   "examples": [
+    "P0.1-legacy (LOCAL_GATE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5",
+    "P0.1-legacy (HIGH_ASSURANCE): a fingerprint-only credential cannot pay without its V6 approval when payment.mode is LEGACY_V5",
+    "P0.1-legacy (pre-check): a fingerprint-only V5 paycap is refused BEFORE the payment transaction, as an owner-approval rejection",
+    "P0.1-legacy (transaction guard): a fingerprint-only paycap that reaches the core without the V6 layer is refused inside the transaction"
+   ]
+  }
+ ]
+}
