@@ -8,6 +8,10 @@ import { fail, exactFields } from '../../v3/common/canon.mjs';
 import { V5_DOMAINS, d5hex } from '../common/v5.mjs';
 import { evaluate, RISK_POLICY_V1, policyDigest } from './detector.mjs';
 import { bufferDecision } from './buffer.mjs';
+import { createHash } from 'node:crypto';
+/** P1 (N3/N4): an incident's id is derived from the payment whose engine decision opened it, so the independent
+ *  verifier can bind every HIGH decision and every owner review to one incident from the engine journal alone. */
+export const incidentIdFor = (paymentId) => 'inc-' + createHash('sha256').update('DIAPORIA_SAFEBOX_V51_INCIDENT\n' + String(paymentId)).digest('hex').slice(0, 24);
 
 export const FINDING_KINDS = Object.freeze(['UNUSUAL_SPENDING', 'CORRELATED_SECURITY_EVENTS', 'NOTIFICATION_ANOMALY', 'JOURNAL_INTEGRITY', 'PROTECTIVE_HOLD_PATTERN', 'RAPID_USE_PATTERN', 'OTHER']);
 export const RECOMMENDATIONS = Object.freeze(['NONE', 'REQUEST_VERIFICATION', 'OWNER_REVIEW', 'REPORT_ONLY']);

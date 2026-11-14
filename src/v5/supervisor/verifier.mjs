@@ -14,8 +14,9 @@
 //    owner device + ORC) and the owner-/delegate-signed issuedAt; an effect at or after it is
 //    EFFECT_AFTER_SETTLEMENT_HORIZON. Consumption after the authorization's own expiresAt is
 //    AUTHORIZATION_CONSUMED_AFTER_DEADLINE. Neither depends on the vault's or the engine's records.
-//  * P1: an effect for a payment pending when the engine (RISK journal) classified its flow HIGH needs an owner LEGITIMATE
-//    review of that credential made after the HIGH decision, or an ACTIVE covering Rapid-Use grant, else
+//  * P1: an effect for a payment whose incident (bound from the engine journal: signed incidentRef or the id derived from
+//    the opening payment) was classified HIGH needs an owner LEGITIMATE review of that incident naming its credential,
+//    or an ACTIVE covering Rapid-Use grant, else
 //    HIGH_RISK_SETTLED_WITHOUT_RESOLUTION. The flow comes from signed evidence, never from the vault's own records.
 //  * P4: every effect needs a V5 evaluation record and the engine's journaled BUFFER_DECISION; the proposal time is the
 //    engine journal's; the applied buffer is the larger of the signed and journaled values; tier resets are checked on
@@ -28,6 +29,7 @@ import { V5_DOMAINS, verifyObj5 } from '../common/v5.mjs';
 import { verifyJournalChain } from '../journal/journal.mjs';
 import { RISK_POLICY_V1 } from '../risk/detector.mjs';
 import { tierFromInputs, tierToBufferMs, bufferFloorMs, MAX_BUFFER_MS } from '../risk/buffer.mjs';
+import { incidentIdFor } from '../risk/engine.mjs';
 
 export const AUTHORITY_TYPES_V5 = new Set(['ENROLL', 'REVOKE', 'ROTATE', 'ROTATE_FREEZE', 'AMEND_PURPOSE', 'AMEND_MATRIX', 'RECOVERY_COMPLETE', 'RECONSTITUTE', 'RECOVERY_OWNER_AUTHORIZE', 'ORC_REPLACE',
   'GOV_CASE_EXECUTE', 'GUARDIAN_ROTATE', 'CONTEST_PROTECTIVE_HOLD', 'DELEGATION_GRANT', 'RAPID_USE_ACTIVATE', 'INCIDENT_REVIEW', 'HOLD_RELEASE', 'UNSUSPEND']);
@@ -82,15 +84,35 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     } catch { f = null; }
     flowCache.set(pid, f); return f;
   };
-  const engineDelay = new Map(); const highByFlow = new Map(); const engineAt = new Map(); const unmapped = [];
+  // P1 (F1/N3/N4): incidents are bound from the engine journal alone. A decision's incident is its signed incidentRef,
+  // or, when the decision opened the incident, the id derived from its own payment (incidentIdFor). A payment belongs to
+  // the incident of its own non-NONE decision, else to the first non-NONE decision of its (signed) flow after it was
+  // proposed (the vault delays every pending payment of the flow when an incident opens).
+  const engineDelay = new Map(); const engineAt = new Map(); const unmapped = []; const openedBy = new Map(); const badRefs = [];
+  const highAt = new Map(); // incidentId -> first HIGH decision time
+  const ownIncident = new Map(); const flowDecisions = new Map(); // flow -> [{at, incident}]
   for (const r of journal?.rows ?? []) {
     const e = JSON.parse(r.body); if (e.layer !== 'RISK') continue;
     if (e.type === 'BUFFER_DECISION' && !engineAt.has(e.relatedId)) engineAt.set(e.relatedId, Date.parse(e.at));
     if (e.type === 'ENGINE_DECISION' && e.outcome !== 'NONE') {
       engineDelay.set(e.relatedId, Math.max(engineDelay.get(e.relatedId) ?? 0, Number(e.data.delayMs)));
-      if (e.data.riskClass === 'HIGH') { const f = flowOf(e.relatedId); if (!f) unmapped.push(e.relatedId); else (highByFlow.get(f.flow) ?? highByFlow.set(f.flow, []).get(f.flow)).push(Date.parse(e.at)); }
+      const inc = e.data.incidentRef && e.data.incidentRef !== '-' ? e.data.incidentRef : incidentIdFor(e.relatedId);
+      const at = Date.parse(e.at);
+      if (!ownIncident.has(e.relatedId)) ownIncident.set(e.relatedId, inc);
+      const f = flowOf(e.relatedId);
+      if (!f) { if (e.data.riskClass === 'HIGH') unmapped.push(e.relatedId); continue; }
+      // an incidentRef must name an incident opened earlier by the SAME flow and not yet reviewed (the vault supplies
+      // the open incident to the engine; it must not re-label a decision onto an already resolved or foreign incident)
+      if (e.data.incidentRef && e.data.incidentRef !== '-') {
+        if (openedBy.get(inc) !== f.flow) badRefs.push(e.relatedId);
+        else { const rv = stateAt(at).v5.incidentReviews[inc]; if (rv && Number(rv.at) < at) badRefs.push(e.relatedId); }
+      } else openedBy.set(inc, f.flow);
+      (flowDecisions.get(f.flow) ?? flowDecisions.set(f.flow, []).get(f.flow)).push({ at, inc });
+      if (e.data.riskClass === 'HIGH' && !(highAt.get(inc) <= at)) highAt.set(inc, at);
     }
   }
+  const incidentOf = (pid, f, tP) => ownIncident.get(pid) ?? (flowDecisions.get(f.flow) ?? []).find(d => d.at >= tP)?.inc ?? null;
+  if (badRefs.length) out.financial.violations.push({ txId: '-', paymentId: badRefs[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_DECISION_ON_FOREIGN_OR_CLOSED_INCIDENT'] });
   if (unmapped.length) out.financial.violations.push({ txId: '-', paymentId: unmapped[0], recipient: '-', amountYocto: '0', codes: ['HIGH_DECISION_WITHOUT_SIGNED_EVIDENCE'] });
   const horizon = Number(st.v5.config.settlementHorizonMs);
   // P4: buffer policy and floor come from the REPLAYED owner-signed genesis, never from the vault's configuration
@@ -108,6 +130,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     // F3: every effect needs the vault's evaluation record AND the engine's own journaled buffer decision
     const jAt = engineAt.get(paymentId);
     if (ev && !String(capId).startsWith('hist-')) {
+      if (ev.payment_id !== paymentId) v.push('EFFECT_CAP_NOT_BOUND_TO_PAYMENT'); // N1: the spent capability must be this payment's own
       if (!vp) v.push('EFFECT_WITHOUT_V5_EVALUATION_RECORD');
       if (journal && jAt === undefined) v.push('EFFECT_WITHOUT_ENGINE_BUFFER_DECISION');
       if (vp && jAt !== undefined && vp.proposed_at !== jAt) v.push('PROPOSAL_TIME_MISMATCH');
@@ -188,7 +211,8 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
           const due = proposedAt + payBuffer + shift;
           if (tx.submitted_at < due) {
             const sf = flowOf(paymentId);
-            const review = sf && Object.values(sE.v5.incidentReviews).some(r => r.verdict === 'LEGITIMATE' && r.credId === sf.credId && Number(r.at) >= proposedAt && Number(r.at) <= tx.submitted_at);
+            const si = sf ? incidentOf(paymentId, sf, proposedAt) : null; const rv = si ? sE.v5.incidentReviews[si] : null;
+            const review = rv?.verdict === 'LEGITIMATE' && rv.credId === sf.credId;
             const grant = sf && Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(sf.credId) || (sf.delegationId && g.scope.delegationIds.includes(sf.delegationId))) && g.scope.recipients.includes(tx.recipient));
             if (!review && !grant) { v.push('DELAYED_PAYMENT_RELEASED_EARLY'); out.delays.earlyRelease.push(paymentId); }
           }
@@ -200,10 +224,12 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
         // or before h and settled after it. It needs an owner LEGITIMATE review of that credential made after h, or a
         // Rapid-Use grant covering the payment. Nothing here reads the vault's incident_id or flow columns.
         const fl = flowOf(paymentId);
-        const hs = fl ? (highByFlow.get(fl.flow) ?? []).filter(h => h >= proposedAt && h <= tx.submitted_at) : [];
-        if (hs.length) {
-          const h = Math.max(...hs);
-          const review = Object.values(sE.v5.incidentReviews).some(r => r.verdict === 'LEGITIMATE' && r.credId === fl.credId && Number(r.at) >= h && Number(r.at) <= tx.submitted_at);
+        const inc = fl ? incidentOf(paymentId, fl, proposedAt) : null;
+        const h = inc ? highAt.get(inc) : undefined;
+        if (h !== undefined && h <= tx.submitted_at) {
+          // resolution = an owner LEGITIMATE review of THAT incident naming this credential, or a covering Rapid-Use grant
+          const rv = sE.v5.incidentReviews[inc];
+          const review = rv?.verdict === 'LEGITIMATE' && rv.credId === fl.credId;
           const grant = Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(fl.credId) || (fl.delegationId && g.scope.delegationIds.includes(fl.delegationId))) && g.scope.recipients.includes(tx.recipient));
           if (!review && !grant) v.push('HIGH_RISK_SETTLED_WITHOUT_RESOLUTION');
         }
@@ -229,6 +255,8 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     if (resets.length) { out.buffer.violations += resets.length; out.financial.violations.push({ txId: '-', paymentId: resets[0], recipient: '-', amountYocto: '0', codes: ['BUFFER_TIER_RESET'] }); }
   }
   if (journal) out.journal = verifyJournalChain(journal.rows, journal.checkpoints, journal.publicKey);
+  // N5: without the engine journal the P1/P4 checks cannot be made independently: never report ok
+  if (!journal && ledgerTxs.length) out.financial.violations.push({ txId: '-', paymentId: '-', recipient: '-', amountYocto: '0', codes: ['ENGINE_JOURNAL_REQUIRED'] });
   out.ok = out.chainValid && !out.financial.violations.length && !out.authority.unauthorized.length && !out.rapid.violations.length && (!journal || out.journal.ok);
   return out;
 }

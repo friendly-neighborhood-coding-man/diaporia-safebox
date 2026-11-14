@@ -18,12 +18,13 @@ import { V5_DOMAINS, d5hex, verifyObj5 } from '../common/v5.mjs';
 import { merchantHolds, delegationHolds, credentialHolds } from '../root/holds.mjs';
 import { RISK_POLICY_V1 } from '../risk/detector.mjs';
 import { bufferFloorMs, MAX_BUFFER_MS, tierToBufferMs } from '../risk/buffer.mjs';
+import { incidentIdFor } from '../risk/engine.mjs';
 
 const HOLDING = ['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN', 'FROZEN'];
 const V5_SCHEMA = `
 CREATE TABLE IF NOT EXISTS v5_pay (payment_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, delegation_id TEXT, recipient TEXT NOT NULL, amount TEXT NOT NULL,
   proposed_at INTEGER NOT NULL, anomaly TEXT NOT NULL, delay_ms INTEGER NOT NULL, incident_id TEXT, rapid_grant TEXT, baseline_eligible INTEGER NOT NULL, decision TEXT, settled_before_detection INTEGER NOT NULL DEFAULT 0, cap_expires_orig INTEGER,
-  risk_class TEXT NOT NULL DEFAULT 'NONE', auth_issued_at INTEGER, settle_deadline INTEGER, buffer_ms INTEGER, tier INTEGER);
+  risk_class TEXT NOT NULL DEFAULT 'NONE', auth_issued_at INTEGER, settle_deadline INTEGER, buffer_ms INTEGER, tier INTEGER, evaluated INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS v5_incidents (incident_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, opened_at INTEGER NOT NULL, state TEXT NOT NULL,
   last_trigger_at INTEGER NOT NULL, delayed_count INTEGER NOT NULL, reasons TEXT NOT NULL, closed_at INTEGER, settled_before INTEGER NOT NULL, exposure_before TEXT NOT NULL, risk_class TEXT NOT NULL DEFAULT 'LOW', triggers INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS v5_security (n INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, type TEXT NOT NULL);
@@ -58,7 +59,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
    * re-authorize. Run on start-up and before every release pass.
    */
   #cancelUnevaluated(reason = 'ENGINE_EVALUATION_FAILED') {
-    const rows = this.store.db.prepare("SELECT p.payment_id FROM payments p LEFT JOIN v5_pay v ON v.payment_id=p.payment_id WHERE p.state='BUFFERED' AND v.payment_id IS NULL AND p.cap_id NOT LIKE 'hist-%'").all()
+    const rows = this.store.db.prepare("SELECT p.payment_id FROM payments p LEFT JOIN v5_pay v ON v.payment_id=p.payment_id WHERE p.state='BUFFERED' AND (v.payment_id IS NULL OR v.evaluated=0) AND p.cap_id NOT LIKE 'hist-%'").all()
     for (const r of rows) this.store.move(r.payment_id, 'BUFFERED', 'CANCELLED', 'vault', { reason }, { reason });
     return rows.length;
   }
@@ -192,9 +193,10 @@ export class ExecutionVaultV5 extends ExecutionVault {
     if (dec.ev.decision !== 'NONE' || dec.statement.action !== 'NONE') this.#j({ type: 'UNUSUAL_ACTIVITY_DETECTED', principal: this.ref(credId), relatedId: paymentId, outcome: dec.statement.action,
       data: { flow: this.ref(flow), level: dec.ev.decision, reasons: dec.ev.reasons.map(r => `${r.cls}:${r.code}`).join(','), features: { ...dec.ev.features, flow: this.ref(flow) }, policy: dec.statement.policy, policyDigest: dec.statement.policyDigest } });
     if (dec.statement.action === 'DELAY' || dec.statement.action === 'DELAY_AND_END_RAPID') {
-      const inc = open ?? this.#openIncident(flow, credId, dec.ev, now);
+      // the incident is exactly the one the engine signed (incidentRef), else a new one derived from this payment
+      const inc = dec.statement.incidentRef !== '-' && open && open.incident_id === dec.statement.incidentRef ? open : this.#openIncident(flow, credId, dec.ev, now, paymentId);
       this.store.db.prepare('UPDATE v5_incidents SET triggers=triggers+1 WHERE incident_id=?').run(inc.incident_id);
-      if (open) this.store.db.prepare('UPDATE v5_incidents SET last_trigger_at=?, reasons=? WHERE incident_id=?').run(now, JSON.stringify([...new Set([...JSON.parse(open.reasons), ...dec.ev.reasons.map(r => r.code)])]), open.incident_id);
+      if (inc === open) this.store.db.prepare('UPDATE v5_incidents SET last_trigger_at=?, reasons=? WHERE incident_id=?').run(now, JSON.stringify([...new Set([...JSON.parse(open.reasons), ...dec.ev.reasons.map(r => r.code)])]), open.incident_id);
       this.#delay(paymentId, inc.incident_id, Number(dec.statement.delayMs));
       // delay every other unsettled, not-yet-released payment of the same flow (never other flows)
       for (const r of this.store.db.prepare("SELECT v.payment_id FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state='BUFFERED' AND v.anomaly='NONE' AND v.payment_id<>? AND v.rapid_grant IS NULL").all(flow, paymentId))
@@ -202,11 +204,13 @@ export class ExecutionVaultV5 extends ExecutionVault {
       this.#classify(inc.incident_id, dec.statement.riskClass === 'HIGH' ? 'HIGH' : 'LOW');
       if (dec.statement.action === 'DELAY_AND_END_RAPID' && grant) this.onRapidRule({ grantId: grant.grantId, ruleId: 'R3_VELOCITY_CEILING', evidence: dec.statement.evaluationDigest });
     }
+    // N2: the evaluation is complete only now; a crash anywhere above leaves evaluated=0 and the payment is cancelled
+    this.store.db.prepare('UPDATE v5_pay SET evaluated=1 WHERE payment_id=?').run(paymentId);
     const out = this.store.get(paymentId);
     return { paymentId, state: out.state, releaseAt: out.release_at, anomaly: this.store.db.prepare('SELECT anomaly FROM v5_pay WHERE payment_id=?').get(paymentId).anomaly };
   }
-  #openIncident(flow, credId, ev, now) {
-    const id = 'inc-' + randomBytes(6).toString('hex');
+  #openIncident(flow, credId, ev, now, paymentId) {
+    const id = incidentIdFor(paymentId);
     const settled = this.store.db.prepare("SELECT COUNT(*) n FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state='SETTLED' AND v.proposed_at > ?").all(flow, now - 86_400_000)[0].n;
     const exposure = this.store.db.prepare("SELECT v.amount FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state='SETTLED' AND v.proposed_at > ?").all(flow, now - 86_400_000).reduce((t, r) => t + BigInt(r.amount), 0n);
     this.store.db.prepare('INSERT INTO v5_incidents (incident_id, flow, cred_id, opened_at, state, last_trigger_at, delayed_count, reasons, settled_before, exposure_before) VALUES (?,?,?,?,?,?,?,?,?,?)')

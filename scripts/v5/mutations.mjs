@@ -1,6 +1,7 @@
 // Mutation checks for the V5 controls: each mutation removes or weakens one check in place, runs the V5 suites, restores
 // the file. A mutation is "caught" when at least one test fails. Writes docs/evidence/v51/mutations.json (the frozen V5 file docs/evidence/v5/mutations.json is never overwritten by default).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 const C = 'src/v5/root/chain.mjs', CMD = 'src/v5/root/command.mjs', HD = 'src/v5/root/holds.mjs', V = 'src/v5/vault/vault.mjs';
@@ -80,5 +81,5 @@ for (const [name, patches] of ALL) {
   } finally { for (const f of files) writeFileSync(f, orig[f]); }
   console.log(JSON.stringify(rows.at(-1)));
 }
-mkdirSync('docs/evidence/v5', { recursive: true });
+mkdirSync(dirname(process.argv[2] ?? 'docs/evidence/v51/mutations.json'), { recursive: true });
 writeFileSync(process.argv[2] ?? 'docs/evidence/v51/mutations.json', JSON.stringify({ generatedBy: 'scripts/v5/mutations.mjs', firstOrder: { caught: rows.filter(r => r.order === 1 && r.caught).length, total: rows.filter(r => r.order === 1).length }, higherOrder: { caught: rows.filter(r => r.order > 1 && r.caught).length, total: rows.filter(r => r.order > 1).length }, caught: rows.filter(r => r.caught).length, total: rows.length, rows }, null, 1) + '\n');
