@@ -150,6 +150,7 @@ export class ExecutionVault {
       if (v.signCount !== null) this.store.db.prepare('INSERT INTO sign_floor (cred_id, n) VALUES (?,?) ON CONFLICT(cred_id) DO UPDATE SET n=MAX(n, excluded.n)').run(v.credId, v.signCount);
       this.store.journal(paymentId, null, 'PROPOSED', 'general-zone', { capId: cap.capId, credId: v.credId, epoch: this.root.epoch, recipient: cap.recipientId, amount: cap.amountYocto });
       this.store.db.prepare('INSERT INTO caps_used (cap_id, payment_id) VALUES (?,?)').run(cap.capId, paymentId);
+      this.proposeTxRecord({ paymentId, cap, credId: v.credId }); // subclass evidence written in the SAME transaction (V6: one-time challenge + approval evidence)
       this.store.move(paymentId, 'PROPOSED', 'AUTHORIZED', 'policy', { decision: 'ALLOW', rootHead: this.root.head, capDigest: v.digestHex });
       this.store.move(paymentId, 'AUTHORIZED', 'RESERVED', 'policy', { reservedYocto: cap.amountYocto });
       const row = this.store.move(paymentId, 'RESERVED', 'BUFFERED', 'policy', { releaseAt: now + this.cfg.bufferMs }, { release_at: now + this.cfg.bufferMs });
@@ -161,6 +162,8 @@ export class ExecutionVault {
   }
 
   extraProposeDenials() { return []; }
+  /** V3 hook, called inside the reservation transaction after the payment rows are inserted (no-op in V3). */
+  proposeTxRecord() {}
   status(paymentId) {
     if (typeof paymentId !== 'string' || !/^p_[0-9a-f]{32}$/.test(paymentId)) fail('INVALID_ID');
     const r = this.store.get(paymentId); if (!r) fail('UNKNOWN_PAYMENT');

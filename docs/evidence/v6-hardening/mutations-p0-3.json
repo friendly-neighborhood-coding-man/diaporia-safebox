@@ -1,0 +1,60 @@
+{
+ "generatedBy": "scripts/v6/mutations.mjs",
+ "suites": "tests/v6 (+ tests/v5 for src/v5 mutants)",
+ "caught": 3,
+ "total": 5,
+ "patternErrors": 0,
+ "rows": [
+  {
+   "name": "Vault: V6 challenge nonce single-use removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "P0.3: V3 in-transaction record hook not called",
+   "file": "src/v3/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 9,
+   "examples": [
+    "P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence",
+    "P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence",
+    "P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record",
+    "P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)"
+   ]
+  },
+  {
+   "name": "P0.3: core reached without V6 verification accepted",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": true,
+   "failingTests": 1,
+   "examples": [
+    "P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed)"
+   ]
+  },
+  {
+   "name": "P0.3: in-transaction challenge check removed",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 1,
+   "caught": false,
+   "failingTests": 0,
+   "examples": []
+  },
+  {
+   "name": "HO: P0.3 challenge single use removed in the pre-check, the transaction AND the primary key",
+   "file": "src/v6/vault/vault.mjs",
+   "order": 3,
+   "caught": true,
+   "failingTests": 3,
+   "examples": [
+    "P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence",
+    "P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence",
+    "A-challenge: reuse with a fresh signature, expiry, forged issuer -> refused"
+   ]
+  }
+ ]
+}

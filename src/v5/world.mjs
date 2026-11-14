@@ -84,6 +84,7 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
   w.vault = openVault(); w.vops = vaultOps(w.vault); w.gz = new DirectClient(w.vops.gz); w.vctl = new DirectClient(w.vops.ctl);
   w.recovery = new RecoveryServiceV4({ notifier: owner.serviceKeyPairs.notifier, now, view: () => w.root.view(), deliver: async (ch, msg) => { (inbox[ch] ??= []).push(msg); }, submit: async (req) => w.root.submit(req) });
   w.challenge = owner.challenge;
+  w.openVault = openVault; // a second Vault worker on the same database (concurrency tests)
   w.restartVault = () => { w.vault.store.close(); w.vault = openVault(); w.vops = vaultOps(w.vault); w.gz = new DirectClient(w.vops.gz); w.vctl = new DirectClient(w.vops.ctl); return w.vault; };
   w.restartRoot = () => { try { w.root.close(); } catch {} w.root = openRoot(); w.rootOps = rootOps(w.root); w.admin = new DirectClient(w.rootOps.admin); return w.root; };
 

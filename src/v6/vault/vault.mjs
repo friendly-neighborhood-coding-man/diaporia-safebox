@@ -45,16 +45,34 @@ export class ExecutionVaultV6 extends ExecutionVaultV5 {
         throw e;
       }
     }
-    const out = super.propose(inner);
+    // P0.3 (issue #14): the challenge nonce and the approval evidence are written INSIDE the V3 reservation transaction
+    // (proposeTxRecord), so a crash or a second Vault worker can never leave a payment without its evidence, or one
+    // Root challenge with two payments. The pre-check above is only an early, cheap denial.
+    this.#pending = pre ? { pre, v6, capId: inner.capability?.capId } : null;
+    let out;
+    try { out = super.propose(inner); } finally { this.#pending = null; }
     if (pre) {
-      // single-threaded: no other proposal ran between the check above and this insert (append-only, PRIMARY KEY)
-      this.store.db.prepare('INSERT INTO v6_challenges (nonce, cap_id, payment_id, at) VALUES (?,?,?,?)').run(pre.nonce, inner.capability.capId, out.paymentId, this.now());
-      this.store.db.prepare('INSERT INTO v6_evidence (cap_id, payment_id, binding, grant_, gate, level) VALUES (?,?,?,?,?,?)')
-        .run(inner.capability.capId, out.paymentId, JSON.stringify(pre.binding), JSON.stringify(v6.grant), v6.gate ? JSON.stringify(v6.gate) : null, pre.level);
       try { this.journal?.writer('VAULT').append({ type: 'OWNER_PAYMENT_APPROVAL_VERIFIED', relatedId: out.paymentId, outcome: pre.level,
         data: { requestId: pre.binding.requestId, policyVersion: pre.binding.policyVersion, assurance: pre.binding.assurance } }); } catch (e) { if (e.code === 'JOURNAL_PRIVACY_VIOLATION') throw e; }
     }
     return out;
+  }
+  #pending = null;
+  proposeTxRecord(ctx) {
+    super.proposeTxRecord(ctx);
+    const p = this.#pending;
+    if (!p) {
+      // an owner paycap reaching the V3 core without the V6 pre-verification is impossible by construction under
+      // PER_TRANSACTION; fail closed instead of committing a payment with no approval evidence
+      if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');
+      return;
+    }
+    if (p.capId !== ctx.cap.capId) fail('V6_APPROVAL_CONTEXT_MISMATCH');
+    // durable single use, decided inside the same IMMEDIATE transaction as the payment rows (serialises workers)
+    if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');
+    this.store.db.prepare('INSERT INTO v6_challenges (nonce, cap_id, payment_id, at) VALUES (?,?,?,?)').run(p.pre.nonce, ctx.cap.capId, ctx.paymentId, this.now());
+    this.store.db.prepare('INSERT INTO v6_evidence (cap_id, payment_id, binding, grant_, gate, level) VALUES (?,?,?,?,?,?)')
+      .run(ctx.cap.capId, ctx.paymentId, JSON.stringify(p.pre.binding), JSON.stringify(p.v6.grant), p.v6.gate ? JSON.stringify(p.v6.gate) : null, p.pre.level);
   }
   proposeDelegated(req) {
     if (this.policy6().delegation !== 'BOUNDED_DELEGATION_ALLOWED') fail('DELEGATION_DISABLED_BY_POLICY');

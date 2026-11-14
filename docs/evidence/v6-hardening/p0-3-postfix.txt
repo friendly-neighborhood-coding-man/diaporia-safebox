@@ -1,0 +1,8 @@
+post-fix run, 2026-11-14T12:49:50Z
+✔ P0.3-crash: a crash right after the payment commit must not leave the challenge reusable or the payment without evidence (115.165979ms)
+✔ P0.3-race: two Vault workers interleaving on one database admit at most one payment per challenge, never a payment without evidence (90.024669ms)
+✔ P0.3-faults: a crash at every write inside the proposal leaves either nothing or the complete record (1783.611687ms)
+✔ P0.3-bypass: an owner paycap that reaches the V3/V5 core without the V6 verification is refused (fail closed) (56.321781ms)
+ℹ tests 4
+ℹ pass 4
+ℹ fail 0

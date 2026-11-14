@@ -11,6 +11,10 @@ const VA = 'src/v6/vault/vault.mjs', PA = 'src/v6/vault/payment-approval.mjs', R
 const M = [
   // Vault
   ['Vault: V6 challenge nonce single-use removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');", ''],
+  // hardening P0.3: evidence and single use inside the payment transaction
+  ['P0.3: V3 in-transaction record hook not called', 'src/v3/vault/vault.mjs', "this.proposeTxRecord({ paymentId, cap, credId: v.credId });", ''],
+  ['P0.3: core reached without V6 verification accepted', VA, "if (this.policy6().payment.mode === 'PER_TRANSACTION') fail('V6_PAYMENT_APPROVAL_REQUIRED', 'no verified approval in this transaction');", ''],
+  ['P0.3: in-transaction challenge check removed', VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''],
   ['Vault: delegation policy check removed', VA, "if (this.policy6().delegation !== 'BOUNDED_DELEGATION_ALLOWED') fail('DELEGATION_DISABLED_BY_POLICY');", ''],
   // payment approval binding
   ['Payment: owner approval not required', PA, "if (!v6) fail('V6_PAYMENT_APPROVAL_REQUIRED', 'per-transaction owner approval policy');", "if (!v6) return null;"],
@@ -68,6 +72,7 @@ const M = [
 ];
 // Higher-order mutants: a first-order survivor whose higher-order mutant is caught is a verified redundant check.
 const HO = [
+  ['HO: P0.3 challenge single use removed in the pre-check, the transaction AND the primary key', [[VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED');", ''], [VA, "if (this.store.db.prepare('SELECT 1 FROM v6_challenges WHERE nonce=?').get(p.pre.nonce)) fail('CHALLENGE_ALREADY_CONSUMED', 'in transaction');", ''], [VA, 'v6_challenges (nonce TEXT PRIMARY KEY,', 'v6_challenges (nonce TEXT,']]],
   ['HO: RS256 modulus minimum removed in BOTH the COSE parser and the signature check', [[WA, "pk.asymmetricKeyDetails.modulusLength >= 2048 && ", ''], [WA, "n.length < 256 || ", '']]],
 ];
 const ONLY = process.env.MUTANTS ? new RegExp(process.env.MUTANTS) : null;
