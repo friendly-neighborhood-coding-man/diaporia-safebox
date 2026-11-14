@@ -135,13 +135,14 @@ const gateSrv = createServer((req, res) => {
 });
 await new Promise((r) => gateSrv.listen(GATE, '127.0.0.1', r));
 
+let lastPaymentId = null;
 // ================================================================== Workflow A
 try {
   ev('STEP', 'Workflow A: the AI prepares a payment over MCP; approve it on the bridge page' + (fpOnly.length ? ' and touch the sensor' : ''));
   const t = await obtainTokens(h.url, h.logins.alice); let ai = await mcpClient(h.url, t.access);
   const prep = await call(ai, 'prepare_payment', { recipientId: 'merchant-a.mock', amountYocto: (3n * 10n ** 22n).toString(), asset: 'NEAR', memo: 'real-device run', idempotencyKey: 'real-device-000000000001' });
   ev('AI', `prepare_payment: ${prep.state}`);
-  const r = await dev.approve(prep.requestId, { credId: 'k2-laptop' });
+  const r = await dev.approve(prep.requestId, { credId: 'k2-laptop' }); lastPaymentId = r.paymentId; results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r };
   ev(r.state === 'SUBMITTED_TO_VAULT' ? 'OK' : 'DENY', 'owner approval -> ' + JSON.stringify(r));
   await w.advance(12 * 60_000);
   // the owner may take minutes at the real prompt: reconnect the AI client (fresh tokens) before the status read
@@ -149,10 +150,11 @@ try {
   catch (e) { ev('INFO', 'AI client reconnect after: ' + (e.code ?? e.message)); try { await ai.close(); } catch {}
     // same OAuth client + access token (requests are client-scoped); the idle keep-alive socket was the likely casualty
     ai = await mcpClient(h.url, t.access); st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
-  results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r, assurance: dev.lastV6?.assurance ?? null, settledVerified: st.settledVerified };
+  results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r, assurance: dev.lastV6?.assurance ?? null, settledVerified: st.settledVerified,
+    vaultState: w.vault.v5payments().find((x) => x.payment_id === r.paymentId)?.state ?? null };
   ev(st.settledVerified ? 'OK' : 'DENY', `MOCK settlement after the 10-minute buffer: settledVerified=${st.settledVerified}`);
   await ai.close();
-} catch (e) { results.workflowA = { error: e.code ?? e.message }; ev('FAIL', 'Workflow A: ' + (e.code ?? e.message)); }
+} catch (e) { results.workflowA = { ...(results.workflowA ?? {}), error: e.code ?? e.message, ...(typeof lastPaymentId === 'string' ? { vaultState: w.vault.v5payments().find((x) => x.payment_id === lastPaymentId)?.state ?? null } : {}) }; ev('FAIL', 'Workflow A: ' + (e.code ?? e.message)); }
 
 // ================================================================== Workflow B
 // --only-workflow-a: the PIN-fallback test (owner answers Windows Hello with a PIN and does NOT touch the sensor at the
@@ -187,8 +189,10 @@ else try {
 if (rec) { rec.stdin.write('q'); await new Promise((r) => rec.on('close', r)); }
 const gateLog = wbg?.log ?? [];
 const gatedApprovals = gateLog.filter((x) => x.purpose !== 'SENSOR_CHECK' && x.purpose !== 'ENROLL_GATE_KEY');
-const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)'];
-if (fpOnly.length && gatedApprovals.length && gatedApprovals.every((x) => x.ok) && results.workflowA?.settledVerified && results.workflowB?.frozen) labels.push('FINGERPRINT_ONLY_LOCALLY_VERIFIED (WinBio gate MATCH; not hardware attestation)'); else labels.push('FINGERPRINT ONLY NOT PROVEN');
+// labels derived from what actually happened, per factor
+const gatedOk = fpOnly.length > 0 && gatedApprovals.length > 0 && gatedApprovals.every((x) => x.ok);
+const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'WINDOWS HELLO UV: PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)'];
+labels.push(gatedOk ? `FINGERPRINT_ONLY_LOCALLY_VERIFIED for ${gatedApprovals.length} gated approvals (WinBio MATCH + ${wbg?.kind ?? 'gate'} key signature; not hardware attestation)` : 'FINGERPRINT ONLY NOT PROVEN');
 if (helper && helper.endsWith('.mjs')) labels.unshift('EMULATED FINGERPRINT HELPER (test fixture: no sensor, no real fingerprint; selftest only)');
 labels.push(results.alert?.api === 'GMAIL_API_ACCEPTED' ? 'REAL GMAIL (API accepted; inbox receipt NOT verified until the owner confirms)' : 'REAL GMAIL: NOT RUN');
 const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, refusedSyncablePasskeys: [...realAuth.refused, ...(activeAuth !== realAuth ? activeAuth.refused : [])], webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
