@@ -182,6 +182,30 @@ static class WinBioGate {
     idHr = hr; unit = u; done = fin;
   }
 
+  /** Phase 3 (run 7/8 finding: an incidental contact with the power-button sensor during the armed window produced a
+   *  genuine WinBio identification). After a MATCH, the owner must confirm with a MOUSE click that they touched the sensor
+   *  for THIS prompt. "I did not touch it" or no answer refuses. A click alone never approves anything: it only counts
+   *  after a fresh MATCH for this prompt. */
+  static int ConfirmTouch(string prompt, DateTime deadline) {
+    int answer = 0; // 0 none, 1 yes, 2 no
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 600, Height = 300, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, ControlBox = false };
+    var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
+      Text = (prompt ?? "") + "\n\nYour fingerprint was read.\nDid YOU just touch the sensor to approve this?" };
+    var panel = new TableLayoutPanel { Dock = DockStyle.Bottom, Height = 56, ColumnCount = 2 };
+    panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50)); panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+    var no = new Button { Text = "No, I did not touch it", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f) };
+    var yes = new Button { Text = "Yes, I touched it: approve", TabStop = false, Dock = DockStyle.Fill, Font = new Font("Segoe UI", 11f, FontStyle.Bold) };
+    panel.Controls.Add(no, 0, 0); panel.Controls.Add(yes, 1, 0);
+    form.Controls.Add(label); form.Controls.Add(panel);
+    no.MouseClick += (o, e) => { answer = 2; form.Close(); };
+    yes.MouseClick += (o, e) => { answer = 1; form.Close(); };
+    var timer = new System.Windows.Forms.Timer { Interval = 150 };
+    timer.Tick += (o, e) => { if (DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } };
+    form.Shown += (o, e) => { form.Activate(); SetForegroundWindow(form.Handle); form.ActiveControl = label; timer.Start(); };
+    Application.Run(form);
+    return answer;
+  }
+
   static int VerifySign(string name, string hashHex, int timeoutS, string prompt, bool sign) {
     var hash = new byte[32];
     if (sign) {
@@ -222,6 +246,10 @@ static class WinBioGate {
       var me = WindowsIdentity.GetCurrent().User; var mine = new byte[me.BinaryLength]; me.GetBinaryForm(mine, 0);
       if (Hex(sid) != Hex(mine)) return Fail("BIOMETRIC_NO_MATCH", 0, "different Windows account");
       string diag = ",\"elapsedMs\":" + LastMs + ",\"subFactor\":" + LastSub + ",\"discarded\":" + Discarded + ",\"quietDiscards\":" + QuietDiscards + ",\"armedAfterMs\":" + ArmedAfterMs;
+      int conf = ConfirmTouch(prompt, DateTime.UtcNow.AddSeconds(20)); // own 20 s window; the Node wrapper allows timeout + 45 s
+      if (conf == 2) return Fail("BIOMETRIC_TOUCH_DISOWNED", 0, "MATCH but owner answered: I did not touch it" + "; elapsedMs " + LastMs);
+      if (conf != 1) return Fail("BIOMETRIC_TIMEOUT", 0, "MATCH but no confirmation click");
+      diag += ",\"ownerConfirmed\":true";
       if (!sign) return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + diag + "}");
       string kind; var k = OpenOrCreate(name, out kind);
       byte[] sig; using (var e = new ECDsaCng(k)) sig = e.SignHash(hash); // IEEE-P1363 r||s
