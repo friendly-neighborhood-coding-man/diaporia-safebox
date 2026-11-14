@@ -7,6 +7,7 @@
 import { fail, exactFields } from '../../v3/common/canon.mjs';
 import { V5_DOMAINS, d5hex } from '../common/v5.mjs';
 import { evaluate, RISK_POLICY_V1, policyDigest } from './detector.mjs';
+import { bufferDecision } from './buffer.mjs';
 
 export const FINDING_KINDS = Object.freeze(['UNUSUAL_SPENDING', 'CORRELATED_SECURITY_EVENTS', 'NOTIFICATION_ANOMALY', 'JOURNAL_INTEGRITY', 'PROTECTIVE_HOLD_PATTERN', 'RAPID_USE_PATTERN', 'OTHER']);
 export const RECOMMENDATIONS = Object.freeze(['NONE', 'REQUEST_VERIFICATION', 'OWNER_REVIEW', 'REPORT_ONLY']);
@@ -33,8 +34,9 @@ export class RiskPolicyEngine {
     this.decisions = 0; this.findings = [];
   }
   /** Deterministic evaluation + signed decision. The vault verifies the signature and enforces its own hard caps. */
-  decide(p, ctx, { openIncident = null } = {}) {
+  decide(p, ctx, { openIncident = null, bufferPolicy = 'FIXED_600' } = {}) {
     const ev = evaluate(p, ctx, this.policy);
+    const buf = bufferDecision(p, ctx, ev, { policy: bufferPolicy, openIncident });
     let action = 'NONE', delayMs = '0';
     if (ctx.rapid) {
       // Rapid-Use: the approved flow is not delayed for anomalies, but monitoring continues and the hard velocity ceiling still applies
@@ -44,11 +46,14 @@ export class RiskPolicyEngine {
       delayMs = openIncident && Number(openIncident.delayed_count) >= Number(this.policy.delay.escalateAfterDelayed) ? this.policy.delay.maxDelayMs : this.policy.delay.anomalyDelayMs;
     }
     const riskClass = action === 'NONE' ? 'NONE' : riskClassOf(ev, openIncident, this.policy);
-    const statement = { kind: 'ANOMALY_DECISION', paymentId: p.paymentId, flow: p.flow, action, delayMs, riskClass, policy: this.policy.version, policyDigest: this.digest,
+    const statement = { kind: 'ANOMALY_DECISION', paymentId: p.paymentId, flow: p.flow, action, delayMs, riskClass, bufferPolicy: buf.policy, tier: buf.tier, bufferMs: buf.bufferMs, tierInputs: buf.inputs,
+      policy: this.policy.version, policyDigest: this.digest,
       evaluationDigest: d5hex(V5_DOMAINS.RISK_ENGINE, { reasons: ev.reasons.map(r => r.code), features: ev.features }), incidentRef: openIncident?.incident_id ?? '-' };
     this.decisions++;
     const sig = this.signer.signObj(V5_DOMAINS.RISK_ENGINE, statement);
     // the engine records its own decisions through its own (RISK-layer) writer, independent of the vault's records
+    // every buffer decision is journaled by the engine itself (RISK layer), so the verifier can cross-check the vault
+    this.journal?.append({ type: 'BUFFER_DECISION', relatedId: p.paymentId, outcome: buf.policy, data: { tier: buf.tier, bufferMs: buf.bufferMs, inputs: buf.inputs } });
     if (action !== 'NONE' || ev.decision !== 'NONE') this.journal?.append({ type: 'ENGINE_DECISION', relatedId: p.paymentId, outcome: action, data: { delayMs, riskClass, incidentRef: statement.incidentRef, level: ev.decision, policy: this.policy.version, evaluationDigest: statement.evaluationDigest } });
     return { ev, statement, sig };
   }

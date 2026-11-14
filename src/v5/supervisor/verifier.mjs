@@ -23,6 +23,7 @@ import { credentialHolds, merchantHolds, delegationHolds } from '../root/holds.m
 import { V5_DOMAINS, verifyObj5 } from '../common/v5.mjs';
 import { verifyJournalChain } from '../journal/journal.mjs';
 import { RISK_POLICY_V1 } from '../risk/detector.mjs';
+import { tierFromInputs, tierToBufferMs, bufferFloorMs, MAX_BUFFER_MS } from '../risk/buffer.mjs';
 
 export const AUTHORITY_TYPES_V5 = new Set(['ENROLL', 'REVOKE', 'ROTATE', 'ROTATE_FREEZE', 'AMEND_PURPOSE', 'AMEND_MATRIX', 'RECOVERY_COMPLETE', 'RECONSTITUTE', 'RECOVERY_OWNER_AUTHORIZE', 'ORC_REPLACE',
   'GOV_CASE_EXECUTE', 'GUARDIAN_ROTATE', 'CONTEST_PROTECTIVE_HOLD', 'DELEGATION_GRANT', 'RAPID_USE_ACTIVATE', 'INCIDENT_REVIEW', 'HOLD_RELEASE', 'UNSUSPEND']);
@@ -69,6 +70,11 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
   // a HIGH decision that opened an incident names the payment; map it to the vault's incident (the vault cannot hide the HIGH class: the engine journal holds it)
   for (const p of v5pay) if (highAt.has('pay:' + p.payment_id) && p.incident_id) markHigh(p.incident_id, highAt.get('pay:' + p.payment_id));
   const horizon = Number(st.v5.config.settlementHorizonMs);
+  // P4: buffer policy and floor come from the REPLAYED owner-signed genesis, never from the vault's configuration
+  const bufferPolicy = st.v5.config.bufferPolicy ?? 'FIXED_600'; const floor = bufferFloorMs(bufferPolicy);
+  out.buffer = { policy: bufferPolicy, floorMs: floor, checked: 0, violations: 0 };
+  const engineBuffer = new Map();
+  for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'BUFFER_DECISION') engineBuffer.set(e.relatedId, e.data); }
   out.horizon = { horizonMs: horizon, violations: 0 };
   for (const tx of [...ledgerTxs].sort((a, b) => a.seq - b.seq)) {
     out.financial.effects++;
@@ -119,7 +125,21 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
         if (credId && sE.creds[credId]?.status !== 'active') v.push('APPROVER_NOT_ACTIVE_AT_EFFECT');
         if (credId && credentialHolds(sE, credId, tx.submitted_at).length) v.push('EFFECT_DURING_CREDENTIAL_HOLD');
         if (merchantHolds(sE, tx.recipient, tx.submitted_at).length) v.push('EFFECT_DURING_MERCHANT_HOLD');
-        if (tx.submitted_at < proposedAt + minBufferMs) v.push('BUFFER_BYPASSED');
+        // P4: the applicable buffer of THIS payment = the engine-signed tier mapped by the owner-signed policy; the
+        // verifier recomputes the tier from the signed inputs, checks the signature, the journal copy and the floor.
+        let payBuffer = floor;
+        let decB = null; try { decB = vp?.decision ? JSON.parse(vp.decision) : null; } catch {}
+        if (decB?.statement?.bufferPolicy !== undefined) {
+          out.buffer.checked++;
+          const s0 = decB.statement;
+          const sigOk = verifyObj5(V5_DOMAINS.RISK_ENGINE, s0, decB.sig, st.v5.riskEngine.publicKey);
+          const tierOk = bufferPolicy === 'FIXED_600' ? s0.tier === '-' : String(tierFromInputs(s0.tierInputs)) === s0.tier;
+          const bufOk = String(tierToBufferMs(bufferPolicy, s0.tier)) === s0.bufferMs && s0.bufferPolicy === bufferPolicy;
+          const jr = engineBuffer.get(paymentId); const jOk = !journal || (jr && jr.tier === s0.tier && jr.bufferMs === s0.bufferMs);
+          if (!sigOk || !tierOk || !bufOk || !jOk) { v.push('BUFFER_DECISION_INVALID'); out.buffer.violations++; }
+          payBuffer = Math.max(floor, Math.min(MAX_BUFFER_MS, Number(s0.bufferMs) || MAX_BUFFER_MS));
+        } else if (vp) payBuffer = MAX_BUFFER_MS; // no signed buffer decision: only the maximum buffer is acceptable
+        if (tx.submitted_at < proposedAt + payBuffer) { v.push('BUFFER_BYPASSED'); out.buffer.violations++; }
         // anomaly delay: verify the engine's signed decision, its bound and that the payment did not leave early
         let dec = null; try { dec = vp?.decision ? JSON.parse(vp.decision) : null; } catch {}
         const recorded = vp ? Number(vp.delay_ms) : 0; const journaled = Math.min(engineDelay.get(paymentId) ?? 0, MAX_DELAY);
@@ -132,7 +152,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
           if (!sigOk) v.push('DELAY_WITHOUT_ENGINE_DECISION');
           if (delayMs > MAX_DELAY) v.push('DELAY_OVER_CAP');
           shift = Math.min(delayMs, MAX_DELAY);
-          const due = proposedAt + minBufferMs + shift;
+          const due = proposedAt + payBuffer + shift;
           if (tx.submitted_at < due) {
             const review = Object.entries(sE.v5.incidentReviews).find(([id, r]) => id === vp.incident_id && r.verdict === 'LEGITIMATE');
             const grant = Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(vp.cred_id) || (vp.delegation_id && g.scope.delegationIds.includes(vp.delegation_id))) && g.scope.recipients.includes(tx.recipient));
@@ -157,6 +177,15 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     cum += BigInt(tx.amount);
     if (v.length) out.financial.violations.push({ txId: tx.tx_id, paymentId, recipient: tx.recipient, amountYocto: tx.amount, codes: v });
     else out.financial.authorized++;
+  }
+  // P4 anti-splitting: a flow's signed tier never drops below the highest signed tier the same flow got in the hour before
+  if (bufferPolicy === 'EXP_30') {
+    const signed = [];
+    for (const p of v5pay) { let d = null; try { d = JSON.parse(p.decision); } catch {} const s0 = d?.statement; if (!s0 || s0.tier === undefined || !verifyObj5(V5_DOMAINS.RISK_ENGINE, s0, d.sig, st.v5.riskEngine.publicKey)) continue; signed.push({ id: p.payment_id, flow: p.flow, at: p.proposed_at, tier: Number(s0.tier) }); }
+    const resets = [];
+    signed.forEach((x, j) => { const exp = signed.slice(0, j).filter(y => y.flow === x.flow && y.at > x.at - 3600_000).reduce((m, y) => Math.max(m, y.tier), 0); if (x.tier < exp) resets.push(x.id); });
+    out.buffer.tierResets = resets.length;
+    if (resets.length) { out.buffer.violations += resets.length; out.financial.violations.push({ txId: '-', paymentId: resets[0], recipient: '-', amountYocto: '0', codes: ['BUFFER_TIER_RESET'] }); }
   }
   if (journal) out.journal = verifyJournalChain(journal.rows, journal.checkpoints, journal.publicKey);
   out.ok = out.chainValid && !out.financial.violations.length && !out.authority.unauthorized.length && !out.rapid.violations.length && (!journal || out.journal.ok);

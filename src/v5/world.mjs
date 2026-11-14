@@ -25,6 +25,7 @@ import { NotificationService, MockTransport } from './notify/notify.mjs';
 import { V5_DOMAINS, d5hex, newSigner5 } from './common/v5.mjs';
 import { EvidenceAPI, metricRecomputer, corroborator, deterministicFindings } from './analyst/analyst.mjs';
 import { buildReport, renderReportText } from './report/report.mjs';
+import { bufferFloorMs } from './risk/buffer.mjs';
 
 export const T0 = Date.parse('2026-11-14T00:00:00.000Z');
 export const ATTACKER = 'attacker.mock';
@@ -73,7 +74,8 @@ export function buildV5({ dir, clock, config = {}, config4 = {}, config5 = {}, c
       kind: 'INCIDENT', keyContextByHolder: keyContext(root, incident.cred_id), delayStatus: `unsettled payments of the affected flow are delayed up to ${Math.round(Number(ev.policy?.delay?.anomalyDelayMs ?? 21_600_000) / 3600_000)} h; settled payments cannot be stopped`, rapidAvailable: hasOwners });
   };
   const onRapidRule = ({ grantId, ruleId, evidence }) => { w.engineQueue.push({ grantId, ruleId, evidence }); };
-  const openVault = () => new ExecutionVaultV5({ genesis, pinnedChainId: owner.chainId5, executorAccount: ACCOUNT, bufferMs, minBufferMs: 600_000, chain: V5 },
+  const floor = bufferFloorMs(genesis.ext.action.body.config.bufferPolicy);
+  const openVault = () => new ExecutionVaultV5({ genesis, pinnedChainId: owner.chainId5, executorAccount: ACCOUNT, bufferMs: floor === 600_000 ? bufferMs : floor, minBufferMs: floor, chain: V5 },
     { store: new SensitiveStore(join(dir, 'vault.db'), { now }), now, wallNow: () => wall.now(), executorSigner: executor, ledger: ledgerExec,
       engine, enginePublicKey: owner.riskEngine.publicKey, journal, onIncident, onRapidRule });
   w.vault = openVault(); w.vops = vaultOps(w.vault); w.gz = new DirectClient(w.vops.gz); w.vctl = new DirectClient(w.vops.ctl);

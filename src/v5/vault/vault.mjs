@@ -17,6 +17,7 @@ import { purposeViolations } from '../../v3/root/capsule.mjs';
 import { V5_DOMAINS, d5hex, verifyObj5 } from '../common/v5.mjs';
 import { merchantHolds, delegationHolds, credentialHolds } from '../root/holds.mjs';
 import { RISK_POLICY_V1 } from '../risk/detector.mjs';
+import { bufferFloorMs, MAX_BUFFER_MS, tierToBufferMs } from '../risk/buffer.mjs';
 
 const HOLDING = ['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN', 'FROZEN'];
 const V5_SCHEMA = `
@@ -42,6 +43,18 @@ export class ExecutionVaultV5 extends ExecutionVault {
     this.store.db.exec(V5_SCHEMA);
     this.mirrorSeq = Number(this.store.getControl('v5MirrorSeq') ?? 0);
     this.metrics = { detectionLatencyMs: [], decisionsMs: [] };
+    // the vault's own floor must match the owner-signed policy on its replica (never lower than the signed floor)
+    if (this.cfg.minBufferMs !== bufferFloorMs(this.bufferPolicy())) fail('BUFFER_POLICY_FLOOR_MISMATCH', `${this.cfg.minBufferMs} vs ${this.bufferPolicy()}`);
+    this.#failSafeUnevaluated();
+  }
+  bufferPolicy() { return this.root.v5.config.bufferPolicy ?? 'FIXED_600'; }
+  /**
+   * Restart safety (P4): a payment the V3 core reserved but the V5 layer never evaluated (crash between the two steps)
+   * would otherwise keep the policy floor (30 s under EXP_30). It gets the maximum buffer instead.
+   */
+  #failSafeUnevaluated() {
+    for (const r of this.store.db.prepare("SELECT p.payment_id, p.proposed_at, p.release_at FROM payments p LEFT JOIN v5_pay v ON v.payment_id=p.payment_id WHERE p.state='BUFFERED' AND v.payment_id IS NULL AND p.cap_id NOT LIKE 'hist-%'").all())
+      if (r.release_at < r.proposed_at + MAX_BUFFER_MS) { this.store.db.prepare("UPDATE payments SET release_at=? WHERE payment_id=? AND state='BUFFERED'").run(r.proposed_at + MAX_BUFFER_MS, r.payment_id); this.store.journal(r.payment_id, 'BUFFERED', 'BUFFERED', 'vault', { event: 'UNEVALUATED_AFTER_RESTART', releaseAt: r.proposed_at + MAX_BUFFER_MS }); }
   }
   ref(credId) { return this.journal ? this.journal.ref('cred', credId) : credId; }
   #j(ev) { try { this.jw?.append(ev); } catch (e) { if (e.code === 'JOURNAL_PRIVACY_VIOLATION') throw e; } }
@@ -131,17 +144,22 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const open = this.store.db.prepare("SELECT * FROM v5_incidents WHERE flow=? AND state='OPEN' ORDER BY opened_at DESC LIMIT 1").get(flow) ?? null;
     const p = { paymentId, flow, credId, recipient: row.recipient, amount: row.amount, at: now, state: 'BUFFERED' };
     const ctx = { history: this.history(), purpose: this.root.purpose, spent: this.spentExcluding(paymentId), securityTimes: this.securityTimes(), rapid: !!grant };
-    const dec = this.engine.decide(p, ctx, { openIncident: grant ? null : open });
+    const dec = this.engine.decide(p, ctx, { openIncident: grant ? null : open, bufferPolicy: this.bufferPolicy() });
     if (!verifyObj5(V5_DOMAINS.RISK_ENGINE, dec.statement, dec.sig, this.enginePublicKey)) fail('ENGINE_DECISION_SIGNATURE'); // the vault trusts only the pinned engine key
     // P2: the four times of a payment authorization are kept apart. submission deadline = the authorization's own
     // expiresAt (checked at proposal), consumption = now, earliest release = now + buffer (+ bounded anomaly delay),
     // latest settlement = authorization issuedAt + the owner-signed settlementHorizonMs (never the risk engine's choice).
     const authIssuedAt = this.#authIssuedAt(paymentId, delegationId);
     const settleDeadline = Math.min(authIssuedAt + this.horizonMs(), Date.parse(this.root.purpose.expiresAt));
-    const bufferMs = this.cfg.bufferMs;
+    // P4: the buffer comes from the engine's signed decision, but the vault re-derives it from the signed tier and
+    // clamps it to [owner-signed floor, 600 s]; an engine statement for another policy is refused.
+    if (dec.statement.bufferPolicy !== this.bufferPolicy()) fail('ENGINE_BUFFER_POLICY_MISMATCH');
+    const bufferMs = Math.min(MAX_BUFFER_MS, Math.max(this.cfg.minBufferMs, tierToBufferMs(this.bufferPolicy(), dec.statement.tier)));
     this.store.db.prepare('INSERT INTO v5_pay (payment_id, flow, cred_id, delegation_id, recipient, amount, proposed_at, anomaly, delay_ms, incident_id, rapid_grant, baseline_eligible, decision, cap_expires_orig, auth_issued_at, settle_deadline, buffer_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
       .run(paymentId, flow, credId, delegationId, row.recipient, row.amount, now, 'NONE', 0, null, grant?.grantId ?? null, grant ? 0 : 1, JSON.stringify({ action: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code), statement: dec.statement, sig: dec.sig }),
         row.cap_expires_at, authIssuedAt, settleDeadline, bufferMs);
+    this.store.db.prepare('UPDATE v5_pay SET tier=? WHERE payment_id=?').run(dec.statement.tier === '-' ? null : Number(dec.statement.tier), paymentId);
+    this.store.db.prepare("UPDATE payments SET release_at=? WHERE payment_id=? AND state='BUFFERED'").run(now + bufferMs, paymentId);
     // the vault's release check (`now >= cap_expires_at` -> EXPIRED) now enforces the latest authorized settlement
     this.store.db.prepare("UPDATE payments SET cap_expires_at=? WHERE payment_id=? AND state='BUFFERED'").run(settleDeadline, paymentId);
     if (grant) this.store.db.prepare('INSERT INTO v5_rapid_use (grant_id, payment_id, amount) VALUES (?,?,?)').run(grant.grantId, paymentId, row.amount);
@@ -223,8 +241,8 @@ export class ExecutionVaultV5 extends ExecutionVault {
     return null;
   }
   history() {
-    return this.store.db.prepare('SELECT v.payment_id, v.flow, v.cred_id, v.recipient, v.amount, v.proposed_at, v.baseline_eligible, p.state FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id').all()
-      .map(r => ({ paymentId: r.payment_id, flow: r.flow, credId: r.cred_id, recipient: r.recipient, amount: r.amount, at: r.proposed_at, state: r.state, baselineEligible: r.baseline_eligible === 1 }));
+    return this.store.db.prepare('SELECT v.payment_id, v.flow, v.cred_id, v.recipient, v.amount, v.proposed_at, v.baseline_eligible, v.tier, p.state FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id').all()
+      .map(r => ({ paymentId: r.payment_id, flow: r.flow, credId: r.cred_id, recipient: r.recipient, amount: r.amount, at: r.proposed_at, state: r.state, baselineEligible: r.baseline_eligible === 1, tier: r.tier }));
   }
   spentExcluding(paymentId) {
     const rows = this.store.db.prepare(`SELECT payment_id, amount, proposed_at FROM payments WHERE state IN (${[...HOLDING, 'SETTLED'].map(() => '?').join(',')})`).all(...HOLDING, 'SETTLED').filter(r => r.payment_id !== paymentId);
