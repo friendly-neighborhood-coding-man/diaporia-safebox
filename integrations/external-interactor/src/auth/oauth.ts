@@ -172,7 +172,8 @@ export class OAuthAuthority {
   }
   completeAuthorization(form: URLSearchParams): { redirect: string } | { error: OAuthError } {
     const p = this.getPending(form.get("request_id"));
-    if (!p || form.get("csrf") !== p.csrf) return { error: new OAuthError("invalid_request", "Authorization request expired or invalid; start again from your AI client", 400) };
+    const csrf = form.get("csrf") ?? "";
+    if (!p || csrf.length !== p.csrf.length || !timingSafeEqual(Buffer.from(csrf), Buffer.from(p.csrf))) return { error: new OAuthError("invalid_request", "Authorization request expired or invalid; start again from your AI client", 400) };
     if (form.get("decision") !== "approve") {
       this.pending.delete(p.id);
       return { redirect: this.errorRedirect(p.redirectUri, new OAuthError("access_denied", "The user denied the request"), p.state) };
@@ -211,7 +212,10 @@ export class OAuthAuthority {
   private authenticateClient(form: URLSearchParams, authorization?: string) {
     let id = form.get("client_id"); let secret = form.get("client_secret");
     const basic = /^Basic ([A-Za-z0-9+/=]+)$/.exec(authorization ?? "");
-    if (basic) { const [bi, ...rest] = Buffer.from(basic[1]!, "base64").toString("utf8").split(":"); id = decodeURIComponent(bi ?? ""); secret = decodeURIComponent(rest.join(":")); }
+    if (basic) {
+      const [bi, ...rest] = Buffer.from(basic[1]!, "base64").toString("utf8").split(":");
+      try { id = decodeURIComponent(bi ?? ""); secret = decodeURIComponent(rest.join(":")); } catch { throw new OAuthError("invalid_client", "Malformed client credentials", 401); }
+    }
     const client = this.client(id);
     if (!client) throw new OAuthError("invalid_client", "Unknown client", 401);
     if (client.authMethod !== "none" && (!secret || !client.secretHash || !eqHex(sha(secret), client.secretHash))) throw new OAuthError("invalid_client", "Client authentication failed", 401);

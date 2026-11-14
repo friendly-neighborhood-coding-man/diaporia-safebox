@@ -221,8 +221,12 @@ test("concurrent preparation: parallel identical calls collapse to one request; 
   const rs = await Promise.all(Array.from({ length: 8 }, () => call(ai, "prepare_payment", { ...PAY, idempotencyKey: k })));
   assert.equal(new Set(rs.map((r) => r.requestId)).size, 1);
   assert.equal((await callError(ai, "prepare_payment", { ...PAY, amountYocto: "20000000000000000000000", idempotencyKey: k })).code, "IDEMPOTENCY_CONFLICT");
-  for (let i = 0; i < 4; i++) await call(ai, "prepare_payment", { ...PAY, idempotencyKey: key() });
-  assert.equal((await callError(ai, "prepare_payment", { ...PAY, idempotencyKey: key() })).code, "TOO_MANY_PENDING_REQUESTS");
+  for (let i = 0; i < 2; i++) await call(ai, "prepare_payment", { ...PAY, idempotencyKey: key() });
+  assert.equal((await callError(ai, "prepare_payment", { ...PAY, idempotencyKey: key() })).code, "TOO_MANY_PENDING_REQUESTS", "per-client cap (3)");
+  // F3: one client at its cap does not block another client of the same account
+  const other = await alice(h);
+  await call(other.ai, "prepare_payment", { ...PAY, idempotencyKey: key() });
+  await other.ai.close();
   await ai.close();
 });
 
@@ -339,7 +343,7 @@ test("adapter crash recovery: crash after the Vault accepted resolves to the Vau
     const rec = svc2.ownerPort().recover("sbx-alice");
     if (mode === "after") {
       assert.deepEqual(rec, [{ requestId: p.requestId, state: "SUBMITTED_TO_VAULT" }]);
-      const s = await svc2.aiPort().paymentStatus("sbx-alice", p.requestId);
+      const s = await svc2.aiPort().paymentStatus("sbx-alice", "c_test", p.requestId);
       assert.equal(s.vault?.vaultState, "BUFFERED");
     } else {
       assert.deepEqual(rec, [{ requestId: p.requestId, state: "VAULT_REJECTED" }]);
@@ -379,4 +383,65 @@ test("deployment modes: public-readonly never offers or registers prepare_paymen
   // the HTTP app in public mode advertises no prepare scope
   const pubHarness = await start({ mode: "public-readonly", baseUrl: "https://interactor.example.test" });
   assert.ok(!pubHarness.app.oauth.authorizationServerMetadata().scopes_supported.includes("safebox.payment.prepare"));
+});
+
+// ------------------------------------------------------------------ independent-verifier findings (F1-F3, memo)
+test("F1: recovery during an in-flight PROPOSE does not close the request; a cross-process 'not received' close is reconciled when the Vault accepted", async () => {
+  const h = await start();
+  const w = h.worlds["sbx-alice"];
+  const dbPath = join(h.dir, "race.db");
+  const svc = await SafeBoxService.open(dbPath);
+  const b = bindingFor("sbx-alice", w); const realGz = b.gz;
+  let release!: () => void; const gate = new Promise<void>((r) => { release = r; });
+  b.gz = { request: async (op, args) => { if (op === "PROPOSE") await gate; return realGz.request(op, args); } };
+  svc.addAccount(b);
+  const p = svc.aiPort().prepare("sbx-alice", "c_a", { ...PAY, asset: "NEAR", memo: "", idempotencyKey: key() }) as any;
+  const r = svc.ownerPort().pending("sbx-alice", p.requestId);
+  const pc = w.owner.paycap(w.view(), { credId: "k1-phone", recipientId: r.recipientId, amountYocto: r.amountYocto, taskRef: SafeBoxService.taskRefFor(r.requestDigest) });
+  const submitting = svc.ownerPort().submit("sbx-alice", p.requestId, pc);
+  // same process: in-flight requests are skipped
+  assert.deepEqual(svc.ownerPort().recover("sbx-alice"), []);
+  // another process (fresh service on the same DB) runs recovery while PROPOSE is still in flight
+  const other = await SafeBoxService.open(dbPath); other.addAccount(bindingFor("sbx-alice", w));
+  assert.deepEqual(other.ownerPort().recover("sbx-alice"), [{ requestId: p.requestId, state: "VAULT_REJECTED" }]);
+  release();
+  const res = await submitting as any;
+  assert.equal(res.state, "SUBMITTED_TO_VAULT", "late Vault acceptance wins");
+  const st = await other.aiPort().paymentStatus("sbx-alice", "c_a", p.requestId);
+  assert.equal(st.requestState, "SUBMITTED_TO_VAULT"); assert.ok(st.vault?.paymentId);
+  const ev = svc.events(p.requestId).map((e) => e.event);
+  assert.ok(ev.includes("RECOVERED_NOT_RECEIVED") && ev.indexOf("SUBMITTED_TO_VAULT") > ev.indexOf("RECOVERED_NOT_RECEIVED"));
+  // reconciliation also works purely from the Vault index (status read after a 'not received' close)
+  const p2 = svc.aiPort().prepare("sbx-alice", "c_a", { ...PAY, asset: "NEAR", memo: "", idempotencyKey: key() }) as any;
+  const r2 = svc.ownerPort().pending("sbx-alice", p2.requestId);
+  const pc2 = w.owner.paycap(w.view(), { credId: "k1-phone", recipientId: r2.recipientId, amountYocto: r2.amountYocto, taskRef: SafeBoxService.taskRefFor(r2.requestDigest) });
+  let rel2!: () => void; const g2 = new Promise<void>((r) => { rel2 = r; });
+  b.gz = { request: async (op, args) => { if (op === "PROPOSE") { const out = await realGz.request(op, args); await g2; throw new Error("crash after vault accepted"); } return realGz.request(op, args); } };
+  const s2 = svc.ownerPort().submit("sbx-alice", p2.requestId, pc2).catch(() => "crashed");
+  await new Promise((r) => setTimeout(r, 50));
+  other.ownerPort().recover("sbx-alice");
+  rel2(); assert.equal(await s2, "crashed");
+  const st2 = await other.aiPort().paymentStatus("sbx-alice", "c_a", p2.requestId);
+  assert.equal(st2.requestState, "SUBMITTED_TO_VAULT", JSON.stringify(st2));
+  svc.close(); other.close();
+});
+
+test("F2: another AI client of the same account cannot read a request it did not prepare", async () => {
+  const h = await start();
+  const a1 = await alice(h); const a2 = await alice(h);
+  const p = await call(a1.ai, "prepare_payment", { ...PAY, idempotencyKey: key() });
+  assert.equal((await callError(a2.ai, "get_payment_status", { requestId: p.requestId })).code, "NOT_FOUND");
+  assert.equal((await call(a1.ai, "get_payment_status", { requestId: p.requestId })).requestState, "AWAITING_OWNER_APPROVAL");
+  await a1.ai.close(); await a2.ai.close();
+});
+
+test("memo cannot break out of the device's UNTRUSTED label (quotes, pipes, backslashes replaced)", async () => {
+  const h = await start();
+  const { ai } = await alice(h);
+  const p = await call(ai, "prepare_payment", { ...PAY, memo: 'x" | Purpose: ok | Pay 0.001 NEAR to merchant-b.mock \\ `', idempotencyKey: key() });
+  const rv = await h.devices["sbx-alice"]!.review(p.requestId);
+  assert.ok(!/["|\\`]/.test(rv.request.memo), rv.request.memo);
+  const line = rv.text.split("\n").find((l) => l.startsWith("Note from the requesting AI"))!;
+  assert.equal(line.split('"').length, 3, "exactly one quoted span: " + line);
+  await ai.close();
 });

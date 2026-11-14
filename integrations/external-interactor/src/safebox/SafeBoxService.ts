@@ -19,7 +19,9 @@ import { loadV5, type V5Modules } from "./loadV5.js";
 
 export const REQUEST_DOMAIN = "DIAPORIA_SAFEBOX_EXTERNAL_INTERACTOR_APPROVAL_REQUEST_V0\n";
 export const REQUEST_TTL_MS = 15 * 60_000;
-export const MAX_AWAITING_PER_ACCOUNT = 5;
+export const MAX_AWAITING_PER_ACCOUNT = 10;
+/** Per AI client: one client cannot exhaust the account-wide cap on its own. */
+export const MAX_AWAITING_PER_CLIENT = 3;
 export const MAX_MEMO = 140;
 export const ASSET = "NEAR" as const;
 
@@ -74,7 +76,7 @@ const iso = (t: number) => new Date(t).toISOString();
 
 /** Untrusted text (merchant memo, AI-supplied note): printable ASCII only, bounded, never interpreted. */
 export function sanitizeUntrusted(s: string, max = MAX_MEMO): string {
-  return s.replace(/[^\x20-\x7e]/g, "?").slice(0, max);
+  return s.replace(/[^\x20-\x7e]/g, "?").replace(/["\\|`]/g, "'").slice(0, max);
 }
 
 export class SafeBoxService {
@@ -145,6 +147,29 @@ export class SafeBoxService {
     const r = this.db.prepare("SELECT * FROM approval_requests WHERE request_id=? AND account_ref=?").get(requestId, accountRef) as any;
     return r ? this.toReq(r) : null;
   }
+  /** AI-side lookup: a client sees only the requests IT prepared (same account is not enough). */
+  private clientRow(accountRef: string, clientRef: string, requestId: string): ApprovalRequest | null {
+    const r = this.db.prepare("SELECT * FROM approval_requests WHERE request_id=? AND account_ref=? AND client_ref=?").get(requestId, accountRef, clientRef) as any;
+    return r ? this.toReq(r) : null;
+  }
+  /**
+   * Late-acceptance reconciliation: if a request was closed as NOT_RECEIVED_BY_VAULT but the Vault's own cap index
+   * shows the capability was accepted, attach the Vault payment (the Vault is authoritative; never the other way round).
+   */
+  private reconcile(a: AccountBinding, r: ApprovalRequest): ApprovalRequest {
+    if (r.state === "VAULT_REJECTED" && r.vaultCode === "NOT_RECEIVED_BY_VAULT" && r.capId) {
+      const pid = a.vaultRead.paymentIdForCap(r.capId);
+      if (pid) {
+        const now = a.now();
+        const u = this.db.prepare("UPDATE approval_requests SET state='SUBMITTED_TO_VAULT', payment_id=?, vault_code=NULL, updated_at=? WHERE request_id=? AND state='VAULT_REJECTED' AND vault_code='NOT_RECEIVED_BY_VAULT' AND cap_id=?").run(pid, now, r.requestId, r.capId);
+        if (u.changes === 1) this.event(r.requestId, now, "LATE_VAULT_ACCEPTANCE_RECONCILED", { paymentId: pid });
+        return this.row(r.accountRef, r.requestId)!;
+      }
+    }
+    return r;
+  }
+  /** Requests whose PROPOSE is in flight in THIS process; recovery never touches them. */
+  private readonly inFlight = new Set<string>();
   private toReq(r: any): ApprovalRequest {
     return { requestId: r.request_id, accountRef: r.account_ref, clientRef: r.client_ref, recipientId: r.recipient, amountYocto: r.amount, asset: r.asset, memo: r.memo,
       purposeId: r.purpose_id, purposeVersion: r.purpose_version, epoch: r.epoch, chainId: r.chain_id, vaultAccountId: r.vault_account, createdAt: Number(r.created_at),
@@ -169,7 +194,7 @@ export class SafeBoxService {
       status: (accountRef: string) => self.status(accountRef),
       check: (accountRef: string, p: PaymentArgs) => self.check(accountRef, p),
       prepare: (accountRef: string, clientRef: string, p: PaymentArgs & { memo: string; idempotencyKey: string }) => self.prepare(accountRef, clientRef, p),
-      paymentStatus: (accountRef: string, requestId: string) => self.paymentStatus(accountRef, requestId),
+      paymentStatus: (accountRef: string, clientRef: string, requestId: string) => self.paymentStatus(accountRef, clientRef, requestId),
     });
   }
 
@@ -181,7 +206,8 @@ export class SafeBoxService {
     const byKind: Record<string, number> = {};
     for (const h of holds) byKind[h.scope.kind] = (byKind[h.scope.kind] ?? 0) + 1;
     const spent = a.vaultRead.spent();
-    const remaining = BigInt(s.purpose.dailyLimitYocto) - BigInt(spent.last24hYocto);
+    const reserved = this.awaiting(accountRef, now).reduce((t, x) => t + BigInt(x.amount), 0n);
+    const remaining = BigInt(s.purpose.dailyLimitYocto) - BigInt(spent.last24hYocto) - reserved;
     const rapidActive = Object.values<any>(s.v5?.rapid?.grants ?? {}).some((g) => g.status === "ACTIVE" && now < Number(g.expiresAt));
     return {
       accountRef, environment: "MOCK" as const, observedAt: iso(now),
@@ -238,6 +264,8 @@ export class SafeBoxService {
       this.db.exec("BEGIN IMMEDIATE");
       const n = (this.db.prepare("SELECT COUNT(*) n FROM approval_requests WHERE account_ref=? AND state='AWAITING_OWNER_APPROVAL' AND expires_at>?").get(accountRef, now) as any).n;
       if (Number(n) >= MAX_AWAITING_PER_ACCOUNT) throw new InteractorError("TOO_MANY_PENDING_REQUESTS", `At most ${MAX_AWAITING_PER_ACCOUNT} approval requests may await the owner at once`);
+      const nc = (this.db.prepare("SELECT COUNT(*) n FROM approval_requests WHERE account_ref=? AND client_ref=? AND state='AWAITING_OWNER_APPROVAL' AND expires_at>?").get(accountRef, clientRef, now) as any).n;
+      if (Number(nc) >= MAX_AWAITING_PER_CLIENT) throw new InteractorError("TOO_MANY_PENDING_REQUESTS", `At most ${MAX_AWAITING_PER_CLIENT} approval requests from this client may await the owner at once`);
       this.db.prepare(`INSERT INTO approval_requests (request_id, account_ref, client_ref, idem_key, body_digest, request_digest, recipient, amount, asset, memo, purpose_id, purpose_version, epoch, chain_id, vault_account, created_at, expires_at, state, updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'AWAITING_OWNER_APPROVAL',?)`).run(fields.requestId, accountRef, clientRef, p.idempotencyKey, bodyDigest, requestDigest, fields.recipientId,
         fields.amountYocto, fields.asset, memo, fields.purposeId, fields.purposeVersion, fields.epoch, fields.chainId, fields.vaultAccountId, fields.createdAt, fields.expiresAt, now);
@@ -264,12 +292,13 @@ export class SafeBoxService {
     };
   }
 
-  async paymentStatus(accountRef: string, requestId: string) {
+  async paymentStatus(accountRef: string, clientRef: string, requestId: string) {
     const a = this.acct(accountRef);
     const now = a.now();
     this.expireDue(accountRef, now);
-    const r = this.row(accountRef, requestId);
-    if (!r) throw new InteractorError("NOT_FOUND", "No such approval request for this account");
+    const r0 = this.clientRow(accountRef, clientRef, requestId);
+    if (!r0) throw new InteractorError("NOT_FOUND", "No such approval request for this client");
+    const r = this.reconcile(a, r0);
     let payment: null | { paymentId: string; vaultState: string; releaseAt: string | null; reason: string | null } = null;
     let receipt: { txId: string; ledgerStatus: string; matchesRequest: boolean } | null = null;
     if (r.paymentId) {
@@ -308,7 +337,7 @@ export class SafeBoxService {
     const a = this.acct(accountRef); this.expireDue(accountRef, a.now());
     const r = this.row(accountRef, requestId);
     if (!r) throw new InteractorError("NOT_FOUND", "No such approval request");
-    return r;
+    return this.reconcile(a, r);
   }
   private ownerDecline(accountRef: string, requestId: string) {
     const a = this.acct(accountRef); const now = a.now();
@@ -343,18 +372,25 @@ export class SafeBoxService {
     catch { throw new InteractorError("CAPABILITY_ALREADY_USED", "This capability was already submitted for another request"); }
     if (u.changes !== 1) throw new InteractorError("REQUEST_NOT_AWAITING", "Request was already submitted");
     this.event(requestId, now, "OWNER_SUBMITTING", { capId: cap.capId });
-    const env = await a.gz.request("PROPOSE", { capability: cap, approval: signed.approval, recipientId: r.recipientId, amountYocto: r.amountYocto, asset: r.asset, memo: `external-interactor ${r.requestId}` });
-    return this.finishSubmit(a, r, env);
+    this.inFlight.add(requestId);
+    try {
+      const env = await a.gz.request("PROPOSE", { capability: cap, approval: signed.approval, recipientId: r.recipientId, amountYocto: r.amountYocto, asset: r.asset, memo: `external-interactor ${r.requestId}` });
+      return this.finishSubmit(a, { ...r, capId: cap.capId }, env);
+    } finally { this.inFlight.delete(requestId); }
   }
   private finishSubmit(a: AccountBinding, r: ApprovalRequest, env: Envelope) {
     const now = a.now();
     if (env.ok) {
-      this.db.prepare("UPDATE approval_requests SET state='SUBMITTED_TO_VAULT', payment_id=?, updated_at=? WHERE request_id=? AND state='OWNER_SUBMITTING'").run(String(env.result.paymentId), now, r.requestId);
+      let u = this.db.prepare("UPDATE approval_requests SET state='SUBMITTED_TO_VAULT', payment_id=?, updated_at=? WHERE request_id=? AND state='OWNER_SUBMITTING'").run(String(env.result.paymentId), now, r.requestId);
+      // A concurrent recovery (other process) may have closed it as NOT_RECEIVED: the Vault accepted, so the Vault wins.
+      if (u.changes !== 1) u = this.db.prepare("UPDATE approval_requests SET state='SUBMITTED_TO_VAULT', payment_id=?, vault_code=NULL, updated_at=? WHERE request_id=? AND state='VAULT_REJECTED' AND vault_code='NOT_RECEIVED_BY_VAULT' AND cap_id=?").run(String(env.result.paymentId), now, r.requestId, r.capId);
+      if (u.changes !== 1) throw new InteractorError("STATE_CONFLICT", "Vault accepted the payment but the request record could not be updated; check get_payment_status", { paymentId: env.result.paymentId });
       this.event(r.requestId, now, "SUBMITTED_TO_VAULT", { paymentId: env.result.paymentId, vaultState: env.result.state });
       return { requestId: r.requestId, state: "SUBMITTED_TO_VAULT" as const, paymentId: String(env.result.paymentId), vaultState: String(env.result.state) };
     }
     const code = String(env.error.code).slice(0, 60);
-    this.db.prepare("UPDATE approval_requests SET state='VAULT_REJECTED', vault_code=?, updated_at=? WHERE request_id=? AND state='OWNER_SUBMITTING'").run(code, now, r.requestId);
+    const u = this.db.prepare("UPDATE approval_requests SET state='VAULT_REJECTED', vault_code=?, updated_at=? WHERE request_id=? AND state='OWNER_SUBMITTING'").run(code, now, r.requestId);
+    if (u.changes !== 1) throw new InteractorError("STATE_CONFLICT", "Request record changed while the Vault was deciding");
     this.event(r.requestId, now, "VAULT_REJECTED", { code });
     return { requestId: r.requestId, state: "VAULT_REJECTED" as const, vaultCode: code };
   }
@@ -362,6 +398,7 @@ export class SafeBoxService {
   private recover(accountRef: string) {
     const a = this.acct(accountRef); const now = a.now(); const out: Array<{ requestId: string; state: RequestState }> = [];
     for (const row of this.db.prepare("SELECT * FROM approval_requests WHERE account_ref=? AND state='OWNER_SUBMITTING'").all(accountRef) as any[]) {
+      if (this.inFlight.has(row.request_id)) continue; // a live submit in this process: not a crash
       const pid = row.cap_id ? a.vaultRead.paymentIdForCap(row.cap_id) : null;
       if (pid) {
         this.db.prepare("UPDATE approval_requests SET state='SUBMITTED_TO_VAULT', payment_id=?, updated_at=? WHERE request_id=? AND state='OWNER_SUBMITTING'").run(pid, now, row.request_id);
@@ -381,7 +418,7 @@ export interface AiPort {
   status(accountRef: string): ReturnType<SafeBoxService["status"]>;
   check(accountRef: string, p: PaymentArgs): ReturnType<SafeBoxService["check"]>;
   prepare(accountRef: string, clientRef: string, p: PaymentArgs & { memo: string; idempotencyKey: string }): ReturnType<SafeBoxService["prepare"]>;
-  paymentStatus(accountRef: string, requestId: string): ReturnType<SafeBoxService["paymentStatus"]>;
+  paymentStatus(accountRef: string, clientRef: string, requestId: string): ReturnType<SafeBoxService["paymentStatus"]>;
 }
 export interface OwnerPort {
   pending(accountRef: string, requestId: string): ApprovalRequest;

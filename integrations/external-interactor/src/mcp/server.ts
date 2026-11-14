@@ -96,7 +96,7 @@ export function createInteractorMcpServer(ai: AiPort, principal: Principal, mode
     inputSchema: INPUTS.get_payment_status, outputSchema: OUTPUTS.get_payment_status,
     annotations: { title: "Get payment status", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     _meta: { "safebox/effect": "READ_ONLY" },
-  }, async (args) => guard("get_payment_status", SCOPES.PAYMENT_READ, args, (a) => ai.paymentStatus(principal.accountRef, a.requestId)));
+  }, async (args) => guard("get_payment_status", SCOPES.PAYMENT_READ, args, (a) => ai.paymentStatus(principal.accountRef, clientRef, a.requestId)));
 
   return server;
 }
