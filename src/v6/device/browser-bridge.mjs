@@ -48,6 +48,7 @@ button{font:inherit;padding:9px 16px;border-radius:7px;border:1px solid #8893a1;
 <h1>SafeBox owner device bridge (${origin})</h1>
 <p>Keep this tab open. When SafeBox needs this laptop's enrolled passkey, the exact request appears below. Approving opens the
 <b>real Windows Hello prompt</b>; Windows Hello may accept a fingerprint, face or PIN (SafeBox cannot tell which: a separate fingerprint gate does).</p>
+<p><b>Save the passkey on THIS laptop (Windows Hello), not in a syncing password manager</b> (e.g. Google Password Manager): SafeBox refuses an undeclared syncable passkey as an owner device key. Microsoft Edge saves to Windows Hello by default.</p>
 <div class="card" id="n" hidden style="border-color:#d29922;background:#fff8e6;font-weight:600"></div><div class="card" id="c"><i>Waiting for a request...</i></div><div id="log"></div>
 <script>
 "use strict";
@@ -61,10 +62,16 @@ async function act(){
   try{
     if(q.op==='create'){
       const c=await navigator.credentials.create({publicKey:{rp:{id:o.rpId,name:'SafeBox'},user:{id:fromB64u(o.userId),name:o.userName,displayName:o.userName},challenge:fromB64u(o.challenge),
-        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},attestation:'none',timeout:180000}});
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},attestation:'none',hints:['client-device'],timeout:180000}});
+      // a passkey saved in a syncing manager reports backup-eligible (flags bit 0x08); SafeBox refuses it as an owner
+      // device key, so say so here (with the AAGUID) instead of failing later at the Root
+      const ad=new Uint8Array(c.response.getAuthenticatorData()); const be=!!(ad[32]&0x08), bs=!!(ad[32]&0x10);
+      const aaguid=[...ad.slice(37,53)].map(x=>x.toString(16).padStart(2,'0')).join('');
+      if(be){await send({id:q.id,ok:false,error:'SYNCABLE_PASSKEY_REFUSED: backup-eligible='+be+' backed-up='+bs+' aaguid='+aaguid});
+        document.getElementById('log').insertAdjacentHTML('afterbegin','<div>&#10007; The passkey was saved in a SYNCING password manager (backup-eligible), not on this laptop. SafeBox refused it. Try again and choose Windows Hello / this device (Edge does this by default).</div>');cur=null;document.getElementById('c').innerHTML='<i>Waiting for a request...</i>';return;}
       await send({id:q.id,ok:true,data:{credentialId:b64u(c.rawId),attestationObject:b64u(c.response.attestationObject),clientDataJSON:b64u(c.response.clientDataJSON)}});
     } else {
-      const c=await navigator.credentials.get({publicKey:{rpId:o.rpId,challenge:fromB64u(o.challenge),allowCredentials:[{type:'public-key',id:fromB64u(o.credentialId)}],userVerification:'required',timeout:180000}});
+      const c=await navigator.credentials.get({publicKey:{rpId:o.rpId,challenge:fromB64u(o.challenge),allowCredentials:[{type:'public-key',id:fromB64u(o.credentialId)}],userVerification:'required',hints:['client-device'],timeout:180000}});
       await send({id:q.id,ok:true,data:{credentialId:b64u(c.rawId),authenticatorData:b64u(c.response.authenticatorData),clientDataJSON:b64u(c.response.clientDataJSON),signature:b64u(c.response.signature)}});
     }
     document.getElementById('log').insertAdjacentHTML('afterbegin','<div>&#10003; '+txt(q.title)+'</div>');
@@ -122,9 +129,19 @@ export class BrowserBridge {
 
 /** Authenticator with the SoftAuthenticator interface, backed by the owner's REAL platform authenticator. */
 export class RealAuthenticator {
-  constructor({ bridge, label }) { this.bridge = bridge; this.label = label; this.credentialIdB64u = null; this.kind = 'REAL_PLATFORM_AUTHENTICATOR'; this.ceremonies = []; }
+  constructor({ bridge, label }) { this.bridge = bridge; this.label = label; this.credentialIdB64u = null; this.kind = 'REAL_PLATFORM_AUTHENTICATOR'; this.ceremonies = []; this.refused = []; }
   register({ rpId, challenge }) {
-    const d = this.bridge.call('create', { rpId, challenge: b64u(challenge), userId: b64u(randomBytes(16)), userName: 'SafeBox ' + this.label }, this.bridge.display);
+    let d;
+    for (let i = 1; ; i++) {
+      try { d = this.bridge.call('create', { rpId, challenge: b64u(challenge), userId: b64u(randomBytes(16)), userName: 'SafeBox ' + this.label }, this.bridge.display); break; }
+      catch (e) {
+        // a syncable passkey is refused by the page itself (nothing registered); let the owner retry twice
+        if (i >= 3 || !String(e.detail ?? e.message).includes('SYNCABLE_PASSKEY_REFUSED')) throw e;
+        this.refused.push({ at: new Date().toISOString(), detail: String(e.detail ?? e.message).slice(0, 120) });
+        this.bridge.notice?.('The last passkey was saved in a syncing password manager and was refused. Approve the request again and choose Windows Hello / this device.');
+      }
+    }
+    this.bridge.notice?.(null);
     this.credentialIdB64u = d.credentialId; this.ceremonies.push({ op: 'create', at: new Date().toISOString(), what: this.bridge.display.split('\n')[0] });
     return { attestationObject: d.attestationObject, clientDataJSON: d.clientDataJSON };
   }

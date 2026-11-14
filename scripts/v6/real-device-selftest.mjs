@@ -17,7 +17,8 @@ const browser = await chromium.launch({ args: ['--host-resolver-rules=MAP localh
 const ctx = await browser.newContext();
 const page = await ctx.newPage(); const cdp = await ctx.newCDPSession(page);
 await cdp.send('WebAuthn.enable');
-const { authenticatorId } = await cdp.send('WebAuthn.addVirtualAuthenticator', { options: { protocol: 'ctap2', transport: 'internal', hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true } });
+// SELFTEST_SYNCABLE=1: the virtual authenticator behaves like a syncing password manager (backup-eligible), to exercise the refusal path
+const { authenticatorId } = await cdp.send('WebAuthn.addVirtualAuthenticator', { options: { protocol: 'ctap2', transport: 'internal', hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true, ...(process.env.SELFTEST_SYNCABLE === '1' ? { defaultBackupEligibility: true } : {}) } });
 await until(/Open http:\/\/localhost:\d+\/bridge/);
 await page.goto(`${ORIGIN}/bridge`);
 let clicks = 0; let stop = false;

@@ -173,7 +173,7 @@ const gatedApprovals = gateLog.filter((x) => x.purpose !== 'SENSOR_CHECK' && x.p
 const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)'];
 if (fpOnly.length && gatedApprovals.length && gatedApprovals.every((x) => x.ok) && results.workflowA?.settledVerified && results.workflowB?.frozen) labels.push('FINGERPRINT_ONLY_LOCALLY_VERIFIED (WinBio gate MATCH; not hardware attestation)'); else labels.push('FINGERPRINT ONLY NOT PROVEN');
 labels.push(results.alert?.api === 'GMAIL_API_ACCEPTED' ? 'REAL GMAIL (API accepted; inbox receipt NOT verified until the owner confirms)' : 'REAL GMAIL: NOT RUN');
-const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
+const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, refusedSyncablePasskeys: [...realAuth.refused, ...(activeAuth !== realAuth ? activeAuth.refused : [])], webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
   ownerReportedModalities: 'ASK THE OWNER: WebAuthn cannot tell which Windows Hello modality was used',
   git: (() => { try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO }).toString().trim(); } catch { return null; } })() };
 writeFileSync(join(OUT, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
