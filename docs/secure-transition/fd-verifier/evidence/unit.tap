@@ -1,0 +1,230 @@
+
+> safebox-secure-transition@0.0.0 test
+> node --test tests/unit/*.spec.mjs
+
+TAP version 13
+# Subtest: payment within Purpose is signed once and is idempotent on requestId
+ok 1 - payment within Purpose is signed once and is idempotent on requestId
+  ---
+  duration_ms: 22.716754
+  type: 'test'
+  ...
+# Subtest: outside Purpose needs a bound, fresh, single-use owner approval
+ok 2 - outside Purpose needs a bound, fresh, single-use owner approval
+  ---
+  duration_ms: 21.125887
+  type: 'test'
+  ...
+# Subtest: budget is cumulative and never restored
+ok 3 - budget is cumulative and never restored
+  ---
+  duration_ms: 17.457866
+  type: 'test'
+  ...
+# Subtest: maintenance refuses payments but FREEZE and recovery rotation still work
+ok 4 - maintenance refuses payments but FREEZE and recovery rotation still work
+  ---
+  duration_ms: 13.631097
+  type: 'test'
+  ...
+# Subtest: policy governance: no app-callable policy setter; permissive migration needs owner+recovery; stale digest refused
+ok 5 - policy governance: no app-callable policy setter; permissive migration needs owner+recovery; stale digest refused
+  ---
+  duration_ms: 13.29036
+  type: 'test'
+  ...
+# Subtest: update authorization respects the version floor; completion needs a reconciled, witness-attested transition
+ok 6 - update authorization respects the version floor; completion needs a reconciled, witness-attested transition
+  ---
+  duration_ms: 7.799248
+  type: 'test'
+  ...
+# Subtest: reconcile: pending payments keep settling during maintenance; unknown txs are rebroadcast once
+ok 7 - reconcile: pending payments keep settling during maintenance; unknown txs are rebroadcast once
+  ---
+  duration_ms: 13.465315
+  type: 'test'
+  ...
+# Subtest: reconcile fails closed when the ledger shows activity the Authority never signed
+ok 8 - reconcile fails closed when the ledger shows activity the Authority never signed
+  ---
+  duration_ms: 3.732859
+  type: 'test'
+  ...
+# Subtest: property: random request sequences never decrease counters or exceed policy
+ok 9 - property: random request sequences never decrease counters or exceed policy
+  ---
+  duration_ms: 167.705682
+  type: 'test'
+  ...
+# Subtest: install into allow-listed slot, read back, verify
+ok 10 - install into allow-listed slot, read back, verify
+  ---
+  duration_ms: 11.197545
+  type: 'test'
+  ...
+# Subtest: destination allow-list, symlinked slot and planted files
+ok 11 - destination allow-list, symlinked slot and planted files
+  ---
+  duration_ms: 5.693233
+  type: 'test'
+  ...
+# Subtest: verifySlot detects tampering after install
+ok 12 - verifySlot detects tampering after install
+  ---
+  duration_ms: 12.323519
+  type: 'test'
+  ...
+# Subtest: journal: hash chain, torn tail dropped, mid-file tamper detected
+ok 13 - journal: hash chain, torn tail dropped, mid-file tamper detected
+  ---
+  duration_ms: 3.777035
+  type: 'test'
+  ...
+# Subtest: verifySlot race: a file swapped for a symlink / another file / a FIFO after the lstat is refused, never read by path
+ok 14 - verifySlot race: a file swapped for a symlink / another file / a FIFO after the lstat is refused, never read by path
+  ---
+  duration_ms: 7.091107
+  type: 'test'
+  ...
+# Subtest: verifySlot directories: a subdirectory replaced by a symlink to a byte-identical tree is refused (static case; the mid-walk swap is covered by pinDir/stillSame by construction)
+ok 15 - verifySlot directories: a subdirectory replaced by a symlink to a byte-identical tree is refused (static case; the mid-walk swap is covered by pinDir/stillSame by construction)
+  ---
+  duration_ms: 1.929542
+  type: 'test'
+  ...
+# Subtest: well-formed package round-trips
+ok 16 - well-formed package round-trips
+  ---
+  duration_ms: 3.117115
+  type: 'test'
+  ...
+# Subtest: tar reader rejects non-regular entries and unsafe paths
+ok 17 - tar reader rejects non-regular entries and unsafe paths
+  ---
+  duration_ms: 1.768976
+  type: 'test'
+  ...
+# Subtest: tar reader enforces bounds and structure
+ok 18 - tar reader enforces bounds and structure
+  ---
+  duration_ms: 22.146802
+  type: 'test'
+  ...
+# Subtest: manifest must be first, canonical, complete and closed
+ok 19 - manifest must be first, canonical, complete and closed
+  ---
+  duration_ms: 8.579822
+  type: 'test'
+  ...
+# Subtest: property: random single-byte corruption never yields an accepted package with different content
+ok 20 - property: random single-byte corruption never yields an accepted package with different content
+  ---
+  duration_ms: 102.601535
+  type: 'test'
+  ...
+# Subtest: valid release verifies (threshold 2-of-3 targets)
+ok 21 - valid release verifies (threshold 2-of-3 targets)
+  ---
+  duration_ms: 75.921809
+  type: 'test'
+  ...
+# Subtest: U01 unsigned / wrong-key metadata is rejected
+ok 22 - U01 unsigned / wrong-key metadata is rejected
+  ---
+  duration_ms: 37.199541
+  type: 'test'
+  ...
+# Subtest: U01 targets signed below threshold is rejected
+ok 23 - U01 targets signed below threshold is rejected
+  ---
+  duration_ms: 31.686617
+  type: 'test'
+  ...
+# Subtest: U02 signed metadata with tampered package bytes is rejected
+ok 24 - U02 signed metadata with tampered package bytes is rejected
+  ---
+  duration_ms: 49.918432
+  type: 'test'
+  ...
+# Subtest: U03/U05 replay of older signed metadata after a newer one was seen is rejected (rollback)
+ok 25 - U03/U05 replay of older signed metadata after a newer one was seen is rejected (rollback)
+  ---
+  duration_ms: 50.335238
+  type: 'test'
+  ...
+# Subtest: U04 expired timestamp is rejected even when the client is offline (no exemption)
+ok 26 - U04 expired timestamp is rejected even when the client is offline (no exemption)
+  ---
+  duration_ms: 16.789111
+  type: 'test'
+  ...
+# Subtest: U04 expired targets metadata is rejected
+ok 27 - U04 expired targets metadata is rejected
+  ---
+  duration_ms: 22.715745
+  type: 'test'
+  ...
+# Subtest: U04 mix-and-match: new timestamp+snapshot with targets from another release is rejected
+ok 28 - U04 mix-and-match: new timestamp+snapshot with targets from another release is rejected
+  ---
+  duration_ms: 24.960964
+  type: 'test'
+  ...
+# Subtest: U05 withheld metadata / target and freeze (server stops updating) are rejected
+ok 29 - U05 withheld metadata / target and freeze (server stops updating) are rejected
+  ---
+  duration_ms: 2196.581527
+  type: 'test'
+  ...
+# Subtest: target without sstp version is rejected
+ok 30 - target without sstp version is rejected
+  ---
+  duration_ms: 24.327159
+  type: 'test'
+  ...
+# Subtest: U15 root rotation: accepted by plain TUF, refused by SSTP unless the owner approved that exact root digest
+ok 31 - U15 root rotation: accepted by plain TUF, refused by SSTP unless the owner approved that exact root digest
+  ---
+  duration_ms: 106.781154
+  type: 'test'
+  ...
+# Subtest: rotation not cross-signed by the old root keys is rejected even by plain TUF
+ok 32 - rotation not cross-signed by the old root keys is rejected even by plain TUF
+  ---
+  duration_ms: 39.548971
+  type: 'test'
+  ...
+# Subtest: fd-relative verification is available on this Linux host and is what verifySlot reports
+ok 33 - fd-relative verification is available on this Linux host and is what verifySlot reports
+  ---
+  duration_ms: 5.366287
+  type: 'test'
+  ...
+# Subtest: exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \#27 had 264)
+ok 34 - exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \#27 had 264)
+  ---
+  duration_ms: 3959.373567
+  type: 'test'
+  ...
+# Subtest: static cases still refused: symlinked subdirectory, symlinked file, extra file, tampered bytes
+ok 35 - static cases still refused: symlinked subdirectory, symlinked file, extra file, tampered bytes
+  ---
+  duration_ms: 11.82739
+  type: 'test'
+  ...
+# Subtest: protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid
+ok 36 - protected path: slot and ancestors must be unwritable by others (sticky ancestors allowed), owned by root or expectUid
+  ---
+  duration_ms: 3.360754
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4272.951244

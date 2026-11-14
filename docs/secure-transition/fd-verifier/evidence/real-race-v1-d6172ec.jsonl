@@ -1,0 +1,3 @@
+{"tree":"<d6172ec>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":3,"refusals":{"SLOT_DIGEST_MISMATCH":13,"SLOT_CHANGED_DURING_VERIFY":501,"ENOENT":614,"SLOT_FILE_SET_MISMATCH":1869}}
+{"tree":"<d6172ec>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":0,"refusals":{"SLOT_DIGEST_MISMATCH":38,"ENOENT":777,"SLOT_CHANGED_DURING_VERIFY":579,"SLOT_FILE_SET_MISMATCH":1606}}
+{"tree":"<d6172ec>","iterations":3000,"verifySlotSuccessWhileSlotHeldEvil":0,"refusals":{"SLOT_DIGEST_MISMATCH":35,"ENOENT":616,"SLOT_CHANGED_DURING_VERIFY":437,"SLOT_FILE_SET_MISMATCH":1912}}

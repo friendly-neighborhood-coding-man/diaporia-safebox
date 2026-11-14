@@ -1,0 +1,601 @@
+{
+ "tree": "<candidate>",
+ "node": "v22.23.4",
+ "uid": 0,
+ "fsCallsPerVerify": 43,
+ "lastContentReadCall": 29,
+ "lastCheckCall": 41,
+ "closingWindowCalls": [
+  "fstatSync",
+  "closeSync",
+  "lstatSync",
+  "lstatSync",
+  "lstatSync",
+  "lstatSync",
+  "realpathSync",
+  "lstatSync",
+  "readdirSync",
+  "fstatSync",
+  "readdirSync",
+  "fstatSync",
+  "closeSync",
+  "closeSync"
+ ],
+ "control": "SUCCESS",
+ "summary": {
+  "A1 a.mjs replaced by an EVIL file (persistent)": {
+   "schedules": 43,
+   "fullyFired": 43,
+   "success": 2,
+   "inCallBypass": 2,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 2,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 8,
+    "SLOT_CHANGED_DURING_VERIFY": 33
+   },
+   "bypassAt": [
+    "42:closeSync",
+    "43:closeSync"
+   ]
+  },
+  "A2 sub/ replaced by an EVIL directory (persistent)": {
+   "schedules": 43,
+   "fullyFired": 43,
+   "success": 2,
+   "inCallBypass": 2,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 2,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 8,
+    "SLOT_CHANGED_DURING_VERIFY": 33
+   },
+   "bypassAt": [
+    "42:closeSync",
+    "43:closeSync"
+   ]
+  },
+  "A3 a.mjs rewritten in place, same inode and length (persistent)": {
+   "schedules": 43,
+   "fullyFired": 43,
+   "success": 11,
+   "inCallBypass": 11,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 11,
+   "bypassBeforeLastCheck": 9,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 12,
+    "SLOT_CHANGED_DURING_VERIFY": 20
+   },
+   "bypassAt": [
+    "33:lstatSync",
+    "34:lstatSync",
+    "35:lstatSync",
+    "36:realpathSync",
+    "37:lstatSync",
+    "38:readdirSync",
+    "39:fstatSync",
+    "40:readdirSync",
+    "41:fstatSync",
+    "42:closeSync",
+    "43:closeSync"
+   ]
+  },
+  "A4 extra file created inside sub/ (persistent)": {
+   "schedules": 43,
+   "fullyFired": 43,
+   "success": 4,
+   "inCallBypass": 4,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 4,
+   "bypassBeforeLastCheck": 2,
+   "refusals": {
+    "SLOT_FILE_SET_MISMATCH": 18,
+    "SLOT_CHANGED_DURING_VERIFY": 21
+   },
+   "bypassAt": [
+    "40:readdirSync",
+    "41:fstatSync",
+    "42:closeSync",
+    "43:closeSync"
+   ]
+  },
+  "A5 a.mjs replaced by a symlink to a genuine file (persistent)": {
+   "schedules": 43,
+   "fullyFired": 43,
+   "success": 2,
+   "inCallBypass": 2,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 2,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_CONTAINS_SYMLINK": 11,
+    "SLOT_CHANGED_DURING_VERIFY": 30
+   },
+   "bypassAt": [
+    "42:closeSync",
+    "43:closeSync"
+   ]
+  },
+  "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)": {
+   "schedules": 946,
+   "fullyFired": 740,
+   "success": 24,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 16,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 31,
+    "SLOT_CHANGED_DURING_VERIFY": 891
+   },
+   "bypassAt": [
+    "1+42:openSync+closeSync",
+    "1+43:openSync+closeSync",
+    "2+42:statSync+closeSync",
+    "2+43:statSync+closeSync",
+    "3+42:fstatSync+closeSync",
+    "3+43:fstatSync+closeSync",
+    "4+42:closeSync+closeSync",
+    "4+43:closeSync+closeSync",
+    "5+42:lstatSync+closeSync",
+    "5+43:lstatSync+closeSync",
+    "6+42:realpathSync+closeSync",
+    "6+43:realpathSync+closeSync",
+    "7+42:openSync+closeSync",
+    "7+43:openSync+closeSync",
+    "8+42:fstatSync+closeSync",
+    "8+43:fstatSync+closeSync"
+   ]
+  },
+  "P2 sub/ swap-and-swap-back with a SYMLINK to the genuine twin": {
+   "schedules": 946,
+   "fullyFired": 322,
+   "success": 0,
+   "inCallBypass": 0,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 0,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 31,
+    "SLOT_CHANGED_DURING_VERIFY": 440,
+    "SLOT_CONTAINS_SYMLINK": 475
+   }
+  },
+  "P3 a.mjs swap-and-swap-back with a genuine file (slot holds EVIL a.mjs)": {
+   "schedules": 946,
+   "fullyFired": 649,
+   "success": 24,
+   "inCallBypass": 16,
+   "bypassDuringWalk": 0,
+   "bypassInClosingWindow": 16,
+   "bypassBeforeLastCheck": 0,
+   "refusals": {
+    "SLOT_DIGEST_MISMATCH": 31,
+    "SLOT_CHANGED_DURING_VERIFY": 891
+   },
+   "bypassAt": [
+    "1+42:openSync+closeSync",
+    "1+43:openSync+closeSync",
+    "2+42:statSync+closeSync",
+    "2+43:statSync+closeSync",
+    "3+42:fstatSync+closeSync",
+    "3+43:fstatSync+closeSync",
+    "4+42:closeSync+closeSync",
+    "4+43:closeSync+closeSync",
+    "5+42:lstatSync+closeSync",
+    "5+43:lstatSync+closeSync",
+    "6+42:realpathSync+closeSync",
+    "6+43:realpathSync+closeSync",
+    "7+42:openSync+closeSync",
+    "7+43:openSync+closeSync",
+    "8+42:fstatSync+closeSync",
+    "8+43:fstatSync+closeSync"
+   ]
+  }
+ },
+ "totalInCallBypass": 53,
+ "totalBypassDuringWalk": 0,
+ "sampleBypasses": [
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    42
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A1 a.mjs replaced by an EVIL file (persistent)",
+   "at": [
+    43
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    42
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A2 sub/ replaced by an EVIL directory (persistent)",
+   "at": [
+    43
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    33
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    34
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    35
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    36
+   ],
+   "before": [
+    "realpathSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    37
+   ],
+   "before": [
+    "lstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    38
+   ],
+   "before": [
+    "readdirSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    39
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    40
+   ],
+   "before": [
+    "readdirSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    41
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    42
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A3 a.mjs rewritten in place, same inode and length (persistent)",
+   "at": [
+    43
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A4 extra file created inside sub/ (persistent)",
+   "at": [
+    40
+   ],
+   "before": [
+    "readdirSync"
+   ]
+  },
+  {
+   "attack": "A4 extra file created inside sub/ (persistent)",
+   "at": [
+    41
+   ],
+   "before": [
+    "fstatSync"
+   ]
+  },
+  {
+   "attack": "A4 extra file created inside sub/ (persistent)",
+   "at": [
+    42
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A4 extra file created inside sub/ (persistent)",
+   "at": [
+    43
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A5 a.mjs replaced by a symlink to a genuine file (persistent)",
+   "at": [
+    42
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "A5 a.mjs replaced by a symlink to a genuine file (persistent)",
+   "at": [
+    43
+   ],
+   "before": [
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    1,
+    42
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    1,
+    43
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    2,
+    42
+   ],
+   "before": [
+    "statSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    2,
+    43
+   ],
+   "before": [
+    "statSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    3,
+    42
+   ],
+   "before": [
+    "fstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    3,
+    43
+   ],
+   "before": [
+    "fstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    4,
+    42
+   ],
+   "before": [
+    "closeSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    4,
+    43
+   ],
+   "before": [
+    "closeSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    5,
+    42
+   ],
+   "before": [
+    "lstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    5,
+    43
+   ],
+   "before": [
+    "lstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    6,
+    42
+   ],
+   "before": [
+    "realpathSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    6,
+    43
+   ],
+   "before": [
+    "realpathSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    7,
+    42
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    7,
+    43
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    8,
+    42
+   ],
+   "before": [
+    "fstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)",
+   "at": [
+    8,
+    43
+   ],
+   "before": [
+    "fstatSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P3 a.mjs swap-and-swap-back with a genuine file (slot holds EVIL a.mjs)",
+   "at": [
+    1,
+    42
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P3 a.mjs swap-and-swap-back with a genuine file (slot holds EVIL a.mjs)",
+   "at": [
+    1,
+    43
+   ],
+   "before": [
+    "openSync",
+    "closeSync"
+   ]
+  },
+  {
+   "attack": "P3 a.mjs swap-and-swap-back with a genuine file (slot holds EVIL a.mjs)",
+   "at": [
+    2,
+    42
+   ],
+   "before": [
+    "statSync",
+    "closeSync"
+   ]
+  }
+ ]
+}

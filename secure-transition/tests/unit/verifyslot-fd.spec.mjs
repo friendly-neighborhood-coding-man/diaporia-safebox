@@ -22,10 +22,10 @@ function slotWorld(t) {
   return { d, slot, manifest };
 }
 
-test('fd-relative verification is available on this Linux host and is what verifySlot reports', (t) => {
+test('fd-relative verification is available on this Linux host', (t) => {
   assert.equal(fdRelativeSupported(), true);
   const { slot, manifest } = slotWorld(t);
-  assert.deepEqual(verifySlot(slot, manifest), { files: 2, assurance: 'FD_RELATIVE_WITHIN_CALL' });
+  assert.deepEqual(verifySlot(slot, manifest), { files: 2 });
 });
 
 test('exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR #27 had 264)', () => {
@@ -42,15 +42,22 @@ test('exhaustive interposition: no attacker mutation made during the walk yields
   // Residual, measured: the remaining in-call successes all need the mutation to land after the final check that
   // covers the mutated object (closing window); they are verify-then-use, not walk races.
   for (const s of Object.values(out.summary)) assert.equal(s.inCallBypass, s.bypassInClosingWindow);
-  // Renames, swaps and symlinks in the root change the root directory's mtime/ctime, and the root directory's check
-  // closes the final pass, so for those attacks a foreign slot only gets through if the mutation lands after the
-  // verifier's LAST inspecting call (only descriptor closes follow). A new file inside sub/ (A4) is bounded by sub/'s
-  // own directory check, which runs just before the root's (2 calls: readdir + fstat of the root remain). The in-place
-  // rewrite (A3) changes no directory and is bounded by that file's own entry re-check.
+  // Renames, swaps, links, symlinks and new entries: refused unless the mutation lands in the last two inspecting calls
+  // (the slot-path check and the root directory's check close the pass, in that order; an ancestor swap-back after
+  // the slot-path check falls in that window). Content and mode changes
+  // (A3 in-place rewrite, A7 chmod, A8 rewrite + utimes) are bounded only by that file's own entry re-check, and only
+  // where ctime is fine-grained; a write through a dirty shared mapping is not detected at all (review F1,
+  // tests/research/review/mmap_bypass.mjs). None of these is a content guarantee against a slot writer.
+  const CONTENT = ['A3', 'A7', 'A8'];
   for (const [name, s] of Object.entries(out.summary)) {
-    if (name.startsWith('A3')) continue;
-    if (name.startsWith('A4')) assert.ok(s.bypassBeforeLastCheck <= 2, `${name}: ${JSON.stringify(s.bypassAt)}`);
-    else assert.equal(s.bypassBeforeLastCheck, 0, `${name}: ${JSON.stringify(s.bypassAt)}`);
+    if (CONTENT.some(c => name.startsWith(c))) continue;
+    // A new entry inside sub/ is bounded by sub/'s own final check, after which the slot-path and root checks (4 calls)
+    // remain; everything in the root or above it is bounded by the last two inspecting calls.
+    const window = name.startsWith('A4') ? 4 : 2;
+    for (const b of s.bypassAt ?? []) {
+      const last = Math.max(...b.split(':')[0].split('+').map(Number));
+      assert.ok(last > out.lastCheckCall - window, `${name}: mutation before call ${last} (last inspecting call ${out.lastCheckCall})`);
+    }
   }
 });
 

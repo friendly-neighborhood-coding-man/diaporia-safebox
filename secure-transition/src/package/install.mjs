@@ -84,9 +84,14 @@ export function readCheckedFile(p, r, lst, { expectUid } = {}) {
 // After the walk, a final pass (all descriptors still held) re-checks every name in every directory: same name set,
 // same dev/inode for each entry, unchanged ctime/size for files and unchanged mtime/ctime for directories (a rename in
 // or out of a directory, including swap-and-swap-back, changes that directory's mtime/ctime), and the slot path still
-// names the root directory that was walked. This bounds every check to the end of the verifySlot call.
-// It does NOT bind what happens after verifySlot returns (verify-then-use): that needs the slot to be unwritable by the
-// attacker, which only OS separation provides; assertProtectedPath() checks that precondition when expectUid is given.
+// names the root directory that was walked. This refuses renames, swaps (including swap-and-swap-back), symlinks and
+// new entries that happen during the walk. It gives NO content guarantee against anyone who can write a slot file:
+// a write through a shared memory mapping changes the bytes without changing any metadata (independent review F1),
+// and in-place writes are otherwise detected only through ctime, i.e. only on filesystems with fine-grained
+// timestamps. Nor does it bind anything after verifySlot returns (verify-then-use). Both need the slot to be
+// unwritable by the attacker, which only OS separation provides; assertProtectedPath() checks that precondition
+// when expectUid is given. The /proc/self/fd traversal is defence in depth: the mutation run shows it is not what
+// carries the measured protection (the identity re-checks over held descriptors are).
 const FD_DIR = '/proc/self/fd';
 const MAX_DIRS = 4096;
 const at = (dfd, name) => `${FD_DIR}/${dfd}/${name}`;
@@ -134,6 +139,7 @@ export function verifySlot(slotDir, manifest, { expectUid } = {}) {
     if (expectUid !== undefined && Number(st.uid) !== expectUid) fail('SLOT_WRONG_OWNER', r);
   };
   const fds = [], dirs = [], entries = [], found = new Map();
+  const listed = new Map(manifest.files.map(f => [f.path, f]));
   const openDir = (p, r, lst) => {
     let fd;
     try { fd = openSync(p, C.O_RDONLY | C.O_DIRECTORY | C.O_NOFOLLOW); }
@@ -168,29 +174,34 @@ export function verifySlot(slotDir, manifest, { expectUid } = {}) {
       if (st.isSymbolicLink()) fail('SLOT_CONTAINS_SYMLINK', r);
       meta(st, r);
       if (st.isDirectory()) { const c = openDir(p, r, st); entries.push({ dfd, n, r, st: c.st, dir: true }); walk(c.fd, c.st, r); }
-      else if (st.isFile()) { const f = readAt(p, r, st); found.set(r, f); entries.push({ dfd, n, r, st: f.st, dir: false }); }
+      else if (st.isFile()) {
+        const mf = listed.get(r); if (!mf) fail('SLOT_FILE_SET_MISMATCH', `unlisted ${r}`);
+        if (mf.size !== undefined && BigInt(mf.size) !== st.size) fail('SLOT_DIGEST_MISMATCH', r);
+        const f = readAt(p, r, st); found.set(r, f); entries.push({ dfd, n, r, st: f.st, dir: false }); }
       else fail('SLOT_SPECIAL_FILE', r);
     }
   };
   try {
     const root = openDir(slotDir, '', top);
     walk(root.fd, root.st, '');
-    // Final pass, every descriptor still held. Entries first, then the slot path, then every directory, deepest first
-    // and the root last: any rename into, out of or within a directory (including swap-and-swap-back) after its
-    // entries were checked changes that directory's mtime/ctime, so the directory checks close the pass.
+    // Final pass, every descriptor still held. Entries first; then every non-root directory, deepest first; then the
+    // slot path (an ancestor rename changes no directory we hold, so this must come after everything but the root);
+    // the root directory last. Renames into, out of or within a held directory change its mtime/ctime.
     for (const e of entries) {
       let now; try { now = lstatSync(at(e.dfd, e.n), { bigint: true }); } catch (x) { fail('SLOT_CHANGED_DURING_VERIFY', `${e.r}: ${x.code}`); }
       if (!sameObj(now, e.st) || now.isSymbolicLink() || now.ctimeNs !== e.st.ctimeNs || (!e.dir && now.size !== e.st.size)) fail('SLOT_CHANGED_DURING_VERIFY', e.r);
     }
+    const dirCheck = (d) => {
+      if (readdirSync(`${FD_DIR}/${d.dfd}`).sort().join('/') !== d.names.join('/')) fail('SLOT_CHANGED_DURING_VERIFY', d.rel || '.');
+      const now = fstatSync(d.dfd, { bigint: true });
+      if (now.mtimeNs !== d.st.mtimeNs || now.ctimeNs !== d.st.ctimeNs) fail('SLOT_CHANGED_DURING_VERIFY', d.rel || '.');
+    };
+    for (const d of [...dirs].reverse()) if (d.rel !== '') dirCheck(d);
     let rp; try { rp = realpathSync(slotDir); } catch (x) { fail('SLOT_CHANGED_DURING_VERIFY', `.: ${x.code}`); }
     if (rp !== slotDir) fail('SLOT_CONTAINS_SYMLINK', '.');
     const nowTop = lstatSync(slotDir, { bigint: true });
     if (!sameObj(nowTop, top) || nowTop.isSymbolicLink()) fail('SLOT_CHANGED_DURING_VERIFY', '.');
-    for (const d of [...dirs].reverse()) {
-      if (readdirSync(`${FD_DIR}/${d.dfd}`).sort().join('/') !== d.names.join('/')) fail('SLOT_CHANGED_DURING_VERIFY', d.rel || '.');
-      const now = fstatSync(d.dfd, { bigint: true });
-      if (now.mtimeNs !== d.st.mtimeNs || now.ctimeNs !== d.st.ctimeNs) fail('SLOT_CHANGED_DURING_VERIFY', d.rel || '.');
-    }
+    dirCheck(dirs[0]);
   } finally { for (const fd of fds) closeSync(fd); }
   if (found.size !== manifest.files.length) fail('SLOT_FILE_SET_MISMATCH', `${found.size} vs ${manifest.files.length}`);
   for (const mf of manifest.files) {
@@ -199,5 +210,5 @@ export function verifySlot(slotDir, manifest, { expectUid } = {}) {
     if (sha256(f.data) !== mf.sha256) fail('SLOT_DIGEST_MISMATCH', mf.path);
     if (f.mode !== mf.mode) fail('SLOT_MODE_MISMATCH', mf.path);
   }
-  return { files: found.size, assurance: 'FD_RELATIVE_WITHIN_CALL' };
+  return { files: found.size };
 }

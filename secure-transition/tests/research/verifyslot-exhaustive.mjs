@@ -51,7 +51,7 @@ function world(evilA = false, evilSub = false) {
 // The slot matches the manifest at return: exactly these entries, no symlinks, genuine bytes.
 const listAll = (dir, rel = '') => fs.readdirSync(dir).flatMap(n => { const p = join(dir, n), r = rel ? `${rel}/${n}` : n; const s = fs.lstatSync(p); return s.isDirectory() && !s.isSymbolicLink() ? [r + '/', ...listAll(p, r)] : [r]; });
 const allGenuine = (slot) => { try { if (listAll(slot).sort().join(',') !== 'a.mjs,sub/,sub/x.mjs,z.mjs') return false; } catch { return false; }
-  return files.every(f => { try { const s = fs.lstatSync(join(slot, f)); return !s.isSymbolicLink() && fs.readFileSync(join(slot, f)).equals(GEN); } catch { return false; } }); };
+  return files.every(f => { try { const s = fs.lstatSync(join(slot, f)); return !s.isSymbolicLink() && (s.mode & 0o7777) === 0o644 && fs.readFileSync(join(slot, f)).equals(GEN); } catch { return false; } }); };
 
 // Attacks. setup(world) -> {evilA, evilSub}; steps: list of actions, each placed before one fs call.
 const R = (a, b) => fs.renameSync(a, b);
@@ -61,6 +61,17 @@ const ATTACKS = {
   'A3 a.mjs rewritten in place, same inode and length (persistent)': { init: [false, false], acts: (w) => [() => { const fd = fs.openSync(join(w.slot, 'a.mjs'), 'r+'); fs.writeSync(fd, EVIL, 0, EVIL.length, 0); fs.closeSync(fd); }] },
   'A4 extra file created inside sub/ (persistent)': { init: [false, false], acts: (w) => [() => { const p = join(w.slot, 'sub/extra.mjs'); fs.writeFileSync(p, GEN); fs.chmodSync(p, 0o644); }] },
   'A5 a.mjs replaced by a symlink to a genuine file (persistent)': { init: [false, false], acts: (w) => [() => { R(join(w.slot, 'a.mjs'), join(w.d, 'aside-a')); fs.symlinkSync(join(w.d, 'gen-a'), join(w.slot, 'a.mjs')); }] },
+  // Added after the independent review (F2, F9): whole-slot and ancestor renames, chmod, utimes, hardlink.
+  'A6 slot dir itself replaced by an EVIL copy (persistent)': { init: [false, false], acts: (w) => [() => { R(w.slot, join(w.d, 'gone-slot')); fs.cpSync(join(w.d, 'gone-slot'), join(w.d, 'evslot'), { recursive: true }); fs.writeFileSync(join(w.d, 'evslot/a.mjs'), EVIL); fs.chmodSync(join(w.d, 'evslot/a.mjs'), 0o644); R(join(w.d, 'evslot'), w.slot); }] },
+  'A7 a.mjs chmod 0664 (persistent, writable by others at return)': { init: [false, false], acts: (w) => [() => fs.chmodSync(join(w.slot, 'a.mjs'), 0o664)] },
+  'A8 a.mjs in-place rewrite then utimes(old atime/mtime) (persistent)': { init: [false, false], acts: (w) => [() => { const p = join(w.slot, 'a.mjs'); const s0 = fs.statSync(p); const fd = fs.openSync(p, 'r+'); fs.writeSync(fd, EVIL, 0, EVIL.length, 0); fs.closeSync(fd); fs.utimesSync(p, s0.atime, s0.mtime); }] },
+  'A9 EVIL file hardlinked over a.mjs via link+rename (persistent)': { init: [false, false], acts: (w) => [() => { fs.linkSync(join(w.d, 'evil-a'), join(w.d, 'hl')); R(join(w.d, 'hl'), join(w.slot, 'a.mjs')); }] },
+  'P4 whole slot swap-and-swap-back with a genuine twin slot (slot holds EVIL a.mjs)': { init: [true, false], acts: (w) => [
+    () => { fs.cpSync(w.slot, join(w.d, 'tw-slot'), { recursive: true }); fs.writeFileSync(join(w.d, 'tw-slot/a.mjs'), GEN); fs.chmodSync(join(w.d, 'tw-slot/a.mjs'), 0o644); R(w.slot, join(w.d, 'aside-slot')); R(join(w.d, 'tw-slot'), w.slot); },
+    () => { R(w.slot, join(w.d, 'tw-slot')); R(join(w.d, 'aside-slot'), w.slot); }] },
+  'P5 ancestor dir swap-and-swap-back with a parent holding a genuine slot (slot holds EVIL a.mjs)': { init: [true, false], acts: (w) => [
+    () => { const D = w.d; fs.mkdirSync(D + '-twin', { recursive: true }); fs.cpSync(w.slot, D + '-twin/slot', { recursive: true }); fs.writeFileSync(D + '-twin/slot/a.mjs', GEN); fs.chmodSync(D + '-twin/slot/a.mjs', 0o644); R(D, D + '-aside'); R(D + '-twin', D); },
+    () => { const D = w.d; R(D, D + '-twin'); R(D + '-aside', D); }] },
   'P1 sub/ swap-and-swap-back with a REAL genuine twin (slot holds EVIL sub/)': { init: [false, true], acts: (w) => [
     () => { R(join(w.slot, 'sub'), join(w.d, 'aside')); R(join(w.d, 'twin'), join(w.slot, 'sub')); },
     () => { R(join(w.slot, 'sub'), join(w.d, 'twin')); R(join(w.d, 'aside'), join(w.slot, 'sub')); }] },
@@ -78,7 +89,7 @@ function runOnce(init, schedule) {
   step = 0; let out;
   try { verifySlot(w.slot, manifest); out = 'SUCCESS'; } catch (e) { out = e.code ?? String(e.message).slice(0, 40); }
   const fired = plan.filter(p => p.done).length; plan = null;
-  const genuine = allGenuine(w.slot); fs.rmSync(w.d, { recursive: true, force: true });
+  const genuine = allGenuine(w.slot); for (const x of [w.d, w.d + '-twin', w.d + '-aside']) fs.rmSync(x, { recursive: true, force: true });
   return { out, fired, genuine };
 }
 
