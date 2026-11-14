@@ -20,10 +20,11 @@ export function buildV6(opts = {}) {
   const policy6 = { ...(opts.policy6 ?? {}), fingerprintOnlyCreds: fpOnly, ...(opts.policy6?.fingerprintOnlyCreds ? { fingerprintOnlyCreds: opts.policy6.fingerprintOnlyCreds } : {}) };
   const t0 = opts.clock?.now?.() ?? T0;
   const ownerWorld = opts.ownerWorld ?? new OwnerWorldV6({ t0, profile: 'personal', config: opts.config ?? {}, capsule: opts.capsule ?? {}, config4: opts.config4 ?? {}, config5: opts.config5 ?? {},
-    apcCreds: opts.apcCreds, displays: opts.displays, policy6, gates, rp: opts.rp });
+    apcCreds: opts.apcCreds, displays: opts.displays, policy6, gates, rp: opts.rp, ownerRecipient: opts.ownerRecipient });
   const w = buildV5({ ...opts, ownerWorld, chain: V6, Vault: ExecutionVaultV6, genesisOf: (o) => o.genesis6(), pinnedOf: (o) => o.chainId6,
     notifyClass: opts.notifyClass ?? NotificationServiceV6, notifyOpts: { emergencyOrigin: ownerWorld.policy6.emergency.origin, locatorTtlMs: Number(ownerWorld.policy6.emergency.locatorTtlMs), ...(opts.notifyOpts ?? {}) } });
   w.gates = gates;
+  ownerWorld.onIntent = (d) => w.intents.add(d); // console-route approvals are owner intents exactly like w.cmd ones
   const v5pay = w.pay;
   /** Owner payment through the V6 owner device ceremony (per-transaction approval); V5 path only under LEGACY_V5. */
   w.pay = async ({ credId = 'k1-phone', recipientId = 'merchant-a.mock', amountYocto = (3n * 10n ** 22n).toString(), request = {}, decide, noGate, tamper, requestId, requestDigest, memo } = {}) => {

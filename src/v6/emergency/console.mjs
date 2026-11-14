@@ -47,6 +47,9 @@ export class OwnerConsole {
   constructor(deps) {
     Object.assign(this, deps);
     if (!/^https?:\/\/[a-z0-9.:-]+$/.test(String(deps.origin))) fail('CONSOLE_ORIGIN_INVALID');
+    // the device-local fingerprint gate helper (loopback only); the page may talk to it and to nothing else
+    this.gateOrigin = deps.gateOrigin ?? 'http://127.0.0.1:47613';
+    if (!/^http:\/\/(127\.0\.0\.1|localhost):[0-9]{2,5}$/.test(this.gateOrigin)) fail('GATE_ORIGIN_NOT_LOOPBACK');
     this.sessionTtlMs = deps.sessionTtlMs ?? 10 * 60_000; this.loginTtlMs = deps.loginTtlMs ?? 120_000;
     this.logins = new Map(); this.sessions = new Map(); this.proposals = new Map(); this.bundles = new Map();
     this.counts = new Map(); // credId -> highest WebAuthn signCount seen by the console (clone / replay signal)
@@ -60,7 +63,7 @@ export class OwnerConsole {
   async handle(req) {
     const method = String(req.method ?? 'GET').toUpperCase(); const url = new URL(req.path ?? '/', 'http://x'); const p = url.pathname;
     const headers = { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'x-frame-options': 'DENY',
-      'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'none'" };
+      'content-security-policy': `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' ${this.gateOrigin}; frame-ancestors 'none'; form-action 'none'; base-uri 'none'` };
     try {
       if (method === 'GET' || method === 'HEAD') {
         let res;
@@ -100,8 +103,8 @@ export class OwnerConsole {
   }
   /** The page is static: it embeds no incident data, no token and no authority; the locator is only echoed (validated). */
   #page(locator) {
-    if (locator !== null && !LOCATOR_RE.test(locator)) return { html: CONSOLE_PAGE({ locator: null, notice: 'This link is not a valid SafeBox link. Nothing has been changed.' }) };
-    return { html: CONSOLE_PAGE({ locator, notice: null }) };
+    if (locator !== null && !LOCATOR_RE.test(locator)) return { html: CONSOLE_PAGE({ locator: null, gateOrigin: this.gateOrigin, notice: 'This link is not a valid SafeBox link. Nothing has been changed.' }) };
+    return { html: CONSOLE_PAGE({ locator, gateOrigin: this.gateOrigin, notice: null }) };
   }
   #postGuards(req) {
     const h = req.headers ?? {};

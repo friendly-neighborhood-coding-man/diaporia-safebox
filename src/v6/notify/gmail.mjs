@@ -49,7 +49,9 @@ export class GmailTransport {
   async #accessToken(force = false) {
     if (!force && this.token && this.now() < this.token.expiresAt - 60_000) return this.token.value;
     const body = new URLSearchParams({ grant_type: 'refresh_token', client_id: this.secrets.clientId, client_secret: this.secrets.clientSecret, refresh_token: this.secrets.refreshToken });
-    const r = await this.#post(this.tokenUrl, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body.toString() });
+    let r;
+    try { r = await this.#post(this.tokenUrl, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body.toString() }); }
+    catch (e) { const x = new Error('token endpoint unreachable'); x.code = 'TEMPORARY_FAILURE'; x.detail = 'NETWORK_ERROR:' + String(e.name); throw x; }
     let j = {}; try { j = await r.json(); } catch {}
     this.log.push({ at: this.now(), op: 'TOKEN_REFRESH', http: r.status, error: j.error ?? null, scope: j.scope ?? null });
     if (r.status === 400 || r.status === 401) { const e = new Error('reauthentication required'); e.code = 'AUTH_FAILED'; e.detail = String(j.error ?? r.status); throw e; }

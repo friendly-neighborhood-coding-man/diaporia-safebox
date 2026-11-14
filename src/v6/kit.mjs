@@ -34,6 +34,9 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     this.policy6 = clonePolicy({ ...DEFAULT_ASSURANCE_POLICY, ...(opts.policy6 ?? {}) });
     this.gates = { ...(opts.gates ?? {}) }; // credId -> fingerprint gate device (SimulatedFingerprintGate or a real-device bridge)
     this.gateErrors = [];
+    // opt-in real run: the PRIMARY owner's verified security contact becomes the consenting test recipient (Root-pinned
+    // through the genesis contact attestations like every other contact); every other contact stays a mock address
+    if (opts.ownerRecipient) { const h = this.devices[0].holderId; this.addressBook = { ...this.addressBook, [h]: [String(opts.ownerRecipient)] }; }
   }
   challengeService(now) {
     super.challengeService(now);
@@ -90,6 +93,7 @@ export class OwnerWorldV6 extends OwnerWorldV5 {
     if (canon(statement) !== canon(command)) { this.gateErrors.push({ credId, code: 'PREPARED_COMMAND_MISMATCH' }); return null; }
     const m = this.metrics; m.prompts++; m.byCred[credId] = (m.byCred[credId] ?? 0) + 1;
     if (!decide({ title: action.type, text }, text, { credId, action, via: 'OWNER_CONSOLE' })) { m.declined++; return null; }
+    this.onIntent?.(actionDigest(action).toString('hex')); // the human approved THIS action (ground truth for the verifier oracle)
     const st = tamper ? tamper(JSON.parse(JSON.stringify(statement))) ?? statement : statement;
     const dig = commandDigest(st);
     m.gestures++; m.signatures++;

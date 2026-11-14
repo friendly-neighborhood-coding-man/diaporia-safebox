@@ -4,7 +4,7 @@
 // credentials additionally need the local fingerprint gate helper, which only answers on a real sensor MATCH).
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export const CONSOLE_PAGE = ({ locator, notice }) => `<!DOCTYPE html>
+export const CONSOLE_PAGE = ({ locator, notice, gateOrigin }) => `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>SafeBox Owner Console</title>
 <style>
@@ -29,7 +29,7 @@ Credential: <input id="cred" value="k2-laptop" autocomplete="off"> <button id="s
 <script>
 "use strict";
 const LOCATOR = ${JSON.stringify(locator)};
-const GATE_URL = (window.localStorage && localStorage.getItem('safebox.gateUrl')) || 'http://127.0.0.1:47613';
+const GATE_URL = ${JSON.stringify(gateOrigin)};
 let CSRF = null, PROPOSAL = null;
 const $ = (id) => document.getElementById(id);
 const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
