@@ -7,7 +7,7 @@
   "engines": { "node": ">=22.13" },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",
     "test": "npm run build && node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"dist/tests/**/*.spec.js\"",
     "demo": "npm run build && node --disable-warning=ExperimentalWarning dist/scripts/demo-mock-e2e.js",
     "serve:mock": "npm run build && node --disable-warning=ExperimentalWarning dist/scripts/serve-mock.js"
