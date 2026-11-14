@@ -9,7 +9,7 @@
 // * Secrets (client secret, refresh / access tokens) are held in memory only, never logged, never journaled. Request
 //   and response metadata are logged with recipient / subject reduced to hashes and the message id truncated.
 import { createHash, randomUUID } from 'node:crypto';
-import { readFileSync, statSync } from 'node:fs';
+import { closeSync, fstatSync, fsyncSync, openSync, readSync, writeSync, unlinkSync, constants as C } from 'node:fs';
 
 export const GMAIL_SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -24,13 +24,63 @@ export function buildRfc822({ from, to, subject, text, idempotencyKey, domain = 
     `X-SafeBox-Idempotency-Key: ${idempotencyKey.slice(0, 64)}`, 'MIME-Version: 1.0', 'Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: 8bit', '', body].join('\r\n');
 }
 
+function credError(code, message) { return Object.assign(new Error(message), { code }); }
+
+function readAll(fd, size) {
+  if (size > (1 << 20)) throw credError('GMAIL_CREDENTIALS_TOO_LARGE', 'credentials file is too large');
+  const buf = Buffer.alloc(size);
+  let off = 0;
+  while (off < buf.length) {
+    const n = readSync(fd, buf, off, buf.length - off, null);
+    if (n === 0) break;
+    off += n;
+  }
+  if (off !== buf.length) throw credError('GMAIL_CREDENTIALS_SHORT_READ', 'credentials file changed while it was read');
+  return buf.toString('utf8');
+}
+
 /** Loads operator OAuth credentials from a JSON file OUTSIDE the repository: {client_id, client_secret, refresh_token, sender}. */
 export function loadGmailCredentials(path) {
-  if (!path) throw Object.assign(new Error('no credentials path'), { code: 'GMAIL_CREDENTIALS_MISSING' });
-  statSync(path);
-  const j = JSON.parse(readFileSync(path, 'utf8'));
-  for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) if (typeof j[k] !== 'string' || !j[k]) throw Object.assign(new Error('credentials field ' + k), { code: 'GMAIL_CREDENTIALS_INVALID' });
-  return { clientId: j.client_id, clientSecret: j.client_secret, refreshToken: j.refresh_token, sender: j.sender };
+  if (!path) throw credError('GMAIL_CREDENTIALS_MISSING', 'no credentials path');
+  let fd;
+  try { fd = openSync(path, C.O_RDONLY | C.O_NOFOLLOW); }
+  catch (e) {
+    if (e.code === 'ELOOP') throw credError('GMAIL_CREDENTIALS_SYMLINK', 'credentials path is a symlink');
+    if (e.code === 'ENOENT') throw credError('GMAIL_CREDENTIALS_MISSING', 'no credentials path');
+    throw e;
+  }
+  try {
+    const st = fstatSync(fd);
+    if (!st.isFile()) throw credError('GMAIL_CREDENTIALS_NOT_A_FILE', 'credentials path is not a regular file');
+    if (process.platform !== 'win32' && (st.mode & 0o077) !== 0) throw credError('GMAIL_CREDENTIALS_TOO_PERMISSIVE', 'chmod 600 required');
+    const j = JSON.parse(readAll(fd, st.size));
+    for (const k of ['client_id', 'client_secret', 'refresh_token', 'sender']) if (typeof j[k] !== 'string' || !j[k]) throw credError('GMAIL_CREDENTIALS_INVALID', 'credentials field ' + k);
+    return { clientId: j.client_id, clientSecret: j.client_secret, refreshToken: j.refresh_token, sender: j.sender };
+  } finally { closeSync(fd); }
+}
+
+/** Creates a new 0600 credential file. Refuses an existing path, including a symlink. */
+export function writeGmailCredentialFile(path, creds) {
+  const text = JSON.stringify(creds, null, 2);
+  let fd;
+  try { fd = openSync(path, C.O_WRONLY | C.O_CREAT | C.O_EXCL | C.O_NOFOLLOW, 0o600); }
+  catch (e) {
+    if (e.code === 'EEXIST' || e.code === 'ELOOP') throw credError('GMAIL_CREDENTIALS_EXISTS', 'refusing to replace credentials path');
+    throw e;
+  }
+  try {
+    const buf = Buffer.from(text);
+    let off = 0;
+    while (off < buf.length) off += writeSync(fd, buf, off, buf.length - off, null);
+    fsyncSync(fd);
+    const st = fstatSync(fd);
+    if (!st.isFile() || (process.platform !== 'win32' && (st.mode & 0o077) !== 0)) {
+      throw credError('GMAIL_CREDENTIALS_TOO_PERMISSIVE', 'credential file mode');
+    }
+  } catch (e) {
+    try { unlinkSync(path); } catch { /* the exclusive file is removed when creation cannot be finished */ }
+    throw e;
+  } finally { closeSync(fd); }
 }
 
 export class GmailTransport {
