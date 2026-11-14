@@ -147,7 +147,8 @@ try {
   // the owner may take minutes at the real prompt: reconnect the AI client (fresh tokens) before the status read
   let st; try { st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
   catch (e) { ev('INFO', 'AI client reconnect after: ' + (e.code ?? e.message)); try { await ai.close(); } catch {}
-    const t2 = await obtainTokens(h.url, h.logins.alice); ai = await mcpClient(h.url, t2.access); st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
+    // same OAuth client + access token (requests are client-scoped); the idle keep-alive socket was the likely casualty
+    ai = await mcpClient(h.url, t.access); st = await call(ai, 'get_payment_status', { requestId: prep.requestId }); }
   results.workflowA = { prepared: prep.state, submitted: r.state ?? r.refusedByDevice ?? r, assurance: dev.lastV6?.assurance ?? null, settledVerified: st.settledVerified };
   ev(st.settledVerified ? 'OK' : 'DENY', `MOCK settlement after the 10-minute buffer: settledVerified=${st.settledVerified}`);
   await ai.close();
