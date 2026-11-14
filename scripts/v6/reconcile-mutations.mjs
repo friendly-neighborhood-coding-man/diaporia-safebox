@@ -19,6 +19,10 @@ const M = [
   ['#22 Gmail loader mode check removed', 'src/v6/notify/gmail.mjs', "if (POSIX && (st.mode & 0o077) !== 0) throw credError('GMAIL_CREDENTIALS_TOO_PERMISSIVE', 'credentials file must be mode 0600');", '', ['tests/v6/gmail-cred-file.test.mjs']],
   ['#22 Gmail writer O_EXCL removed', 'src/v6/notify/gmail.mjs', "FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600", 'FS.O_WRONLY | FS.O_CREAT | FS.O_TRUNC, 0o600', ['tests/v6/gmail-cred-file.test.mjs']],
   ['#28-cond Gmail writer field validation removed', 'src/v6/notify/gmail.mjs', "if (typeof v !== 'string' || !v || v.length > 4096 || /[\\u0000-\\u001f\\u007f]/.test(v))", 'if (false)', ['tests/v6/gmail-cred-file.test.mjs']],
+  // Independent review F1: request-supplied ids must be own keys
+  ['F1 HOLD_EXPIRE id lookup reverted to a bare bracket', 'src/v5/root/chain.mjs', "const h = own(s.v5.holds, a.body.holdId); if (!h) fail('HOLD_UNKNOWN');", "const h = s.v5.holds[a.body.holdId]; if (!h) fail('HOLD_UNKNOWN');", ['tests/v5/prototype-ids.test.mjs']],
+  ['F1 RAPID_USE_EXPIRE id lookup reverted to a bare bracket', 'src/v5/root/chain.mjs', "const g = own(s.v5.rapid.grants, a.body.grantId); if (!g) fail('RAPID_GRANT_UNKNOWN');", "const g = s.v5.rapid.grants[a.body.grantId]; if (!g) fail('RAPID_GRANT_UNKNOWN');", ['tests/v5/prototype-ids.test.mjs']],
+  ['F1 own() helper made a plain bracket lookup', 'src/v5/root/chain.mjs', "const own = (o, k) => (typeof k === 'string' && o != null && Object.hasOwn(o, k) ? o[k] : undefined);", "const own = (o, k) => o?.[k];", ['tests/v5/prototype-ids.test.mjs']],
   // PR #25 superseded by PR #26 termSafe
   ['#26 termSafe bypassed in the showcase console line', 'scripts/v6/showcase.mjs', '${kind.padEnd(7)} ${termSafe(text)}`', '${kind.padEnd(7)} ${text}`', ['tests/v6/showcase-log-reconcile.test.mjs']],
   ['#26 termSafe U+2028/2029 range removed', 'src/v6/common/term.mjs', '\\u2028-\\u202e', '\\u202a-\\u202e', ['tests/v6/showcase-log-reconcile.test.mjs']],
@@ -30,9 +34,11 @@ for (const [name, file, from, to, tests] of M) {
   if (!orig.includes(from)) { rows.push({ name, file, error: 'PATTERN_NOT_FOUND' }); console.log(JSON.stringify(rows.at(-1))); continue; }
   writeFileSync(file, orig.replace(from, to));
   try {
-    const r = spawnSync(process.execPath, ['--disable-warning=ExperimentalWarning', '--test', ...tests], { encoding: 'utf8', timeout: 600_000 });
-    const fail = Number(/# fail (\d+)/.exec(r.stdout)?.[1] ?? -1);
-    rows.push({ name, file, tests, caught: fail !== 0, failingTests: fail, examples: [...r.stdout.matchAll(/^not ok \d+ - (.*)$/gm)].map(m => m[1]).slice(0, 3) });
+    const r = spawnSync(process.execPath, ['--disable-warning=ExperimentalWarning', '--test', ...tests], { encoding: 'utf8', timeout: 120_000 });
+    // Independent review F5: only a parsed failing-test count counts as caught; a crash or timeout is reported separately.
+    const parsed = /# fail (\d+)/.exec(r.stdout); const fail = parsed ? Number(parsed[1]) : null;
+    const timedOut = r.error?.code === 'ETIMEDOUT' || r.signal === 'SIGTERM';
+    rows.push({ name, file, tests, caught: fail !== null && fail > 0, failingTests: fail, ...(fail === null ? { noSummary: true, timedOut, status: r.status, signal: r.signal } : {}), examples: [...r.stdout.matchAll(/^not ok \d+ - (.*)$/gm)].map(m => m[1]).slice(0, 3) });
   } finally { writeFileSync(file, orig); }
   console.log(JSON.stringify(rows.at(-1)));
 }

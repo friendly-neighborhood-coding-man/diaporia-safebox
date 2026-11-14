@@ -16,7 +16,7 @@
 //     simulated k1-phone credential or replay recorded artefacts. Each one must be refused or change nothing.
 //   --demo: recording mode. The terminal never shows the per-run bridge secret (the full link is written to
 //     --bridge-url-file, default .demo-bridge-url in the repo root, mode 0600, and on Windows also copied to the
-//     clipboard unless --no-clipboard) and evidence paths are printed relative to the repository.
+//     clipboard only with --clipboard) and evidence paths are printed relative to the repository.
 //   --open-edge (with --demo, Windows only): the runner opens the bridge in an Edge --app window itself.
 // Nothing here presses a button, touches a sensor or clicks a link for the owner. The runner waits for the human.
 import { createServer } from 'node:http';
@@ -69,9 +69,10 @@ if (DEMO) {
   try { if (lstatSync(uf).isFile()) unlinkSync(uf); else { console.error('refusing: ' + shown(uf) + ' is not a regular file'); process.exit(2); } } catch (e) { if (e.code !== 'ENOENT') throw e; }
   const ufd = openSync(uf, FS.O_WRONLY | FS.O_CREAT | FS.O_EXCL | (FS.O_NOFOLLOW ?? 0), 0o600); try { writeSync(ufd, bridge.url() + '\n'); } finally { closeSync(ufd); }
   process.on('exit', () => { try { unlinkSync(uf); } catch { /* already gone */ } }); // the per-run secret dies with the run
-  // --no-clipboard: Windows clipboard history (Win+V) and cloud clipboard sync can retain the per-run secret; the recording
-  // runbook opens the bridge from the 0600 file instead (Start-Process msedge --app=...), so no address bar ever shows it.
-  let clip = false; if (process.platform === 'win32' && !flag('--no-clipboard')) { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
+  // Clipboard copy is OPT-IN (--clipboard) since the final candidate: Windows clipboard history (Win+V) and cloud
+  // clipboard sync can retain the per-run secret. --no-clipboard is still accepted (no-op). The recording runbook uses
+  // --open-edge, so the secret is never typed, pasted or shown.
+  let clip = false; if (process.platform === 'win32' && flag('--clipboard') && !flag('--no-clipboard')) { try { execFileSync('clip', [], { input: bridge.url() }); clip = true; } catch { /* file only */ } }
   // --open-edge (Windows): the runner opens the bridge itself in an Edge app window (no address bar), so the secret is
   // never typed, pasted or displayed on screen. It is passed on Edge's command line (visible to same-user processes,
   // already inside the documented same-user residual). Not available elsewhere: falls back to the manual step.
