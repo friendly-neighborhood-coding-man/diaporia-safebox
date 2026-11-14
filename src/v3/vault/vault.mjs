@@ -139,6 +139,7 @@ export class ExecutionVault {
         sku: cap.sku === '-' ? null : cap.sku, now, capExpiresAt: v.expiresAt, capIssuedAt: v.issuedAt }, this.#spent()));
       const pend = this.store.byState(['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN']).length;
       if (pend + 1 > 16) deny.push('PENDING_COUNT_LIMIT');
+      deny.push(...this.extraProposeDenials({ credId: v.credId, recipient: cap.recipientId, amount: cap.amountYocto, asset: cap.asset })); // subclass capacity rules (V5.1: incident-flow cap); none in V3
       if (deny.length) return { denied: deny };
       this.store.db.prepare(`INSERT INTO payments (payment_id, cap_id, cap_digest, principal_id, policy_id, policy_digest, recipient, asset, amount,
         intent_nonce, state, proposed_at, cap_expires_at, memo, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?, 'PROPOSED', ?,?,?,?)`)
@@ -159,6 +160,7 @@ export class ExecutionVault {
     return { paymentId, state: out.row.state, releaseAt: out.row.release_at };
   }
 
+  extraProposeDenials() { return []; }
   status(paymentId) {
     if (typeof paymentId !== 'string' || !/^p_[0-9a-f]{32}$/.test(paymentId)) fail('INVALID_ID');
     const r = this.store.get(paymentId); if (!r) fail('UNKNOWN_PAYMENT');

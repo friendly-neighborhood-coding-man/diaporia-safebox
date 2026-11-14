@@ -35,7 +35,7 @@ test('Scenario C: evasive strategies', async () => {
   for (const [k, v] of Object.entries(c)) assert.equal(v.verifier, true, k);
   assert.ok(c.split_small_payments.k1.delayed > 0);
   assert.ok(c.across_all_merchants.k1.delayed > 0);
-  assert.ok(c.slow_baseline_poisoning.k1.delayed >= 10);
+  assert.ok(c.slow_baseline_poisoning.k1.delayed >= 8); // V5.1: a flow under an open incident holds at most 8 pending payments
   assert.equal(c.false_alarm_against_other_key.otherKeyAnomaly, 'NONE');
   assert.ok(c.notification_flood.notify.byState.DELIVERED <= 2);
   assert.match(c.forged_votes.forgedCredId, /CHALLENGE_NOT_FOR_THIS_CREDENTIAL/);
