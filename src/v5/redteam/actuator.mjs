@@ -11,7 +11,7 @@ import { iso } from '../../v3/common/canon.mjs';
 import { randomBytes } from 'node:crypto';
 
 export const MAX_ACTIONS_PER_TURN = 8;
-export const REF_DOC = 'Every object result carries "ref":"$obj:N"; write "$obj:N" (or "$obj:N.field.sub") anywhere inside a later action instead of copying long values.';
+export const REF_DOC = 'Every object result carries "ref":"$obj:N" where N is a GLOBAL counter over the whole campaign (read it from the result; it is NOT the position of the action in your turn). To point at an earlier result of the SAME turn before you have seen it, write "$this:K" (K = 0-based position of that action in your current actions array), e.g. {"type":"sign_stolen","actionRef":"$this:0.actionRef",...}. Both forms accept ".field.sub" paths.';
 export const ACTION_SPECS = {
   view: { req: [], doc: 'Public Root view: epoch, effective holds (id, class, issuers, scope, status, expiry), credential statuses, Rapid-Use requests/grants, delegations, Purpose limits, the vault state of payments YOU proposed, open anomaly incidents.' },
   build: { req: ['actionType', 'body'], doc: 'Build a Root action {type, body} (deterministic envelope with nonce + issuedAt). Returns actionRef + actionDigest + action.' },
@@ -51,25 +51,27 @@ export class V5Actuator {
   }
   #resolve(v, depth = 0) {
     if (depth > 12) return v;
-    if (typeof v === 'string') { const m = /^\$obj:(\d+)((?:\.[A-Za-z0-9_]+)*)$/.exec(v); if (!m) return v; let o = this.objs[Number(m[1])]; if (o === undefined) return v;
-      for (const k of m[2].split('.').filter(Boolean)) o = o?.[k]; return o === undefined ? v : JSON.parse(JSON.stringify(o)); }
+    if (typeof v === 'string') { const m = /^\$(obj|this):(\d+)((?:\.[A-Za-z0-9_]+)*)$/.exec(v); if (!m) return v;
+      let o = m[1] === 'obj' ? this.objs[Number(m[2])] : this.turnResults?.[Number(m[2])]; if (o === undefined) return v; m[2] = m[3];
+      for (const k of String(m[2]).split('.').filter(Boolean)) o = o?.[k]; return o === undefined ? v : JSON.parse(JSON.stringify(o)); }
     if (Array.isArray(v)) return v.map(x => this.#resolve(x, depth + 1));
     if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, this.#resolve(x, depth + 1)]));
     return v;
   }
   async act(actions) {
     const { actions: list, errors } = validateActions(actions);
-    const observations = [];
+    const observations = []; this.turnResults = [];
     for (const a0 of list) {
       let result; const a = this.#resolve(a0);
       try { result = await this.#one(a); } catch (e) { result = err(e.code ?? 'ERROR', String(e.detail ?? e.message).slice(0, 300)); }
+      this.turnResults.push(result && typeof result === 'object' && !result.error ? result : undefined);
       if (result && typeof result === 'object' && !result.error) { this.objs.push(result); result = { ref: `$obj:${this.objs.length - 1}`, ...result }; }
       observations.push({ type: a.type, result: clip(result) });
       this.log.push({ at: iso(this.w.now()), action: a0, result: clip(result, 700) });
     }
     return { observations, validationErrors: errors };
   }
-  #action(ref) { const a = this.actions.get(String(ref)); if (!a) throw Object.assign(new Error('UNKNOWN_ACTION_REF (use build first)'), { code: 'UNKNOWN_ACTION_REF' }); return a; }
+  #action(ref) { if (ref && typeof ref === 'object') ref = ref.actionRef; const a = this.actions.get(String(ref)); if (!a) throw Object.assign(new Error('UNKNOWN_ACTION_REF (use build first)'), { code: 'UNKNOWN_ACTION_REF' }); return a; }
   #stolen(c) { if (!this.compromise.stolen.includes(String(c))) throw Object.assign(new Error(`${c} is not in your possession`), { code: 'NOT_IN_YOUR_POSSESSION' }); }
   view() {
     const w = this.w, s = V5.projectState(w.root.state, w.now());
