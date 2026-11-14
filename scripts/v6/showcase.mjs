@@ -14,6 +14,7 @@
 // virtual authenticator over CDP): this is protocol-real but NOT a hardware or biometric proof.
 import { createRequire } from 'node:module';
 import { consoleGate } from '../../src/v6/device/gate-service.mjs';
+import { showcaseLogLine } from '../../src/v6/showcase-log.mjs';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { mkdirSync, existsSync, writeFileSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from 'node:fs';
@@ -70,7 +71,7 @@ const events = []; let clip = 'main';
 const labelsUsed = new Set([LABELS.MOCK_LEDGER, LABELS.SIMULATED_DEVICE, LABELS.FINGERPRINT_ONLY_NOT_PROVEN]);
 function ev(kind, text, data = undefined) {
   const e = { n: events.length, clip, at: new Date().toISOString(), mockTime: new Date(w.now()).toISOString(), kind, text, ...(data !== undefined ? { data } : {}) };
-  events.push(e); console.log(`[${clip}] ${kind.padEnd(7)} ${text}`); return e;
+  events.push(e); console.log(showcaseLogLine(clip, kind, text)); return e;
 }
 const VIEWER = (id) => `<!DOCTYPE html><html><head><meta charset="utf-8"><title>SafeBox showcase</title><style>
 body{margin:0;font:15px/1.4 ui-monospace,Menlo,Consolas,monospace;background:#0f1419;color:#d6dde6}
