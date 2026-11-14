@@ -36,7 +36,7 @@ node scripts\v6\gmail-oauth-setup.mjs --client "<path to your OAuth client JSON>
 
 ```
 cd tools\winbio-gate
-%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:exe /out:winbio-gate.exe /r:System.Core.dll WinBioGate.cs
+%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:exe /out:winbio-gate.exe /r:System.Core.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll WinBioGate.cs
 winbio-gate.exe probe
 ```
 

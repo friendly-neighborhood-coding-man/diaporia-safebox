@@ -26,8 +26,9 @@ produce something SafeBox accepts as a fingerprint-only approval?
   more than that.
 * **Laptop (real CNG key), `tools/winbio-gate/same-user-sign-probe.ps1`.** Opens `SafeBoxGate-k2-laptop` as the same
   user, signs one fixed hash that is not a SafeBox statement, and prints the key's properties plus
-  `signedWithoutFingerprint`. It never prints the signature. Status: **NOT_RUN** (needs Eric at the laptop).
-  Expected result from the key-creation code: `opened=true`, `uiProtectionLevel=None`, `signedWithoutFingerprint=true`.
+  `signedWithoutFingerprint`. It never prints the signature. Status: **RUN 2026-11-14 on the real laptop** (`docs/evidence/v6-hardening/p0-1-laptop-probe.txt`).
+  Result: TPM key (Platform Crypto Provider), `exportPolicy=None`, `uiProtectionLevel=None`, `signedWithoutFingerprint=true`,
+  `signatureVerified=true`, not elevated. Same-user signing without a finger is CONFIRMED on real hardware.
 
 ## Outcome
 
