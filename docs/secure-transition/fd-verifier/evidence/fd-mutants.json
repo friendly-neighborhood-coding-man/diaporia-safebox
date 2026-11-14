@@ -1,11 +1,12 @@
 {
- "tree": "<candidate>",
+ "tree": "<mutation-worktree>/secure-transition",
  "baseline": {
-  "inCallBypass": 53,
-  "duringWalk": 0
+  "inCallBypass": 111,
+  "duringWalk": 0,
+  "renameBeforeLastCheck": 10
  },
- "caught": 12,
- "total": 23,
+ "caught": 14,
+ "total": 25,
  "patternErrors": 0,
  "rows": [
   {
@@ -21,9 +22,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -43,9 +44,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -65,9 +66,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -87,9 +88,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -99,9 +100,11 @@
   {
    "name": "openDir: identity check removed",
    "unit": {
-    "fail": 0,
+    "fail": 1,
     "timedOut": false,
-    "failing": []
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
    },
    "os": {
     "fail": 0,
@@ -109,14 +112,13 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
-    "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "inCallBypass": 177,
+    "duringWalk": 46,
+    "renameBeforeLastCheck": 76,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
-   "caught": false,
-   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+   "caught": true
   },
   {
    "name": "readAt: O_NOFOLLOW removed",
@@ -133,9 +135,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -154,9 +156,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -176,9 +178,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -200,9 +202,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 71,
-    "duringWalk": 15,
-    "renameBeforeLastCheck": 0,
+    "inCallBypass": 165,
+    "duringWalk": 45,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -223,9 +225,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 71,
-    "duringWalk": 15,
-    "renameBeforeLastCheck": 0,
+    "inCallBypass": 165,
+    "duringWalk": 45,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -246,9 +248,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 318,
+    "inCallBypass": 397,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 244,
+    "renameBeforeLastCheck": 275,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -267,9 +269,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 50,
+    "inCallBypass": 99,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 5,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -278,6 +280,50 @@
   },
   {
    "name": "final pass: directories checked root-first (not deepest-first, root last)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 111,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 10,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+  },
+  {
+   "name": "final pass: slot path checked last, after the root directory (review F2 order reverted)",
+   "unit": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "os": {
+    "fail": 0,
+    "timedOut": false,
+    "failing": []
+   },
+   "exposure": {
+    "inCallBypass": 141,
+    "duringWalk": 0,
+    "renameBeforeLastCheck": 40,
+    "symlinkSwapSuccess": 0,
+    "control": "SUCCESS"
+   },
+   "caught": false,
+   "survivorClass": "CLOSING_WINDOW_LARGER"
+  },
+  {
+   "name": "final pass: root directory never re-checked",
    "unit": {
     "fail": 1,
     "timedOut": false,
@@ -291,9 +337,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 71,
+    "inCallBypass": 238,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 20,
+    "renameBeforeLastCheck": 125,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -302,9 +348,11 @@
   {
    "name": "final pass: slot path identity re-check removed",
    "unit": {
-    "fail": 0,
+    "fail": 1,
     "timedOut": false,
-    "failing": []
+    "failing": [
+     "exhaustive interposition: no attacker mutation made during the walk yields SUCCESS with a foreign slot (PR \\#27 had 264)"
+    ]
    },
    "os": {
     "fail": 0,
@@ -312,14 +360,13 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
-    "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "inCallBypass": 277,
+    "duringWalk": 116,
+    "renameBeforeLastCheck": 176,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
-   "caught": false,
-   "survivorClass": "NO_EXTRA_EXPOSURE_IN_MODEL"
+   "caught": true
   },
   {
    "name": "final pass re-checks entries and name sets by slot PATH (no held descriptors)",
@@ -334,9 +381,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -360,9 +407,9 @@
     ]
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -383,9 +430,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -406,9 +453,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -431,9 +478,9 @@
     ]
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -454,9 +501,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 318,
+    "inCallBypass": 397,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 244,
+    "renameBeforeLastCheck": 275,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -477,9 +524,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 71,
-    "duringWalk": 15,
-    "renameBeforeLastCheck": 0,
+    "inCallBypass": 240,
+    "duringWalk": 90,
+    "renameBeforeLastCheck": 85,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -501,9 +548,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },
@@ -522,9 +569,9 @@
     "failing": []
    },
    "exposure": {
-    "inCallBypass": 53,
+    "inCallBypass": 111,
     "duringWalk": 0,
-    "renameBeforeLastCheck": 0,
+    "renameBeforeLastCheck": 10,
     "symlinkSwapSuccess": 0,
     "control": "SUCCESS"
    },

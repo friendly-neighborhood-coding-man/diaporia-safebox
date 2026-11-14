@@ -71,8 +71,20 @@ fired comes from the d6172ec run (the reviewer confirmed it fires and bypasses o
 
 ### What carries the protection (mutation run, `evidence/fd-mutants.json`)
 
-- **Load-bearing:** the closing entry identity re-check, its ctime comparison, the directory mtime/ctime check, the
-  check ordering, and the protected-path checks; removing any of them is caught by the tests.
+25 mutants on `0a2fd75` (before the R2-2 size cap), **14 caught**. Each survivor's exposure was measured with the
+exhaustive probe and compared against the unmutated baseline (111 in-call, 0 during the walk, 10 renames before the
+last inspecting call):
+
+- **Load-bearing (caught):** the closing entry re-check loop, its ctime comparison, the directory mtime/ctime check,
+  the root-directory and slot-path re-checks, the openDir identity check, `O_NOFOLLOW` on file opens, all four
+  protected-path checks, and three double mutants that remove the descriptor walk together with a closing check.
+- **Survivor, CLOSING_WINDOW_LARGER (test gap):** reverting the review-F2 order (slot path checked after the root
+  directory) keeps 0 during the walk but raises renames before the last inspecting call from 10 to 40. The unit test
+  asserts the window width (2 calls), not the schedule count, so it does not catch this. RESIDUAL as a test gap.
+- **Survivors, NO_EXTRA_EXPOSURE_IN_MODEL (10):** descending and listing by path, `stat` instead of `lstat`,
+  `O_NOFOLLOW` on directory opens, the readAt identity and post-read checks (alone and together), root-first directory
+  order, the directory name-set check, and re-checking by path without held descriptors. In this model the closing
+  inode re-checks already catch what these would.
 - **Defence in depth, not load-bearing in this model:** the descriptor-relative traversal itself. Descending, listing
   and even re-checking by path instead of through `/proc/self/fd` adds no measured exposure (reviewer F3 agrees). We
   therefore do **not** claim security from the descriptor-relative traversal, and not from path re-checks alone (PR #27
