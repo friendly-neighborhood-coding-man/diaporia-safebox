@@ -9,6 +9,13 @@
 //    an owner LEGITIMATE review existed;
 //  * lists authority changes (and flags those the owner did not intend), Rapid-Use windows (<= 24 h), hold outcomes;
 //  * verifies the Footprint Journal hash chain against witness checkpoints.
+// V5.1:
+//  * P2: the latest authorized settlement is recomputed from the REPLAYED genesis (settlementHorizonMs signed by every
+//    owner device + ORC) and the owner-/delegate-signed issuedAt; an effect at or after it is
+//    EFFECT_AFTER_SETTLEMENT_HORIZON. Consumption after the authorization's own expiresAt is
+//    AUTHORIZATION_CONSUMED_AFTER_DEADLINE. Neither depends on the vault's or the engine's records.
+//  * P1: an effect for a payment of an incident the engine classified HIGH needs an owner LEGITIMATE review of that
+//    incident or an ACTIVE covering Rapid-Use grant, else HIGH_RISK_SETTLED_WITHOUT_RESOLUTION.
 import * as V5 from '../root/chain.mjs';
 import { verifyPaycap } from '../../v3/vault/paycap.mjs';
 import { purposeViolations } from '../../v3/root/capsule.mjs';
@@ -56,14 +63,19 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
   const v5ByPay = new Map(v5pay.map(p => [p.payment_id, p]));
   const seenCaps = new Set(); const delegUse = new Map(); let cum = 0n;
   // the engine's own journaled decisions (RISK layer) cross-check the vault's delay records
-  const engineDelay = new Map();
-  for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'ENGINE_DECISION' && e.outcome !== 'NONE') engineDelay.set(e.relatedId, Math.max(engineDelay.get(e.relatedId) ?? 0, Number(e.data.delayMs))); }
+  const engineDelay = new Map(); const highAt = new Map(); // incident (or 'pay:<id>' when the HIGH decision opened it) -> first HIGH decision time
+  const markHigh = (k, t) => { if (!highAt.has(k) || t < highAt.get(k)) highAt.set(k, t); };
+  for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'ENGINE_DECISION' && e.outcome !== 'NONE') { engineDelay.set(e.relatedId, Math.max(engineDelay.get(e.relatedId) ?? 0, Number(e.data.delayMs))); if (e.data.riskClass === 'HIGH') markHigh(e.data.incidentRef !== '-' ? e.data.incidentRef : 'pay:' + e.relatedId, Date.parse(e.at)); } }
+  // a HIGH decision that opened an incident names the payment; map it to the vault's incident (the vault cannot hide the HIGH class: the engine journal holds it)
+  for (const p of v5pay) if (highAt.has('pay:' + p.payment_id) && p.incident_id) markHigh(p.incident_id, highAt.get('pay:' + p.payment_id));
+  const horizon = Number(st.v5.config.settlementHorizonMs);
+  out.horizon = { horizonMs: horizon, violations: 0 };
   for (const tx of [...ledgerTxs].sort((a, b) => a.seq - b.seq)) {
     out.financial.effects++;
     const v = []; let capId = null, paymentId = null;
     try { const s = JSON.parse(tx.statement); capId = s.capId; paymentId = s.paymentId; } catch { v.push('UNPARSEABLE_TX'); }
     const ev = evByCap.get(capId); const vp = v5ByPay.get(paymentId);
-    let credId = null, proposedAt = null, windowEnd = null;
+    let credId = null, proposedAt = null, windowEnd = null, authIssued = null;
     if (!ev) v.push('NO_OWNER_CAPABILITY');
     else {
       let cap, approval;
@@ -82,9 +94,10 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
           u.n++; u.sum += BigInt(tx.amount); if (u.seqs.has(op.seq)) v.push('DELEGATED_OP_REPLAY'); u.seqs.add(op.seq); delegUse.set(d.delegationId, u);
           if (u.n > Number(d.maxUses)) v.push('DELEGATION_MAX_USES_EXCEEDED');
           if (u.sum > BigInt(d.cumulativeMaxYocto)) v.push('OVER_DELEGATION_CUMULATIVE');
-          credId = d.issuerCredId; windowEnd = Number(d.expiresAt);
+          credId = d.issuerCredId; windowEnd = Number(d.expiresAt); authIssued = Date.parse(op.issuedAt);
           const sE = stateAt(tx.submitted_at); const dE = sE.v5.delegations[op.delegationId];
-          if (dE?.status !== 'ACTIVE' && !(dE?.status === 'EXPIRED' && tx.submitted_at < Number(d.expiresAt) + MAX_DELAY + tickSlackMs)) v.push('DELEGATION_ENDED_BEFORE_EFFECT');
+          // a consumed delegated operation may settle after the delegation's own expiry, but never after its horizon (checked below)
+          if (dE?.status !== 'ACTIVE' && dE?.status !== 'EXPIRED') v.push('DELEGATION_ENDED_BEFORE_EFFECT');
           if (delegationHolds(sE, op.delegationId, tx.submitted_at).length) v.push('EFFECT_DURING_DELEGATION_HOLD');
           if (tx.amount !== op.amountYocto || tx.recipient !== op.recipientId) v.push('EFFECT_NOT_EXACT');
         }
@@ -96,7 +109,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
         if (tx.amount !== cap.amountYocto) v.push('AMOUNT_NOT_EXACT');
         if (String(stateAt(tx.submitted_at).epoch) !== cap.epoch) v.push('EFFECT_IN_OTHER_EPOCH');
         if (stateAt(tx.submitted_at).purpose.version !== cap.purposeVersion) v.push('EFFECT_UNDER_OTHER_PURPOSE_VERSION');
-        credId = approval?.credId; windowEnd = Date.parse(cap.expiresAt);
+        credId = approval?.credId; windowEnd = Date.parse(cap.expiresAt); authIssued = issued;
         if (seenCaps.has(capId)) v.push('DUPLICATE_EFFECT_FOR_CAPABILITY'); seenCaps.add(capId);
       }
       if (proposedAt !== null) {
@@ -126,7 +139,16 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
             if (!review && !grant) { v.push('DELAYED_PAYMENT_RELEASED_EARLY'); out.delays.earlyRelease.push(paymentId); }
           }
         }
-        if (windowEnd !== null && tx.submitted_at >= windowEnd + shift + (shift ? 0 : 0)) v.push('EFFECT_AFTER_CAPABILITY_WINDOW');
+        // P2: submission deadline (consumption) and latest authorized settlement, from signed data + replayed genesis only
+        if (windowEnd !== null && proposedAt >= windowEnd) v.push('AUTHORIZATION_CONSUMED_AFTER_DEADLINE');
+        if (authIssued !== null && tx.submitted_at >= Math.min(authIssued + horizon, Date.parse(sE.purpose.expiresAt))) { v.push('EFFECT_AFTER_SETTLEMENT_HORIZON'); out.horizon.violations++; }
+        // P1: HIGH-risk incident payments need an owner resolution (LEGITIMATE review) or a covering Rapid-Use grant
+        const hAt = Math.min(highAt.get(vp?.incident_id) ?? Infinity, highAt.get('pay:' + paymentId) ?? Infinity);
+        if (tx.submitted_at >= hAt) {
+          const review = vp?.incident_id && sE.v5.incidentReviews[vp.incident_id]?.verdict === 'LEGITIMATE';
+          const grant = vp && Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(vp.cred_id) || (vp.delegation_id && g.scope.delegationIds.includes(vp.delegation_id))) && g.scope.recipients.includes(tx.recipient));
+          if (!review && !grant) v.push('HIGH_RISK_SETTLED_WITHOUT_RESOLUTION');
+        }
         const pv = purposeViolations(sE.purpose, { operation: 'PAY', recipientId: tx.recipient, asset: 'NEAR', amountYocto: tx.amount, sku: null, now: tx.submitted_at, capExpiresAt: tx.submitted_at + 1, capIssuedAt: tx.submitted_at },
           { cumulativeYocto: cum.toString(), last24hYocto: '0' }).filter(x => !['OVER_DAILY_LIMIT', 'PURPOSE_NOT_ACTIVE', 'SKU_NOT_ALLOWED', 'SKU_REQUIRED'].includes(x));
         v.push(...pv.map(x => 'PURPOSE:' + x));

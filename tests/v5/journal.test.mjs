@@ -78,6 +78,9 @@ test('all layers record the lifecycle: Root holds, vault payments, risk detectio
   ok(await freezeBy(w, 'k4-freeze', 'h1'));
   ok(await w.cmd('HOLD_RELEASE', { holdId: 'h1', holdDigest: w.holdDigest('h1') }, ['k4-freeze']));
   await burst(w, 4);
+  // V5.1 (P1): a burst within 24 h of a security event is HIGH risk and expires unresolved when the owner does not act;
+  // an ordinary payment on another flow still settles (no global freeze)
+  ok(await w.pay({ credId: 'k2-laptop' }));
   await w.advance(25 * H, 10 * 60_000); // vault ticks every 10 min here (real deployment: seconds)
   const types = new Set(w.journal.reader('auditor').events().map(e => `${e.layer}:${e.type}`));
   for (const t of ['ROOT:HOLD_CREATED', 'ROOT:HOLD_RELEASED', 'VAULT:PAYMENT_PROPOSED', 'VAULT:UNUSUAL_ACTIVITY_DETECTED', 'VAULT:INCIDENT_OPENED', 'VAULT:PAYMENT_DELAYED', 'VAULT:PAYMENT_SETTLED', 'NOTIFY:NOTIFICATION_QUEUED', 'NOTIFY:NOTIFICATION_ATTEMPT'])

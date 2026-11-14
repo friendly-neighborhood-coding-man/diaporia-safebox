@@ -34,6 +34,11 @@ export const V5_DEFAULT_CONFIG = Object.freeze({
   rapidActivationsPer7d: '3',
   delegationMaxTtlMs: String(7 * D),
   delegationMaxUses: '500',
+  // V5.1 (P2): owner-signed maximum settlement horizon. A payment authorization (capability / delegated operation) must be
+  // CONSUMED before its own expiresAt (submission deadline); once consumed and reserved, the vault may settle it no later
+  // than issuedAt + settlementHorizonMs. Every owner device and the ORC sign this value in the genesis extension; no
+  // delay, review or Rapid-Use can move a payment past it (the vault and the verifier enforce it independently).
+  settlementHorizonMs: String(26 * H),
 });
 const CFG5 = Object.keys(V5_DEFAULT_CONFIG);
 /** Predefined deterministic Risk-Policy-Engine rules that may END a Rapid-Use grant (they can never start or extend one). */
@@ -46,6 +51,7 @@ function parseV5Config(c) {
   if (n.provisionalMaxMs > 48 * H || n.quarantineMaxMs > 7 * D || n.provisionalMaxMs < H) fail('V5_CONFIG_HOLD_DURATIONS');
   if (n.rapidMaxMs > 24 * H || n.rapidMaxMs < 600_000) fail('V5_CONFIG_RAPID_MAX_24H');
   if (n.issuerBudgetMs < n.provisionalMaxMs) fail('V5_CONFIG_ISSUER_BUDGET');
+  if (n.settlementHorizonMs < H || n.settlementHorizonMs > 72 * H) fail('V5_CONFIG_SETTLEMENT_HORIZON', 'between 1 h and 72 h');
   return { ...c };
 }
 

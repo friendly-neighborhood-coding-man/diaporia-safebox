@@ -21,9 +21,10 @@ import { RISK_POLICY_V1 } from '../risk/detector.mjs';
 const HOLDING = ['RESERVED', 'BUFFERED', 'RELEASED', 'UNKNOWN', 'FROZEN'];
 const V5_SCHEMA = `
 CREATE TABLE IF NOT EXISTS v5_pay (payment_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, delegation_id TEXT, recipient TEXT NOT NULL, amount TEXT NOT NULL,
-  proposed_at INTEGER NOT NULL, anomaly TEXT NOT NULL, delay_ms INTEGER NOT NULL, incident_id TEXT, rapid_grant TEXT, baseline_eligible INTEGER NOT NULL, decision TEXT, settled_before_detection INTEGER NOT NULL DEFAULT 0, cap_expires_orig INTEGER);
+  proposed_at INTEGER NOT NULL, anomaly TEXT NOT NULL, delay_ms INTEGER NOT NULL, incident_id TEXT, rapid_grant TEXT, baseline_eligible INTEGER NOT NULL, decision TEXT, settled_before_detection INTEGER NOT NULL DEFAULT 0, cap_expires_orig INTEGER,
+  risk_class TEXT NOT NULL DEFAULT 'NONE', auth_issued_at INTEGER, settle_deadline INTEGER, buffer_ms INTEGER, tier INTEGER);
 CREATE TABLE IF NOT EXISTS v5_incidents (incident_id TEXT PRIMARY KEY, flow TEXT NOT NULL, cred_id TEXT NOT NULL, opened_at INTEGER NOT NULL, state TEXT NOT NULL,
-  last_trigger_at INTEGER NOT NULL, delayed_count INTEGER NOT NULL, reasons TEXT NOT NULL, closed_at INTEGER, settled_before INTEGER NOT NULL, exposure_before TEXT NOT NULL);
+  last_trigger_at INTEGER NOT NULL, delayed_count INTEGER NOT NULL, reasons TEXT NOT NULL, closed_at INTEGER, settled_before INTEGER NOT NULL, exposure_before TEXT NOT NULL, risk_class TEXT NOT NULL DEFAULT 'LOW', triggers INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS v5_security (n INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, type TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS v5_deleg_use (delegation_id TEXT NOT NULL, op_seq INTEGER NOT NULL, payment_id TEXT NOT NULL, amount TEXT NOT NULL, PRIMARY KEY (delegation_id, op_seq));
 CREATE TABLE IF NOT EXISTS v5_rapid_use (grant_id TEXT NOT NULL, payment_id TEXT PRIMARY KEY, amount TEXT NOT NULL);
@@ -31,6 +32,7 @@ CREATE TRIGGER IF NOT EXISTS v5_pay_no_delete BEFORE DELETE ON v5_pay BEGIN SELE
 `;
 const SECURITY_EFFECTS = new Set(['SUSPENDED', 'HOLD_CREATED', 'RECOVERY_OPENED', 'REVOKED', 'FROZEN', 'CONTEST_RESOLVED', 'GOV_CASE_OPENED', 'RAPID_USE_REQUESTED']);
 const MAX_DELAY_MS = Number(RISK_POLICY_V1.delay.maxDelayMs); // vault-side hard cap, independent of the engine
+const DUE_STATES = ['BUFFERED'];
 
 export class ExecutionVaultV5 extends ExecutionVault {
   constructor(cfg, deps) {
@@ -131,8 +133,17 @@ export class ExecutionVaultV5 extends ExecutionVault {
     const ctx = { history: this.history(), purpose: this.root.purpose, spent: this.spentExcluding(paymentId), securityTimes: this.securityTimes(), rapid: !!grant };
     const dec = this.engine.decide(p, ctx, { openIncident: grant ? null : open });
     if (!verifyObj5(V5_DOMAINS.RISK_ENGINE, dec.statement, dec.sig, this.enginePublicKey)) fail('ENGINE_DECISION_SIGNATURE'); // the vault trusts only the pinned engine key
-    this.store.db.prepare('INSERT INTO v5_pay (payment_id, flow, cred_id, delegation_id, recipient, amount, proposed_at, anomaly, delay_ms, incident_id, rapid_grant, baseline_eligible, decision) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
-      .run(paymentId, flow, credId, delegationId, row.recipient, row.amount, now, 'NONE', 0, null, grant?.grantId ?? null, grant ? 0 : 1, JSON.stringify({ action: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code), statement: dec.statement, sig: dec.sig }));
+    // P2: the four times of a payment authorization are kept apart. submission deadline = the authorization's own
+    // expiresAt (checked at proposal), consumption = now, earliest release = now + buffer (+ bounded anomaly delay),
+    // latest settlement = authorization issuedAt + the owner-signed settlementHorizonMs (never the risk engine's choice).
+    const authIssuedAt = this.#authIssuedAt(paymentId, delegationId);
+    const settleDeadline = Math.min(authIssuedAt + this.horizonMs(), Date.parse(this.root.purpose.expiresAt));
+    const bufferMs = this.cfg.bufferMs;
+    this.store.db.prepare('INSERT INTO v5_pay (payment_id, flow, cred_id, delegation_id, recipient, amount, proposed_at, anomaly, delay_ms, incident_id, rapid_grant, baseline_eligible, decision, cap_expires_orig, auth_issued_at, settle_deadline, buffer_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+      .run(paymentId, flow, credId, delegationId, row.recipient, row.amount, now, 'NONE', 0, null, grant?.grantId ?? null, grant ? 0 : 1, JSON.stringify({ action: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code), statement: dec.statement, sig: dec.sig }),
+        row.cap_expires_at, authIssuedAt, settleDeadline, bufferMs);
+    // the vault's release check (`now >= cap_expires_at` -> EXPIRED) now enforces the latest authorized settlement
+    this.store.db.prepare("UPDATE payments SET cap_expires_at=? WHERE payment_id=? AND state='BUFFERED'").run(settleDeadline, paymentId);
     if (grant) this.store.db.prepare('INSERT INTO v5_rapid_use (grant_id, payment_id, amount) VALUES (?,?,?)').run(grant.grantId, paymentId, row.amount);
     this.#j({ type: 'PAYMENT_PROPOSED', principal: this.ref(credId), relatedId: paymentId, outcome: 'BUFFERED', epoch: this.root.epoch, purposeVersion: this.root.purpose.version,
       operationDigest: row.cap_digest, data: { flow: this.ref(flow), recipient: row.recipient, amount: row.amount, rapidGrant: grant?.grantId ?? '-', decision: dec.statement.action, reasons: dec.ev.reasons.map(r => r.code).join(','), score: dec.ev.score },
@@ -141,11 +152,13 @@ export class ExecutionVaultV5 extends ExecutionVault {
       data: { flow: this.ref(flow), level: dec.ev.decision, reasons: dec.ev.reasons.map(r => `${r.cls}:${r.code}`).join(','), features: { ...dec.ev.features, flow: this.ref(flow) }, policy: dec.statement.policy, policyDigest: dec.statement.policyDigest } });
     if (dec.statement.action === 'DELAY' || dec.statement.action === 'DELAY_AND_END_RAPID') {
       const inc = open ?? this.#openIncident(flow, credId, dec.ev, now);
+      this.store.db.prepare('UPDATE v5_incidents SET triggers=triggers+1 WHERE incident_id=?').run(inc.incident_id);
       if (open) this.store.db.prepare('UPDATE v5_incidents SET last_trigger_at=?, reasons=? WHERE incident_id=?').run(now, JSON.stringify([...new Set([...JSON.parse(open.reasons), ...dec.ev.reasons.map(r => r.code)])]), open.incident_id);
       this.#delay(paymentId, inc.incident_id, Number(dec.statement.delayMs));
       // delay every other unsettled, not-yet-released payment of the same flow (never other flows)
       for (const r of this.store.db.prepare("SELECT v.payment_id FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE v.flow=? AND p.state='BUFFERED' AND v.anomaly='NONE' AND v.payment_id<>? AND v.rapid_grant IS NULL").all(flow, paymentId))
         this.#delay(r.payment_id, inc.incident_id, Number(dec.statement.delayMs));
+      this.#classify(inc.incident_id, dec.statement.riskClass === 'HIGH' ? 'HIGH' : 'LOW');
       if (dec.statement.action === 'DELAY_AND_END_RAPID' && grant) this.onRapidRule({ grantId: grant.grantId, ruleId: 'R3_VELOCITY_CEILING', evidence: dec.statement.evaluationDigest });
     }
     const out = this.store.get(paymentId);
@@ -162,17 +175,33 @@ export class ExecutionVaultV5 extends ExecutionVault {
     this.onIncident({ incident: inc, ev, root: this.root });
     return inc;
   }
+  #authIssuedAt(paymentId, delegationId) {
+    const ev = this.store.db.prepare('SELECT cap FROM cap_evidence WHERE payment_id=?').get(paymentId);
+    const cap = JSON.parse(ev.cap);
+    return delegationId ? isoMs(cap.delegated.issuedAt, 'issuedAt') : isoMs(cap.issuedAt, 'issuedAt');
+  }
+  /** Owner-signed settlement horizon from the vault's own Root replica (genesis extension), never from the engine. */
+  horizonMs() { return Number(this.root.v5.config.settlementHorizonMs); }
+  /** P1: an incident's risk class only ever rises (LOW -> HIGH); a HIGH incident marks all its pending payments HIGH. Deadlines never move. */
+  #classify(incidentId, cls) {
+    const inc = this.store.db.prepare('SELECT risk_class FROM v5_incidents WHERE incident_id=?').get(incidentId);
+    const next = inc?.risk_class === 'HIGH' || cls === 'HIGH' ? 'HIGH' : 'LOW';
+    this.store.db.prepare('UPDATE v5_incidents SET risk_class=? WHERE incident_id=?').run(next, incidentId);
+    const n = this.store.db.prepare("UPDATE v5_pay SET risk_class=? WHERE incident_id=? AND anomaly='ANOMALY_PAYMENT_DELAY' AND risk_class<>'HIGH' AND payment_id IN (SELECT payment_id FROM payments WHERE state='BUFFERED')").run(next, incidentId).changes;
+    if (next === 'HIGH' && inc?.risk_class !== 'HIGH') this.#j({ type: 'INCIDENT_ESCALATED', relatedId: incidentId, outcome: 'HIGH', data: { pendingPayments: String(n), note: 'unresolved HIGH-risk payments expire instead of settling; nothing else is frozen' } });
+  }
   #delay(paymentId, incidentId, delayMs) {
     const r = this.store.get(paymentId); if (r.state !== 'BUFFERED') return;
+    const v = this.store.db.prepare('SELECT buffer_ms, settle_deadline FROM v5_pay WHERE payment_id=?').get(paymentId);
     const ms = Math.min(delayMs, MAX_DELAY_MS); // the vault enforces its own cap whatever the engine asks
-    const release = r.proposed_at + this.cfg.bufferMs + ms;
+    const release = r.proposed_at + (v?.buffer_ms ?? this.cfg.bufferMs) + ms;
     this.store.tx(() => {
-      // the authorization was validated at proposal; the delay must not silently turn into a cancellation, so the
-      // capability's release window follows the bounded delay (epoch / Purpose / credential re-checks still apply at release)
-      this.store.db.prepare("UPDATE payments SET release_at=?, cap_expires_at=MAX(cap_expires_at, ?), updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(release, r.cap_expires_at + (release - r.release_at), this.now(), paymentId); // the window shifts by the added delay
-      this.store.db.prepare("UPDATE v5_pay SET anomaly='ANOMALY_PAYMENT_DELAY', delay_ms=?, incident_id=?, baseline_eligible=0, cap_expires_orig=COALESCE(cap_expires_orig, ?) WHERE payment_id=?").run(ms, incidentId, r.cap_expires_at, paymentId);
+      // P2: the delay moves only the earliest release. The latest authorized settlement (cap_expires_at = issuedAt +
+      // owner-signed horizon) is NOT moved: a payment whose delay ends after it expires unsettled (fail closed).
+      this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(release, this.now(), paymentId);
+      this.store.db.prepare("UPDATE v5_pay SET anomaly='ANOMALY_PAYMENT_DELAY', delay_ms=?, incident_id=?, baseline_eligible=0 WHERE payment_id=?").run(ms, incidentId, paymentId);
       this.store.db.prepare('UPDATE v5_incidents SET delayed_count=delayed_count+1 WHERE incident_id=?').run(incidentId);
-      this.store.journal(paymentId, 'BUFFERED', 'BUFFERED', 'risk-engine', { event: 'ANOMALY_PAYMENT_DELAY', incidentId, releaseAt: release, delayMs: ms, unchanged: 'recipient,amount,asset,purpose,authorization' });
+      this.store.journal(paymentId, 'BUFFERED', 'BUFFERED', 'risk-engine', { event: 'ANOMALY_PAYMENT_DELAY', incidentId, releaseAt: release, delayMs: ms, latestSettlement: v?.settle_deadline ?? r.cap_expires_at, unchanged: 'recipient,amount,asset,purpose,authorization,settlement-horizon' });
     });
     const fl = this.store.db.prepare('SELECT flow FROM v5_pay WHERE payment_id=?').get(paymentId)?.flow;
     this.#j({ type: 'PAYMENT_DELAYED', relatedId: paymentId, outcome: 'ANOMALY_PAYMENT_DELAY', evidenceRefs: [incidentId], data: { flow: fl ? this.ref(fl) : '-', incidentId, delayMs: String(ms), releaseAt: iso(release), amount: r.amount, recipient: r.recipient } });
@@ -236,7 +265,7 @@ export class ExecutionVaultV5 extends ExecutionVault {
       for (const r of rows) {
         const p = this.store.get(r.payment_id);
         if (e.verdict === 'LEGITIMATE') {
-          this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(Math.max(p.proposed_at + this.cfg.bufferMs, this.now()), this.now(), r.payment_id);
+          this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(Math.max(p.proposed_at + this.#bufferOf(r.payment_id), this.now()), this.now(), r.payment_id);
           this.store.db.prepare("UPDATE v5_pay SET anomaly='RELEASED_BY_REVIEW' WHERE payment_id=?").run(r.payment_id);
         } else {
           this.store.move(r.payment_id, 'BUFFERED', 'CANCELLED', 'owner-review', { reason: 'INCIDENT_FRAUD', incidentId: inc.incident_id }, { reason: 'INCIDENT_FRAUD' });
@@ -247,13 +276,14 @@ export class ExecutionVaultV5 extends ExecutionVault {
     });
     this.#j({ type: 'INCIDENT_REVIEWED', relatedId: inc.incident_id, outcome: e.verdict, data: { payments: String(rows.length), by: (e.by ?? []).map(x => this.ref(x)).join(',') } });
   }
+  #bufferOf(paymentId) { return this.store.db.prepare('SELECT buffer_ms FROM v5_pay WHERE payment_id=?').get(paymentId)?.buffer_ms ?? this.cfg.bufferMs; }
   #accelerate() {
     const now = this.now(); let n = 0;
     for (const r of this.store.db.prepare("SELECT v.*, p.asset, p.proposed_at AS pa FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE p.state='BUFFERED' AND v.anomaly='ANOMALY_PAYMENT_DELAY'").all()) {
       const g = this.rapidGrantFor({ credId: r.cred_id, delegationId: r.delegation_id, recipient: r.recipient, amount: r.amount, asset: r.asset });
       if (!g) continue;
       this.store.tx(() => {
-        this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(Math.max(r.pa + this.cfg.bufferMs, now), now, r.payment_id);
+        this.store.db.prepare("UPDATE payments SET release_at=?, updated_at=? WHERE payment_id=? AND state='BUFFERED'").run(Math.max(r.pa + (r.buffer_ms ?? this.cfg.bufferMs), now), now, r.payment_id);
         this.store.db.prepare("UPDATE v5_pay SET anomaly='RELEASED_BY_RAPID', rapid_grant=? WHERE payment_id=?").run(g.grantId, r.payment_id);
         this.store.db.prepare('INSERT OR IGNORE INTO v5_rapid_use (grant_id, payment_id, amount) VALUES (?,?,?)').run(g.grantId, r.payment_id, r.amount);
       });
@@ -276,9 +306,39 @@ export class ExecutionVaultV5 extends ExecutionVault {
       if (held) this.store.db.prepare("UPDATE payments SET release_at=? WHERE payment_id=? AND state='BUFFERED'").run(now + 600_000, r.payment_id);
     }
     this.#accelerate();
+    this.#settlementGate(now);
     const out = await super.tick();
     this.mirror();
     return out;
+  }
+  /**
+   * P1 / P2 release gate, run before the V3 release-time re-check (which still checks freeze, lockdown, epoch, Purpose
+   * version, approver status, lease and the latest settlement time):
+   *  1. latest authorized settlement reached -> EXPIRED (SETTLEMENT_HORIZON_EXPIRED), whatever the delay or review state;
+   *  2. a HIGH-risk delayed payment whose delay ended without an owner LEGITIMATE review or Rapid-Use -> EXPIRED
+   *     (HIGH_RISK_UNRESOLVED): it needs renewed authorization; nothing else on the account is restricted;
+   *  3. due payments: Purpose recipient / asset / validity, credential holds and the delegation are re-checked.
+   */
+  #settlementGate(now) {
+    const rows = this.store.db.prepare(`SELECT v.*, p.release_at, p.cap_expires_at, p.asset, p.state FROM v5_pay v JOIN payments p ON p.payment_id=v.payment_id WHERE p.state='BUFFERED'`).all();
+    for (const r of rows) {
+      let why = null;
+      if (now >= r.cap_expires_at || (r.settle_deadline !== null && now >= r.settle_deadline)) why = 'SETTLEMENT_HORIZON_EXPIRED';
+      else if (r.release_at <= now && r.risk_class === 'HIGH' && r.anomaly === 'ANOMALY_PAYMENT_DELAY') why = 'HIGH_RISK_UNRESOLVED';
+      else if (r.release_at <= now) {
+        const pv = purposeViolations(this.root.purpose, { operation: 'PAY', recipientId: r.recipient, asset: r.asset, amountYocto: r.amount, sku: null, now, capExpiresAt: now + 1, capIssuedAt: now }, { cumulativeYocto: '0', last24hYocto: '0' })
+          .filter(x => ['RECIPIENT_NOT_IN_PURPOSE', 'ASSET_NOT_IN_PURPOSE', 'PURPOSE_NOT_ACTIVE', 'OVER_PER_PAYMENT_LIMIT', 'OPERATION_NOT_IN_PURPOSE'].includes(x));
+        if (pv.length) why = 'RELEASE_RECHECK_PURPOSE:' + pv.join(',');
+        else if (credentialHolds(this.root, r.cred_id, now).length) why = null; // credential holds suspend the credential: the V3 re-check cancels (APPROVER_CREDENTIAL_NOT_ACTIVE); keep the reason single-sourced
+        else if (r.delegation_id) { const d = this.root.v5.delegations[r.delegation_id]; if (!d || d.status === 'REVOKED') why = 'RELEASE_RECHECK_DELEGATION_REVOKED'; }
+      }
+      if (!why) continue;
+      const to = why.startsWith('RELEASE_RECHECK') ? 'CANCELLED' : 'EXPIRED';
+      this.store.tx(() => {
+        this.store.move(r.payment_id, 'BUFFERED', to, 'policy', { reason: why, latestSettlement: r.settle_deadline, riskClass: r.risk_class }, { reason: why });
+        if (why === 'HIGH_RISK_UNRESOLVED') this.store.db.prepare("UPDATE v5_pay SET anomaly='EXPIRED_UNRESOLVED' WHERE payment_id=?").run(r.payment_id);
+      });
+    }
   }
   /** Mirror the vault's own hash-chained lifecycle journal into the Footprint Journal (VAULT layer). */
   mirror() {
