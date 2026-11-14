@@ -1,7 +1,7 @@
 // Install a verified package into an inactive slot. Destination must be one of the allow-listed slot directories, must be
 // a real directory (not a symlink) and is emptied first. Files are created with O_EXCL|O_NOFOLLOW so nothing pre-planted
 // in the slot can redirect a write, then read back and re-hashed against the manifest.
-import { lstatSync, readdirSync, rmSync, mkdirSync, openSync, writeSync, fsyncSync, closeSync, chmodSync, readFileSync, realpathSync, statfsSync, constants as C } from 'node:fs';
+import { lstatSync, fstatSync, readdirSync, rmSync, mkdirSync, openSync, writeSync, fsyncSync, closeSync, chmodSync, readFileSync, realpathSync, statfsSync, constants as C } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { sha256 } from '../common/crypto.mjs';
 import { fsyncDir } from '../common/fsutil.mjs';
@@ -55,6 +55,27 @@ export function installToSlot(slotDir, pkg, { allowList, minFreeFactor = 2 }) {
   return verifySlot(slotDir, pkg.manifest);
 }
 
+/**
+ * Read a file that walk() has just lstat-checked, WITHOUT a second lookup by path (CodeQL js/file-system-race,
+ * submission-freeze triage). The file is opened once with O_NOFOLLOW (a symlink swapped in after the lstat fails with
+ * ELOOP) and O_NONBLOCK (a FIFO swapped in cannot hang the verifier); the descriptor is then fstat-ed and must be the
+ * SAME inode on the same device as the lstat result, still a regular file, with the same mode / owner checks. The
+ * bytes are read from that descriptor, so the digest is computed over exactly the object whose metadata was checked.
+ */
+export function readCheckedFile(p, r, lst, { expectUid } = {}) {
+  let fd;
+  try { fd = openSync(p, C.O_RDONLY | C.O_NOFOLLOW | C.O_NONBLOCK); }
+  catch (e) { if (e.code === 'ELOOP') fail('SLOT_CONTAINS_SYMLINK', r); fail('SLOT_CHANGED_DURING_VERIFY', `${r}: ${e.code}`); }
+  try {
+    const st = fstatSync(fd);
+    if (st.dev !== lst.dev || st.ino !== lst.ino) fail('SLOT_CHANGED_DURING_VERIFY', r);
+    if (!st.isFile()) fail('SLOT_SPECIAL_FILE', r);
+    if (st.mode & 0o022) fail('SLOT_WRITABLE_BY_OTHERS', r);
+    if (expectUid !== undefined && st.uid !== expectUid) fail('SLOT_WRONG_OWNER', r);
+    return { mode: st.mode & 0o7777, data: readFileSync(fd) };
+  } finally { closeSync(fd); }
+}
+
 /** Re-read a slot and compare it to the manifest: exact file set, digests, modes, no symlinks, nothing app-writable. */
 export function verifySlot(slotDir, manifest, { expectUid } = {}) {
   const found = new Map();
@@ -65,7 +86,7 @@ export function verifySlot(slotDir, manifest, { expectUid } = {}) {
       if (st.mode & 0o022) fail('SLOT_WRITABLE_BY_OTHERS', r);
       if (expectUid !== undefined && st.uid !== expectUid) fail('SLOT_WRONG_OWNER', r);
       if (st.isDirectory()) walk(p, r);
-      else if (st.isFile()) found.set(r, { mode: st.mode & 0o7777, data: readFileSync(p) });
+      else if (st.isFile()) found.set(r, readCheckedFile(p, r, st, { expectUid }));
       else fail('SLOT_SPECIAL_FILE', r);
     }
   };
