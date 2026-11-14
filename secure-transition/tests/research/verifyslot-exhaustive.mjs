@@ -89,20 +89,22 @@ const N = baseTrace.length;
 // Boundary used to classify bypasses: the last call that reads file content (readFileSync). Mutations up to it happen
 // during the walk itself (what PR #27 tried to close); later ones fall in the closing re-check window.
 const lastRead = baseTrace.lastIndexOf('readFileSync') + 1;
+// The verifier's last inspecting call (everything after it only closes descriptors).
+const lastCheck = baseTrace.findLastIndex(k => k !== 'closeSync') + 1;
 const summary = {}; const bypasses = [];
 for (const [name, a] of Object.entries(ATTACKS)) {
   const pairs = a.acts({ d: '', slot: '' }).length === 2;
   const sched = []; if (pairs) { for (let i = 1; i <= N; i++) for (let j = i + 1; j <= N + 1; j++) sched.push([i, j]); } else for (let k = 1; k <= N; k++) sched.push([k]);
-  const s = { schedules: 0, fullyFired: 0, success: 0, inCallBypass: 0, bypassDuringWalk: 0, bypassInClosingWindow: 0, refusals: {} };
+  const s = { schedules: 0, fullyFired: 0, success: 0, inCallBypass: 0, bypassDuringWalk: 0, bypassInClosingWindow: 0, bypassBeforeLastCheck: 0, refusals: {} };
   for (const at of sched) {
     const r = runOnce(a.init, { name, at });
     s.schedules++; if (r.fired === at.length) s.fullyFired++;
-    if (r.out === 'SUCCESS') { s.success++; if (!r.genuine) { s.inCallBypass++; if (Math.max(...at) <= lastRead) s.bypassDuringWalk++; else s.bypassInClosingWindow++; s.bypassAt = s.bypassAt ?? []; s.bypassAt.push(at.join('+') + ':' + at.map(k => baseTrace[k - 1] ?? 'end').join('+')); if (bypasses.length < 40) bypasses.push({ attack: name, at, before: at.map(k => baseTrace[k - 1] ?? 'end') }); } }
+    if (r.out === 'SUCCESS') { s.success++; if (!r.genuine) { s.inCallBypass++; if (Math.max(...at) <= lastRead) s.bypassDuringWalk++; else s.bypassInClosingWindow++; if (Math.max(...at) <= lastCheck) s.bypassBeforeLastCheck++; s.bypassAt = s.bypassAt ?? []; s.bypassAt.push(at.join('+') + ':' + at.map(k => baseTrace[k - 1] ?? 'end').join('+')); if (bypasses.length < 40) bypasses.push({ attack: name, at, before: at.map(k => baseTrace[k - 1] ?? 'end') }); } }
     else s.refusals[r.out] = (s.refusals[r.out] ?? 0) + 1;
   }
   summary[name] = s;
 }
 const ctl = (() => { const w = world(); let o; try { verifySlot(w.slot, manifest); o = 'SUCCESS'; } catch (e) { o = e.code; } fs.rmSync(w.d, { recursive: true, force: true }); return o; })();
-const result = { tree: ST, node: process.version, uid: process.getuid?.(), fsCallsPerVerify: N, lastContentReadCall: lastRead, closingWindowCalls: baseTrace.slice(lastRead), control: ctl, summary, totalInCallBypass: Object.values(summary).reduce((a, s) => a + s.inCallBypass, 0), totalBypassDuringWalk: Object.values(summary).reduce((a, s) => a + s.bypassDuringWalk, 0), sampleBypasses: bypasses };
+const result = { tree: ST, node: process.version, uid: process.getuid?.(), fsCallsPerVerify: N, lastContentReadCall: lastRead, lastCheckCall: lastCheck, closingWindowCalls: baseTrace.slice(lastRead), control: ctl, summary, totalInCallBypass: Object.values(summary).reduce((a, s) => a + s.inCallBypass, 0), totalBypassDuringWalk: Object.values(summary).reduce((a, s) => a + s.bypassDuringWalk, 0), sampleBypasses: bypasses };
 console.log(JSON.stringify(result, null, 1));
 if (process.argv[3]) fs.writeFileSync(process.argv[3], JSON.stringify(result, null, 1) + '\n');

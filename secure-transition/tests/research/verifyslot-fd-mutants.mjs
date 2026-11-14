@@ -22,11 +22,21 @@ const M = [
   ['final pass: directory name-set check removed', "if (readdirSync(`${FD_DIR}/${d.dfd}`).sort().join('/') !== d.names.join('/')) fail('SLOT_CHANGED_DURING_VERIFY', d.rel || '.');", ''],
   ['final pass: directories checked root-first (not deepest-first, root last)', 'for (const d of [...dirs].reverse()) {', 'for (const d of dirs) {'],
   ['final pass: slot path identity re-check removed', "if (!sameObj(nowTop, top) || nowTop.isSymbolicLink()) fail('SLOT_CHANGED_DURING_VERIFY', '.');", ''],
+  ['final pass re-checks entries and name sets by slot PATH (no held descriptors)', ["let now; try { now = lstatSync(at(e.dfd, e.n), { bigint: true }); }", "if (readdirSync(`${FD_DIR}/${d.dfd}`).sort().join('/') !== d.names.join('/'))"], ["let now; try { now = lstatSync(join(slotDir, e.r), { bigint: true }); }", "if (readdirSync(d.rel ? join(slotDir, d.rel) : slotDir).sort().join('/') !== d.names.join('/'))"]],
   ['protected path: not checked when expectUid is given', 'if (expectUid !== undefined) assertProtectedPath(slotDir, expectUid);', ''],
   ['protected path: sticky bit excuses the slot itself', "if ((st.mode & 0o022) && (cur === slotDir || !sticky))", 'if ((st.mode & 0o022) && !sticky)'],
   ['protected path: ancestors not walked (slot only)', 'const up = dirname(cur); if (up === cur) break; cur = up;', 'break;'],
   ['protected path: any owner accepted', 'if (!okOwner(st)) fail(', 'if (false) fail('],
 ];
+// Double mutants: the walk and the final pass are deliberately redundant; removing one layer of a pair is expected to
+// leave no extra exposure in the model, removing both must be caught.
+const D = [
+  ['DOUBLE walk descends by PATH + directory mtime/ctime check removed', 0, 10],
+  ['DOUBLE walk descends by PATH + entry re-check loop removed', 0, 8],
+  ['DOUBLE child lstat follows + openDir O_NOFOLLOW removed', 2, 3],
+  ['DOUBLE readAt identity + post-read ctime/size check removed', 6, 7],
+];
+for (const [name, a, b] of D) M.push([name, [M[a][1], M[b][1]], [M[a][2], M[b][2]]]);
 const run = (dir) => {
   const files = readdirSync(join(ST, dir)).filter(f => f.endsWith('.spec.mjs')).map(f => `${dir}/${f}`);
   const u = spawnSync(process.execPath, ['--test', '--test-concurrency=1', ...files], { cwd: ST, encoding: 'utf8', timeout: 600_000 });
@@ -34,15 +44,23 @@ const run = (dir) => {
   return { fail: m ? Number(m[1]) : null, timedOut: u.error?.code === 'ETIMEDOUT', failing: [...(u.stdout ?? '').matchAll(/^not ok \d+ - (.*)$/gm)].map(x => x[1]).slice(0, 3) };
 };
 const orig = readFileSync(F, 'utf8'); const rows = [];
+const base = JSON.parse(spawnSync(process.execPath, [join(ST, 'tests/research/verifyslot-exhaustive.mjs'), ST], { encoding: 'utf8' }).stdout);
+const baseline = { inCallBypass: base.totalInCallBypass, duringWalk: base.totalBypassDuringWalk };
 for (const [name, from, to] of M) {
-  if (!orig.includes(from)) { rows.push({ name, error: 'PATTERN_NOT_FOUND' }); console.log(JSON.stringify(rows.at(-1))); continue; }
-  writeFileSync(F, orig.replace(from, to));
+  const froms = [from].flat(), tos = [to].flat();
+  if (!froms.every(f => orig.includes(f))) { rows.push({ name, error: 'PATTERN_NOT_FOUND' }); console.log(JSON.stringify(rows.at(-1))); continue; }
+  writeFileSync(F, froms.reduce((src, f, i) => src.replace(f, tos[i]), orig));
   try {
     const unit = run('tests/unit'); const os = process.getuid?.() === 0 ? run('tests/os') : { fail: null, note: 'NOT_RUN (not root)' };
-    rows.push({ name, unit, os, caught: (unit.fail ?? 0) > 0 || (os.fail ?? 0) > 0 });
+    // Exposure under the exhaustive interposition model, whether or not a test failed: does the mutant let more
+    // attacker schedules through than the unmutated verifier (baseline below)?
+    const ex = spawnSync(process.execPath, [join(ST, 'tests/research/verifyslot-exhaustive.mjs'), ST], { encoding: 'utf8', timeout: 300_000 });
+    let exposure = null; try { const j = JSON.parse(ex.stdout); exposure = { inCallBypass: j.totalInCallBypass, duringWalk: j.totalBypassDuringWalk, renameBeforeLastCheck: Object.entries(j.summary).filter(([k]) => !k.startsWith('A3') && !k.startsWith('A4')).reduce((x, [, v]) => x + v.bypassBeforeLastCheck, 0), symlinkSwapSuccess: j.summary['P2 sub/ swap-and-swap-back with a SYMLINK to the genuine twin'].success, control: j.control }; } catch { exposure = { error: (ex.stderr ?? '').slice(0, 200) }; }
+    rows.push({ name, unit, os, exposure, caught: (unit.fail ?? 0) > 0 || (os.fail ?? 0) > 0 });
   } finally { writeFileSync(F, orig); }
   console.log(JSON.stringify(rows.at(-1)));
 }
 const caught = rows.filter(r => r.caught).length;
-writeFileSync(OUT, JSON.stringify({ tree: ST, caught, total: rows.length, patternErrors: rows.filter(r => r.error).length, rows }, null, 1) + '\n');
+for (const r of rows) if (!r.caught && r.exposure && !r.exposure.error) r.survivorClass = (r.exposure.inCallBypass > baseline.inCallBypass || r.exposure.renameBeforeLastCheck > 0 || r.exposure.duringWalk > 0 || r.exposure.symlinkSwapSuccess > 0) ? 'GAP_MORE_EXPOSURE' : 'NO_EXTRA_EXPOSURE_IN_MODEL';
+writeFileSync(OUT, JSON.stringify({ tree: ST, baseline, caught, total: rows.length, patternErrors: rows.filter(r => r.error).length, rows }, null, 1) + '\n');
 console.log(`caught ${caught}/${rows.length}`);

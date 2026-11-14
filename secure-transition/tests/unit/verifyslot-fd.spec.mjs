@@ -42,6 +42,16 @@ test('exhaustive interposition: no attacker mutation made during the walk yields
   // Residual, measured: the remaining in-call successes all need the mutation to land after the final check that
   // covers the mutated object (closing window); they are verify-then-use, not walk races.
   for (const s of Object.values(out.summary)) assert.equal(s.inCallBypass, s.bypassInClosingWindow);
+  // Renames, swaps and symlinks in the root change the root directory's mtime/ctime, and the root directory's check
+  // closes the final pass, so for those attacks a foreign slot only gets through if the mutation lands after the
+  // verifier's LAST inspecting call (only descriptor closes follow). A new file inside sub/ (A4) is bounded by sub/'s
+  // own directory check, which runs just before the root's (2 calls: readdir + fstat of the root remain). The in-place
+  // rewrite (A3) changes no directory and is bounded by that file's own entry re-check.
+  for (const [name, s] of Object.entries(out.summary)) {
+    if (name.startsWith('A3')) continue;
+    if (name.startsWith('A4')) assert.ok(s.bypassBeforeLastCheck <= 2, `${name}: ${JSON.stringify(s.bypassAt)}`);
+    else assert.equal(s.bypassBeforeLastCheck, 0, `${name}: ${JSON.stringify(s.bypassAt)}`);
+  }
 });
 
 test('static cases still refused: symlinked subdirectory, symlinked file, extra file, tampered bytes', (t) => {
