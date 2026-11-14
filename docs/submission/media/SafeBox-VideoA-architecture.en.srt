@@ -1,0 +1,79 @@
+1
+00:00:00,000 --> 00:00:03,100
+An AI assistant can be helpful with a payment.
+
+2
+00:00:03,100 --> 00:00:05,475
+But it should not control the money.
+
+3
+00:00:05,475 --> 00:00:07,915
+SafeBox separates the two.
+
+4
+00:00:07,915 --> 00:00:11,450
+The assistant connects through an MCP interface.
+
+5
+00:00:11,450 --> 00:00:15,160
+It can check status and prepare a payment request.
+
+6
+00:00:15,160 --> 00:00:18,970
+It cannot sign, approve, or settle through that interface.
+
+7
+00:00:18,970 --> 00:00:26,947
+The owner sees the exact recipient, amount, purpose, and expiry on their enrolled device.
+
+8
+00:00:26,947 --> 00:00:34,009
+In our Windows prototype, approval uses Windows Hello and a local fingerprint gate.
+
+9
+00:00:34,009 --> 00:00:39,225
+The Root and Vault then verify the authorization against the policy.
+
+10
+00:00:39,225 --> 00:00:45,276
+A fixed ten-minute safety buffer allows time for protective action.
+
+11
+00:00:45,276 --> 00:00:53,654
+For this demo, time moves on a simulated clock, and settlement is recorded only in a mock ledger.
+
+12
+00:00:53,654 --> 00:00:59,567
+When suspicious activity is detected, the Risk Engine raises an incident.
+
+13
+00:00:59,567 --> 00:01:07,332
+An alert appears in a mock outbox, but its link cannot freeze or approve anything.
+
+14
+00:01:07,332 --> 00:01:11,447
+The owner signs an Emergency Freeze from the console.
+
+15
+00:01:11,447 --> 00:01:14,487
+While frozen, new payments are refused.
+
+16
+00:01:14,487 --> 00:01:18,837
+Recovery requires an authorized hold release.
+
+17
+00:01:18,837 --> 00:01:25,387
+SafeBox is a research prototype, not a production security guarantee.
+
+18
+00:01:25,387 --> 00:01:31,252
+Independent signing and operating-system isolation remain unfinished.
+
+19
+00:01:31,482 --> 00:01:36,772
+The principle is simple: let AI prepare.
+
+20
+00:01:37,142 --> 00:01:39,922
+Keep authority with the owner.

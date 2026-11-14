@@ -171,8 +171,9 @@ already settled. Recovery releases the hold only through the hold's own valid pa
 | **Video A: architecture overview** | Problem, trust boundaries, Workflow A and Workflow B, labelled SIMULATED CLOCK / MOCK ALERT where applicable | 102 s |
 | **Video B: real-device demonstration** | One real run of the frozen commit `a8ce018` on the owner's Windows laptop: passkey enrollment, fingerprint-gated payment approval (MOCK ledger), 8 attack denials, Emergency Freeze, payment refused while frozen, recovery | 183 s |
 
-Links: _see the `near-hackathon-2026` release of this repository and the project's demo post on X._
-<!-- OPERATOR: replace the line above with the release asset URLs and the X post URL once they are published. -->
+Files (in this branch):
+[Video A MP4](docs/submission/media/SafeBox-VideoA-architecture.mp4) ([captions](docs/submission/media/SafeBox-VideoA-architecture.en.srt)),
+[Video B MP4](docs/submission/media/SafeBox-VideoB-real-device.mp4) ([captions](docs/submission/media/SafeBox-VideoB-real-device.en.srt)).
 
 Video integrity (verify with `ffmpeg -v error -i <file> -map 0 -c copy -f streamhash -hash sha256 -`):
 

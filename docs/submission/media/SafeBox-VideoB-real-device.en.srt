@@ -1,0 +1,84 @@
+1
+00:00:06,000 --> 00:00:25,000
+1 · Bridge page connected. Fingerprint sensor check (nothing is signed). Terminal: sensor check 1: MATCH.
+
+2
+00:00:25,000 --> 00:00:43,000
+2 · Enrollment: Windows Hello registers this laptop's passkey, then the fingerprint gate key is enrolled.
+
+3
+00:00:43,000 --> 00:00:58,000
+3 · An AI assistant prepared a 0.03 NEAR payment (MOCK ledger). The owner reads the exact request.
+
+4
+00:00:58,000 --> 00:01:12,400
+4 · Owner approves: fingerprint gate (WinBio MATCH, owner confirms), then Windows Hello.
+
+5
+00:01:12,400 --> 00:01:28,400
+5 · Approval submitted. Simulated attacks run against the SafeBox interfaces; each is refused. The 10-minute buffer runs on a simulated clock.
+
+6
+00:01:13,300 --> 00:01:15,800
+ATTACK 01 · REPLAY ATTACK: Reusing the owner's approval was rejected.
+
+7
+00:01:15,800 --> 00:01:18,300
+ATTACK 02 · PURPOSE VIOLATION: A recipient outside the approved purpose was blocked.
+
+8
+00:01:18,300 --> 00:01:20,800
+ATTACK 03 · ROGUE AI CLIENT: A valid MCP session could prepare a request, but not settle it.
+
+9
+00:01:20,800 --> 00:01:23,300
+ATTACK 04a · AMOUNT TAMPERING: Changing 0.03 to 0.06 NEAR (MOCK) invalidated authorization.
+
+10
+00:01:23,300 --> 00:01:25,800
+ATTACK 04b · RECIPIENT SUBSTITUTION: Changing the recipient invalidated authorization.
+
+11
+00:01:25,800 --> 00:01:28,200
+ATTACK 05 · STOLEN PAYMENT KEY: The key alone could not bypass owner approval.
+
+12
+00:01:28,400 --> 00:01:32,250
+Waiting for the owner.
+
+13
+00:01:32,250 --> 00:01:58,490
+6 · Owner opens the Emergency Freeze link (it only opens the console; it authorizes nothing), signs in with Windows Hello and requests FREEZE.
+
+14
+00:01:58,490 --> 00:02:11,190
+7 · Fingerprint gate for FREEZE: fresh touch, MATCH, owner confirms.
+
+15
+00:02:11,190 --> 00:02:16,590
+The terminal scrolled: log lines for attacks 06 and 07 come into view. They ran at raw 02:22 with attacks 01–05 and did not run again.
+
+16
+00:02:11,290 --> 00:02:13,890
+ATTACK 06 · ORIGIN SPOOFING: Missing or foreign origins returned HTTP 403.
+
+17
+00:02:13,890 --> 00:02:16,590
+ATTACK 07 · EMAIL LINK SCANNING: Six HTTP visits caused no unauthorized state change.
+
+18
+00:02:16,590 --> 00:02:36,494
+8 · Recovery: owner approves HOLD_RELEASE with Windows Hello and the fingerprint gate.
+
+19
+00:02:36,494 --> 00:02:44,494
+9 · Freeze results, now scrolled into view. The HOLD_RELEASE and verifier lines printed below the screen edge: see the evidence card.
+
+20
+00:02:36,794 --> 00:02:40,494
+OWNER FREEZE APPLIED: Printed at raw 03:46 when the owner froze the Vault; visible here after the terminal scrolled.
+
+21
+00:02:40,494 --> 00:02:44,294
+PAYMENT BLOCKED WHILE FROZEN: A new payment during the freeze was refused.
+
