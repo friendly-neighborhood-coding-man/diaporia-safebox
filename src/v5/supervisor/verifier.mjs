@@ -118,14 +118,22 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
   const quiet = Number(RISK_POLICY_V1.delay.incidentQuietCloseMs);
   const decOf = new Map();
   for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'ENGINE_DECISION' && !decOf.has(e.relatedId)) decOf.set(e.relatedId, e); }
-  const hidden = []; const liveInc = new Map(); // flow -> Map(incidentId -> {t0, last})
+  const hidden = []; const wrongOpen = []; const liveInc = new Map(); // flow -> Map(incidentId -> {t0, last})
   for (const [pid, at] of [...engineAt.entries()].sort((a, b) => a[1] - b[1])) {
     const f = flowOf(pid); if (!f) continue;
     const e = decOf.get(pid); const out_ = e?.outcome ?? 'NONE'; const ref = e?.data?.incidentRef ?? '-';
     const sA = stateAt(at); const incs = liveInc.get(f.flow) ?? liveInc.set(f.flow, new Map()).get(f.flow);
-    const open = [...incs.entries()].filter(([id, x]) => { const rv = sA.v5.incidentReviews[id]; return !(rv && Number(rv.at) <= at) && at < x.last + quiet - tickSlackMs; }).map(([id]) => id);
+    // E1 (closeout): an honest vault lapses an incident only on a TICK strictly after last trigger + quiet period, so up
+    // to and including last + quiet it is certainly still OPEN (no tick slack inside the lifetime). Only the short
+    // window after the boundary (until the next tick) is ambiguous: there a decision may, but need not, name it.
+    const notReviewed = (id) => { const rv = sA.v5.incidentReviews[id]; return !(rv && Number(rv.at) <= at); };
+    const open = [...incs.entries()].filter(([id, x]) => notReviewed(id) && at <= x.last + quiet).map(([id]) => id);
+    const maybeOpen = [...incs.entries()].filter(([id, x]) => notReviewed(id) && at <= x.last + quiet + tickSlackMs).map(([id]) => id);
     const reviewedLately = [...incs.keys()].some(id => { const rv = sA.v5.incidentReviews[id]; return rv && Number(rv.at) > at - tickSlackMs; });
-    if (open.length && !open.includes(ref) && !reviewedLately) {
+    // E3 (closeout): with two or more open incidents on one flow the honest vault hands the engine the MOST RECENTLY
+    // opened one; a decision naming an older open incident (to borrow a review of it, or its lower class) is flagged.
+    if (ref !== '-' && open.length && maybeOpen.includes(ref) && incs.get(ref).t0 < Math.max(...open.map(id => incs.get(id).t0))) wrongOpen.push(pid);
+    if (open.length && !maybeOpen.includes(ref) && !reviewedLately) {
       let recipient = null; try { const c = JSON.parse(evByPay.get(pid).cap); recipient = c.delegated ? c.delegated.recipientId : c.recipientId; } catch {}
       const grant = Object.values(sA.v5.rapid.grants).some(g => g.status === 'ACTIVE' && Number(g.activatedAt) <= at && at < Number(g.expiresAt) && (g.scope.credIds.includes(f.credId) || (f.delegationId && g.scope.delegationIds.includes(f.delegationId))) && g.scope.recipients.includes(recipient));
       if (!grant) hidden.push(pid);
@@ -133,6 +141,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
     if (out_ !== 'NONE') { if (ref === '-') incs.set(incidentIdFor(pid), { t0: at, last: at }); else if (incs.has(ref)) incs.get(ref).last = at; }
   }
   if (hidden.length) out.financial.violations.push({ txId: '-', paymentId: hidden[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_CONTEXT_OMITTED_OPEN_INCIDENT'] });
+  if (wrongOpen.length) out.financial.violations.push({ txId: '-', paymentId: wrongOpen[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_DECISION_ON_OLDER_OPEN_INCIDENT'] });
   const incidentOf = (pid, f, tP) => ownIncident.get(pid) ?? (flowDecisions.get(f.flow) ?? []).find(d => d.at >= tP)?.inc ?? null;
   if (badRefs.length) out.financial.violations.push({ txId: '-', paymentId: badRefs[0], recipient: '-', amountYocto: '0', codes: ['ENGINE_DECISION_ON_FOREIGN_OR_CLOSED_INCIDENT'] });
   if (unmapped.length) out.financial.violations.push({ txId: '-', paymentId: unmapped[0], recipient: '-', amountYocto: '0', codes: ['HIGH_DECISION_WITHOUT_SIGNED_EVIDENCE'] });
@@ -143,6 +152,33 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
   const engineBuffer = new Map();
   for (const r of journal?.rows ?? []) { const e = JSON.parse(r.body); if (e.layer === 'RISK' && e.type === 'BUFFER_DECISION') engineBuffer.set(e.relatedId, e.data); }
   out.horizon = { horizonMs: horizon, violations: 0 };
+  // Rapid-Use (closeout): a grant covers a payment only inside its EXACT signed scope: flow, recipient, asset, the
+  // unchanged per-payment maximum, its activation window (ACTIVE at some time between the proposal and the effect) and
+  // its session cap. The cap is checked on a running sum of the payments that actually RELIED on the grant (released
+  // early or settled HIGH because of it). The honest vault counts at least those payments against the cap, so this sum
+  // never exceeds the cap unless the vault applied the grant beyond it. Nothing here reads the vault's v5_rapid_use rows.
+  const rapidUse = new Map(); const reliedOn = new Map(); out.rapid.covered = 0;
+  const signedAsset = (pid) => { try { const c = JSON.parse(evByPay.get(pid).cap); return c.delegated ? c.delegated.asset : c.asset; } catch { return null; } };
+  const rapidCover = (sE, f, tx, pid, proposedAt) => {
+    if (!f) return null;
+    if (reliedOn.has(pid)) return reliedOn.get(pid);
+    const asset = signedAsset(pid); const amt = BigInt(tx.amount); let scopeMatch = false;
+    for (const g of Object.values(sE.v5.rapid.grants)) {
+      const inFlow = f.delegationId ? g.scope.delegationIds.includes(f.delegationId) : g.scope.credIds.includes(f.credId);
+      if (!inFlow || !g.scope.recipients.includes(tx.recipient)) continue;
+      const act = Number(g.activatedAt), end = Math.min(Number(g.expiresAt), g.endedAt !== undefined ? Number(g.endedAt) : Infinity);
+      if (!(act <= tx.submitted_at && end > proposedAt)) continue;
+      scopeMatch = true;
+      if (asset !== g.scope.asset || amt > BigInt(g.scope.perPaymentMaxYocto)) continue;
+      const used = rapidUse.get(g.grantId) ?? 0n;
+      if (g.scope.sessionCapYocto !== '-' && used + amt > BigInt(g.scope.sessionCapYocto)) continue;
+      rapidUse.set(g.grantId, used + amt); reliedOn.set(pid, g); out.rapid.covered++;
+      return g;
+    }
+    if (scopeMatch) out.rapid.violations.push({ grantId: '-', paymentId: pid, code: 'RAPID_GRANT_LIMIT_OR_ASSET_EXCEEDED' });
+    reliedOn.set(pid, null);
+    return null;
+  };
   for (const tx of [...ledgerTxs].sort((a, b) => a.seq - b.seq)) {
     out.financial.effects++;
     const v = []; let capId = null, paymentId = null;
@@ -235,7 +271,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
             const sf = flowOf(paymentId);
             const si = sf ? incidentOf(paymentId, sf, proposedAt) : null; const rv = si ? sE.v5.incidentReviews[si] : null;
             const review = rv?.verdict === 'LEGITIMATE' && rv.credId === sf.credId;
-            const grant = sf && Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(sf.credId) || (sf.delegationId && g.scope.delegationIds.includes(sf.delegationId))) && g.scope.recipients.includes(tx.recipient));
+            const grant = !review && rapidCover(sE, sf, tx, paymentId, proposedAt);
             if (!review && !grant) { v.push('DELAYED_PAYMENT_RELEASED_EARLY'); out.delays.earlyRelease.push(paymentId); }
           }
         }
@@ -252,7 +288,7 @@ export function verifyV5({ genesis, pinnedChainId, transitions, ledgerTxs = [], 
           // resolution = an owner LEGITIMATE review of THAT incident naming this credential, or a covering Rapid-Use grant
           const rv = sE.v5.incidentReviews[inc];
           const review = rv?.verdict === 'LEGITIMATE' && rv.credId === fl.credId;
-          const grant = Object.values(sE.v5.rapid.grants).find(g => Number(g.activatedAt) <= tx.submitted_at && (g.scope.credIds.includes(fl.credId) || (fl.delegationId && g.scope.delegationIds.includes(fl.delegationId))) && g.scope.recipients.includes(tx.recipient));
+          const grant = !review && rapidCover(sE, fl, tx, paymentId, proposedAt);
           if (!review && !grant) v.push('HIGH_RISK_SETTLED_WITHOUT_RESOLUTION');
         }
         const pv = purposeViolations(sE.purpose, { operation: 'PAY', recipientId: tx.recipient, asset: 'NEAR', amountYocto: tx.amount, sku: null, now: tx.submitted_at, capExpiresAt: tx.submitted_at + 1, capIssuedAt: tx.submitted_at },
