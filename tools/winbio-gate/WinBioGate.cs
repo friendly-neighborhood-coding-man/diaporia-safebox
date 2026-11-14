@@ -21,9 +21,9 @@
 // without a fingerprint (the enrollment proof-of-possession also goes through verify-sign).
 //
 // Window focus: in the system pool, the Windows Biometric Service delivers a capture only to the process whose window
-// has the foreground. A windowless console helper therefore never receives the touch. While waiting, the helper shows
-// a small top-most window ("SafeBox fingerprint gate") and activates it; if Windows refuses to move the focus, the
-// window says so, and one click on it gives it the foreground.
+// has the foreground. While waiting, the helper shows a small top-most window ("SafeBox fingerprint gate").
+// Freshness: no capture starts until the owner clicks "Start fingerprint check" in that window, and a result that
+// arrives too fast (finger already resting, or a queued capture) is discarded; see IdentifyFocused.
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -101,21 +101,51 @@ static class WinBioGate {
 
   [DllImport("user32.dll")] static extern bool SetForegroundWindow(IntPtr hWnd);
 
+  // Freshness (run 7 finding: the PAYMENT gate MATCHed ~6 s after its window opened, ~9 s after the previous Windows
+  // Hello touch, while the owner reports no touch). A capture is accepted ONLY if:
+  //   1. the owner first clicked "Start fingerprint check" in this window (a deliberate act for THIS prompt), AND
+  //   2. it began at least ArmDelayMs after that click, AND
+  //   3. WinBioIdentify took at least MinCaptureMs (a finger already resting on the sensor, or a capture queued by
+  //      the service, returns almost at once; such a result is DISCARDED and a NEW touch is required).
+  // Discarded results are counted in the output. Diagnostics carry no biometric data (time, sub-factor index only).
+  const int ArmDelayMs = 1500, MinCaptureMs = 700, MaxDiscards = 25;
+  static long LastMs = -1; static byte LastSub = 0; static uint LastReject = 0; static int Discarded = 0; static long ArmedAfterMs = -1;
+
   /** Runs WinBioIdentify on a worker thread while a top-most window of this process holds the foreground. */
   static void IdentifyFocused(IntPtr s, IntPtr ident, int timeoutS, string prompt, out int idHr, out uint unit, out bool done) {
-    int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false;
-    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 520, Height = 210, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
+    int hr = unchecked((int)0x80004004); uint u = 0; bool fin = false; bool stop = false; var shown = new System.Diagnostics.Stopwatch();
+    var form = new Form { Text = "SafeBox fingerprint gate", TopMost = true, Width = 560, Height = 280, StartPosition = FormStartPosition.CenterScreen, FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false };
     var label = new Label { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 12f),
-      Text = "Touch the fingerprint sensor now (" + timeoutS + " s).\n" + (prompt ?? "") + "\n\nIf nothing happens when you touch it, click this window once, then touch again." };
-    form.Controls.Add(label);
-    var t = new Thread(() => { uint sub2 = 0; byte sub = 0; hr = WinBioIdentify(s, out u, ident, out sub, out sub2); fin = true; });
+      Text = (prompt ?? "") + "\n\nKeep your finger OFF the sensor.\nClick \"Start fingerprint check\" to approve with your fingerprint (" + timeoutS + " s)." };
+    var btn = new Button { Text = "Start fingerprint check", Dock = DockStyle.Bottom, Height = 48, Font = new Font("Segoe UI", 12f, FontStyle.Bold) };
+    form.Controls.Add(label); form.Controls.Add(btn);
+    var t = new Thread(() => {
+      Thread.Sleep(ArmDelayMs);
+      while (!stop) {
+        uint sub2 = 0; byte sub = 0; var sw = System.Diagnostics.Stopwatch.StartNew();
+        int r = WinBioIdentify(s, out u, ident, out sub, out sub2); sw.Stop();
+        LastMs = sw.ElapsedMilliseconds; LastSub = sub; LastReject = sub2;
+        if (stop) break;
+        if (sw.ElapsedMilliseconds < MinCaptureMs) { // resting finger or queued capture: never accept it
+          if (++Discarded >= MaxDiscards) { hr = unchecked((int)0x8009FFFE); fin = true; break; }
+          Thread.Sleep(300); continue;
+        }
+        hr = r; fin = true; break;
+      }
+    });
     t.IsBackground = true;
     var deadline = DateTime.UtcNow.AddSeconds(timeoutS);
+    btn.Click += (o, e) => {
+      if (t.IsAlive || fin) return;
+      ArmedAfterMs = shown.ElapsedMilliseconds; btn.Enabled = false; btn.Text = "Checking...";
+      label.Text = (prompt ?? "") + "\n\nNow lift any finger, then TOUCH the fingerprint sensor.";
+      form.Activate(); SetForegroundWindow(form.Handle); t.Start();
+    };
     var timer = new System.Windows.Forms.Timer { Interval = 150 };
     timer.Tick += (o, e) => { if (fin || DateTime.UtcNow > deadline) { timer.Stop(); form.Close(); } else if (Form.ActiveForm != form) { label.ForeColor = Color.DarkRed; } else { label.ForeColor = Color.Black; } };
-    form.Shown += (o, e) => { form.Activate(); SetForegroundWindow(form.Handle); t.Start(); timer.Start(); };
+    form.Shown += (o, e) => { shown.Start(); form.Activate(); SetForegroundWindow(form.Handle); timer.Start(); };
     Application.Run(form);
-    if (!fin) { WinBioCancel(s); t.Join(3000); }
+    if (!fin) { stop = true; WinBioCancel(s); t.Join(3000); }
     idHr = hr; unit = u; done = fin;
   }
 
@@ -134,7 +164,9 @@ static class WinBioGate {
       uint unit; int idHr; bool done;
       Console.Error.Write("Touch the fingerprint sensor now (" + timeoutS + " s)...\n");
       IdentifyFocused(s, ident, timeoutS, prompt, out idHr, out unit, out done);
-      if (!done) return Fail("BIOMETRIC_TIMEOUT");
+      if (!done) return Fail("BIOMETRIC_TIMEOUT", 0, ArmedAfterMs < 0 ? "not started (no click)" : "no fresh touch; discarded " + Discarded);
+      Console.Error.Write("WinBioIdentify returned after " + LastMs + " ms (hr 0x" + idHr.ToString("X8") + ", subFactor " + LastSub + ", reject " + LastReject + ", discarded " + Discarded + ", armed after " + ArmedAfterMs + " ms)\n");
+      if (unchecked((uint)idHr) == 0x8009FFFE) return Fail("BIOMETRIC_STALE", 0, "finger never lifted: " + Discarded + " instant captures discarded");
       if (idHr != 0) {
         uint u = unchecked((uint)idHr);
         // winerror.h: 0x80098003 WINBIO_E_UNKNOWN_ID, 0x80098004 WINBIO_E_CANCELED, 0x80098005 WINBIO_E_NO_MATCH,
@@ -153,10 +185,11 @@ static class WinBioGate {
       var sid = new byte[sidSize]; Marshal.Copy(IntPtr.Add(ident, 8), sid, 0, sidSize);
       var me = WindowsIdentity.GetCurrent().User; var mine = new byte[me.BinaryLength]; me.GetBinaryForm(mine, 0);
       if (Hex(sid) != Hex(mine)) return Fail("BIOMETRIC_NO_MATCH", 0, "different Windows account");
-      if (!sign) return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + "}");
+      string diag = ",\"elapsedMs\":" + LastMs + ",\"subFactor\":" + LastSub + ",\"discarded\":" + Discarded + ",\"armedAfterMs\":" + ArmedAfterMs;
+      if (!sign) return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + diag + "}");
       string kind; var k = OpenOrCreate(name, out kind);
       byte[] sig; using (var e = new ECDsaCng(k)) sig = e.SignHash(hash); // IEEE-P1363 r||s
-      return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + ",\"kind\":" + Q(kind) + ",\"sig\":" + Q(Hex(sig)) + "}");
+      return Out("{\"ok\":true,\"result\":\"MATCH\",\"unit\":" + unit + ",\"kind\":" + Q(kind) + ",\"sig\":" + Q(Hex(sig)) + diag + "}");
     } finally { Marshal.FreeHGlobal(ident); WinBioCloseSession(s); }
   }
 }

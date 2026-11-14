@@ -59,7 +59,7 @@ ev('OK', 'bridge page connected');
 // ------------------------------------------------------------------ fingerprint gate
 const helper = opt('--helper');
 let gates = {}, fpOnly = [], gateProbe = null, sensorCheck = [], wbg = null;
-const TOUCH = (p) => `TOUCH THE FINGERPRINT SENSOR NOW (${p}). A small "SafeBox fingerprint gate" window opens: if touching does nothing, click that window once and touch again.`;
+const TOUCH = (p) => `SAFEBOX FINGERPRINT GATE (${p}): in the small "SafeBox fingerprint gate" window, click "Start fingerprint check", then touch the sensor. Nothing is approved without that click and a fresh touch.`;
 if (helper) {
   const g = wbg = new WinBioGate({ credId: 'k2-laptop', exe: helper.endsWith('.mjs') ? [process.execPath, resolve(helper)] : resolve(helper), timeoutS: Number(opt('--touch-timeout', '60')),
     onPrompt: (p) => { ev('TOUCH', `Touch the fingerprint sensor now (${p})`); bridge.notice(TOUCH(p)); }, onDone: () => bridge.notice(null) });
