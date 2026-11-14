@@ -1,0 +1,20 @@
+{
+  "name": "safebox-secure-transition",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SSTP V0: experimental trust-minimized offline update protocol for SafeBox (MOCK only).",
+  "engines": { "node": ">=22.22.2" },
+  "scripts": {
+    "test": "node --test tests/unit/*.spec.mjs",
+    "test:os": "node --test --test-concurrency=1 tests/os/*.spec.mjs",
+    "campaign": "node scripts/campaign.mjs",
+    "demo": "node scripts/demo-offline-transition.mjs",
+    "mutations": "node scripts/mutations.mjs"
+  },
+  "dependencies": {
+    "tuf-js": "6.0.2",
+    "@tufjs/models": "5.0.2",
+    "@tufjs/canonical-json": "2.0.0"
+  }
+}
