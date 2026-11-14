@@ -19,6 +19,7 @@ import { BrowserBridge, RealAuthenticator } from '../../src/v6/device/browser-br
 import { WinBioGate } from '../../src/v6/device/winbio-gate.mjs';
 import { consoleForWorld, emergencyReason } from '../../src/v6/emergency/console.mjs';
 import { verifyWorld6 } from '../../src/v6/supervisor/verifier.mjs';
+import { commandDigest } from '../../src/v5/root/command.mjs';
 import { GmailTransport, loadGmailCredentials } from '../../src/v6/notify/gmail.mjs';
 import { MockTransport } from '../../src/v5/notify/notify.mjs';
 
@@ -49,7 +50,8 @@ if (flag('--record')) {
 let consoleObj = null;
 const bridge = new BrowserBridge({ port: PORT, origin: ORIGIN, handler: async (req) => consoleObj ? consoleObj.handle(req) : { status: 503, headers: { 'content-type': 'text/plain' }, body: 'SafeBox is starting' } });
 await bridge.ready();
-ev('STEP', `Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
+console.log(`STEP   Open ${bridge.url()} in Microsoft Edge on THIS laptop and keep that tab open (copy the whole link, including the part after #).`);
+events.push({ at: new Date().toISOString(), kind: 'STEP', text: `Open ${ORIGIN}/bridge#t=<per-run secret, redacted> in Microsoft Edge` }); // the secret never reaches the evidence
 for (let i = 0; ; i++) { if (Date.now() - (await bridge.lastPoll()) < 3000) break; if (i > 1200) { ev('FAIL', 'bridge page never opened (10 min)'); process.exit(4); } await sleep(500); }
 ev('OK', 'bridge page connected');
 
@@ -58,7 +60,7 @@ const helper = opt('--helper');
 let gates = {}, fpOnly = [], gateProbe = null, sensorCheck = [], wbg = null;
 const TOUCH = (p) => `TOUCH THE FINGERPRINT SENSOR NOW (${p}). A small "SafeBox fingerprint gate" window opens: if touching does nothing, click that window once and touch again.`;
 if (helper) {
-  const g = wbg = new WinBioGate({ credId: 'k2-laptop', exe: resolve(helper), timeoutS: Number(opt('--touch-timeout', '60')),
+  const g = wbg = new WinBioGate({ credId: 'k2-laptop', exe: helper.endsWith('.mjs') ? [process.execPath, resolve(helper)] : resolve(helper), timeoutS: Number(opt('--touch-timeout', '60')),
     onPrompt: (p) => { ev('TOUCH', `Touch the fingerprint sensor now (${p})`); bridge.notice(TOUCH(p)); }, onDone: () => bridge.notice(null) });
   try { gateProbe = g.probe(); } catch (e) { gateProbe = { ok: false, code: e.code }; }
   ev(gateProbe.ok ? 'OK' : 'INFO', 'WinBio probe: ' + JSON.stringify(gateProbe));
@@ -120,6 +122,11 @@ const gateSrv = createServer((req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204, cors); return res.end(); }
   let b = ''; req.on('data', (d) => { b += d; }); req.on('end', () => {
     try { const q = JSON.parse(b); const g = w.gates[q.credId]; if (!g) throw Object.assign(new Error('no gate'), { code: 'FINGERPRINT_ONLY_UNSUPPORTED' });
+      // review: Origin can be forged by a local process, so the gate signs ONLY a digest the console itself prepared
+      // and still holds as PREPARED (an exact FREEZE proposal or an open command bundle) - never an arbitrary digest
+      const prepared = new Set([...[...consoleObj.proposals.values()].filter((x) => x.state === 'PREPARED').map((x) => commandDigest(x.command).toString('hex')),
+        ...[...consoleObj.bundles.values()].filter((x) => x.state === 'OPEN').flatMap((x) => [...x.challenges.values()].map((c) => c.command ? commandDigest(c.command).toString('hex') : null))]);
+      if (q.subject !== 'COMMAND' || !prepared.has(q.boundDigestHex)) throw Object.assign(new Error('not prepared'), { code: 'GATE_DIGEST_NOT_PREPARED_BY_CONSOLE' });
       const gate = g.attest({ accountId: q.accountId, chainId: q.chainId, subject: q.subject, boundDigestHex: q.boundDigestHex, challengeNonce: q.challengeNonce, at: w.now() });
       ev('OK', 'REAL fingerprint gate MATCH for the console command'); res.writeHead(200, cors); res.end(JSON.stringify({ ok: true, gate })); }
     catch (e) { ev('DENY', 'fingerprint gate: ' + (e.code ?? e.message)); res.writeHead(200, cors); res.end(JSON.stringify({ ok: false, code: e.code ?? 'GATE_ERROR' })); }
@@ -177,6 +184,7 @@ const gateLog = wbg?.log ?? [];
 const gatedApprovals = gateLog.filter((x) => x.purpose !== 'SENSOR_CHECK' && x.purpose !== 'ENROLL_GATE_KEY');
 const labels = ['MOCK LEDGER', 'REAL DEVICE AUTH (Windows Hello WebAuthn)', 'PIN FALLBACK POSSIBLE (WebAuthn UV cannot tell fingerprint from PIN)'];
 if (fpOnly.length && gatedApprovals.length && gatedApprovals.every((x) => x.ok) && results.workflowA?.settledVerified && results.workflowB?.frozen) labels.push('FINGERPRINT_ONLY_LOCALLY_VERIFIED (WinBio gate MATCH; not hardware attestation)'); else labels.push('FINGERPRINT ONLY NOT PROVEN');
+if (helper && helper.endsWith('.mjs')) labels.unshift('EMULATED FINGERPRINT HELPER (test fixture: no sensor, no real fingerprint; selftest only)');
 labels.push(results.alert?.api === 'GMAIL_API_ACCEPTED' ? 'REAL GMAIL (API accepted; inbox receipt NOT verified until the owner confirms)' : 'REAL GMAIL: NOT RUN');
 const summary = { runner: 'scripts/v6/real-device.mjs', startedAt: stamp, labels, gateProbe, sensorCheck, gateEnrollment, gateLog, refusedSyncablePasskeys: [...realAuth.refused, ...(activeAuth !== realAuth ? activeAuth.refused : [])], webauthnCeremonies: [...realAuth.ceremonies, ...(activeAuth !== realAuth ? activeAuth.ceremonies : [])], results,
   ownerReportedModalities: 'ASK THE OWNER: WebAuthn cannot tell which Windows Hello modality was used',
